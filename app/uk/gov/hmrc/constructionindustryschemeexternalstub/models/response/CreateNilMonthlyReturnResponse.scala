@@ -14,18 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.constructionindustryschemeexternalstub
+package uk.gov.hmrc.constructionindustryschemeexternalstub.models.response
 
-import play.api.{Configuration, Environment}
-import play.api.inject.{Binding, Module as AppModule}
-import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.{AuthAction, DefaultAuthAction}
+import play.api.libs.json.{Json, OFormat}
 
-class Module extends AppModule:
+final case class CreateNilMonthlyReturnResponse(
+  status: String
+)
 
-  override def bindings(
-    environment: Environment,
-    configuration: Configuration
-  ): Seq[Binding[_]] =
-    List(
-      bind[AuthAction].to(classOf[DefaultAuthAction])
-    )
+object CreateNilMonthlyReturnResponse {
+  implicit val format: OFormat[CreateNilMonthlyReturnResponse] = Json.format[CreateNilMonthlyReturnResponse]
+}

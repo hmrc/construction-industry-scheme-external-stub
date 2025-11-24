@@ -14,18 +14,22 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.constructionindustryschemeexternalstub
+package uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests
 
-import play.api.{Configuration, Environment}
-import play.api.inject.{Binding, Module as AppModule}
-import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.{AuthAction, DefaultAuthAction}
+import play.api.libs.json.{Json, OFormat}
 
-class Module extends AppModule:
+case class CreateSubmissionRequest(
+  instanceId: String,
+  taxYear: Int,
+  taxMonth: Int,
+  hmrcMarkGenerated: Option[String] = None,
+  emailRecipient: Option[String] = None,
+  agentId: Option[String] = None,
+  subcontractorCount: Option[Int] = None,
+  totalPaymentsMade: Option[BigDecimal] = None,
+  totalTaxDeducted: Option[BigDecimal] = None
+)
 
-  override def bindings(
-    environment: Environment,
-    configuration: Configuration
-  ): Seq[Binding[_]] =
-    List(
-      bind[AuthAction].to(classOf[DefaultAuthAction])
-    )
+object CreateSubmissionRequest {
+  implicit val format: OFormat[CreateSubmissionRequest] = Json.format[CreateSubmissionRequest]
+}

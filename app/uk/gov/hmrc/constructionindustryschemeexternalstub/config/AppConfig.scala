@@ -22,4 +22,18 @@ import play.api.Configuration
 @Singleton
 class AppConfig @Inject() (config: Configuration):
 
+  private lazy val callback: String = config.get[String]("stub.polling.callback")
+
+  def responseUrl(service: String): String = callback + config.get[String](s"stub.$service.response")
+  def pollUrl(service: String): String = callback + config.get[String](s"stub.$service.poll")
+  def pollingStatus(taxNumber: String): String = config.getOptional[String](s"stub.endpoint.submission.cis.polling.statusMap.$taxNumber")
+    .getOrElse("SUBMITTED")
+
   val appName: String = config.get[String]("appName")
+
+  lazy val acknowledgeFilter: Seq[String] = config.get[Seq[String]]("stub.endpoint.submission.cis.filing.acknowledgeFilter")
+  lazy val businessErrorFilter: Seq[String] = config.get[Seq[String]]("stub.endpoint.submission.cis.filing.businessErrorFilter")
+  lazy val fatalErrorFilter: Seq[String] = config.get[Seq[String]]("stub.endpoint.submission.cis.filing.fatalErrorFilter")
+  lazy val perfMode: Boolean = config.get[Boolean]("perfMode")
+  lazy val pollInterval: String = if (perfMode) "0" else "2"
+

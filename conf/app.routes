@@ -1,3 +1,28 @@
 # microservice specific routes
 
-GET        /hello-world             uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.MicroserviceHelloWorldController.hello
+# stubbed formp-proxy routes
+POST       /monthly-returns                                         uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.retrieveMonthlyReturns
+POST       /monthly-return/nil/create                               uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.createNilMonthlyReturn
+POST       /scheme/email                                            uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.getSchemeEmail
+POST       /submissions/create                                      uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubmissionController.createSubmission()
+POST       /submissions/update                                      uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubmissionController.updateSubmission()
+
+# stubbed rds-datacache-proxy routes
+POST       /cis-taxpayer                                            uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.rdsDataCacheProxy.CisTaxpayerController.getCisTaxpayerByTaxReference
+GET        /cis/client-list-status                                  uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.rdsDataCacheProxy.ClientController.getClientListDownloadStatus(credentialId: String, serviceName: String, gracePeriod: Int = 14400)
+
+# stubbed client-exchange-proxy routes
+GET        /:serviceId/:credentialId/:agentId/clientlist            uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.clientExchangeProxy.ClientlistController.updateClientList(serviceId, credentialId, agentId)
+
+# stubbed iass routes
+#GET        /:service/:credential/:agentId/clientlist                uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.iass.StubController.clientlist(service: String, credential: String, agentId: String)
+
+# stubbed chris routes
+POST       /submission/ChRIS/CISR/Filing/sync/CIS300MR              uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.chris.ChrisController.submitCISMessage()
+POST       /submission/ChRIS/CISR/Filing/sync/CISVERIFY             uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.chris.ChrisController.submitCISVerifyMessage()
+POST       /submission/ChRIS/IR-CIS-CIS300MR/Filing/data/:error     uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.chris.ChrisController.getCISResponse(error: Boolean)
+POST       /submission/ChRIS/poll/:service/:count/:error            uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.chris.ChrisController.pollMessage(service: String, count: Int, error: Boolean)
+
+
+
+

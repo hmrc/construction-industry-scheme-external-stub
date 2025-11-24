@@ -14,19 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.constructionindustryschemeexternalstub.controllers
+package uk.gov.hmrc.constructionindustryschemeexternalstub.models
 
-import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+import play.api.libs.json.{Json, OFormat}
 
-import javax.inject.{Inject, Singleton}
+case class EmployerReference(taxOfficeNumber: String, taxOfficeReference: String)
 
-@Singleton()
-class MicroserviceHelloWorldController @Inject()(
-  cc: ControllerComponents
-) extends BackendController(cc):
-
-  val hello: Action[AnyContent] =
-    Action:
-      implicit request =>
-        Ok("Hello world")
+object EmployerReference {
+  implicit val format: OFormat[EmployerReference] = Json.format[EmployerReference]
+}

@@ -1,3 +1,6 @@
 # Add all the application routes to the app.routes file
-->         /construction-industry-scheme-external-stub              app.Routes
-->         /                          health.Routes
+->         /formp-proxy              app.Routes
+->         /rds-datacache-proxy      app.Routes
+->         /client-exchange-proxy    app.Routes
+->         /clientlistexchange       app.Routes
+->         /                         health.Routes

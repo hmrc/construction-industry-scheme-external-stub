@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,11 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.constructionindustryschemeexternalstub
+package uk.gov.hmrc.constructionindustryschemeexternalstub.models
 
-import play.api.{Configuration, Environment}
-import play.api.inject.{Binding, Module as AppModule}
-import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.{AuthAction, DefaultAuthAction}
+sealed trait ChRISResponseType
 
-class Module extends AppModule:
-
-  override def bindings(
-    environment: Environment,
-    configuration: Configuration
-  ): Seq[Binding[_]] =
-    List(
-      bind[AuthAction].to(classOf[DefaultAuthAction])
-    )
+case object ACKNOWLEDGE extends ChRISResponseType
+case object FATAL_ERROR extends ChRISResponseType
+case object BUSINESS_ERROR extends ChRISResponseType
+case object SUCCESS extends ChRISResponseType

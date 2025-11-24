@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.constructionindustryschemeexternalstub
+package uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests
 
-import play.api.{Configuration, Environment}
-import play.api.inject.{Binding, Module as AppModule}
-import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.{AuthAction, DefaultAuthAction}
+import play.api.mvc.{Request, WrappedRequest}
+import uk.gov.hmrc.auth.core.Enrolments
+import uk.gov.hmrc.http.SessionId
 
-class Module extends AppModule:
-
-  override def bindings(
-    environment: Environment,
-    configuration: Configuration
-  ): Seq[Binding[_]] =
-    List(
-      bind[AuthAction].to(classOf[DefaultAuthAction])
-    )
+case class AuthenticatedRequest[A](
+  private val request: Request[A],
+  internalId: String,
+  credentialId: String,
+  sessionId: SessionId,
+  enrolments: Enrolments
+) extends WrappedRequest[A](request)

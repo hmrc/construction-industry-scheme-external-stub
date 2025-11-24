@@ -1,0 +1,17 @@
+{
+  "uniqueId" : "1",
+  "taxOfficeNumber" : "123",
+  "taxOfficeRef" : "AB456",
+  "aoDistrict" : "123",
+  "aoPayType" : "M",
+  "aoCheckCode" : "XY",
+  "aoReference" : "1234567XY",
+  "validBusinessAddr" : "Y",
+  "correlation" : "corr-abc",
+  "ggAgentId" : "AGENT-001",
+  "employerName1" : "TEST LTD",
+  "agentOwnRef" : "AG-REF-001",
+  "schemeName" : "CIS Scheme",
+  "utr" : "1234567890",
+  "enrolledSig" : "Y"
+}

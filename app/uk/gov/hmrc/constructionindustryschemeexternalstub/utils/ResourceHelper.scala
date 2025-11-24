@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.constructionindustryschemeexternalstub
+package uk.gov.hmrc.constructionindustryschemeexternalstub.utils
 
-import play.api.{Configuration, Environment}
-import play.api.inject.{Binding, Module as AppModule}
-import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.{AuthAction, DefaultAuthAction}
+import play.api.Environment
 
-class Module extends AppModule:
+import javax.inject.Inject
+import scala.io.Source
 
-  override def bindings(
-    environment: Environment,
-    configuration: Configuration
-  ): Seq[Binding[_]] =
-    List(
-      bind[AuthAction].to(classOf[DefaultAuthAction])
-    )
+class ResourceHelper @Inject()(environment: Environment) {
+
+  def resourceAsString(resourcePath: String): String = {
+    val path = environment.resourceAsStream(resourcePath).get
+    Source.fromInputStream(path).getLines().mkString("\n")
+  }
+
+}

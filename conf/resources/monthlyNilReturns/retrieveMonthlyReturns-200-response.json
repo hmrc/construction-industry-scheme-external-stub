@@ -1,0 +1,46 @@
+{
+  "monthlyReturnList": [
+    {
+      "monthlyReturnId": 1000001,
+      "taxYear": 2025,
+      "taxMonth": 1,
+      "nilReturnIndicator": "N",
+      "decEmpStatusConsidered": "Y",
+      "decAllSubsVerified": "N",
+      "decInformationCorrect": "N",
+      "decNoMoreSubPayments": "Y",
+      "decNilReturnNoPayments": "N",
+      "status": "SUBMITTED",
+      "lastUpdate": "2025-07-23T00:00:00",
+      "amendment": "N"
+    },
+    {
+      "monthlyReturnId": 1000002,
+      "taxYear": 2025,
+      "taxMonth": 2,
+      "nilReturnIndicator": "N",
+      "decEmpStatusConsidered": "Y",
+      "decAllSubsVerified": "N",
+      "decInformationCorrect": "N",
+      "decNoMoreSubPayments": "Y",
+      "decNilReturnNoPayments": "Y",
+      "status": "SUBMITTED",
+      "lastUpdate": "2025-07-19T00:00:00",
+      "amendment": "N"
+    },
+    {
+      "monthlyReturnId": 1000003,
+      "taxYear": 2025,
+      "taxMonth": 3,
+      "nilReturnIndicator": "Y",
+      "decEmpStatusConsidered": "N",
+      "decAllSubsVerified": "Y",
+      "decInformationCorrect": "Y",
+      "decNoMoreSubPayments": "Y",
+      "decNilReturnNoPayments": "N",
+      "status": "STARTED",
+      "lastUpdate": "2025-08-03T00:00:00",
+      "amendment": "Y"
+    }
+  ]
+}

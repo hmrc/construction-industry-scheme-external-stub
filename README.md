@@ -36,11 +36,19 @@ sbt clean coverage test it/test coverageReport
 **Description**: Returns the taxpayer (contractor) details for the given employer reference (tax office number and tax office reference).
 
 #### Happy Path
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 200
+- Identifier Name: TaxOfficeReference
+- Identifier Value: AB123456
+
 To trigger the happy path, ensure you provide a valid request body:
 ```json
 {
-  "taxOfficeNumber": "123",
-  "taxOfficeReference": "AB456"
+  "taxOfficeNumber": "200",
+  "taxOfficeReference": "AB123456"
 }
 ```
 - Response status: `200`
@@ -49,7 +57,7 @@ To trigger the happy path, ensure you provide a valid request body:
 {
   "uniqueId" : "1",
   "taxOfficeNumber" : "123",
-  "taxOfficeRef" : "AB456",
+  "taxOfficeRef" : "AB123456",
   "aoDistrict" : "123",
   "aoPayType" : "M",
   "aoCheckCode" : "XY",
@@ -64,36 +72,134 @@ To trigger the happy path, ensure you provide a valid request body:
   "enrolledSig" : "Y"
 }
 ```
-#### Unhappy Path
-To trigger the unhappy paths, ensure you provide a valid request body.
 
-The below error responses can be expected:
+**Endpoint**: `GET /cis/client-list-status?credentialId=$credentialId&serviceName=$serviceName&gracePeriod=$gracePeriodSeconds`
 
-###### HTTP 500 Internal Server Error
-```json
-{
-  "taxOfficeNumber": "500",
-  "taxOfficeReference": "TAXPAY" // TODO
-}
-```
+**Description**: Returns the status of the client list download process.
 
-- Response status: `500`
+#### Happy Path
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 200
+- Identifier Name: TaxOfficeReference
+- Identifier Value: AB123456
+
+
+- Request body: N/A
+
+
+- Response status: `200`
 - Response body:
 ```json
 {
-  "errorDetail": {
-    "timestamp": "2025-11-23T18:15:41Z",
-    "correlationId": "c182e731-2386-4359-8ee6-f911d6e5f4bc",
-    "errorCode": "500",
-    "errorMessage": "Unexpected error",
-    "source": "Internal Server error"
-  }
+  "status": "Succeeded"
 }
 ```
 
-
 ### FormP Proxy
 
+**Endpoint**: `POST /monthly-returns `
+
+**Description**: Returns the full list of Monthly Returns for the given scheme.
+
+#### Happy Path
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 200
+- Identifier Name: TaxOfficeReference
+- Identifier Value: AB123456
+
+To trigger the happy path, ensure you provide a valid request body:
+```json
+{
+  "instanceId": "1"
+}
+```
+- Response status: `200`
+- Response body:
+```json
+{
+  "monthlyReturnList": [
+    {
+      "monthlyReturnId": 1000001,
+      "taxYear": 2025,
+      "taxMonth": 1,
+      "nilReturnIndicator": "N",
+      "decEmpStatusConsidered": "Y",
+      "decAllSubsVerified": "N",
+      "decInformationCorrect": "N",
+      "decNoMoreSubPayments": "Y",
+      "decNilReturnNoPayments": "N",
+      "status": "SUBMITTED",
+      "lastUpdate": "2025-07-23T00:00:00",
+      "amendment": "N"
+    },
+    {
+      "monthlyReturnId": 1000002,
+      "taxYear": 2025,
+      "taxMonth": 2,
+      "nilReturnIndicator": "N",
+      "decEmpStatusConsidered": "Y",
+      "decAllSubsVerified": "N",
+      "decInformationCorrect": "N",
+      "decNoMoreSubPayments": "Y",
+      "decNilReturnNoPayments": "Y",
+      "status": "SUBMITTED",
+      "lastUpdate": "2025-07-19T00:00:00",
+      "amendment": "N"
+    },
+    {
+      "monthlyReturnId": 1000003,
+      "taxYear": 2025,
+      "taxMonth": 3,
+      "nilReturnIndicator": "Y",
+      "decEmpStatusConsidered": "N",
+      "decAllSubsVerified": "Y",
+      "decInformationCorrect": "Y",
+      "decNoMoreSubPayments": "Y",
+      "decNilReturnNoPayments": "N",
+      "status": "STARTED",
+      "lastUpdate": "2025-08-03T00:00:00",
+      "amendment": "Y"
+    }
+  ]
+}
+```
+
+**Endpoint**: `POST /monthly-return/nil/create`
+
+**Description**: Creates a monthly return record in the monthly return table.
+
+#### Happy Path
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 200
+- Identifier Name: TaxOfficeReference
+- Identifier Value: AB123456
+
+To trigger the happy path, ensure you provide a valid request body:
+```json
+{
+  "instanceId":  "1",
+  "taxYear": 2025,
+  "taxMonth": 11,
+  "decInformationCorrect": "true",
+  "decNilReturnNoPayments": "true"
+}
+```
+- Response status: `200`
+- Response body:
+```json
+{
+  "status": ??? 
+}
+```
 
 ### IASS 
 

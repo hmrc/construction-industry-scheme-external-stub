@@ -201,7 +201,98 @@ To trigger the happy path, ensure you provide a valid request body:
 }
 ```
 
-### IASS 
+**Endpoint**: `POST /scheme/email`
+
+**Description**: Return a scheme email from the scheme table.
+
+#### Happy Path
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 200
+- Identifier Name: TaxOfficeReference
+- Identifier Value: AB123456
+
+To trigger the happy path, ensure you provide a valid request body:
+
+```json
+{
+  "instanceId": "1"
+}
+```
+- Response status: `200`
+- Response body:
+```json
+{
+  "email": "test@test.com" 
+}
+```
+
+**Endpoint**: `POST /submissions/create`
+
+**Description**: Creates a new submission record in the submission table.
+
+#### Happy Path
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 200
+- Identifier Name: TaxOfficeReference
+- Identifier Value: AB123456
+
+To trigger the happy path, ensure you provide a valid request body:
+```json
+{
+  "instanceId":  "1",
+  "taxYear": 2025,
+  "taxMonth": 11,
+  "emailRecipient": "test@test.com"
+}
+```
+- Response status: `200`
+- Response body:
+```json
+{
+  "submissionId": "90001" 
+}
+```
+
+**Endpoint**: `POST /submissions/update`
+
+**Description**: Updates the submission record in the submission table.
+
+#### Happy Path
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 200
+- Identifier Name: TaxOfficeReference
+- Identifier Value: AB123456
+
+To trigger the happy path, ensure you provide a valid request body:
+```json
+{
+  "instanceId":  "1",
+  "taxYear": 2025,
+  "taxMonth": 11,
+  "hmrcMarkGenerated": "Dj5TVJDyRYCn9zta5EdySeY4fyA=",
+  "submittableStatus": "ACCEPTED"
+}
+```
+- Response status: `200`
+- Response body: N/A
+
+
+### ChRIS
+
+
+### Iass 
+
+
+### Client Exchange Proxy
 
 ---
 

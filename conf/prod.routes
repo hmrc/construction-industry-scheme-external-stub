@@ -3,4 +3,5 @@
 ->         /rds-datacache-proxy      app.Routes
 ->         /client-exchange-proxy    app.Routes
 ->         /clientlistexchange       app.Routes
+->         /                         app.Routes
 ->         /                         health.Routes

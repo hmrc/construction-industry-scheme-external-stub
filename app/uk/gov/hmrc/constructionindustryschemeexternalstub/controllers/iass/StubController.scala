@@ -34,7 +34,6 @@ class StubController @Inject()(val authConnector: AuthConnector,
 
 
   def clientlist(service: String, credential: String, ignored: String): Action[JsValue] = authorise(parse.json) { implicit request =>
-    println("************************************ clientlist ***********************************************")
     val identifier = enrolmentHelper.agentEnrolmentsOpt(request)
     identifier match {
       case Some(agentReference) => agentReference match {

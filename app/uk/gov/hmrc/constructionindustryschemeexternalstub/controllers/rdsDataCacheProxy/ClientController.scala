@@ -40,21 +40,21 @@ class ClientController @Inject() (
     serviceName: String,
     gracePeriod: Int = 14400
   ): Action[AnyContent] = authorise { implicit request =>
-
     if (serviceName.trim().isEmpty || credentialId.trim().isEmpty) {
       BadRequest(Json.obj("error" -> "credentialId and serviceName must be provided"))
     } else {
       val identifier = enrolmentHelper.agentEnrolmentsOpt(request)
       identifier match {
-        case Some(agentReference) => agentReference match {
-          case "400" => BadRequest(Json.obj("error" -> "credentialId and serviceName must be provided"))
-          case "500" => InternalServerError(Json.obj("error" -> "Could not map client list download status"))
-          case "InDown" => Ok(Json.obj("status" -> InitiateDownload.toString))
-          case "InProg" => Ok(Json.obj("status" -> InProgress.toString))
-          case "Succes" => Ok(Json.obj("status" -> Succeeded.toString))
-          case "Failed" => Ok(Json.obj("status" -> Failed.toString))
-        }
-        case None => InternalServerError
+        case Some(agentReference) =>
+          agentReference match {
+            case "400"    => BadRequest(Json.obj("error" -> "credentialId and serviceName must be provided"))
+            case "500"    => InternalServerError(Json.obj("error" -> "Could not map client list download status"))
+            case "InDown" => Ok(Json.obj("status" -> InitiateDownload.toString))
+            case "InProg" => Ok(Json.obj("status" -> InProgress.toString))
+            case "Succes" => Ok(Json.obj("status" -> Succeeded.toString))
+            case "Failed" => Ok(Json.obj("status" -> Failed.toString))
+          }
+        case None                 => InternalServerError
       }
     }
   }

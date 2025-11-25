@@ -18,8 +18,7 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub.models
 
 import scala.xml.NodeSeq
 
-/**
-  * Created by volkan on 03/06/2016.
+/** Created by volkan on 03/06/2016.
   */
 trait ChrisResponse {
 

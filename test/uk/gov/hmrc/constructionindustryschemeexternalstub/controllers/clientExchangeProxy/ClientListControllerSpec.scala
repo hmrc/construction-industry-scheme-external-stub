@@ -39,7 +39,8 @@ class ClientListControllerSpec extends SpecBase with MockitoSugar {
         .thenReturn(Some("200"))
 
       val req: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, "/serviceId/credentialId/agentId/clientlist")
-      val res: Future[Result] = controller.updateClientList(serviceId = "serviceId", credentialId = "credentialId", agentId = "agentId")(req)
+      val res: Future[Result]                      =
+        controller.updateClientList(serviceId = "serviceId", credentialId = "credentialId", agentId = "agentId")(req)
 
       status(res) mustBe OK
     }
@@ -50,7 +51,8 @@ class ClientListControllerSpec extends SpecBase with MockitoSugar {
         .thenReturn(Some("400"))
 
       val req: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, "/serviceId/credentialId/agentId/clientlist")
-      val res: Future[Result] = controller.updateClientList(serviceId = "serviceId", credentialId = "credentialId", agentId = "agentId")(req)
+      val res: Future[Result]                      =
+        controller.updateClientList(serviceId = "serviceId", credentialId = "credentialId", agentId = "agentId")(req)
 
       status(res) mustBe BAD_REQUEST
       contentType(res) mustBe Some(JSON)
@@ -63,7 +65,8 @@ class ClientListControllerSpec extends SpecBase with MockitoSugar {
         .thenReturn(Some("500"))
 
       val req: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, "/serviceId/credentialId/agentId/clientlist")
-      val res: Future[Result] = controller.updateClientList(serviceId = "serviceId", credentialId = "credentialId", agentId = "agentId")(req)
+      val res: Future[Result]                      =
+        controller.updateClientList(serviceId = "serviceId", credentialId = "credentialId", agentId = "agentId")(req)
 
       status(res) mustBe INTERNAL_SERVER_ERROR
       contentType(res) mustBe Some(JSON)
@@ -76,7 +79,8 @@ class ClientListControllerSpec extends SpecBase with MockitoSugar {
         .thenReturn(None)
 
       val req: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, "/serviceId/credentialId/agentId/clientlist")
-      val res: Future[Result] = controller.updateClientList(serviceId = "serviceId", credentialId = "credentialId", agentId = "agentId")(req)
+      val res: Future[Result]                      =
+        controller.updateClientList(serviceId = "serviceId", credentialId = "credentialId", agentId = "agentId")(req)
 
       status(res) mustBe INTERNAL_SERVER_ERROR
       contentType(res) mustBe Some(JSON)
@@ -87,6 +91,6 @@ class ClientListControllerSpec extends SpecBase with MockitoSugar {
 
   private trait Setup {
     val mockEnrolmentsHelper: EnrolmentsHelper = mock[EnrolmentsHelper]
-    val controller = new ClientlistController(fakeAuthAction, mockEnrolmentsHelper, cc)()
+    val controller                             = new ClientlistController(fakeAuthAction, mockEnrolmentsHelper, cc)()
   }
 }

@@ -28,21 +28,21 @@ class ResourceHelperSpec extends AnyWordSpec with Matchers with MockitoSugar {
   ".resourceAsString" should {
 
     "return the contents of the resource as a string" in {
-      val mockEnv = mock[Environment]
+      val mockEnv      = mock[Environment]
       val resourceText =
         """line1
           |line2
           |line3""".stripMargin
-      val stream = new ByteArrayInputStream(resourceText.getBytes())
+      val stream       = new ByteArrayInputStream(resourceText.getBytes())
       when(mockEnv.resourceAsStream("/test/resource.json")).thenReturn(Some(stream))
-      val helper = new ResourceHelper(mockEnv)
+      val helper       = new ResourceHelper(mockEnv)
       helper.resourceAsString("/test/resource.json") mustBe resourceText
     }
 
     "throw an exception when resource does not exist" in {
       val mockEnv = mock[Environment]
       when(mockEnv.resourceAsStream("missing.json")).thenReturn(None)
-      val helper = new ResourceHelper(mockEnv)
+      val helper  = new ResourceHelper(mockEnv)
       assertThrows[NoSuchElementException] {
         helper.resourceAsString("missing.json")
       }

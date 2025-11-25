@@ -46,7 +46,7 @@ class DefaultAuthAction @Inject() (
       .retrieve(Retrievals.internalId and Retrievals.credentials and Retrievals.allEnrolments) {
         case Some(internalId) ~ Some(credentials) ~ enrolments =>
           block(AuthenticatedRequest(request, internalId, credentials.providerId, sessionId, enrolments))
-        case _                                    =>
+        case _                                                 =>
           throw new UnauthorizedException("Unable to retrieve credential or internal Id")
       }
       .recover { case ae: AuthorisationException =>

@@ -26,30 +26,32 @@ import javax.inject.{Inject, Singleton}
 import scala.xml.Elem
 
 @Singleton()
-class ClientlistController @Inject()(
-    authorise: AuthAction,
-    enrolmentHelper: EnrolmentsHelper,
-    cc: ControllerComponents)()
-  extends BackendController(cc) {
+class ClientlistController @Inject() (
+  authorise: AuthAction,
+  enrolmentHelper: EnrolmentsHelper,
+  cc: ControllerComponents
+)() extends BackendController(cc) {
 
-  def updateClientList(serviceId: String, credentialId: String, agentId: String): Action[AnyContent] = authorise { implicit request =>
+  def updateClientList(serviceId: String, credentialId: String, agentId: String): Action[AnyContent] = authorise {
+    implicit request =>
 
-    val responseXML: Elem =
-      <gwe:AsynchronousProcessWaitTime browserInterval="8000" xmlns:gwe="gwe">
+      val responseXML: Elem =
+        <gwe:AsynchronousProcessWaitTime browserInterval="8000" xmlns:gwe="gwe">
         <BusinessServiceInterval>1000</BusinessServiceInterval>
         <BusinessServiceInterval>2000</BusinessServiceInterval>
       </gwe:AsynchronousProcessWaitTime>
-    
-    val identifier = enrolmentHelper.agentEnrolmentsOpt(request)
-    identifier match {
-      case Some(agentReference) => agentReference match {
-        case "400" => BadRequest(Json.obj("error" -> "Invalid ServiceId"))
-        case "500" => InternalServerError(Json.obj("error" -> "Server Error"))
-        case _ => Ok(responseXML)
+
+      val identifier = enrolmentHelper.agentEnrolmentsOpt(request)
+      identifier match {
+        case Some(agentReference) =>
+          agentReference match {
+            case "400" => BadRequest(Json.obj("error" -> "Invalid ServiceId"))
+            case "500" => InternalServerError(Json.obj("error" -> "Server Error"))
+            case _     => Ok(responseXML)
+          }
+        case None                 => InternalServerError(Json.obj("error" -> "Server Error"))
       }
-      case None => InternalServerError(Json.obj("error" -> "Server Error"))
-    }
-    
+
   }
 
 }

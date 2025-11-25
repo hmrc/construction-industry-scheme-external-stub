@@ -26,7 +26,7 @@ import uk.gov.hmrc.constructionindustryschemeexternalstub.config.AppConfig
 class ChrisServiceSpec extends AnyWordSpec with Matchers with OneInstancePerTest {
 //  private val submitFATCAFilingSuccessXML = <xml></xml>
 
-  private def submitCorrelationTestSuccessXML(clazz :String, corrId: String) =
+  private def submitCorrelationTestSuccessXML(clazz: String, corrId: String) =
     <GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
       <EnvelopeVersion>2.0</EnvelopeVersion>
       <Header>
@@ -271,7 +271,6 @@ class ChrisServiceSpec extends AnyWordSpec with Matchers with OneInstancePerTest
 //      </Body>
 //    </GovTalkMessage>
 
-
 //  private val vatSubmitXml = (vatDueAmount: String) => <GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
 //    <EnvelopeVersion>2.0</EnvelopeVersion>
 //    <Header>
@@ -329,7 +328,7 @@ class ChrisServiceSpec extends AnyWordSpec with Matchers with OneInstancePerTest
 //      </IRenvelope>
 //    </Body>
 //  </GovTalkMessage>
-  
+
 //   private val vatSubmitXmlWithID = (vatDueAmount: String, irMark: String, correlationId: String) => <GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
 //    <EnvelopeVersion>2.0</EnvelopeVersion>
 //    <Header>
@@ -465,7 +464,7 @@ class ChrisServiceSpec extends AnyWordSpec with Matchers with OneInstancePerTest
       </GovTalkDetails>
       <Body/>
     </GovTalkMessage>
-    
+
 //  private val vatPollXML = (correlationId: String) =>
 //    <GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
 //      <EnvelopeVersion>2.0</EnvelopeVersion>
@@ -879,9 +878,8 @@ class ChrisServiceSpec extends AnyWordSpec with Matchers with OneInstancePerTest
 
   private val configuration = new Configuration(ConfigFactory.load("test-application.conf"))
 
-  private val appConfig     = new AppConfig(configuration)
+  private val appConfig                  = new AppConfig(configuration)
   private val testInstance: ChrisService = new ChrisService(appConfig)
-  
 
   "ChrisService.pollMessage" should {
 
@@ -1055,13 +1053,13 @@ class ChrisServiceSpec extends AnyWordSpec with Matchers with OneInstancePerTest
   }
 
   "ChrisService.responseMessage" should {
-    
+
     "responseCISMessage should return successful business response for a valid CIS MR-FILING submit request" in {
 
       val response = testInstance.responseCISMessage(submitCISMRSuccessFilingXML).get
 
-      val clazz = (response \ "Header" \ "MessageDetails" \ "Class").text
-      val qualifier = (response \ "Header" \ "MessageDetails" \ "Qualifier").text
+      val clazz           = (response \ "Header" \ "MessageDetails" \ "Class").text
+      val qualifier       = (response \ "Header" \ "MessageDetails" \ "Qualifier").text
       val successResponse = (response \ "Body" \ "SuccessResponse" \ "Message").text
       qualifier mustBe "response"
       successResponse mustBe "The Monthly Return has been processed and passed full validation"
@@ -1072,8 +1070,8 @@ class ChrisServiceSpec extends AnyWordSpec with Matchers with OneInstancePerTest
 
       val response = testInstance.responseCISMessage(submitCISMRAcknowledgeFilingXML).get
 
-      val clazz = (response \ "Header" \ "MessageDetails" \ "Class").text
-      val qualifier = (response \ "Header" \ "MessageDetails" \ "Qualifier").text
+      val clazz            = (response \ "Header" \ "MessageDetails" \ "Class").text
+      val qualifier        = (response \ "Header" \ "MessageDetails" \ "Qualifier").text
       val govTalkErrorText = (response \ "GovTalkDetails" \ "GovTalkErrors" \ "Error" \ "Text").text
 
       clazz mustBe "CISR"
@@ -1099,8 +1097,8 @@ class ChrisServiceSpec extends AnyWordSpec with Matchers with OneInstancePerTest
     "responseCISVERIFYMessage should return successful business response for a valid CIS VERIFY submit request" in {
       val response = testInstance.responseCISVerifyMessage(submitCISVerifyXML).get
 
-      val clazz = (response \ "Header" \ "MessageDetails" \ "Class").text
-      val qualifier = (response \ "Header" \ "MessageDetails" \ "Qualifier").text
+      val clazz           = (response \ "Header" \ "MessageDetails" \ "Class").text
+      val qualifier       = (response \ "Header" \ "MessageDetails" \ "Qualifier").text
       val successResponse = (response \ "Body" \ "SuccessResponse" \ "Message").text
       qualifier mustBe "response"
       successResponse mustBe "The Subcontractor Verification has been processed and passed full validation"
@@ -1116,6 +1114,6 @@ class ChrisServiceSpec extends AnyWordSpec with Matchers with OneInstancePerTest
       val response = testInstance.responseCISVerifyMessage(submitUnknownCISMessage)
       response mustBe empty
     }
-    
+
   }
 }

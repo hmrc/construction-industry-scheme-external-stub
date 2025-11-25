@@ -29,13 +29,13 @@ import uk.gov.hmrc.constructionindustryschemeexternalstub.models.EmployerReferen
 class EnrolmentsHelperSpec extends AnyWordSpec with Matchers with MockitoSugar {
 
   val helper = new EnrolmentsHelper
-  
+
   "contractorEnrolmentsOpt" should {
     "return EmployerReference when enrolment and identifiers exist" in {
-      val request = mock[AuthenticatedRequest[AnyContent]]
-      val enrolments = mock[Enrolments]
-      val cisEnrol = mock[Enrolment]
-      val taxOfficeNr = EnrolmentIdentifier("TaxOfficeNumber", "123")
+      val request      = mock[AuthenticatedRequest[AnyContent]]
+      val enrolments   = mock[Enrolments]
+      val cisEnrol     = mock[Enrolment]
+      val taxOfficeNr  = EnrolmentIdentifier("TaxOfficeNumber", "123")
       val taxOfficeRef = EnrolmentIdentifier("TaxOfficeReference", "AB456")
       when(request.enrolments).thenReturn(enrolments)
       when(enrolments.getEnrolment("HMRC-CIS-ORG")).thenReturn(Some(cisEnrol))
@@ -44,43 +44,43 @@ class EnrolmentsHelperSpec extends AnyWordSpec with Matchers with MockitoSugar {
       helper.contractorEnrolmentsOpt(request) mustBe Some(EmployerReference("123", "AB456"))
     }
     "return None when the enrolment does not exist" in {
-      val request = mock[AuthenticatedRequest[AnyContent]]
+      val request    = mock[AuthenticatedRequest[AnyContent]]
       val enrolments = mock[Enrolments]
       when(request.enrolments).thenReturn(enrolments)
       when(enrolments.getEnrolment("HMRC-CIS-ORG")).thenReturn(None)
       helper.contractorEnrolmentsOpt(request) mustBe None
     }
     "return None when identifiers are missing" in {
-      val request = mock[AuthenticatedRequest[AnyContent]]
+      val request    = mock[AuthenticatedRequest[AnyContent]]
       val enrolments = mock[Enrolments]
-      val cisEnrol = mock[Enrolment]
+      val cisEnrol   = mock[Enrolment]
       when(request.enrolments).thenReturn(enrolments)
       when(enrolments.getEnrolment("HMRC-CIS-ORG")).thenReturn(Some(cisEnrol))
       when(cisEnrol.getIdentifier("TaxOfficeNumber")).thenReturn(None)
       helper.contractorEnrolmentsOpt(request) mustBe None
     }
   }
-  
+
   "agentEnrolmentsOpt" should {
     "return agent reference when enrolment and identifier exist" in {
-      val request = mock[AuthenticatedRequest[AnyContent]]
+      val request    = mock[AuthenticatedRequest[AnyContent]]
       val enrolments = mock[Enrolments]
       val agentEnrol = mock[Enrolment]
-      val agentId = EnrolmentIdentifier("IRAgentReference", "AGENT123")
+      val agentId    = EnrolmentIdentifier("IRAgentReference", "AGENT123")
       when(request.enrolments).thenReturn(enrolments)
       when(enrolments.getEnrolment("IR-PAYE-AGENT")).thenReturn(Some(agentEnrol))
       when(agentEnrol.getIdentifier("IRAgentReference")).thenReturn(Some(agentId))
       helper.agentEnrolmentsOpt(request) mustBe Some("AGENT123")
     }
     "return None when enrolment is missing" in {
-      val request = mock[AuthenticatedRequest[AnyContent]]
+      val request    = mock[AuthenticatedRequest[AnyContent]]
       val enrolments = mock[Enrolments]
       when(request.enrolments).thenReturn(enrolments)
       when(enrolments.getEnrolment("IR-PAYE-AGENT")).thenReturn(None)
       helper.agentEnrolmentsOpt(request) mustBe None
     }
     "return None when identifier is missing" in {
-      val request = mock[AuthenticatedRequest[AnyContent]]
+      val request    = mock[AuthenticatedRequest[AnyContent]]
       val enrolments = mock[Enrolments]
       val agentEnrol = mock[Enrolment]
       when(request.enrolments).thenReturn(enrolments)

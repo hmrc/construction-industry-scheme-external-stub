@@ -20,9 +20,9 @@ sealed trait ClientListDownloadStatus
 
 object ClientListDownloadStatus {
   case object InitiateDownload extends ClientListDownloadStatus with WithName("InitiateDownload")
-  case object InProgress       extends ClientListDownloadStatus with WithName("InProgress")
-  case object Succeeded        extends ClientListDownloadStatus with WithName("Succeeded")
-  case object Failed           extends ClientListDownloadStatus with WithName("Failed")
+  case object InProgress extends ClientListDownloadStatus with WithName("InProgress")
+  case object Succeeded extends ClientListDownloadStatus with WithName("Succeeded")
+  case object Failed extends ClientListDownloadStatus with WithName("Failed")
 
   def fromInt(status: Int): Either[String, ClientListDownloadStatus] = status match {
     case -1 => Right(InitiateDownload)

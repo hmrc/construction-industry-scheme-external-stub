@@ -18,18 +18,20 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub.models
 
 import scala.xml.{Elem, NodeSeq}
 
-case class CISVerifyResponse(transactionId: String,
-                             correlationId: String,
-                             timestamp: String,
-                             service: String,
-                             body: NodeSeq,
-                             utr: Option[String],
-                             matched: String,
-                             taxTreatment: String,
-                             verificationNumber: String,
-                             tradingName: Option[String],
-                             url: String,
-                             irMarkValue: Option[String]) extends ChrisResponse {
+case class CISVerifyResponse(
+  transactionId: String,
+  correlationId: String,
+  timestamp: String,
+  service: String,
+  body: NodeSeq,
+  utr: Option[String],
+  matched: String,
+  taxTreatment: String,
+  verificationNumber: String,
+  tradingName: Option[String],
+  url: String,
+  irMarkValue: Option[String]
+) extends ChrisResponse {
 
   override def successResponseXml(): Elem = <GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
     <EnvelopeVersion>2.0</EnvelopeVersion>
@@ -112,6 +114,6 @@ case class CISVerifyResponse(transactionId: String,
       </Error>
     )
 
-  override def errorResponseXmlFatal(): NodeSeq = ???
+  override def errorResponseXmlFatal(): NodeSeq  = ???
   override def acknowledgeResponseXml(): NodeSeq = ???
 }

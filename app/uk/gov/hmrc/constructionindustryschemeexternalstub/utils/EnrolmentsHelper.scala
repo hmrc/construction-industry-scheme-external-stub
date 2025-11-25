@@ -23,15 +23,15 @@ class EnrolmentsHelper {
 
   def contractorEnrolmentsOpt(request: AuthenticatedRequest[_]): Option[EmployerReference] =
     for {
-      enrol <- request.enrolments.getEnrolment("HMRC-CIS-ORG")
-      taxOfficeNumber <- enrol.getIdentifier("TaxOfficeNumber")
+      enrol              <- request.enrolments.getEnrolment("HMRC-CIS-ORG")
+      taxOfficeNumber    <- enrol.getIdentifier("TaxOfficeNumber")
       taxOfficeReference <- enrol.getIdentifier("TaxOfficeReference")
     } yield EmployerReference(taxOfficeNumber.value, taxOfficeReference.value)
 
   def agentEnrolmentsOpt(request: AuthenticatedRequest[_]): Option[String] =
     for {
-      enrol <- request.enrolments.getEnrolment("IR-PAYE-AGENT")
+      enrol          <- request.enrolments.getEnrolment("IR-PAYE-AGENT")
       agentReference <- enrol.getIdentifier("IRAgentReference")
     } yield agentReference.value
-    
+
 }

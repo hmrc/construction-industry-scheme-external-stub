@@ -35,8 +35,9 @@ class CisTaxpayerController @Inject() (
 )() extends BackendController(cc)
     with Logging {
 
-  private val monthlyNilReturnResponsePath = "/resources"
-  private val getCisTaxpayerByTaxReference_200_ResponsePath = s"$monthlyNilReturnResponsePath/getCisTaxpayerByTaxReference-200-response.json"
+  private val monthlyNilReturnResponsePath                  = "/resources"
+  private val getCisTaxpayerByTaxReference_200_ResponsePath =
+    s"$monthlyNilReturnResponsePath/getCisTaxpayerByTaxReference-200-response.json"
 
   def getCisTaxpayerByTaxReference: Action[JsValue] =
     authorise(parse.json) { implicit request =>
@@ -55,11 +56,16 @@ class CisTaxpayerController @Inject() (
             enrolments match {
               case Some(enrolmentReference) =>
                 (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {
-                  case ("404", _) => NotFound(Json.obj("message" -> s"CIS taxpayer not found for TON=${er.taxOfficeNumber}, TOR=${er.taxOfficeReference}"))
+                  case ("404", _) =>
+                    NotFound(
+                      Json.obj(
+                        "message" -> s"CIS taxpayer not found for TON=${er.taxOfficeNumber}, TOR=${er.taxOfficeReference}"
+                      )
+                    )
                   case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
-                  case _ => Ok(resourceHelper.resourceAsString(getCisTaxpayerByTaxReference_200_ResponsePath))
+                  case _          => Ok(resourceHelper.resourceAsString(getCisTaxpayerByTaxReference_200_ResponsePath))
                 }
-              case None => InternalServerError
+              case None                     => InternalServerError
             }
           }
         )

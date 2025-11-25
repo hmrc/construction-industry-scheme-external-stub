@@ -26,24 +26,27 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class StubController @Inject()(val authConnector: AuthConnector,
-                               authorise: AuthAction,
-                               enrolmentHelper: EnrolmentsHelper,
-                               cc: ControllerComponents)()
-  extends BackendController(cc) with AuthorisedFunctions {
+class StubController @Inject() (
+  val authConnector: AuthConnector,
+  authorise: AuthAction,
+  enrolmentHelper: EnrolmentsHelper,
+  cc: ControllerComponents
+)() extends BackendController(cc)
+    with AuthorisedFunctions {
 
-
-  def clientlist(service: String, credential: String, ignored: String): Action[JsValue] = authorise(parse.json) { implicit request =>
-    val identifier = enrolmentHelper.agentEnrolmentsOpt(request)
-    identifier match {
-      case Some(agentReference) => agentReference match {
-          case "400" => BadRequest(Json.obj("message" -> "Missing CIS enrolment identifiers"))
-          case "404" => NotFound(Json.obj("message" -> "CIS taxpayer not found"))
-          case "500" => InternalServerError(Json.obj("message" -> "Unexpected error"))
-          case _ => Ok("test")
+  def clientlist(service: String, credential: String, ignored: String): Action[JsValue] = authorise(parse.json) {
+    implicit request =>
+      val identifier = enrolmentHelper.agentEnrolmentsOpt(request)
+      identifier match {
+        case Some(agentReference) =>
+          agentReference match {
+            case "400" => BadRequest(Json.obj("message" -> "Missing CIS enrolment identifiers"))
+            case "404" => NotFound(Json.obj("message" -> "CIS taxpayer not found"))
+            case "500" => InternalServerError(Json.obj("message" -> "Unexpected error"))
+            case _     => Ok("test")
+          }
+        case None                 => InternalServerError
       }
-      case None => InternalServerError
-    }
   }
-  
+
 }

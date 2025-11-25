@@ -30,7 +30,7 @@ import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.EnrolmentsHelper
 import scala.concurrent.Future
 
 class ClientControllerSpec extends SpecBase with MockitoSugar {
-  
+
   ".getClientListDownloadStatus" - {
 
     "returns 200 with status 'InitiateDownload' when agentReference = InDown" in new Setup {
@@ -38,8 +38,9 @@ class ClientControllerSpec extends SpecBase with MockitoSugar {
       when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
         .thenReturn(Some("InDown"))
 
-      val req: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, "/client-list-status?credentialId=cred-123&serviceName=service-xyz&gracePeriod=14400")
-      val res: Future[Result] = controller.getClientListDownloadStatus("cred-123", "service-xyz")(req)
+      val req: FakeRequest[AnyContentAsEmpty.type] =
+        FakeRequest(GET, "/client-list-status?credentialId=cred-123&serviceName=service-xyz&gracePeriod=14400")
+      val res: Future[Result]                      = controller.getClientListDownloadStatus("cred-123", "service-xyz")(req)
 
       status(res) mustBe OK
       contentType(res) mustBe Some(JSON)
@@ -51,8 +52,9 @@ class ClientControllerSpec extends SpecBase with MockitoSugar {
       when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
         .thenReturn(Some("InProg"))
 
-      val req: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, "/client-list-status?credentialId=cred-123&serviceName=service-xyz&gracePeriod=14400")
-      val res: Future[Result] = controller.getClientListDownloadStatus("cred-123", "service-xyz")(req)
+      val req: FakeRequest[AnyContentAsEmpty.type] =
+        FakeRequest(GET, "/client-list-status?credentialId=cred-123&serviceName=service-xyz&gracePeriod=14400")
+      val res: Future[Result]                      = controller.getClientListDownloadStatus("cred-123", "service-xyz")(req)
 
       status(res) mustBe OK
       (contentAsJson(res) \ "status").as[String] mustBe "InProgress"
@@ -63,8 +65,9 @@ class ClientControllerSpec extends SpecBase with MockitoSugar {
       when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
         .thenReturn(Some("Succes"))
 
-      val req: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, "/client-list-status?credentialId=cred-123&serviceName=service-xyz&gracePeriod=14400")
-      val res: Future[Result] = controller.getClientListDownloadStatus("cred-123", "service-xyz")(req)
+      val req: FakeRequest[AnyContentAsEmpty.type] =
+        FakeRequest(GET, "/client-list-status?credentialId=cred-123&serviceName=service-xyz&gracePeriod=14400")
+      val res: Future[Result]                      = controller.getClientListDownloadStatus("cred-123", "service-xyz")(req)
 
       status(res) mustBe OK
       (contentAsJson(res) \ "status").as[String] mustBe "Succeeded"
@@ -75,8 +78,9 @@ class ClientControllerSpec extends SpecBase with MockitoSugar {
       when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
         .thenReturn(Some("Failed"))
 
-      val req: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, "/client-list-status?credentialId=cred-123&serviceName=service-xyz&gracePeriod=14400")
-      val res: Future[Result] = controller.getClientListDownloadStatus("cred-123", "service-xyz")(req)
+      val req: FakeRequest[AnyContentAsEmpty.type] =
+        FakeRequest(GET, "/client-list-status?credentialId=cred-123&serviceName=service-xyz&gracePeriod=14400")
+      val res: Future[Result]                      = controller.getClientListDownloadStatus("cred-123", "service-xyz")(req)
 
       status(res) mustBe OK
       (contentAsJson(res) \ "status").as[String] mustBe "Failed"
@@ -87,22 +91,23 @@ class ClientControllerSpec extends SpecBase with MockitoSugar {
       when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
         .thenReturn(Some("500"))
 
-      val req: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, "/client-list-status?credentialId=cred-123&serviceName=service-xyz&gracePeriod=14400")
-      val res: Future[Result] = controller.getClientListDownloadStatus("cred-123", "service-xyz")(req)
+      val req: FakeRequest[AnyContentAsEmpty.type] =
+        FakeRequest(GET, "/client-list-status?credentialId=cred-123&serviceName=service-xyz&gracePeriod=14400")
+      val res: Future[Result]                      = controller.getClientListDownloadStatus("cred-123", "service-xyz")(req)
 
       status(res) mustBe INTERNAL_SERVER_ERROR
       contentType(res) mustBe Some(JSON)
       (contentAsJson(res) \ "error").as[String] mustBe "Could not map client list download status"
     }
 
-
     "returns 400 when credentialId is empty" in new Setup {
 
       when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
         .thenReturn(Some("400"))
 
-      val req: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, "/client-list-status?credentialId=&serviceName=service-xyz&gracePeriod=14400")
-      val res: Future[Result] = controller.getClientListDownloadStatus("", "service-xyz")(req)
+      val req: FakeRequest[AnyContentAsEmpty.type] =
+        FakeRequest(GET, "/client-list-status?credentialId=&serviceName=service-xyz&gracePeriod=14400")
+      val res: Future[Result]                      = controller.getClientListDownloadStatus("", "service-xyz")(req)
 
       status(res) mustBe BAD_REQUEST
       contentType(res) mustBe Some(JSON)
@@ -114,8 +119,9 @@ class ClientControllerSpec extends SpecBase with MockitoSugar {
       when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
         .thenReturn(Some("400"))
 
-      val req: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, "/client-list-status?credentialId=cred-123&serviceName=&gracePeriod=14400")
-      val res: Future[Result] = controller.getClientListDownloadStatus("cred-123", "")(req)
+      val req: FakeRequest[AnyContentAsEmpty.type] =
+        FakeRequest(GET, "/client-list-status?credentialId=cred-123&serviceName=&gracePeriod=14400")
+      val res: Future[Result]                      = controller.getClientListDownloadStatus("cred-123", "")(req)
 
       status(res) mustBe BAD_REQUEST
       contentType(res) mustBe Some(JSON)
@@ -125,6 +131,6 @@ class ClientControllerSpec extends SpecBase with MockitoSugar {
 
   private trait Setup {
     val mockEnrolmentsHelper: EnrolmentsHelper = mock[EnrolmentsHelper]
-    val controller = new ClientController(fakeAuthAction, mockEnrolmentsHelper, cc)(using ec)
+    val controller                             = new ClientController(fakeAuthAction, mockEnrolmentsHelper, cc)(using ec)
   }
 }

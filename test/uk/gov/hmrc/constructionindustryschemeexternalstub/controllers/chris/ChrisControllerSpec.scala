@@ -30,14 +30,13 @@ import uk.gov.hmrc.constructionindustryschemeexternalstub.services.ChrisService
 
 import scala.xml.NodeSeq
 
-
 class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
 
   private val configuration = new Configuration(ConfigFactory.load("test-application.conf"))
 
-  private val appConfig     = new AppConfig(configuration)
+  private val appConfig = new AppConfig(configuration)
 
-  private val service = mock[ChrisService]
+  private val service      = mock[ChrisService]
   private val testInstance = new ChrisController(service, appConfig, Helpers.stubControllerComponents())
 
   private val message = <ChRISEnvelope xmns="http://www.hmrc.gov.uk/ChRIS/Envelope/2">
@@ -49,7 +48,6 @@ class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
   private val postRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("POST", "/submission/ChRIS")
 
   "ChrisController " should {
-
 
     "handle pollMessage with an acknowledgement" in {
       val expected: NodeSeq = <poll></poll>
@@ -76,7 +74,7 @@ class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
       </ChRISEnvelope>
 
       val expected: NodeSeq = <poll></poll>
-      val request = postRequest.withXmlBody(cisMessage)
+      val request           = postRequest.withXmlBody(cisMessage)
       when(service.responseCISMessage(request.body.xml)).thenReturn(Some(expected))
 
       val response = testInstance.submitCISMessage().apply(request)
@@ -129,7 +127,7 @@ class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
       </ChRISEnvelope>
 
       val expected: NodeSeq = <poll></poll>
-      val request = postRequest.withXmlBody(cisMessage)
+      val request           = postRequest.withXmlBody(cisMessage)
       when(service.responseCISVerifyMessage(request.body.xml)).thenReturn(Some(expected))
 
       val response = testInstance.submitCISVerifyMessage().apply(request)

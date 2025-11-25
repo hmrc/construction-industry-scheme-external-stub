@@ -13,6 +13,8 @@ lazy val microservice = Project("construction-industry-scheme-external-stub", fi
     // https://www.scala-lang.org/2021/01/12/configuring-and-suppressing-warnings.html
     // suppress warnings in generated routes files
     scalacOptions += "-Wconf:src=routes/.*:s",
+    Compile / scalafmtOnCompile := true,
+    Test / scalafmtOnCompile := true
   )
   .settings(CodeCoverageSettings.settings *)
 

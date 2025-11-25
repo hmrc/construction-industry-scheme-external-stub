@@ -63,7 +63,7 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
         .thenReturn(Json.toJson(UserMonthlyReturns(Seq.empty)).toString)
 
       val req: FakeRequest[JsValue] = makeJsonRequest(Json.obj("instanceId" -> "abc-123"))
-      val res: Future[Result] = controller.retrieveMonthlyReturns(req)
+      val res: Future[Result]       = controller.retrieveMonthlyReturns(req)
 
       status(res) mustBe OK
       contentAsJson(res) mustBe Json.toJson(UserMonthlyReturns(Seq.empty))
@@ -71,7 +71,7 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
 
     "returns 400 when JSON body is an empty object" in new Setup {
       val req: FakeRequest[JsValue] = makeJsonRequest(Json.obj())
-      val res: Future[Result] = controller.retrieveMonthlyReturns(req)
+      val res: Future[Result]       = controller.retrieveMonthlyReturns(req)
 
       status(res) mustBe BAD_REQUEST
       (contentAsJson(res) \ "message").as[String] mustBe "Invalid JSON body"
@@ -79,7 +79,7 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
 
     "returns 400 when instanceId is missing" in new Setup {
       val req: FakeRequest[JsValue] = makeJsonRequest(Json.obj("somethingElse" -> "oops"))
-      val res: Future[Result] = controller.retrieveMonthlyReturns(req)
+      val res: Future[Result]       = controller.retrieveMonthlyReturns(req)
 
       status(res) mustBe BAD_REQUEST
       (contentAsJson(res) \ "message").as[String] mustBe "Invalid JSON body"
@@ -91,7 +91,7 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
         .thenReturn(Some(EmployerReference("502", "")))
 
       val req: FakeRequest[JsValue] = makeJsonRequest(Json.obj("instanceId" -> "abc-123"))
-      val res: Future[Result] = controller.retrieveMonthlyReturns(req)
+      val res: Future[Result]       = controller.retrieveMonthlyReturns(req)
 
       status(res) mustBe BAD_GATEWAY
       (contentAsJson(res) \ "message").as[String] must include("formp failed")
@@ -103,7 +103,7 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
         .thenReturn(Some(EmployerReference("500", "")))
 
       val req: FakeRequest[JsValue] = makeJsonRequest(Json.obj("instanceId" -> "abc-123"))
-      val res: Future[Result] = controller.retrieveMonthlyReturns(req)
+      val res: Future[Result]       = controller.retrieveMonthlyReturns(req)
 
       status(res) mustBe INTERNAL_SERVER_ERROR
       (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
@@ -113,7 +113,7 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
   ".createNilMonthlyReturn" - {
 
     "returns 201 with status when service succeeds for an unknown taxOfficeNumber / taxOfficeReference" in new Setup {
-      val request: CreateNilMonthlyReturnRequest = CreateNilMonthlyReturnRequest(
+      val request: CreateNilMonthlyReturnRequest   = CreateNilMonthlyReturnRequest(
         instanceId = "abc-123",
         taxYear = 2025,
         taxMonth = 2,
@@ -167,12 +167,11 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
         .thenReturn(Some(EmployerReference("500", "")))
 
       val req: FakeRequest[JsValue] = makeJsonRequest(Json.obj("instanceId" -> "abc-123"))
-      val res: Future[Result] = controller.retrieveMonthlyReturns(req)
+      val res: Future[Result]       = controller.retrieveMonthlyReturns(req)
 
       status(res) mustBe INTERNAL_SERVER_ERROR
       (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
     }
-
 
   }
 
@@ -202,11 +201,11 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
         .thenReturn(Some(EmployerReference("000", "")))
 
       when(mockResourceHelper.resourceAsString(any()))
-        .thenReturn(Json.toJson({"email" -> ""}).toString)
+        .thenReturn(Json.toJson("email" -> "").toString)
 
       val req: FakeRequest[InstanceIdRequest] =
         FakeRequest(POST, "/formp-proxy/scheme/email").withBody(requests.InstanceIdRequest("abc-123"))
-      val res: Future[Result] = controller.getSchemeEmail(req)
+      val res: Future[Result]                 = controller.getSchemeEmail(req)
 
       status(res) mustBe OK
       (contentAsJson(res) \ "email").toOption.flatMap(_.asOpt[String]) mustBe None
@@ -219,7 +218,7 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
 
       val req: FakeRequest[InstanceIdRequest] =
         FakeRequest(POST, "/formp-proxy/scheme/email").withBody(requests.InstanceIdRequest("abc-123"))
-      val res: Future[Result] = controller.getSchemeEmail(req)
+      val res: Future[Result]                 = controller.getSchemeEmail(req)
 
       status(res) mustBe BAD_GATEWAY
       (contentAsJson(res) \ "message").as[String] must include("formp failed")
@@ -231,13 +230,12 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
         .thenReturn(Some(EmployerReference("500", "")))
 
       val req: FakeRequest[JsValue] = makeJsonRequest(Json.obj("instanceId" -> "abc-123"))
-      val res: Future[Result] = controller.retrieveMonthlyReturns(req)
+      val res: Future[Result]       = controller.retrieveMonthlyReturns(req)
 
       status(res) mustBe INTERNAL_SERVER_ERROR
       (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
-    }    
-    
-    
+    }
+
   }
 
   private trait Setup {
@@ -246,10 +244,10 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
     private val parsers: PlayBodyParsers = cc.parsers
     private def fakeAuth: AuthAction     = new FakeAuthAction(parsers)
 
-    val mockResourceHelper: ResourceHelper = mock[ResourceHelper]
+    val mockResourceHelper: ResourceHelper     = mock[ResourceHelper]
     val mockEnrolmentsHelper: EnrolmentsHelper = mock[EnrolmentsHelper]
 
-    val controller                        = new MonthlyReturnController(fakeAuth, mockResourceHelper, mockEnrolmentsHelper, cc)
+    val controller = new MonthlyReturnController(fakeAuth, mockResourceHelper, mockEnrolmentsHelper, cc)
 
     def makeJsonRequest(body: JsValue): FakeRequest[JsValue] =
       FakeRequest(POST, "/formp-proxy/monthly-returns")

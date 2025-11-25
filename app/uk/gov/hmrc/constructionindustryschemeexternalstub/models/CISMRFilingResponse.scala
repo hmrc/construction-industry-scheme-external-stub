@@ -18,14 +18,16 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub.models
 
 import scala.xml.{Elem, NodeSeq}
 
-case class CISMRFilingResponse(transactionId: String,
-                               correlationId: String,
-                               timestamp: String,
-                               service: String,
-                               body: NodeSeq,
-                               url: String,
-                               pollingUrl: String,
-                               irMarkValue: Option[String]) extends ChrisResponse {
+case class CISMRFilingResponse(
+  transactionId: String,
+  correlationId: String,
+  timestamp: String,
+  service: String,
+  body: NodeSeq,
+  url: String,
+  pollingUrl: String,
+  irMarkValue: Option[String]
+) extends ChrisResponse {
 
   override def successResponseXml(): Elem = <GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
     <EnvelopeVersion>2.0</EnvelopeVersion>
@@ -104,8 +106,7 @@ case class CISMRFilingResponse(transactionId: String,
 
   override def errorResponseXmlFatal(): Elem =
     CommonChrisResponse(transactionId, correlationId, timestamp, service, body, url, "2").toErrorResponseXml(
-      errorResponse =
-        <Error>
+      errorResponse = <Error>
           <RaisedBy>Gateway</RaisedBy>
           <Number>1020</Number>
           <Type>fatal</Type>
@@ -116,8 +117,7 @@ case class CISMRFilingResponse(transactionId: String,
 
   override def errorResponseXmlBusiness(): Elem =
     CommonChrisResponse(transactionId, correlationId, timestamp, service, body, url, "2").toErrorResponseXml(
-      errorResponse =
-        <Error>
+      errorResponse = <Error>
           <RaisedBy>Department</RaisedBy>
           <Number>3001</Number>
           <Type>business</Type>

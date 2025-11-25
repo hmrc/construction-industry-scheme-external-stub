@@ -26,21 +26,24 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.Inject
 
-class MonthlyReturnController @Inject()(
+class MonthlyReturnController @Inject() (
   authorise: AuthAction,
   resourceHelper: ResourceHelper,
   enrolmentHelper: EnrolmentsHelper,
   cc: ControllerComponents
-)()
-    extends BackendController(cc)
+)() extends BackendController(cc)
     with Logging {
 
-  private val monthlyNilReturnResponsePath = "/resources/monthlyNilReturns"
-  private val retrieveMonthlyReturns_200_ResponsePath = s"$monthlyNilReturnResponsePath/retrieveMonthlyReturns-200-response.json"
-  private val retrieveMonthlyReturns_empty_200_ResponsePath = s"$monthlyNilReturnResponsePath/retrieveMonthlyReturns-empty-200-response.json"
-  private val createNilMonthlyReturn_200_ResponsePath = s"$monthlyNilReturnResponsePath/createNilMonthlyReturn-200-response.json"
-  private val getSchemeEmail_200_ResponsePath = s"$monthlyNilReturnResponsePath/getSchemeEmail-200-response.json"
-  private val getSchemeEmail_null_200_ResponsePath = s"$monthlyNilReturnResponsePath/getSchemeEmail-null-200-response.json"
+  private val monthlyNilReturnResponsePath                  = "/resources/monthlyNilReturns"
+  private val retrieveMonthlyReturns_200_ResponsePath       =
+    s"$monthlyNilReturnResponsePath/retrieveMonthlyReturns-200-response.json"
+  private val retrieveMonthlyReturns_empty_200_ResponsePath =
+    s"$monthlyNilReturnResponsePath/retrieveMonthlyReturns-empty-200-response.json"
+  private val createNilMonthlyReturn_200_ResponsePath       =
+    s"$monthlyNilReturnResponsePath/createNilMonthlyReturn-200-response.json"
+  private val getSchemeEmail_200_ResponsePath               = s"$monthlyNilReturnResponsePath/getSchemeEmail-200-response.json"
+  private val getSchemeEmail_null_200_ResponsePath          =
+    s"$monthlyNilReturnResponsePath/getSchemeEmail-null-200-response.json"
 
   def retrieveMonthlyReturns: Action[JsValue] =
     authorise(parse.json) { implicit request =>
@@ -63,9 +66,9 @@ class MonthlyReturnController @Inject()(
                   case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
                   case ("502", _) => BadGateway(Json.obj("message" -> "formp failed"))
                   case ("000", _) => Ok(resourceHelper.resourceAsString(retrieveMonthlyReturns_empty_200_ResponsePath))
-                  case _ => Ok(resourceHelper.resourceAsString(retrieveMonthlyReturns_200_ResponsePath))
+                  case _          => Ok(resourceHelper.resourceAsString(retrieveMonthlyReturns_200_ResponsePath))
                 }
-              case None => InternalServerError
+              case None                     => InternalServerError
             }
           }
         )
@@ -81,9 +84,9 @@ class MonthlyReturnController @Inject()(
 //            case ("404", _) => NotFound(Json.obj("message" -> "CIS taxpayer not found"))
             case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
             case ("502", _) => BadGateway(Json.obj("message" -> "formp failed"))
-            case _ => Created(resourceHelper.resourceAsString(createNilMonthlyReturn_200_ResponsePath))
+            case _          => Created(resourceHelper.resourceAsString(createNilMonthlyReturn_200_ResponsePath))
           }
-        case None => InternalServerError
+        case None                     => InternalServerError
       }
     }
 
@@ -98,9 +101,9 @@ class MonthlyReturnController @Inject()(
             case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
             case ("502", _) => BadGateway(Json.obj("message" -> "formp failed"))
             case ("000", _) => Ok(resourceHelper.resourceAsString(getSchemeEmail_null_200_ResponsePath))
-            case _ => Ok(resourceHelper.resourceAsString(getSchemeEmail_200_ResponsePath))
+            case _          => Ok(resourceHelper.resourceAsString(getSchemeEmail_200_ResponsePath))
           }
-        case None => InternalServerError
+        case None                     => InternalServerError
       }
     }
 }

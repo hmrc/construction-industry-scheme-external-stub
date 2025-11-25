@@ -21,7 +21,7 @@ import play.api.Environment
 import javax.inject.Inject
 import scala.io.Source
 
-class ResourceHelper @Inject()(environment: Environment) {
+class ResourceHelper @Inject() (environment: Environment) {
 
   def resourceAsString(resourcePath: String): String = {
     val path = environment.resourceAsStream(resourcePath).get

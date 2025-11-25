@@ -27,13 +27,14 @@ import javax.inject.{Inject, Singleton}
 import scala.xml.NodeSeq
 
 @Singleton()
-class ChrisController @Inject()(service: ChrisService, config: AppConfig, cc: ControllerComponents) extends BackendController(cc) {
+class ChrisController @Inject() (service: ChrisService, config: AppConfig, cc: ControllerComponents)
+    extends BackendController(cc) {
   private val logger = Logger(classOf[ChrisController])
-  
+
   def submitCISMessage(): Action[AnyContent] = Action { (request: Request[AnyContent]) =>
     val rootTextOpt = service.responseCISMessage(request.body.asXml.get)
     if (rootTextOpt.isDefined) {
-      Ok({rootTextOpt.get})
+      Ok(rootTextOpt.get)
     } else {
       NotFound
     }
@@ -42,7 +43,7 @@ class ChrisController @Inject()(service: ChrisService, config: AppConfig, cc: Co
   def submitCISVerifyMessage(): Action[AnyContent] = Action { (request: Request[AnyContent]) =>
     val rootTextOpt = service.responseCISVerifyMessage(request.body.asXml.get)
     if (rootTextOpt.isDefined) {
-      Ok({rootTextOpt.get})
+      Ok(rootTextOpt.get)
     } else {
       NotFound
     }
@@ -51,50 +52,57 @@ class ChrisController @Inject()(service: ChrisService, config: AppConfig, cc: Co
   def actionCISMessage(): Action[AnyContent] = Action { (request: Request[AnyContent]) =>
     val rootTextOpt = service.responseActionMonthlyReturnCISMessage(request.body.asXml.get)
     if (rootTextOpt.isDefined) {
-      Ok({rootTextOpt.get})
+      Ok(rootTextOpt.get)
     } else {
       NotFound
     }
   }
 
-
-  def submitAsyncMessage(service: String, serviceId: String): Action[AnyContent] = Action { (request: Request[AnyContent]) =>
-    request.body.asXml.map { (message: NodeSeq) =>
-      logger.info(s"Async submission received: \n${message.toString}")
-    }
-    Ok
-  }
-
-
-  def asyncSubmitToChRISReceiver(serviceName: String, serviceId: String): Action[AnyContent] = Action { (request: Request[AnyContent]) =>
-    Ok({"<ChRISReply><SuccessfulAcknowledgement>OK</SuccessfulAcknowledgement></ChRISReply>"})
-  }
-
-  def pollMessage(serviceName: String, count: Int, error: Boolean): Action[AnyContent] = Action { (request: Request[AnyContent]) =>
-    val rootTextOpt = request.body.asXml.map { (message: NodeSeq) =>
-      if (config.perfMode) {
-        serviceName match {
-          case "HMRC-SA-SA100" => ??? //service.responseMessageSAFiling(message, error)
-          case "HMRC-VAT-DEC" => ??? //service.responseMessageVATDec(message, error)
-          case "IR-PAYE-EXB" => ??? //service.responseMessagePAYEEXB(message, error)
-          case "HMRC-FATCA-RETURN" => ??? //service.responseMessageFATCAFiling(message, error)
-          case "SDLT-RETURN" => ??? // service.responseMessageSDLTFiling(message, error)
-        }
-      } else {
-        service.pollMessage(message, serviceName, count, error)
+  def submitAsyncMessage(service: String, serviceId: String): Action[AnyContent] = Action {
+    (request: Request[AnyContent]) =>
+      request.body.asXml.map { (message: NodeSeq) =>
+        logger.info(s"Async submission received: \n${message.toString}")
       }
-    }
-    Ok({rootTextOpt.get})
+      Ok
+  }
+
+  def asyncSubmitToChRISReceiver(serviceName: String, serviceId: String): Action[AnyContent] = Action {
+    (request: Request[AnyContent]) =>
+      Ok("<ChRISReply><SuccessfulAcknowledgement>OK</SuccessfulAcknowledgement></ChRISReply>")
+  }
+
+  def pollMessage(serviceName: String, count: Int, error: Boolean): Action[AnyContent] = Action {
+    (request: Request[AnyContent]) =>
+      val rootTextOpt = request.body.asXml.map { (message: NodeSeq) =>
+        if (config.perfMode) {
+          serviceName match {
+            case "HMRC-SA-SA100"     => ??? // service.responseMessageSAFiling(message, error)
+            case "HMRC-VAT-DEC"      => ??? // service.responseMessageVATDec(message, error)
+            case "IR-PAYE-EXB"       => ??? // service.responseMessagePAYEEXB(message, error)
+            case "HMRC-FATCA-RETURN" => ??? // service.responseMessageFATCAFiling(message, error)
+            case "SDLT-RETURN"       => ??? // service.responseMessageSDLTFiling(message, error)
+          }
+        } else {
+          service.pollMessage(message, serviceName, count, error)
+        }
+      }
+      Ok(rootTextOpt.get)
   }
 
   def getCISResponse(error: Boolean): Action[AnyContent] = Action { (request: Request[AnyContent]) =>
 
-    val rootTextOpt = request.body.asXml.map(service.responseMessageCISMRFiling(_, "IR-CIS-CIS300MR", if (error) {
-      FATAL_ERROR
-    } else {
-      SUCCESS
-    }))
-    Ok({rootTextOpt.get})
+    val rootTextOpt = request.body.asXml.map(
+      service.responseMessageCISMRFiling(
+        _,
+        "IR-CIS-CIS300MR",
+        if (error) {
+          FATAL_ERROR
+        } else {
+          SUCCESS
+        }
+      )
+    )
+    Ok(rootTextOpt.get)
   }
-  
+
 }

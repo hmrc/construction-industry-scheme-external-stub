@@ -48,7 +48,7 @@ class CisTaxpayerControllerSpec extends SpecBase with MockitoSugar {
           .thenReturn(Json.toJson(taxpayer).toString)
 
         val req: FakeRequest[JsValue] = requestWithEmployeeReferenceJsonPayload("200", "123456")
-        val res: Future[Result] = controller.getCisTaxpayerByTaxReference(req)
+        val res: Future[Result]       = controller.getCisTaxpayerByTaxReference(req)
         status(res) mustBe OK
 //        contentType(res) mustBe Some(JSON)
         contentAsJson(res) mustBe Json.toJson(taxpayer)
@@ -60,7 +60,7 @@ class CisTaxpayerControllerSpec extends SpecBase with MockitoSugar {
           .thenReturn(Some(EmployerReference("404", "123456")))
 
         val req: FakeRequest[JsValue] = requestWithEmployeeReferenceJsonPayload("404", "123456")
-        val res: Future[Result] = controller.getCisTaxpayerByTaxReference(req)
+        val res: Future[Result]       = controller.getCisTaxpayerByTaxReference(req)
         status(res) mustBe NOT_FOUND
         (contentAsJson(res) \ "message").as[String] mustBe "CIS taxpayer not found for TON=404, TOR=123456"
 
@@ -68,21 +68,21 @@ class CisTaxpayerControllerSpec extends SpecBase with MockitoSugar {
 
       "returns 400 when request JSON is an empty object" in new Setup {
         val req: FakeRequest[JsValue] = makeJsonRequest(Json.obj())
-        val res: Future[Result] = controller.getCisTaxpayerByTaxReference(req)
+        val res: Future[Result]       = controller.getCisTaxpayerByTaxReference(req)
         status(res) mustBe BAD_REQUEST
         (contentAsJson(res) \ "message").as[String] mustBe "Invalid JSON body"
       }
 
       "returns 400 when taxOfficeNumber is missing from request" in new Setup {
         val req: FakeRequest[JsValue] = makeJsonRequest(Json.obj("taxOfficeReference" -> "test111"))
-        val res: Future[Result] = controller.getCisTaxpayerByTaxReference(req)
+        val res: Future[Result]       = controller.getCisTaxpayerByTaxReference(req)
         status(res) mustBe BAD_REQUEST
         (contentAsJson(res) \ "message").as[String] mustBe "Invalid JSON body"
       }
 
       "returns 400 when taxOfficeReference is missing from request" in new Setup {
         val req: FakeRequest[JsValue] = makeJsonRequest(Json.obj("taxOfficeNumber" -> "111"))
-        val res: Future[Result] = controller.getCisTaxpayerByTaxReference(req)
+        val res: Future[Result]       = controller.getCisTaxpayerByTaxReference(req)
         status(res) mustBe BAD_REQUEST
         (contentAsJson(res) \ "message").as[String] mustBe "Invalid JSON body"
       }
@@ -93,7 +93,7 @@ class CisTaxpayerControllerSpec extends SpecBase with MockitoSugar {
           .thenReturn(Some(EmployerReference("500", "123456")))
 
         val req: FakeRequest[JsValue] = requestWithEmployeeReferenceJsonPayload("500", "123456")
-        val res: Future[Result] = controller.getCisTaxpayerByTaxReference(req)
+        val res: Future[Result]       = controller.getCisTaxpayerByTaxReference(req)
         status(res) mustBe INTERNAL_SERVER_ERROR
         (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
       }
@@ -101,9 +101,9 @@ class CisTaxpayerControllerSpec extends SpecBase with MockitoSugar {
     }
 
   }
-  
+
   private trait Setup {
-    val mockResourceHelper: ResourceHelper = mock[ResourceHelper]
+    val mockResourceHelper: ResourceHelper     = mock[ResourceHelper]
     val mockEnrolmentsHelper: EnrolmentsHelper = mock[EnrolmentsHelper]
 
     val controller = new CisTaxpayerController(fakeAuthAction, mockResourceHelper, mockEnrolmentsHelper, cc)

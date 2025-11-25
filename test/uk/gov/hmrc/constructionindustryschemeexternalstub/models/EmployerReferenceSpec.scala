@@ -35,11 +35,11 @@ class EmployerReferenceSpec extends AnyWordSpec with Matchers {
         """.stripMargin
       )
 
-      val json = Json.parse(jsonAsString)
+      val json  = Json.parse(jsonAsString)
       val model = json.as[EmployerReference]
 
       model mustBe EmployerReference(
-        taxOfficeNumber    = "123",
+        taxOfficeNumber = "123",
         taxOfficeReference = "AB456"
       )
 

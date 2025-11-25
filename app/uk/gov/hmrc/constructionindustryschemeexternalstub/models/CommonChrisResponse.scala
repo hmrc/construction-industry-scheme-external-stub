@@ -18,8 +18,15 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub.models
 
 import scala.xml.{Elem, NodeSeq}
 
-case class CommonChrisResponse(transactionId: String, correlationId: String, timestamp: String,
-                               service: String, body: NodeSeq, url: String, pollInterval: String) {
+case class CommonChrisResponse(
+  transactionId: String,
+  correlationId: String,
+  timestamp: String,
+  service: String,
+  body: NodeSeq,
+  url: String,
+  pollInterval: String
+) {
 
   def toPollXml: Elem = <GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
     <EnvelopeVersion>1.0</EnvelopeVersion>

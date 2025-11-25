@@ -34,7 +34,7 @@ import scala.concurrent.Future
 
 class SubmissionControllerSpec extends SpecBase {
 
-  ".createSubmission" -{
+  ".createSubmission" - {
 
     val createSubmissionUrl = "/submissions"
 
@@ -59,7 +59,7 @@ class SubmissionControllerSpec extends SpecBase {
         .thenReturn(response.toString)
 
       val req: FakeRequest[JsValue] = makeJsonRequest(json, createSubmissionUrl)
-      val res: Future[Result] = controller.createSubmission()(req)
+      val res: Future[Result]       = controller.createSubmission()(req)
 
       status(res) mustBe CREATED
       contentAsJson(res) mustBe Json.obj("submissionId" -> "sub-123")
@@ -67,9 +67,9 @@ class SubmissionControllerSpec extends SpecBase {
 
     "returns 400 BadRequest for invalid JSON" in new Setup {
 
-      val bad: JsObject = Json.obj("nope" -> "nope")
+      val bad: JsObject             = Json.obj("nope" -> "nope")
       val req: FakeRequest[JsValue] = makeJsonRequest(bad, createSubmissionUrl)
-      val res: Future[Result] = controller.createSubmission()(req)
+      val res: Future[Result]       = controller.createSubmission()(req)
 
       status(res) mustBe BAD_REQUEST
       (contentAsJson(res) \ "message").as[String] mustBe "Invalid payload"
@@ -80,9 +80,9 @@ class SubmissionControllerSpec extends SpecBase {
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
         .thenReturn(Some(EmployerReference("500", "")))
 
-      val json: JsValue = Json.toJson(CreateSubmissionRequest("123", 2024, 4))
+      val json: JsValue             = Json.toJson(CreateSubmissionRequest("123", 2024, 4))
       val req: FakeRequest[JsValue] = makeJsonRequest(json, createSubmissionUrl)
-      val res: Future[Result] = controller.createSubmission()(req)
+      val res: Future[Result]       = controller.createSubmission()(req)
 
       status(res) mustBe INTERNAL_SERVER_ERROR
       contentAsJson(res) mustBe Json.obj("message" -> "Unexpected error")
@@ -109,7 +109,7 @@ class SubmissionControllerSpec extends SpecBase {
       )
 
       val req: FakeRequest[JsValue] = makeJsonRequest(json, updateSubmissionUrl)
-      val res: Future[Result] = controller.updateSubmission()(req)
+      val res: Future[Result]       = controller.updateSubmission()(req)
 
       status(res) mustBe NO_CONTENT
     }
@@ -119,7 +119,7 @@ class SubmissionControllerSpec extends SpecBase {
       val bad: JsObject = Json.obj("bad" -> "json")
 
       val req: FakeRequest[JsValue] = makeJsonRequest(bad, updateSubmissionUrl)
-      val res: Future[Result] = controller.updateSubmission()(req)
+      val res: Future[Result]       = controller.updateSubmission()(req)
 
       status(res) mustBe BAD_REQUEST
       (contentAsJson(res) \ "message").as[String] mustBe "Invalid payload"
@@ -141,18 +141,18 @@ class SubmissionControllerSpec extends SpecBase {
       )
 
       val req: FakeRequest[JsValue] = makeJsonRequest(json, updateSubmissionUrl)
-      val res: Future[Result] = controller.updateSubmission()(req)
+      val res: Future[Result]       = controller.updateSubmission()(req)
 
       status(res) mustBe INTERNAL_SERVER_ERROR
     }
   }
 
   private trait Setup {
-    val mockResourceHelper: ResourceHelper = mock[ResourceHelper]
+    val mockResourceHelper: ResourceHelper     = mock[ResourceHelper]
     val mockEnrolmentsHelper: EnrolmentsHelper = mock[EnrolmentsHelper]
 
     val auth: FakeAuthAction = new FakeAuthAction(cc.parsers)
-    lazy val controller = new SubmissionController(auth, mockResourceHelper, mockEnrolmentsHelper, cc)
+    lazy val controller      = new SubmissionController(auth, mockResourceHelper, mockEnrolmentsHelper, cc)
 
     def makeJsonRequest(body: JsValue, url: String): FakeRequest[JsValue] =
       FakeRequest(POST, "/submissions")

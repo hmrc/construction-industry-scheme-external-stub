@@ -52,15 +52,15 @@ trait SpecBase
     GuiceApplicationBuilder()
       .build()
 
-  val cc: ControllerComponents = stubControllerComponents()
+  val cc: ControllerComponents                         = stubControllerComponents()
   val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
-  val bodyParsers: PlayBodyParsers = app.injector.instanceOf[PlayBodyParsers]
-  val fakeAuthAction = new FakeAuthAction(bodyParsers)
+  val bodyParsers: PlayBodyParsers                     = app.injector.instanceOf[PlayBodyParsers]
+  val fakeAuthAction                                   = new FakeAuthAction(bodyParsers)
 
   def fakeRequestWithJsonBody(json: JsValue): FakeRequest[JsValue] = fakeRequestWithBody(json)
-  def fakeRequestWithBody[A](body: A): FakeRequest[A] = FakeRequest("", "/", FakeHeaders(), body)
+  def fakeRequestWithBody[A](body: A): FakeRequest[A]              = FakeRequest("", "/", FakeHeaders(), body)
 
-  implicit val hc: HeaderCarrier = HeaderCarrier()
+  implicit val hc: HeaderCarrier    = HeaderCarrier()
   implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
 
   final val TonHeader = "X-Tax-Office-Number"
@@ -88,21 +88,21 @@ trait SpecBase
     employerName1: Option[String] = Some("TEST LTD")
   ): CisTaxpayer =
     CisTaxpayer(
-      uniqueId          = id,
-      taxOfficeNumber   = ton,
-      taxOfficeRef      = tor,
-      aoDistrict        = None,
-      aoPayType         = None,
-      aoCheckCode       = None,
-      aoReference       = None,
+      uniqueId = id,
+      taxOfficeNumber = ton,
+      taxOfficeRef = tor,
+      aoDistrict = None,
+      aoPayType = None,
+      aoCheckCode = None,
+      aoReference = None,
       validBusinessAddr = None,
-      correlation       = None,
-      ggAgentId         = None,
-      employerName1     = employerName1,
-      employerName2     = None,
-      agentOwnRef       = None,
-      schemeName        = None,
-      utr               = None,
-      enrolledSig       = None
+      correlation = None,
+      ggAgentId = None,
+      employerName1 = employerName1,
+      employerName2 = None,
+      agentOwnRef = None,
+      schemeName = None,
+      utr = None,
+      enrolledSig = None
     )
 }

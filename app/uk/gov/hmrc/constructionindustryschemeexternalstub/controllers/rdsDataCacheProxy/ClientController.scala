@@ -22,18 +22,23 @@ import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.ClientListDownloadStatus.*
-import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.EnrolmentsHelper
+import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
 class ClientController @Inject() (
   authorise: AuthAction,
+  resourceHelper: ResourceHelper,
   enrolmentHelper: EnrolmentsHelper,
   cc: ControllerComponents
 )(using ExecutionContext)
     extends BackendController(cc)
     with Logging {
+
+  private val responsePath                   = "/resources"
+  private val getClientList_200_ResponsePath =
+    s"$responsePath/getClientList-200-response.json"
 
   def getClientListDownloadStatus(
     credentialId: String,
@@ -51,11 +56,37 @@ class ClientController @Inject() (
             case "500"    => InternalServerError(Json.obj("error" -> "Could not map client list download status"))
             case "InDown" => Ok(Json.obj("status" -> InitiateDownload.toString))
             case "InProg" => Ok(Json.obj("status" -> InProgress.toString))
-            case "Succes" => Ok(Json.obj("status" -> Succeeded.toString))
             case "Failed" => Ok(Json.obj("status" -> Failed.toString))
+            case _        => Ok(Json.obj("status" -> Succeeded.toString))
           }
         case None                 => InternalServerError
       }
     }
   }
+
+  def getClientList(
+    irAgentId: String,
+    credentialId: String,
+    start: Int = 0,
+    count: Int = -1,
+    sort: Int = 0,
+    ascending: Boolean = true
+  ): Action[AnyContent] = authorise { implicit request =>
+    if (irAgentId.trim().isEmpty || credentialId.trim().isEmpty) {
+      BadRequest(Json.obj("error" -> "credentialId and irAgentId must be provided"))
+    } else {
+      val identifier = enrolmentHelper.agentEnrolmentsOpt(request)
+      identifier match {
+        case Some(agentReference) =>
+          agentReference match {
+//            case "400" => BadRequest(Json.obj("error" -> "credentialId and irAgentId must be provided"))
+            case "500" => InternalServerError(Json.obj("error" -> "Could not get client list"))
+            case _     =>
+              Ok(resourceHelper.resourceAsString(getClientList_200_ResponsePath))
+          }
+        case None                 => InternalServerError
+      }
+    }
+  }
+
 }

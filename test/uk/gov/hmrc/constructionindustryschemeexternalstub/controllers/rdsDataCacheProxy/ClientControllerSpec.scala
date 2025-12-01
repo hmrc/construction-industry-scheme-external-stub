@@ -249,7 +249,7 @@ class ClientControllerSpec extends SpecBase with MockitoSugar {
     def callOnce(): String = {
       val req: FakeRequest[AnyContentAsEmpty.type] =
         FakeRequest(GET, "/cis/client-list-status?credentialId=cred-123&serviceName=service-xyz&gracePeriod=14400")
-      val res: Future[Result] =
+      val res: Future[Result]                      =
         controller.getClientListDownloadStatus("cred-123", "service-xyz")(req)
 
       status(res) mustBe OK

@@ -129,6 +129,61 @@ class ClientControllerSpec extends SpecBase with MockitoSugar {
       contentType(res) mustBe Some(JSON)
       (contentAsJson(res) \ "error").as[String] mustBe "credentialId and serviceName must be provided"
     }
+
+    "progresses PollSu from InitiateDownload to InProgress to Succeeded and then resets" in new Setup {
+
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(Some("PollSu"))
+
+      val statuses = (1 to 8).map(_ => callOnce())
+
+      statuses mustBe Seq(
+        "InitiateDownload",
+        "InProgress",
+        "InProgress",
+        "InProgress",
+        "InProgress",
+        "InProgress",
+        "Succeeded",
+        "InitiateDownload"
+      )
+    }
+
+    "progresses PollFa from InitiateDownload to InProgress to Failed" in new Setup {
+
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(Some("PollFa"))
+
+      val statuses = (1 to 7).map(_ => callOnce())
+
+      statuses mustBe Seq(
+        "InitiateDownload",
+        "InProgress",
+        "InProgress",
+        "InProgress",
+        "InProgress",
+        "InProgress",
+        "Failed"
+      )
+    }
+
+    "progresses PollIn with InitiateDownload on first and terminal InitiateDownload after limit" in new Setup {
+
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(Some("PollIn"))
+
+      val statuses = (1 to 7).map(_ => callOnce())
+
+      statuses mustBe Seq(
+        "InitiateDownload",
+        "InProgress",
+        "InProgress",
+        "InProgress",
+        "InProgress",
+        "InProgress",
+        "InitiateDownload"
+      )
+    }
   }
 
   ".getClientList" - {
@@ -190,6 +245,16 @@ class ClientControllerSpec extends SpecBase with MockitoSugar {
     val mockEnrolmentsHelper: EnrolmentsHelper = mock[EnrolmentsHelper]
     val mockResourceHelper: ResourceHelper     = mock[ResourceHelper]
     val controller                             = new ClientController(fakeAuthAction, mockResourceHelper, mockEnrolmentsHelper, cc)(using ec)
+
+    def callOnce(): String = {
+      val req: FakeRequest[AnyContentAsEmpty.type] =
+        FakeRequest(GET, "/cis/client-list-status?credentialId=cred-123&serviceName=service-xyz&gracePeriod=14400")
+      val res: Future[Result] =
+        controller.getClientListDownloadStatus("cred-123", "service-xyz")(req)
+
+      status(res) mustBe OK
+      (contentAsJson(res) \ "status").as[String]
+    }
 
     val clientList: CisClientSearchResult =
       CisClientSearchResult(

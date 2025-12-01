@@ -21,10 +21,13 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.ClientListDownloadStatus
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.ClientListDownloadStatus.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 
+import java.time.{Duration, Instant}
 import javax.inject.Inject
+import scala.collection.concurrent.TrieMap
 import scala.concurrent.ExecutionContext
 
 class ClientController @Inject() (
@@ -36,9 +39,45 @@ class ClientController @Inject() (
     extends BackendController(cc)
     with Logging {
 
+  private case class Progress(count: Int, lastSeen: Instant)
+
   private val responsePath                   = "/resources"
-  private val getClientList_200_ResponsePath =
-    s"$responsePath/getClientList-200-response.json"
+  private val getClientList_200_ResponsePath = s"$responsePath/getClientList-200-response.json"
+
+  private val callCounts          = TrieMap.empty[String, Progress]
+  private val InProgressCallLimit = 6
+
+  private val AttemptTimeout: Duration = Duration.ofMinutes(1)
+
+  private def progressiveStatus(
+    agentReference: String,
+    terminal: ClientListDownloadStatus
+  ): ClientListDownloadStatus = {
+    val now          = Instant.now()
+    val prev         = callCounts.getOrElse(agentReference, Progress(0, Instant.MIN))
+    val isNewAttempt = Duration.between(prev.lastSeen, now).compareTo(AttemptTimeout) > 0
+
+    val currentCount =
+      if (isNewAttempt) 1
+      else prev.count + 1
+
+    val reachedTerminal = currentCount > InProgressCallLimit
+
+    val status: ClientListDownloadStatus =
+      if (currentCount == 1) InitiateDownload
+      else if (!reachedTerminal) InProgress
+      else terminal
+
+    val nextProgress =
+      if (reachedTerminal)
+        Progress(0, now)
+      else
+        Progress(currentCount, now)
+
+    callCounts.update(agentReference, nextProgress)
+
+    status
+  }
 
   def getClientListDownloadStatus(
     credentialId: String,
@@ -57,6 +96,9 @@ class ClientController @Inject() (
             case "InDown" => Ok(Json.obj("status" -> InitiateDownload.toString))
             case "InProg" => Ok(Json.obj("status" -> InProgress.toString))
             case "Failed" => Ok(Json.obj("status" -> Failed.toString))
+            case "PollSu" => Ok(Json.obj("status" -> progressiveStatus(agentReference, Succeeded).toString))
+            case "PollFa" => Ok(Json.obj("status" -> progressiveStatus(agentReference, Failed).toString))
+            case "PollIn" => Ok(Json.obj("status" -> progressiveStatus(agentReference, InitiateDownload).toString))
             case _        => Ok(Json.obj("status" -> Succeeded.toString))
           }
         case None                 => InternalServerError

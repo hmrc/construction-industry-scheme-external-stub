@@ -52,7 +52,9 @@ class CisTaxpayerController @Inject() (
               )
             ),
           er => {
-            val enrolments = enrolmentHelper.contractorEnrolmentsOpt(request)
+            val enrolments = enrolmentHelper
+              .contractorEnrolmentsOpt(request)
+              .orElse(enrolmentHelper.agentEnrolmentsOpt(request))
             enrolments match {
               case Some(enrolmentReference) =>
                 (er.taxOfficeNumber, er.taxOfficeReference) match {

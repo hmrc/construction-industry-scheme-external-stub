@@ -551,6 +551,65 @@ To trigger the unhappy paths, ensure you provide the following auth login stub v
 </GovTalkMessage>
 ```
 
+###### HTTP 200 - irMark Miss Match Error (will not trigger Polling)
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 754
+- Identifier Name: TaxOfficeReference
+- Identifier Value: **EZ00200**
+
+
+- Request body: **See valid request body above.**
+
+
+- Response status: `200`
+- Response body:
+
+```xml
+<GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
+    <EnvelopeVersion>2.0</EnvelopeVersion>
+    <Header>
+        <MessageDetails>
+            <Class>IR-CIS-CIS300MR</Class>
+            <Qualifier>error</Qualifier>
+            <Function>submit</Function>
+            <TransactionID></TransactionID>
+            <CorrelationID>6483DA820AA844D8A62B1AE43FFC6014</CorrelationID>
+            <ResponseEndPoint PollInterval="2">http://localhost:9712/submission/ChRIS/IR-CIS-CIS300MR/Filing/data/true</ResponseEndPoint>
+            <Transformation>XML</Transformation>
+            <GatewayTimestamp>2025-12-01T10:51:31.225</GatewayTimestamp>
+        </MessageDetails>
+    </Header>
+    <GovTalkDetails>
+        <Keys/>
+        <GovTalkErrors>
+            <Error>
+                <RaisedBy>ChRIS</RaisedBy>
+                <Number>3001</Number>
+                <Type>business</Type>
+                <Text>Your submission failed due to business validation errors. Please see below for details.</Text>
+                <Location></Location>
+            </Error>
+        </GovTalkErrors>
+    </GovTalkDetails>
+    <Body>
+        <ErrorResponse SchemaVersion="2.0">
+            <Application>
+                <MessageCount>1</MessageCount>
+            </Application>
+            <Error>
+                <RaisedBy>ChRIS</RaisedBy>
+                <Number>2021</Number>
+                <Type>business</Type>
+                <Text>The supplied IRmark is incorrect.</Text>
+                <Location>IRmark</Location>
+            </Error>
+        </ErrorResponse>
+    </Body>
+</GovTalkMessage>
+```
 
 ###### HTTP 200 - Submitted (will not trigger Polling)
 
@@ -559,7 +618,7 @@ To trigger the unhappy paths, ensure you provide the following auth login stub v
 - Identifier Name: TaxOfficeNumber
 - Identifier Value: 754
 - Identifier Name: TaxOfficeReference
-- Identifier Value: **Any value excluding: EZ00100, EZ00125, EZ00150** e.g. EZ00200
+- Identifier Value: **Any value excluding: EZ00100, EZ00125, EZ00150** e.g. EZ00300
 
 
 - Request body: **See valid request body above.**

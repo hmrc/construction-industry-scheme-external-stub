@@ -108,10 +108,10 @@ class ClientController @Inject() (
           irAgentId match {
             //            case "400" => BadRequest(Json.obj("error" -> "credentialId and irAgentId must be provided"))
 //            case "500" => InternalServerError(Json.obj("error" -> "Could not check hasClient:))
-            case "000123" if List("789", "900").contains(taxOfficeNumber)                  => Ok(Json.obj("hasClient" -> true))
+            case "000123" if List("789", "900").contains(taxOfficeNumber)                   => Ok(Json.obj("hasClient" -> true))
             case _ if irAgentId != "000123" && List("123", "456").contains(taxOfficeNumber) =>
               Ok(Json.obj("hasClient" -> true))
-            case _                                                                         => Ok(Json.obj("hasClient" -> false))
+            case _                                                                          => Ok(Json.obj("hasClient" -> false))
           }
         case None    => InternalServerError
       }

@@ -5,7 +5,7 @@
             <Class>CISR</Class>
             <Qualifier>acknowledgement</Qualifier>
             <Function>submit</Function>
-            <CorrelationID>4B28ACCBF4B84DEE86EB1581B53E024B</CorrelationID>
+            <CorrelationID>[correlationId]</CorrelationID>
             <ResponseEndPoint PollInterval="5">http://localhost:9712/submission/ChRIS/poll/IR-CIS-CIS300MR/0/false</ResponseEndPoint>
             <GatewayTimestamp/>
             <Transformation>XML</Transformation>

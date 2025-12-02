@@ -50,6 +50,7 @@ class ChrisController @Inject() (
 
   def submitCISMessage(): Action[AnyContent] = Action { (request: Request[AnyContent]) =>
     val message                           = request.body.asXml.get
+    val correlationId                     = (message \ "Header" \ "MessageDetails" \ "CorrelationID").text
     val keys                              = message \ "GovTalkDetails" \ "Keys" \ "Key"
     def typeIs(value: String)(node: Node) = node \@ "Type" == value
     val taxOfficeNumber                   = (keys filter typeIs("TaxOfficeNumber")).text match {
@@ -59,11 +60,33 @@ class ChrisController @Inject() (
     val taxOfficeReference                = (keys filter typeIs("TaxOfficeReference")).text
 
     (taxOfficeNumber, taxOfficeReference) match {
-      case ("754", "EZ00100") => Ok(resourceHelper.resourceAsString(submitCISMessage_acknowledgement_ResponsePath))
-      case ("754", "EZ00125") => Ok(resourceHelper.resourceAsString(submitCISMessage_fatalError_ResponsePath))
-      case ("754", "EZ00150") => Ok(resourceHelper.resourceAsString(submitCISMessage_businessError_ResponsePath))
-      case ("754", "EZ00200") => Ok(resourceHelper.resourceAsString(submitCISMessage_irMarkMismatchError_ResponsePath))
-      case _                  => Ok(resourceHelper.resourceAsString(submitCISMessage_success_ResponsePath))
+      case ("754", "EZ00100") =>
+        Ok(
+          replaceCorrelationId(
+            resourceHelper.resourceAsString(submitCISMessage_acknowledgement_ResponsePath),
+            correlationId
+          )
+        )
+      case ("754", "EZ00125") =>
+        Ok(
+          replaceCorrelationId(resourceHelper.resourceAsString(submitCISMessage_fatalError_ResponsePath), correlationId)
+        )
+      case ("754", "EZ00150") =>
+        Ok(
+          replaceCorrelationId(
+            resourceHelper.resourceAsString(submitCISMessage_businessError_ResponsePath),
+            correlationId
+          )
+        )
+      case ("754", "EZ00200") =>
+        Ok(
+          replaceCorrelationId(
+            resourceHelper.resourceAsString(submitCISMessage_irMarkMismatchError_ResponsePath),
+            correlationId
+          )
+        )
+      case _                  =>
+        Ok(replaceCorrelationId(resourceHelper.resourceAsString(submitCISMessage_success_ResponsePath), correlationId))
     }
 
   }
@@ -132,5 +155,8 @@ class ChrisController @Inject() (
     )
     Ok(rootTextOpt.get)
   }
+
+  private def replaceCorrelationId(response: String, correlationId: String): String =
+    response.replace("[correlationId]", correlationId)
 
 }

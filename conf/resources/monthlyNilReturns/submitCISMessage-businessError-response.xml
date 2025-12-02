@@ -6,7 +6,7 @@
             <Qualifier>error</Qualifier>
             <Function>submit</Function>
             <TransactionID></TransactionID>
-            <CorrelationID>7CEE4C9E82EB4FEFB45E0630701C98BC</CorrelationID>
+            <CorrelationID>[correlationId]</CorrelationID>
             <ResponseEndPoint PollInterval="2">http://localhost:9712/submission/ChRIS/IR-CIS-CIS300MR/Filing/data/true</ResponseEndPoint>
             <Transformation>XML</Transformation>
             <GatewayTimestamp>2025-12-01T10:41:42.885</GatewayTimestamp>

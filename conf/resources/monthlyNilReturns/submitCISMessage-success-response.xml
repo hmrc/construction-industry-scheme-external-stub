@@ -5,7 +5,7 @@
             <Class>IR-CIS-CIS300MR</Class>
             <Qualifier>response</Qualifier>
             <Function>submit</Function>
-            <CorrelationID>77E82433B5764086B7523DDFDE4082BE</CorrelationID>
+            <CorrelationID>[correlationId]</CorrelationID>
             <ResponseEndPoint/>
             <GatewayTimestamp>2025-12-01T11:41:05.431</GatewayTimestamp>
             <Transformation>XML</Transformation>

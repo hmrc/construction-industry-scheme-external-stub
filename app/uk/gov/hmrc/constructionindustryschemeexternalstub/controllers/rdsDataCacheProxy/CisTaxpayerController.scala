@@ -17,7 +17,7 @@
 package uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.rdsDataCacheProxy
 
 import play.api.Logging
-import play.api.libs.json.{JsError, JsValue, Json}
+import play.api.libs.json.{JsError, JsObject, JsValue, Json}
 import play.api.mvc.Results.{InternalServerError, NotFound}
 import play.api.mvc.{Action, ControllerComponents}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -52,10 +52,12 @@ class CisTaxpayerController @Inject() (
               )
             ),
           er => {
-            val enrolments = enrolmentHelper.contractorEnrolmentsOpt(request)
+            val enrolments = enrolmentHelper
+              .contractorEnrolmentsOpt(request)
+              .orElse(enrolmentHelper.agentEnrolmentsOpt(request))
             enrolments match {
               case Some(enrolmentReference) =>
-                (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {
+                (er.taxOfficeNumber, er.taxOfficeReference) match {
                   case ("404", _) =>
                     NotFound(
                       Json.obj(
@@ -63,7 +65,19 @@ class CisTaxpayerController @Inject() (
                       )
                     )
                   case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
-                  case _          => Ok(resourceHelper.resourceAsString(getCisTaxpayerByTaxReference_200_ResponsePath))
+                  case (ton, tor) =>
+                    val json    =
+                      Json.parse(resourceHelper.resourceAsString(getCisTaxpayerByTaxReference_200_ResponsePath))
+                    val updated = json
+                      .as[JsObject]
+                      .deepMerge(
+                        Json.obj(
+                          "taxOfficeNumber" -> ton,
+                          "taxOfficeRef"    -> tor
+                        )
+                      )
+
+                    Ok(updated)
                 }
               case None                     => InternalServerError
             }

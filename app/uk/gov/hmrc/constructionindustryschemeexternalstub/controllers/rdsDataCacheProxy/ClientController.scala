@@ -79,6 +79,9 @@ class ClientController @Inject() (
     status
   }
 
+  private val getClientList_200_Alt_ResponsePath =
+    s"$responsePath/getClientList-200-alt-response.json"
+
   def getClientListDownloadStatus(
     credentialId: String,
     serviceName: String,
@@ -119,16 +122,42 @@ class ClientController @Inject() (
     } else {
       val identifier = enrolmentHelper.agentEnrolmentsOpt(request)
       identifier match {
-        case Some(agentReference) =>
-          agentReference match {
+        case Some(_) =>
+          irAgentId match {
 //            case "400" => BadRequest(Json.obj("error" -> "credentialId and irAgentId must be provided"))
-            case "500" => InternalServerError(Json.obj("error" -> "Could not get client list"))
-            case _     =>
+            case "500"    => InternalServerError(Json.obj("error" -> "Could not get client list"))
+            case "000123" => Ok(resourceHelper.resourceAsString(getClientList_200_Alt_ResponsePath))
+            case _        =>
               Ok(resourceHelper.resourceAsString(getClientList_200_ResponsePath))
           }
-        case None                 => InternalServerError
+        case None    => InternalServerError
       }
     }
   }
 
+  def hasClient(
+    irAgentId: String,
+    credentialId: String,
+    taxOfficeNumber: String,
+    taxOfficeReference: String
+  ): Action[AnyContent] = authorise { implicit request =>
+    if (irAgentId.trim().isEmpty || credentialId.trim().isEmpty) {
+      BadRequest(Json.obj("error" -> "credentialId and irAgentId must be provided"))
+    } else {
+      val identifier = enrolmentHelper.agentEnrolmentsOpt(request)
+      identifier match {
+        case Some(_) =>
+          irAgentId match {
+            case "400"                                                                      => BadRequest(Json.obj("error" -> "credentialId and irAgentId must be provided"))
+            case "500"                                                                      => InternalServerError(Json.obj("error" -> "Could not check hasClient"))
+            case "000123" if List("789", "900").contains(taxOfficeNumber)                   => Ok(Json.obj("hasClient" -> true))
+            case _ if irAgentId != "000123" && List("123", "456").contains(taxOfficeNumber) =>
+              Ok(Json.obj("hasClient" -> true))
+            case _                                                                          => Ok(Json.obj("hasClient" -> false))
+          }
+        case None    => InternalServerError
+      }
+    }
+
+  }
 }

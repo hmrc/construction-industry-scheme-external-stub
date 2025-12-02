@@ -1,0 +1,21 @@
+{
+  "clients":
+    [
+      {
+        "uniqueId": "3",
+        "taxOfficeNumber": "789",
+        "taxOfficeRef": "EF003",
+        "employerName1": "Alternate ABC Ltd",
+        "schemeName": "ALT ABC"
+      },
+      {
+        "uniqueId": "4",
+        "taxOfficeNumber": "900",
+        "taxOfficeRef": "GH005",
+        "employerName1": "Alternate XYZ Builders",
+        "schemeName": "ALT XYZ"
+      }
+    ],
+  "totalCount": 2,
+  "clientNameStartingCharacters": ["A"]
+}

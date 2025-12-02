@@ -211,8 +211,8 @@ class ClientControllerSpec extends SpecBase with MockitoSugar {
         .thenReturn(Some("500"))
 
       val req: FakeRequest[AnyContentAsEmpty.type] =
-        FakeRequest(GET, "/client-list?irAgentId=IR123456&credentialId=CRED-ABC-123")
-      val res: Future[Result]                      = controller.getClientList(irAgentId = "IR123456", credentialId = "CRED-ABC-123")(req)
+        FakeRequest(GET, "/client-list?irAgentId=500&credentialId=CRED-ABC-123")
+      val res: Future[Result]                      = controller.getClientList(irAgentId = "500", credentialId = "CRED-ABC-123")(req)
 
       status(res) mustBe INTERNAL_SERVER_ERROR
       contentType(res) mustBe Some(JSON)
@@ -239,6 +239,57 @@ class ClientControllerSpec extends SpecBase with MockitoSugar {
       (contentAsJson(res) \ "error").as[String] mustBe "credentialId and irAgentId must be provided"
     }
 
+  }
+
+  ".hasClient" - {
+
+    "returns 200 with hasClient true when irAgentId is '000123' and taxOfficeNumber is in allowed list" in new Setup {
+
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(Some("agent-ref-123"))
+
+      val req: FakeRequest[AnyContentAsEmpty.type] =
+        FakeRequest(
+          GET,
+          "/has-client?irAgentId=000123&credentialId=CRED-ABC-123&taxOfficeNumber=789&taxOfficeReference=AB001"
+        )
+      val res: Future[Result]                      = controller.hasClient("000123", "CRED-ABC-123", "789", "AB001")(req)
+
+      status(res) mustBe OK
+      (contentAsJson(res) \ "hasClient").as[Boolean] mustBe true
+    }
+
+    "returns 200 with hasClient true when irAgentId is not '000123' and taxOfficeNumber is '123'" in new Setup {
+
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(Some("agent-ref-123"))
+
+      val req: FakeRequest[AnyContentAsEmpty.type] =
+        FakeRequest(
+          GET,
+          "/has-client?irAgentId=IR123456&credentialId=CRED-ABC-123&taxOfficeNumber=123&taxOfficeReference=AB001"
+        )
+      val res: Future[Result]                      = controller.hasClient("IR123456", "CRED-ABC-123", "123", "AB001")(req)
+
+      status(res) mustBe OK
+      (contentAsJson(res) \ "hasClient").as[Boolean] mustBe true
+    }
+
+    "returns 200 with hasClient false when no match conditions are met" in new Setup {
+
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(Some("agent-ref-123"))
+
+      val req: FakeRequest[AnyContentAsEmpty.type] =
+        FakeRequest(
+          GET,
+          "/has-client?irAgentId=IR999999&credentialId=CRED-ABC-123&taxOfficeNumber=999&taxOfficeReference=ZZ001"
+        )
+      val res: Future[Result]                      = controller.hasClient("IR999999", "CRED-ABC-123", "999", "ZZ001")(req)
+
+      status(res) mustBe OK
+      (contentAsJson(res) \ "hasClient").as[Boolean] mustBe false
+    }
   }
 
   private trait Setup {

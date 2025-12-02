@@ -1,0 +1,26 @@
+<GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
+    <EnvelopeVersion>2.0</EnvelopeVersion>
+    <Header>
+        <MessageDetails>
+            <Class>CISR</Class>
+            <Qualifier>acknowledgement</Qualifier>
+            <Function>submit</Function>
+            <CorrelationID>[correlationId]</CorrelationID>
+            <ResponseEndPoint PollInterval="5">http://localhost:9712/submission/ChRIS/poll/IR-CIS-CIS300MR/0/false</ResponseEndPoint>
+            <GatewayTimestamp/>
+            <Transformation>XML</Transformation>
+        </MessageDetails>
+    </Header>
+    <GovTalkDetails>
+        <Keys/>
+        <GovTalkErrors>
+            <Error>
+                <RaisedBy>ChRIS</RaisedBy>
+                <Number>5999</Number>
+                <Type>business</Type>
+                <Text>Unknown CorrelationId</Text>
+            </Error>
+        </GovTalkErrors>
+    </GovTalkDetails>
+    <Body/>
+</GovTalkMessage>

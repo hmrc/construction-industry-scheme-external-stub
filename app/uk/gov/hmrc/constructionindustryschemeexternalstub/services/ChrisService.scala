@@ -235,10 +235,8 @@ class ChrisService @Inject() (config: AppConfig) {
     pollStatusByCorrelation.put(correlationId, status)
   }
 
-  def consumeFinalStatus(correlationId: String): String = {
+  def consumeFinalStatus(correlationId: String): String =
     pollStatusByCorrelation.remove(correlationId).getOrElse("SUBMITTED")
-  }
-
 }
 
 object CorrelationIDGenerator {

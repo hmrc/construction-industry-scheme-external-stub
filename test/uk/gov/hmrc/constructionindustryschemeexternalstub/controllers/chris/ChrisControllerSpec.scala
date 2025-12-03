@@ -17,7 +17,7 @@
 package uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.chris
 
 import com.typesafe.config.ConfigFactory
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.*
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -27,6 +27,7 @@ import play.api.mvc.*
 import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.config.AppConfig
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.FATAL_ERROR
 import uk.gov.hmrc.constructionindustryschemeexternalstub.services.ChrisService
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.ResourceHelper
 
@@ -170,6 +171,115 @@ class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
       status(response) mustBe OK
       contentType(response).get mustBe "application/xml"
       contentAsString(response) mustBe expected.toString()
+    }
+
+    "return fatal error response for submitCISMessage when initial status is FATAL_ERROR" in {
+      val correlationId = "CORR-123"
+      val cisMessage =
+        <GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
+          <Header>
+            <MessageDetails>
+              <Class>IR-CIS-CIS300MR</Class>
+              <CorrelationID>{correlationId}</CorrelationID>
+            </MessageDetails>
+          </Header>
+          <GovTalkDetails>
+            <Keys>
+              <Key Type="TaxOfficeNumber">754</Key>
+              <Key Type="TaxOfficeReference">EZ00125</Key>
+            </Keys>
+          </GovTalkDetails>
+          <Body/>
+        </GovTalkMessage>
+
+      when(service.initialCisStatus(eqTo("754"), eqTo("EZ00125")))
+        .thenReturn(FATAL_ERROR)
+
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn("FATAL-[correlationId]")
+
+      val request = postRequest.withXmlBody(cisMessage)
+      val response = testInstance.submitCISMessage().apply(request)
+
+      status(response) mustBe OK
+      contentAsString(response) mustBe "FATAL-" + correlationId
+
+      verify(service).registerInitialSubmission(eqTo(correlationId), eqTo("754"))
+    }
+
+    "return ACKNOWLEDGE polling response on first poll" in {
+      val correlationId = "CORR-ACK-1"
+      val pollCount = 0
+
+      val pollRequestXml =
+        <GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
+          <Header>
+            <MessageDetails>
+              <CorrelationID>{correlationId}</CorrelationID>
+            </MessageDetails>
+          </Header>
+          <Body/>
+        </GovTalkMessage>
+
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn("[correlationId]-[pollUrl]")
+
+      val request = postRequest.withXmlBody(pollRequestXml)
+      val response = testInstance.getCISResponse(pollCount).apply(request)
+
+      status(response) mustBe OK
+
+      val expectedNextPollUrl =
+        s"${appConfig.pollUrl("IR-CIS-CIS300MR")}/${pollCount + 1}"
+
+      contentAsString(response) mustBe
+        s"$correlationId-$expectedNextPollUrl"
+    }
+
+    "return correct polling response template for all terminal statuses" in {
+      val correlationId = "CORR-LOOP"
+      val pollCount     = 2
+
+      val pollRequestXml =
+        <GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
+          <Header>
+            <MessageDetails>
+              <CorrelationID>{correlationId}</CorrelationID>
+            </MessageDetails>
+          </Header>
+          <Body/>
+        </GovTalkMessage>
+
+      val statuses = Seq(
+        "ACKNOWLEDGE",
+        "SUBMITTED_NO_RECEIPT",
+        "FATAL_ERROR",
+        "DEPARTMENTAL_ERROR",
+        "SUBMITTED"
+      )
+
+      val basePollUrl = appConfig.pollUrl("IR-CIS-CIS300MR")
+      val request     = postRequest.withXmlBody(pollRequestXml)
+
+      statuses.foreach { statusValue =>
+        reset(service, mockResourceHelper)
+
+        when(service.consumeFinalStatus(eqTo(correlationId)))
+          .thenReturn(statusValue)
+
+        when(mockResourceHelper.resourceAsString(any()))
+          .thenReturn("[correlationId]-[pollUrl]-" + statusValue)
+
+        val response = testInstance.getCISResponse(pollCount).apply(request)
+
+        status(response) mustBe OK
+
+        val expectedNextPollUrl =
+          s"$basePollUrl/${pollCount + 1}"
+
+        contentAsString(response) mustBe
+          s"$correlationId-$expectedNextPollUrl-$statusValue"
+      }
     }
   }
 }

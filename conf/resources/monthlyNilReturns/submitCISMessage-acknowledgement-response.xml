@@ -6,7 +6,7 @@
             <Qualifier>acknowledgement</Qualifier>
             <Function>submit</Function>
             <CorrelationID>[correlationId]</CorrelationID>
-            <ResponseEndPoint PollInterval="5">http://localhost:9712/submission/ChRIS/poll/IR-CIS-CIS300MR/0/false</ResponseEndPoint>
+            <ResponseEndPoint PollInterval="5">[pollUrl]</ResponseEndPoint>
             <GatewayTimestamp/>
             <Transformation>XML</Transformation>
         </MessageDetails>

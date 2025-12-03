@@ -21,7 +21,7 @@ import play.api.mvc.{Action, AnyContent, ControllerComponents, Request}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.constructionindustryschemeexternalstub.config.AppConfig
 import uk.gov.hmrc.constructionindustryschemeexternalstub.services.ChrisService
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{FATAL_ERROR, SUCCESS}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.ResourceHelper
 
 import javax.inject.{Inject, Singleton}
@@ -59,34 +59,27 @@ class ChrisController @Inject() (
     }
     val taxOfficeReference                = (keys filter typeIs("TaxOfficeReference")).text
 
-    (taxOfficeNumber, taxOfficeReference) match {
-      case ("754", "EZ00100") =>
+    service.registerInitialSubmission(correlationId, taxOfficeNumber)
+
+    service.initialCisStatus(taxOfficeNumber, taxOfficeReference) match {
+      case FATAL_ERROR =>
         Ok(
           replaceCorrelationId(
-            resourceHelper.resourceAsString(submitCISMessage_acknowledgement_ResponsePath),
+            resourceHelper.resourceAsString(submitCISMessage_fatalError_ResponsePath),
             correlationId
           )
         )
-      case ("754", "EZ00125") =>
-        Ok(
-          replaceCorrelationId(resourceHelper.resourceAsString(submitCISMessage_fatalError_ResponsePath), correlationId)
-        )
-      case ("754", "EZ00150") =>
-        Ok(
-          replaceCorrelationId(
-            resourceHelper.resourceAsString(submitCISMessage_businessError_ResponsePath),
-            correlationId
-          )
-        )
-      case ("754", "EZ00200") =>
-        Ok(
-          replaceCorrelationId(
-            resourceHelper.resourceAsString(submitCISMessage_irMarkMismatchError_ResponsePath),
-            correlationId
-          )
-        )
-      case _                  =>
-        Ok(replaceCorrelationId(resourceHelper.resourceAsString(submitCISMessage_success_ResponsePath), correlationId))
+
+      case _ =>
+        val basePollUrl  = config.pollUrl("IR-CIS-CIS300MR")
+        val pollUrlWith0 = s"$basePollUrl/0"
+        val xml          =
+          resourceHelper
+            .resourceAsString(submitCISMessage_acknowledgement_ResponsePath)
+            .replace("[correlationId]", correlationId)
+            .replace("[pollUrl]", pollUrlWith0)
+
+        Ok(xml)
     }
 
   }
@@ -140,20 +133,30 @@ class ChrisController @Inject() (
       Ok(rootTextOpt.get)
   }
 
-  def getCISResponse(error: Boolean): Action[AnyContent] = Action { (request: Request[AnyContent]) =>
+  def getCISResponse(count: Int): Action[AnyContent] = Action { request =>
+    val message       = request.body.asXml.get
+    val correlationId = (message \ "Header" \ "MessageDetails" \ "CorrelationID").text
+    val isFinalPoll   = count >= 2
 
-    val rootTextOpt = request.body.asXml.map(
-      service.responseMessageCISMRFiling(
-        _,
-        "IR-CIS-CIS300MR",
-        if (error) {
-          FATAL_ERROR
-        } else {
-          SUCCESS
-        }
-      )
-    )
-    Ok(rootTextOpt.get)
+    val status =
+      if (!isFinalPoll) "ACKNOWLEDGE"
+      else service.consumeFinalStatus(correlationId)
+
+    val resourcePath = status match {
+      case "ACKNOWLEDGE"          => submitCISMessage_acknowledgement_ResponsePath
+      case "SUBMITTED_NO_RECEIPT" => submitCISMessage_irMarkMismatchError_ResponsePath
+      case "FATAL_ERROR"          => submitCISMessage_fatalError_ResponsePath
+      case "DEPARTMENTAL_ERROR"   => submitCISMessage_businessError_ResponsePath
+      case _                      => submitCISMessage_success_ResponsePath
+    }
+
+    val rawXml      = resourceHelper.resourceAsString(resourcePath)
+    val basePollUrl = config.pollUrl("IR-CIS-CIS300MR")
+    val nextPollUrl = s"$basePollUrl/${count + 1}"
+    val xml         = rawXml
+      .replace("[correlationId]", correlationId)
+      .replace("[pollUrl]", nextPollUrl)
+    Ok(xml)
   }
 
   private def replaceCorrelationId(response: String, correlationId: String): String =

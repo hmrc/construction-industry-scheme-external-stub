@@ -207,7 +207,7 @@ class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
 
     "return ACKNOWLEDGE polling response on first poll" in {
       val correlationId = "CORR-ACK-1"
-      val pollCount = 0
+      val pollCount     = 0
 
       val pollRequestXml =
         <GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
@@ -222,7 +222,7 @@ class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
       when(mockResourceHelper.resourceAsString(any()))
         .thenReturn("[correlationId]-[pollUrl]")
 
-      val request = postRequest.withXmlBody(pollRequestXml)
+      val request  = postRequest.withXmlBody(pollRequestXml)
       val response = testInstance.getCISResponse(pollCount).apply(request)
 
       status(response) mustBe OK
@@ -236,7 +236,7 @@ class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
 
     "return correct polling response template for all terminal statuses" in {
       val correlationId = "CORR-LOOP"
-      val pollCount = 2
+      val pollCount     = 2
 
       val pollRequestXml =
         <GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">

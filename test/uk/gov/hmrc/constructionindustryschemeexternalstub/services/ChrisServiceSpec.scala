@@ -1137,28 +1137,20 @@ class ChrisServiceSpec extends AnyWordSpec with Matchers with OneInstancePerTest
       }
     }
 
-    "ChrisService.registerInitialSubmission and consumeFinalStatus" should {
+    "ChrisService.terminalStatusFor" should {
 
-      "store polling status for a correlationId and return it once" in {
-        val correlationId   = "corr-123"
+      "return configured terminal status for a known tax office number" in {
         val taxOfficeNumber = "754"
-        val expectedStatus  = appConfig.pollingStatus(taxOfficeNumber)
+        val expected        = appConfig.pollingStatus(taxOfficeNumber)
 
-        testInstance.registerInitialSubmission(correlationId, taxOfficeNumber)
-
-        val first = testInstance.consumeFinalStatus(correlationId)
-        first mustBe expectedStatus
-
-        val second = testInstance.consumeFinalStatus(correlationId)
-        second mustBe "SUBMITTED"
+        testInstance.terminalStatusFor(taxOfficeNumber) mustBe expected
       }
 
-      "return SUBMITTED for an unknown correlationId" in {
-        val unknownCorrelationId = "does-not-exist"
+      "return SUBMITTED when tax office number is not configured" in {
+        val unknownTaxOfficeNumber = "99999"
 
-        val result = testInstance.consumeFinalStatus(unknownCorrelationId)
-
-        result mustBe "SUBMITTED"
+        appConfig.pollingStatus(unknownTaxOfficeNumber) mustBe "SUBMITTED"
+        testInstance.terminalStatusFor(unknownTaxOfficeNumber) mustBe "SUBMITTED"
       }
     }
   }

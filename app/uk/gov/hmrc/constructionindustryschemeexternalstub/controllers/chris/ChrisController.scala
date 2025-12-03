@@ -59,7 +59,7 @@ class ChrisController @Inject() (
     }
     val taxOfficeReference                = (keys filter typeIs("TaxOfficeReference")).text
 
-    service.registerInitialSubmission(correlationId, taxOfficeNumber)
+    val terminalStatus = service.terminalStatusFor(taxOfficeNumber)
 
     service.initialCisStatus(taxOfficeNumber, taxOfficeReference) match {
       case FATAL_ERROR =>
@@ -72,7 +72,7 @@ class ChrisController @Inject() (
 
       case _ =>
         val basePollUrl  = config.pollUrl("IR-CIS-CIS300MR")
-        val pollUrlWith0 = s"$basePollUrl/0"
+        val pollUrlWith0 = s"$basePollUrl/0?final=$terminalStatus"
         val xml          =
           resourceHelper
             .resourceAsString(submitCISMessage_acknowledgement_ResponsePath)
@@ -138,9 +138,12 @@ class ChrisController @Inject() (
     val correlationId = (message \ "Header" \ "MessageDetails" \ "CorrelationID").text
     val isFinalPoll   = count >= 2
 
+    val finalStatusParam: String =
+      request.getQueryString("final").getOrElse("SUBMITTED")
+
     val status =
       if (!isFinalPoll) "ACKNOWLEDGE"
-      else service.consumeFinalStatus(correlationId)
+      else finalStatusParam
 
     val resourcePath = status match {
       case "ACKNOWLEDGE"          => submitCISMessage_acknowledgement_ResponsePath
@@ -152,10 +155,15 @@ class ChrisController @Inject() (
 
     val rawXml      = resourceHelper.resourceAsString(resourcePath)
     val basePollUrl = config.pollUrl("IR-CIS-CIS300MR")
-    val nextPollUrl = s"$basePollUrl/${count + 1}"
-    val xml         = rawXml
+
+    val nextPollUrl =
+      if (isFinalPoll) ""
+      else s"$basePollUrl/${count + 1}?final=$finalStatusParam"
+
+    val xml = rawXml
       .replace("[correlationId]", correlationId)
       .replace("[pollUrl]", nextPollUrl)
+
     Ok(xml)
   }
 

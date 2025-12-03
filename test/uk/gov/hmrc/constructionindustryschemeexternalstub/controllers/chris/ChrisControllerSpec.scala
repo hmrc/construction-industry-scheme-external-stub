@@ -203,8 +203,6 @@ class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
 
       status(response) mustBe OK
       contentAsString(response) mustBe "FATAL-" + correlationId
-
-      verify(service).registerInitialSubmission(eqTo(correlationId), eqTo("754"))
     }
 
     "return ACKNOWLEDGE polling response on first poll" in {
@@ -229,16 +227,19 @@ class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
 
       status(response) mustBe OK
 
-      val expectedNextPollUrl =
-        s"${appConfig.pollUrl("IR-CIS-CIS300MR")}/${pollCount + 1}"
+      val defaultTaxOfficeNumber = "123"
+      val expectedFinal          = appConfig.pollingStatus(defaultTaxOfficeNumber)
+      val expectedNextPollUrl    =
+        s"${appConfig.pollUrl("IR-CIS-CIS300MR")}/${pollCount + 1}?final=$expectedFinal"
 
       contentAsString(response) mustBe
         s"$correlationId-$expectedNextPollUrl"
     }
 
     "return correct polling response template for all terminal statuses" in {
-      val correlationId = "CORR-LOOP"
-      val pollCount     = 2
+      val correlationId   = "CORR-LOOP"
+      val pollCount       = 2
+      val taxOfficeNumber = "754"
 
       val pollRequestXml =
         <GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
@@ -258,13 +259,12 @@ class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
         "SUBMITTED"
       )
 
-      val basePollUrl = appConfig.pollUrl("IR-CIS-CIS300MR")
-      val request     = postRequest.withXmlBody(pollRequestXml)
+      val request = postRequest.withXmlBody(pollRequestXml)
 
       statuses.foreach { statusValue =>
         reset(service, mockResourceHelper)
 
-        when(service.consumeFinalStatus(eqTo(correlationId)))
+        when(service.terminalStatusFor(eqTo(taxOfficeNumber)))
           .thenReturn(statusValue)
 
         when(mockResourceHelper.resourceAsString(any()))
@@ -274,11 +274,8 @@ class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
 
         status(response) mustBe OK
 
-        val expectedNextPollUrl =
-          s"$basePollUrl/${pollCount + 1}"
-
         contentAsString(response) mustBe
-          s"$correlationId-$expectedNextPollUrl-$statusValue"
+          s"$correlationId--$statusValue"
       }
     }
   }

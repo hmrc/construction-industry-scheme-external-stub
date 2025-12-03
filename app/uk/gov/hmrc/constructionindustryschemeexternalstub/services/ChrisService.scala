@@ -22,7 +22,6 @@ import play.api.Logger
 import uk.gov.hmrc.constructionindustryschemeexternalstub.config.AppConfig
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{ACKNOWLEDGE, BUSINESS_ERROR, CISMRFilingResponse, CISVerifyResponse, ChRISResponseType, ChrisResponse, CommonChrisResponse, FATAL_ERROR, SUCCESS}
 
-import scala.collection.concurrent.TrieMap
 import scala.xml.{Node, NodeSeq}
 
 @Singleton
@@ -227,15 +226,8 @@ class ChrisService @Inject() (config: AppConfig) {
     else ACKNOWLEDGE
   }
 
-  private val pollStatusByCorrelation = TrieMap.empty[String, String]
-
-  def registerInitialSubmission(correlationId: String, taxOfficeNumber: String): Unit = {
-    val status = config.pollingStatus(taxOfficeNumber)
-    pollStatusByCorrelation.put(correlationId, status)
-  }
-
-  def consumeFinalStatus(correlationId: String): String =
-    pollStatusByCorrelation.remove(correlationId).getOrElse("SUBMITTED")
+  def terminalStatusFor(taxOfficeNumber: String): String =
+    config.pollingStatus(taxOfficeNumber)
 }
 
 object CorrelationIDGenerator {

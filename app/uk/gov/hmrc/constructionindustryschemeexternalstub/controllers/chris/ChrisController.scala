@@ -59,8 +59,6 @@ class ChrisController @Inject() (
     }
     val taxOfficeReference                = (keys filter typeIs("TaxOfficeReference")).text
 
-    val terminalStatus = service.terminalStatusFor(taxOfficeNumber)
-
     service.initialCisStatus(taxOfficeNumber, taxOfficeReference) match {
       case FATAL_ERROR =>
         Ok(
@@ -71,9 +69,17 @@ class ChrisController @Inject() (
         )
 
       case _ =>
-        val basePollUrl  = config.pollUrl("IR-CIS-CIS300MR")
-        val pollUrlWith0 = s"$basePollUrl/0?final=$terminalStatus"
-        val xml          =
+        val basePollUrl = config.pollUrl("IR-CIS-CIS300MR")
+
+        val pollUrlWith0 =
+          if (service.isForeverPending(taxOfficeNumber)) {
+            s"$basePollUrl/0"
+          } else {
+            val finalStatus = service.terminalStatusFor(taxOfficeNumber)
+            s"$basePollUrl/0?final=$finalStatus"
+          }
+
+        val xml =
           resourceHelper
             .resourceAsString(submitCISMessage_acknowledgement_ResponsePath)
             .replace("[correlationId]", correlationId)
@@ -134,9 +140,10 @@ class ChrisController @Inject() (
   }
 
   def getCISResponse(count: Int): Action[AnyContent] = Action { request =>
-    val message       = request.body.asXml.get
-    val correlationId = (message \ "Header" \ "MessageDetails" \ "CorrelationID").text
-    val isFinalPoll   = count >= 2
+    val message        = request.body.asXml.get
+    val correlationId  = (message \ "Header" \ "MessageDetails" \ "CorrelationID").text
+    val finalStatusOpt = request.getQueryString("final")
+    val isFinalPoll    = finalStatusOpt.isDefined && count >= 2
 
     val finalStatusParam: String =
       request.getQueryString("final").getOrElse("SUBMITTED")
@@ -157,8 +164,13 @@ class ChrisController @Inject() (
     val basePollUrl = config.pollUrl("IR-CIS-CIS300MR")
 
     val nextPollUrl =
-      if (isFinalPoll) ""
-      else s"$basePollUrl/${count + 1}?final=$finalStatusParam"
+      if (isFinalPoll) {
+        ""
+      } else {
+        val nextCount = count + 1
+        val suffix    = finalStatusOpt.map(fs => s"?final=$fs").getOrElse("")
+        s"$basePollUrl/$nextCount$suffix"
+      }
 
     val xml = rawXml
       .replace("[correlationId]", correlationId)

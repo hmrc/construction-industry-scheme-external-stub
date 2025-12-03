@@ -1153,5 +1153,19 @@ class ChrisServiceSpec extends AnyWordSpec with Matchers with OneInstancePerTest
         testInstance.terminalStatusFor(unknownTaxOfficeNumber) mustBe "SUBMITTED"
       }
     }
+
+    "ChrisService.isForeverPending" should {
+
+      "return true when polling status is ACKNOWLEDGE" in {
+        val taxOfficeNumber = "758"
+        testInstance.terminalStatusFor(taxOfficeNumber) mustBe "ACKNOWLEDGE"
+        testInstance.isForeverPending(taxOfficeNumber) mustBe true
+      }
+
+      "return false when polling status is not ACKNOWLEDGE" in {
+        val taxOfficeNumber = "754"
+        testInstance.isForeverPending(taxOfficeNumber) mustBe false
+      }
+    }
   }
 }

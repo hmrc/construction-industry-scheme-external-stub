@@ -228,6 +228,9 @@ class ChrisService @Inject() (config: AppConfig) {
 
   def terminalStatusFor(taxOfficeNumber: String): String =
     config.pollingStatus(taxOfficeNumber)
+
+  def isForeverPending(taxOfficeNumber: String): Boolean =
+    terminalStatusFor(taxOfficeNumber) == "ACKNOWLEDGE"
 }
 
 object CorrelationIDGenerator {

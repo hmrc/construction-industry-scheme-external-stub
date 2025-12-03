@@ -1119,7 +1119,7 @@ class ChrisServiceSpec extends AnyWordSpec with Matchers with OneInstancePerTest
     "ChrisService.initialCisStatus" should {
 
       "return FATAL_ERROR when tax office / reference is in fatalErrorFilter" in {
-        val fatalKey = appConfig.fatalErrorFilter.headOption.getOrElse("754/EZ00125")
+        val fatalKey                             = appConfig.fatalErrorFilter.headOption.getOrElse("754/EZ00125")
         val Array(taxOfficeNumber, taxOfficeRef) = fatalKey.split("/")
 
         val result = testInstance.initialCisStatus(taxOfficeNumber, taxOfficeRef)
@@ -1128,7 +1128,7 @@ class ChrisServiceSpec extends AnyWordSpec with Matchers with OneInstancePerTest
       }
 
       "return ACKNOWLEDGE when tax office / reference is not in fatalErrorFilter" in {
-        val ackKey = appConfig.acknowledgeFilter.headOption.getOrElse("754/EZ00100")
+        val ackKey                               = appConfig.acknowledgeFilter.headOption.getOrElse("754/EZ00100")
         val Array(taxOfficeNumber, taxOfficeRef) = ackKey.split("/")
 
         val result = testInstance.initialCisStatus(taxOfficeNumber, taxOfficeRef)
@@ -1140,9 +1140,9 @@ class ChrisServiceSpec extends AnyWordSpec with Matchers with OneInstancePerTest
     "ChrisService.registerInitialSubmission and consumeFinalStatus" should {
 
       "store polling status for a correlationId and return it once" in {
-        val correlationId = "corr-123"
+        val correlationId   = "corr-123"
         val taxOfficeNumber = "754"
-        val expectedStatus = appConfig.pollingStatus(taxOfficeNumber)
+        val expectedStatus  = appConfig.pollingStatus(taxOfficeNumber)
 
         testInstance.registerInitialSubmission(correlationId, taxOfficeNumber)
 

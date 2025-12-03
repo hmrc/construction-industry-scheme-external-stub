@@ -175,7 +175,7 @@ class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
 
     "return fatal error response for submitCISMessage when initial status is FATAL_ERROR" in {
       val correlationId = "CORR-123"
-      val cisMessage =
+      val cisMessage    =
         <GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
           <Header>
             <MessageDetails>
@@ -198,7 +198,7 @@ class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
       when(mockResourceHelper.resourceAsString(any()))
         .thenReturn("FATAL-[correlationId]")
 
-      val request = postRequest.withXmlBody(cisMessage)
+      val request  = postRequest.withXmlBody(cisMessage)
       val response = testInstance.submitCISMessage().apply(request)
 
       status(response) mustBe OK
@@ -209,7 +209,7 @@ class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
 
     "return ACKNOWLEDGE polling response on first poll" in {
       val correlationId = "CORR-ACK-1"
-      val pollCount = 0
+      val pollCount     = 0
 
       val pollRequestXml =
         <GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
@@ -224,7 +224,7 @@ class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
       when(mockResourceHelper.resourceAsString(any()))
         .thenReturn("[correlationId]-[pollUrl]")
 
-      val request = postRequest.withXmlBody(pollRequestXml)
+      val request  = postRequest.withXmlBody(pollRequestXml)
       val response = testInstance.getCISResponse(pollCount).apply(request)
 
       status(response) mustBe OK

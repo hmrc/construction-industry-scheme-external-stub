@@ -1,7 +1,12 @@
 {
-  "taxOfficeNumber": "123",
-  "taxOfficeReference": "AB456",
-  "aoRef": "123PA12345678",
-  "utr": "1123456789",
-  "schemeName": "PAL-355 Scheme"
+  "knownfacts": {
+    "taxOfficeNumber": "123",
+    "taxOfficeReference": "AB456",
+    "agentOwnReference": "1234657890"
+  },
+  "prePopContractor": {
+    "schemeName": "PAL-355 Scheme",
+    "utr": "1123456789",
+    "response": 0
+  }
 }

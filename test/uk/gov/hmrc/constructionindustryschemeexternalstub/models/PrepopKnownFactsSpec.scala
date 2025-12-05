@@ -19,17 +19,17 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub.models
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.libs.json.*
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.SchemePrepopKnownFactsRequest
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.PrepopKnownFacts
 
-class SchemePrepopKnownFactsRequestSpec extends AnyWordSpec with Matchers {
+class PrepopKnownFactsSpec extends AnyWordSpec with Matchers {
 
-  "SchemePrepopKnownFactsRequest" must {
+  "PrepopKnownFacts" must {
 
     "serialise to and deserialise from JSON" in {
-      val model = SchemePrepopKnownFactsRequest(
+      val model = PrepopKnownFacts(
         taxOfficeNumber = "123",
         taxOfficeReference = "AB456",
-        aoRef = "123PA12345678"
+        agentOwnReference = "123PA12345678"
       )
 
       val json = Json.toJson(model)
@@ -37,10 +37,10 @@ class SchemePrepopKnownFactsRequestSpec extends AnyWordSpec with Matchers {
       json mustBe Json.obj(
         "taxOfficeNumber"    -> "123",
         "taxOfficeReference" -> "AB456",
-        "aoRef"              -> "123PA12345678"
+        "agentOwnReference"  -> "123PA12345678"
       )
 
-      json.as[SchemePrepopKnownFactsRequest] mustBe model
+      json.as[PrepopKnownFacts] mustBe model
     }
   }
 }

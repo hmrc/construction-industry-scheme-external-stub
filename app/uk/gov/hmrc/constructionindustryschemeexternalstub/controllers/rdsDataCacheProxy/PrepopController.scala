@@ -41,8 +41,8 @@ class PrepopController @Inject() (
   private val getSubconPrepopByKnownFacts_200_ResponsePath =
     s"$resourcesBasePath/getSubcontractorPrepopByKnownFacts-200-response.json"
 
-  private def context(k: PrepopKnownFacts): String =
-    s"TON=${k.taxOfficeNumber}, TOR=${k.taxOfficeReference}, AO=${k.agentOwnReference}"
+  private def context(knownFactsSummary: PrepopKnownFacts): String =
+    s"TON=${knownFactsSummary.taxOfficeNumber}, TOR=${knownFactsSummary.taxOfficeReference}, AO=${knownFactsSummary.agentOwnReference}"
 
   private def badJson(errs: Seq[(JsPath, Seq[JsonValidationError])]): Result =
     BadRequest(
@@ -52,13 +52,9 @@ class PrepopController @Inject() (
       )
     )
 
-  private def knownfactsJson(k: PrepopKnownFacts): JsObject =
+  private def knownfactsJson(knownFactsSummary: PrepopKnownFacts): JsObject =
     Json.obj(
-      "knownfacts" -> Json.obj(
-        "taxOfficeNumber"    -> k.taxOfficeNumber,
-        "taxOfficeReference" -> k.taxOfficeReference,
-        "agentOwnReference"  -> k.agentOwnReference
-      )
+      "knownfacts" -> Json.toJson(knownFactsSummary)
     )
 
   def getSchemePrepopByKnownFacts: Action[JsValue] =

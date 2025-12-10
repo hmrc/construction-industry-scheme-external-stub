@@ -6,6 +6,9 @@ POST       /monthly-return/nil/create                               uk.gov.hmrc.
 POST       /scheme/email                                            uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.getSchemeEmail
 POST       /submissions/create                                      uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubmissionController.createSubmission()
 POST       /submissions/update                                      uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubmissionController.updateSubmission()
+GET        /scheme/:instanceId                                      uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.ContractorSchemeController.getScheme(instanceId: String)
+POST       /scheme                                                  uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.ContractorSchemeController.createScheme
+POST       /scheme/update                                           uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.ContractorSchemeController.updateScheme
 
 # stubbed rds-datacache-proxy routes
 POST       /cis-taxpayer                                            uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.rdsDataCacheProxy.CisTaxpayerController.getCisTaxpayerByTaxReference

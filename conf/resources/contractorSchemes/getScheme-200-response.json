@@ -1,0 +1,17 @@
+{
+  "schemeId": 1000,
+  "instanceId": "CIS-123",
+  "accountsOfficeReference": "123PA00123456",
+  "taxOfficeNumber": "123",
+  "taxOfficeReference": "AB1234",
+  "utr": "1234567890",
+  "name": "ABC Construction Ltd",
+  "emailAddress": "test@test.com",
+  "displayWelcomePage": null,
+  "prePopCount": 1,
+  "prePopSuccessful": "Y",
+  "subcontractorCounter": 1,
+  "verificationBatchCounter": 0,
+  "lastUpdate": "2025-01-01T12:00:00Z",
+  "version": 1
+}

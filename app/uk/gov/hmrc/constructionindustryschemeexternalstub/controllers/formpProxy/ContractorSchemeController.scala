@@ -17,10 +17,11 @@
 package uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy
 
 import play.api.Logging
-import play.api.libs.json.{JsError, JsValue, Json}
-import play.api.mvc.{Action, AnyContent, ControllerComponents}
+import play.api.libs.json.{JsError, JsObject, JsValue, Json}
+import play.api.mvc.{Action, AnyContent, ControllerComponents, RequestHeader, Result}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{CreateContractorSchemeParams, UpdateContractorSchemeParams}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.AuthenticatedRequest
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{CreateContractorSchemeParams, EmployerReference, UpdateContractorSchemeParams}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -35,7 +36,8 @@ class ContractorSchemeController @Inject() (
     with Logging {
 
   private val basePath                            = "/resources/contractorSchemes"
-  private val getScheme_200_ResponsePath          = s"$basePath/getScheme-200-response.json"
+  private val getScheme_200_org_ResponsePath      = s"$basePath/getScheme-200-org-response.json"
+  private val getScheme_200_agent_ResponsePath    = s"$basePath/getScheme-200-agent-response.json"
   private val getScheme_noNameNoUtr_sub1_Response = s"$basePath/getScheme-200-no-name-no-utr-response.json"
   private val getScheme_nameOnly_Response         = s"$basePath/getScheme-200-name-only-response.json"
   private val getScheme_utrOnly_Response          = s"$basePath/getScheme-200-utr-only-response.json"
@@ -45,37 +47,22 @@ class ContractorSchemeController @Inject() (
 
   def getScheme(instanceId: String): Action[AnyContent] =
     authorise { implicit request =>
-      val enrolmentsOpt = enrolmentHelper.contractorEnrolmentsOpt(request)
+      val contractorRefOpt: Option[EmployerReference] = enrolmentHelper.contractorEnrolmentsOpt(request)
+      val agentRefOpt: Option[String]                 = enrolmentHelper.agentEnrolmentsOpt(request)
 
-      enrolmentsOpt match {
-        case Some(enrolRef) =>
-          val ton = enrolRef.taxOfficeNumber
-          val tor = enrolRef.taxOfficeReference
+      (contractorRefOpt, agentRefOpt) match {
 
-          (ton, tor) match {
-            case ("400", _) => BadRequest(Json.obj("message" -> "Bad request"))
-            case ("404", _) => NotFound(Json.obj("message" -> "Scheme not found"))
-            case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
-            case ("502", _) => BadGateway(Json.obj("message" -> "formp failed"))
+        case (Some(employerRef), _) =>
+          contractorSchemeResult(
+            taxOfficeNumber = employerRef.taxOfficeNumber,
+            taxOfficeReference = employerRef.taxOfficeReference
+          )
 
-            // 1) no utr & no name, but subcontractorCounter = 1, prepopSucessful = "N"
-            case ("201", _) => Ok(resourceHelper.resourceAsString(getScheme_noNameNoUtr_sub1_Response))
+        case (None, Some(agentRef)) =>
+          agentSchemeResult(agentRef)
 
-            // 2) no utr but there is a name, prepopSucessful = "N"
-            case ("202", _) => Ok(resourceHelper.resourceAsString(getScheme_nameOnly_Response))
-
-            // 3) there is an utr but no name, prepopSucessful = "N"
-            case ("203", _) => Ok(resourceHelper.resourceAsString(getScheme_utrOnly_Response))
-
-            // 4) no utr, no name, subcontractorCounter = 0 (first-time user), prepopSucessful = "N"
-            case ("204", _) => Ok(resourceHelper.resourceAsString(getScheme_firstTime_Response))
-
-            // default happy path with prepopSucessful = "Y", name & utr existing, subcontractorCounter = 1
-            case _ => Ok(resourceHelper.resourceAsString(getScheme_200_ResponsePath))
-          }
-
-        case None =>
-          logger.warn("[ContractorSchemeController][getScheme] Missing contractor enrolments")
+        case (None, None) =>
+          logger.warn("[ContractorSchemeController][getScheme] Missing contractor and agent enrolments")
           InternalServerError(Json.obj("message" -> "Missing enrolments"))
       }
     }
@@ -92,24 +79,13 @@ class ContractorSchemeController @Inject() (
                 "errors"  -> JsError.toJson(errs)
               )
             ),
-          _ => {
-            val enrolmentsOpt = enrolmentHelper.contractorEnrolmentsOpt(request)
-
-            enrolmentsOpt match {
-              case Some(enrolRef) =>
-                (enrolRef.taxOfficeNumber, enrolRef.taxOfficeReference) match {
-                  case ("400", _) => BadRequest(Json.obj("message" -> "Bad request"))
-                  case ("404", _) => NotFound(Json.obj("message" -> "Scheme not found"))
-                  case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
-                  case ("502", _) => BadGateway(Json.obj("message" -> "formp failed"))
-                  case _          => Created(resourceHelper.resourceAsString(createScheme_201_ResponsePath))
-                }
-
-              case None =>
-                logger.warn("[ContractorSchemeController][createScheme] Missing contractor enrolments")
-                InternalServerError(Json.obj("message" -> "Missing enrolments"))
+          _ =>
+            if (hasAnyEnrolments) {
+              Created(resourceHelper.resourceAsString(createScheme_201_ResponsePath))
+            } else {
+              logger.warn("[ContractorSchemeController][createScheme] Missing contractor enrolments")
+              InternalServerError(Json.obj("message" -> "Missing enrolments"))
             }
-          }
         )
     }
 
@@ -125,24 +101,94 @@ class ContractorSchemeController @Inject() (
                 "errors"  -> JsError.toJson(errs)
               )
             ),
-          _ => {
-            val enrolmentsOpt = enrolmentHelper.contractorEnrolmentsOpt(request)
-
-            enrolmentsOpt match {
-              case Some(enrolRef) =>
-                (enrolRef.taxOfficeNumber, enrolRef.taxOfficeReference) match {
-                  case ("400", _) => BadRequest(Json.obj("message" -> "Bad request"))
-                  case ("404", _) => NotFound(Json.obj("message" -> "Scheme not found"))
-                  case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
-                  case ("502", _) => BadGateway(Json.obj("message" -> "formp failed"))
-                  case _          => Ok(resourceHelper.resourceAsString(updateScheme_200_ResponsePath))
-                }
-
-              case None =>
-                logger.warn("[ContractorSchemeController][updateScheme] Missing contractor enrolments")
-                InternalServerError(Json.obj("message" -> "Missing enrolments"))
+          _ =>
+            if (hasAnyEnrolments) {
+              Ok(resourceHelper.resourceAsString(updateScheme_200_ResponsePath))
+            } else {
+              logger.warn("[ContractorSchemeController][updateScheme] Missing contractor enrolments")
+              InternalServerError(Json.obj("message" -> "Missing enrolments"))
             }
-          }
         )
     }
+
+  private def hasAnyEnrolments(implicit request: AuthenticatedRequest[_]): Boolean =
+    enrolmentHelper.contractorEnrolmentsOpt(request).isDefined ||
+      enrolmentHelper.agentEnrolmentsOpt(request).isDefined
+
+  private def contractorSchemeResult(
+    taxOfficeNumber: String,
+    taxOfficeReference: String
+  ): Result =
+    taxOfficeNumber match {
+      // 1) no utr & no name, but subcontractorCounter = 1, prepopSuccessful = "N"
+      case "201" =>
+        Ok(schemeJson(getScheme_noNameNoUtr_sub1_Response, Some(taxOfficeNumber), Some(taxOfficeReference)))
+
+      // 2) no utr but there is a name, prepopSuccessful = "N"
+      case "202" =>
+        Ok(schemeJson(getScheme_nameOnly_Response, Some(taxOfficeNumber), Some(taxOfficeReference)))
+
+      // 3) there is an utr but no name, prepopSuccessful = "N"
+      case "203" =>
+        Ok(schemeJson(getScheme_utrOnly_Response, Some(taxOfficeNumber), Some(taxOfficeReference)))
+
+      // 4) no utr, no name, subcontractorCounter = 0 (first-time user), prepopSuccessful = "N"
+      case "204" =>
+        Ok(schemeJson(getScheme_firstTime_Response, Some(taxOfficeNumber), Some(taxOfficeReference)))
+
+      // 5) Not found scheme, expected to call createScheme
+      case "205" =>
+        NotFound(Json.obj("message" -> "Scheme not found"))
+
+      // default happy path with prepopSuccessful = "Y", expected to pass F1 check without update / create scheme
+      case _     =>
+        Ok(schemeJson(getScheme_200_org_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
+    }
+
+  private def agentSchemeResult(agentRef: String): Result =
+    agentRef match {
+      // 1) no utr & no name, but subcontractorCounter = 1, prepopSuccessful = "N"
+      case "AGT201" =>
+        Ok(schemeJson(getScheme_noNameNoUtr_sub1_Response))
+
+      // 2) no utr but there is a name, prepopSuccessful = "N"
+      case "AGT202" =>
+        Ok(schemeJson(getScheme_nameOnly_Response))
+
+      // 3) there is an utr but no name, prepopSuccessful = "N"
+      case "AGT203" =>
+        Ok(schemeJson(getScheme_utrOnly_Response))
+
+      // 4) no utr, no name, subcontractorCounter = 0 (first-time user), prepopSuccessful = "N"
+      case "AGT204" =>
+        Ok(schemeJson(getScheme_firstTime_Response))
+
+      // 5) Not found scheme, expected to call createScheme endpoint
+      case "AGT205" =>
+        NotFound(Json.obj("message" -> "Scheme not found"))
+
+      // default happy path with prepopSuccessful = "Y", expected to pass F1 check without update / create scheme
+      case _        =>
+        Ok(schemeJson(getScheme_200_agent_ResponsePath))
+    }
+
+  private def schemeJson(
+    path: String,
+    taxOfficeNumberOpt: Option[String] = None,
+    taxOfficeReferenceOpt: Option[String] = None
+  ): JsValue = {
+    val base: JsObject = Json.parse(resourceHelper.resourceAsString(path)).as[JsObject]
+
+    (taxOfficeNumberOpt, taxOfficeReferenceOpt) match {
+      case (Some(taxOfficeNumber), Some(taxOfficeReference)) =>
+        base.deepMerge(
+          Json.obj(
+            "taxOfficeNumber"    -> taxOfficeNumber,
+            "taxOfficeReference" -> taxOfficeReference
+          )
+        )
+      case _                                                 =>
+        base
+    }
+  }
 }

@@ -41,7 +41,7 @@ class ContractorSchemeControllerSpec extends AnyWordSpec with Matchers with Mock
 
       when(
         mockResourceHelper.resourceAsString(
-          eqTo("/resources/contractorSchemes/getScheme-200-response.json")
+          eqTo("/resources/contractorSchemes/getScheme-200-org-response.json")
         )
       ).thenReturn("""{ "schemeId": 1000 }""")
 
@@ -61,34 +61,10 @@ class ContractorSchemeControllerSpec extends AnyWordSpec with Matchers with Mock
         controller.getScheme("some-instance-id")(FakeRequest(GET, "/formp-proxy/scheme/some-instance-id"))
 
       status(result) mustBe OK
-      contentAsString(result) mustBe """{ "schemeId": 1000 }"""
+      (contentAsJson(result) \ "schemeId").as[Int] mustBe 1000
 
       verify(mockResourceHelper)
-        .resourceAsString(eqTo("/resources/contractorSchemes/getScheme-200-response.json"))
-    }
-
-    "return 400 when taxOfficeNumber = 400" in {
-      val mockResourceHelper   = mock[ResourceHelper]
-      val mockEnrolmentsHelper = mock[EnrolmentsHelper]
-
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(Some(EmployerReference("400", "AB1234")))
-
-      val authAction = new FakeAuthAction(cc.parsers)
-
-      val controller = new ContractorSchemeController(
-        authorise = authAction,
-        resourceHelper = mockResourceHelper,
-        enrolmentHelper = mockEnrolmentsHelper,
-        cc = cc
-      )
-
-      val result = controller.getScheme("any")(FakeRequest(GET, "/formp-proxy/scheme/any"))
-
-      status(result) mustBe BAD_REQUEST
-      (contentAsJson(result) \ "message").as[String] mustBe "Bad request"
-
-      verify(mockResourceHelper, never()).resourceAsString(any[String])
+        .resourceAsString(eqTo("/resources/contractorSchemes/getScheme-200-org-response.json"))
     }
 
     "return 500 when enrolments are missing" in {
@@ -96,6 +72,8 @@ class ContractorSchemeControllerSpec extends AnyWordSpec with Matchers with Mock
       val mockEnrolmentsHelper = mock[EnrolmentsHelper]
 
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(None)
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
         .thenReturn(None)
 
       val authAction = new FakeAuthAction(cc.parsers)

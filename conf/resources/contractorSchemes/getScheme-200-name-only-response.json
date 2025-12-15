@@ -1,0 +1,17 @@
+{
+  "schemeId": 2020,
+  "instanceId": "some-instance-id",
+  "accountsOfficeReference": "123PA00123456",
+  "taxOfficeNumber": "202",
+  "taxOfficeReference": "AB1234",
+  "utr": null,
+  "name": "ABC Construction Ltd",
+  "emailAddress": "contact@example.com",
+  "displayWelcomePage": null,
+  "prePopCount": 1,
+  "prePopSuccessful": "N",
+  "subcontractorCounter": 0,
+  "verificationBatchCounter": 0,
+  "lastUpdate": "2025-01-01T12:00:00Z",
+  "version": 1
+}

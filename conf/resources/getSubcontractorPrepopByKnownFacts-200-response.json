@@ -8,7 +8,7 @@
     "response": 0,
     "subcontractors": [
       {
-        "subcontractorType": "I",
+        "subcontractorType": "C",
         "utr": "1123456789",
         "verificationNumber": "12345678901",
         "verificationSuffix": "AB",

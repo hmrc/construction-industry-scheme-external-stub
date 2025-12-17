@@ -44,9 +44,9 @@ class PrepopControllerSpec extends SpecBase with MockitoSugar {
 
         val stubJson = Json.obj(
           "knownfacts"       -> Json.obj(
-            "taxOfficeNumber"    -> "TEMPLATE_TON",
-            "taxOfficeReference" -> "TEMPLATE_TOR",
-            "agentOwnReference"  -> "TEMPLATE_AO"
+            "taxOfficeNumber"    -> "123",
+            "taxOfficeReference" -> "AB456",
+            "agentOwnReference"  -> "1234567890"
           ),
           "prePopContractor" -> Json.obj(
             "schemeName" -> "PAL-355 Scheme",
@@ -76,33 +76,34 @@ class PrepopControllerSpec extends SpecBase with MockitoSugar {
         (json \ "prePopContractor" \ "response").as[Int] mustBe 0
       }
 
-      "must return 404 with NOT FOUND message for taxOfficeNumber 404" in new Setup {
+      "must return 404 with NOT FOUND message for missing scheme for organisation" in new Setup {
 
         when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-          .thenReturn(Some(EmployerReference("404", "123456")))
+          .thenReturn(Some(EmployerReference("204", "EZ00100")))
 
         val req: FakeRequest[JsValue] =
-          requestWithSchemePrepopKnownFactsJsonPayload("404", "123456", "AO123")
+          requestWithSchemePrepopKnownFactsJsonPayload("204", "EZ00100", "AO123")
 
         val res: Future[Result] = controller.getSchemePrepopByKnownFacts(req)
 
         status(res) mustBe NOT_FOUND
         (contentAsJson(res) \ "message").as[String] mustBe
-          "No CIS scheme pre-pop data found for TON=404, TOR=123456, AO=AO123"
+          "No CIS scheme pre-pop data found for TON=204, TOR=EZ00100, AO=AO123"
       }
 
-      "must return 500 with InternalServerError for taxOfficeNumber 500" in new Setup {
+      "must return 404 with NOT FOUND message for missing scheme for agent" in new Setup {
 
         when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-          .thenReturn(Some(EmployerReference("500", "123456")))
+          .thenReturn(Some(EmployerReference("123", "AB456")))
 
         val req: FakeRequest[JsValue] =
-          requestWithSchemePrepopKnownFactsJsonPayload("500", "123456", "AO123")
+          requestWithSchemePrepopKnownFactsJsonPayload("123", "AB456", "AGT204")
 
         val res: Future[Result] = controller.getSchemePrepopByKnownFacts(req)
 
-        status(res) mustBe INTERNAL_SERVER_ERROR
-        (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
+        status(res) mustBe NOT_FOUND
+        (contentAsJson(res) \ "message").as[String] mustBe
+          "No CIS scheme pre-pop data found for TON=123, TOR=AB456, AO=AGT204"
       }
 
       "must return 500 when no enrolments are found" in new Setup {
@@ -119,6 +120,7 @@ class PrepopControllerSpec extends SpecBase with MockitoSugar {
         val res: Future[Result] = controller.getSchemePrepopByKnownFacts(req)
 
         status(res) mustBe INTERNAL_SERVER_ERROR
+        (contentAsJson(res) \ "message").as[String] mustBe "Missing enrolments"
       }
 
       "must return 400 when request JSON is an empty object" in new Setup {
@@ -162,13 +164,13 @@ class PrepopControllerSpec extends SpecBase with MockitoSugar {
       "must return Ok response with subcontractor pre-pop details for a normal request" in new Setup {
 
         when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-          .thenReturn(Some(EmployerReference("123", "AB456")))
+          .thenReturn(Some(EmployerReference("204", "EZ00200")))
 
         val stubJson = Json.obj(
           "knownfacts"           -> Json.obj(
-            "taxOfficeNumber"    -> "TEMPLATE_TON",
-            "taxOfficeReference" -> "TEMPLATE_TOR",
-            "agentOwnReference"  -> "TEMPLATE_AO"
+            "taxOfficeNumber"    -> "123",
+            "taxOfficeReference" -> "AB456",
+            "agentOwnReference"  -> "1234567890"
           ),
           "prePopSubcontractors" -> Json.obj(
             "response"       -> 0,
@@ -191,7 +193,7 @@ class PrepopControllerSpec extends SpecBase with MockitoSugar {
           .thenReturn(stubJson.toString)
 
         val req: FakeRequest[JsValue] =
-          requestWithSubconPrepopKnownFactsJsonPayload("123", "AB456", "123PA12345678")
+          requestWithSubconPrepopKnownFactsJsonPayload("204", "EZ00200", "123PA12345678")
 
         val res: Future[Result] = controller.getSubcontractorPrepopByKnownFacts(req)
 
@@ -199,8 +201,8 @@ class PrepopControllerSpec extends SpecBase with MockitoSugar {
 
         val json = contentAsJson(res)
 
-        (json \ "knownfacts" \ "taxOfficeNumber").as[String] mustBe "123"
-        (json \ "knownfacts" \ "taxOfficeReference").as[String] mustBe "AB456"
+        (json \ "knownfacts" \ "taxOfficeNumber").as[String] mustBe "204"
+        (json \ "knownfacts" \ "taxOfficeReference").as[String] mustBe "EZ00200"
         (json \ "knownfacts" \ "agentOwnReference").as[String] mustBe "123PA12345678"
 
         (json \ "prePopSubcontractors" \ "response").as[Int] mustBe 0
@@ -232,18 +234,19 @@ class PrepopControllerSpec extends SpecBase with MockitoSugar {
           "No CIS subcontractor pre-pop data found for TON=404, TOR=123456, AO=AO123"
       }
 
-      "must return 500 with InternalServerError for taxOfficeNumber 500" in new Setup {
+      "must return 404 with NOT FOUND message when contractor has no subcontractors" in new Setup {
 
         when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-          .thenReturn(Some(EmployerReference("500", "123456")))
+          .thenReturn(Some(EmployerReference("204", "EZ00201")))
 
         val req: FakeRequest[JsValue] =
-          requestWithSubconPrepopKnownFactsJsonPayload("500", "123456", "AO123")
+          requestWithSubconPrepopKnownFactsJsonPayload("204", "EZ00201", "AO123")
 
         val res: Future[Result] = controller.getSubcontractorPrepopByKnownFacts(req)
 
-        status(res) mustBe INTERNAL_SERVER_ERROR
-        (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
+        status(res) mustBe NOT_FOUND
+        (contentAsJson(res) \ "message").as[String] mustBe
+          "No CIS subcontractor pre-pop data found for TON=204, TOR=EZ00201, AO=AO123"
       }
 
       "must return 500 when no enrolments are found" in new Setup {
@@ -260,6 +263,7 @@ class PrepopControllerSpec extends SpecBase with MockitoSugar {
         val res: Future[Result] = controller.getSubcontractorPrepopByKnownFacts(req)
 
         status(res) mustBe INTERNAL_SERVER_ERROR
+        (contentAsJson(res) \ "message").as[String] mustBe "Missing enrolments"
       }
 
       "must return 400 when request JSON is an empty object" in new Setup {

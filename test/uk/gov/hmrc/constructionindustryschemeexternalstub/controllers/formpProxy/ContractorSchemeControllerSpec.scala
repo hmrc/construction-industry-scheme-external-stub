@@ -41,7 +41,7 @@ class ContractorSchemeControllerSpec extends AnyWordSpec with Matchers with Mock
 
       when(
         mockResourceHelper.resourceAsString(
-          eqTo("/resources/contractorSchemes/getScheme-200-org-response.json")
+          eqTo("/resources/contractorSchemes/getScheme-200-sub1-response.json")
         )
       ).thenReturn("""{ "schemeId": 1000 }""")
 
@@ -64,7 +64,7 @@ class ContractorSchemeControllerSpec extends AnyWordSpec with Matchers with Mock
       (contentAsJson(result) \ "schemeId").as[Int] mustBe 1000
 
       verify(mockResourceHelper)
-        .resourceAsString(eqTo("/resources/contractorSchemes/getScheme-200-org-response.json"))
+        .resourceAsString(eqTo("/resources/contractorSchemes/getScheme-200-sub1-response.json"))
     }
 
     "return 500 when enrolments are missing" in {
@@ -205,6 +205,217 @@ class ContractorSchemeControllerSpec extends AnyWordSpec with Matchers with Mock
 
       status(result) mustBe OK
       contentAsString(result) mustBe """{ "version": 2 }"""
+    }
+  }
+
+  "ContractorSchemeController#updateSchemeVersion" should {
+
+    "return 200 and increment version on valid payload and enrolments" in {
+      val mockResourceHelper   = mock[ResourceHelper]
+      val mockEnrolmentsHelper = mock[EnrolmentsHelper]
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("123", "AB1234")))
+
+      val authAction = new FakeAuthAction(cc.parsers)
+
+      val controller = new ContractorSchemeController(
+        authorise = authAction,
+        resourceHelper = mockResourceHelper,
+        enrolmentHelper = mockEnrolmentsHelper,
+        cc = cc
+      )
+
+      val jsonBody =
+        """
+          |{
+          |  "instanceId": "CIS-123456",
+          |  "version": 2
+          |}
+          |""".stripMargin
+
+      val request = FakeRequest(POST, "/formp-proxy/scheme/update-version")
+        .withBody(Json.parse(jsonBody))
+        .withHeaders("Content-Type" -> "application/json")
+
+      val result = controller.updateSchemeVersion(request)
+
+      status(result) mustBe OK
+      (contentAsJson(result) \ "version").as[Int] mustBe 3
+    }
+
+    "return 500 when enrolments are missing" in {
+      val mockResourceHelper   = mock[ResourceHelper]
+      val mockEnrolmentsHelper = mock[EnrolmentsHelper]
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(None)
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      val authAction = new FakeAuthAction(cc.parsers)
+
+      val controller = new ContractorSchemeController(
+        authorise = authAction,
+        resourceHelper = mockResourceHelper,
+        enrolmentHelper = mockEnrolmentsHelper,
+        cc = cc
+      )
+
+      val request = FakeRequest(POST, "/formp-proxy/scheme/update-version")
+        .withBody(Json.obj("instanceId" -> "CIS-123456", "version" -> 2))
+        .withHeaders("Content-Type" -> "application/json")
+
+      val result = controller.updateSchemeVersion(request)
+
+      status(result) mustBe INTERNAL_SERVER_ERROR
+      (contentAsJson(result) \ "message").as[String] mustBe "Missing enrolments"
+    }
+
+    "return 400 on invalid JSON" in {
+      val mockResourceHelper   = mock[ResourceHelper]
+      val mockEnrolmentsHelper = mock[EnrolmentsHelper]
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("123", "AB1234")))
+
+      val authAction = new FakeAuthAction(cc.parsers)
+
+      val controller = new ContractorSchemeController(
+        authorise = authAction,
+        resourceHelper = mockResourceHelper,
+        enrolmentHelper = mockEnrolmentsHelper,
+        cc = cc
+      )
+
+      val request = FakeRequest(POST, "/formp-proxy/scheme/update-version")
+        .withBody(Json.obj("foo" -> "bar"))
+        .withHeaders("Content-Type" -> "application/json")
+
+      val result = controller.updateSchemeVersion(request)
+
+      status(result) mustBe BAD_REQUEST
+      (contentAsJson(result) \ "message").as[String] mustBe "Invalid JSON body"
+    }
+  }
+
+  "ContractorSchemeController#applyPrepopulation" should {
+
+    "return 200 and increment version on valid payload and enrolments" in {
+      val mockResourceHelper   = mock[ResourceHelper]
+      val mockEnrolmentsHelper = mock[EnrolmentsHelper]
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("123", "AB1234")))
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      val controller = new ContractorSchemeController(
+        authorise = new FakeAuthAction(cc.parsers),
+        resourceHelper = mockResourceHelper,
+        enrolmentHelper = mockEnrolmentsHelper,
+        cc = cc
+      )
+
+      val request =
+        FakeRequest(POST, "/formp-proxy/scheme/apply-prepopulation")
+          .withBody(
+            Json.parse("""
+                |{
+                |  "schemeId": 1000,
+                |  "instanceId": "CIS-123456",
+                |  "accountsOfficeReference": "123PA00123456",
+                |  "taxOfficeNumber": "123",
+                |  "taxOfficeReference": "AB1234",
+                |  "utr": "1234567890",
+                |  "name": "Test Ltd",
+                |  "emailAddress": "test@example.com",
+                |  "displayWelcomePage": "Y",
+                |  "prePopCount": 1,
+                |  "prePopSuccessful": "Y",
+                |  "version": 2,
+                |  "subcontractorTypes": ["soletrader"]
+                |}
+                |""".stripMargin)
+          )
+          .withHeaders("Content-Type" -> "application/json")
+
+      val result = controller.applyPrepopulation(request)
+
+      status(result) mustBe OK
+      (contentAsJson(result) \ "version").as[Int] mustBe 3
+    }
+
+    "return 500 when enrolments are missing" in {
+      val mockResourceHelper   = mock[ResourceHelper]
+      val mockEnrolmentsHelper = mock[EnrolmentsHelper]
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(None)
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      val controller = new ContractorSchemeController(
+        authorise = new FakeAuthAction(cc.parsers),
+        resourceHelper = mockResourceHelper,
+        enrolmentHelper = mockEnrolmentsHelper,
+        cc = cc
+      )
+
+      val request =
+        FakeRequest(POST, "/formp-proxy/scheme/apply-prepopulation")
+          .withBody(
+            Json.parse("""
+                |{
+                |  "schemeId": 1000,
+                |  "instanceId": "CIS-123456",
+                |  "accountsOfficeReference": "123PA00123456",
+                |  "taxOfficeNumber": "123",
+                |  "taxOfficeReference": "AB1234",
+                |  "utr": "1234567890",
+                |  "name": "Test Ltd",
+                |  "emailAddress": "test@example.com",
+                |  "displayWelcomePage": "Y",
+                |  "prePopCount": 1,
+                |  "prePopSuccessful": "Y",
+                |  "version": 2,
+                |  "subcontractorTypes": ["soletrader"]
+                |}
+                |""".stripMargin)
+          )
+          .withHeaders("Content-Type" -> "application/json")
+
+      val result = controller.applyPrepopulation(request)
+
+      status(result) mustBe INTERNAL_SERVER_ERROR
+      (contentAsJson(result) \ "message").as[String] mustBe "Missing enrolments"
+    }
+
+    "return 400 on invalid JSON when enrolments exist" in {
+      val mockResourceHelper   = mock[ResourceHelper]
+      val mockEnrolmentsHelper = mock[EnrolmentsHelper]
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("123", "AB1234")))
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      val controller = new ContractorSchemeController(
+        authorise = new FakeAuthAction(cc.parsers),
+        resourceHelper = mockResourceHelper,
+        enrolmentHelper = mockEnrolmentsHelper,
+        cc = cc
+      )
+
+      val request =
+        FakeRequest(POST, "/formp-proxy/scheme/apply-prepopulation")
+          .withBody(Json.obj("foo" -> "bar"))
+          .withHeaders("Content-Type" -> "application/json")
+
+      val result = controller.applyPrepopulation(request)
+
+      status(result) mustBe BAD_REQUEST
+      (contentAsJson(result) \ "message").as[String] mustBe "Invalid JSON body"
     }
   }
 }

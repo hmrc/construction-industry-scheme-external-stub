@@ -17,7 +17,7 @@
         <GovTalkErrors>
             <Error>
                 <RaisedBy>Gateway</RaisedBy>
-                <Number>1020</Number>
+                <Number>3000</Number>
                 <Type>fatal</Type>
                 <Text>Forced fatal error (stub)</Text>
                 <Location></Location>

@@ -32,11 +32,9 @@ class AppConfig @Inject() (config: Configuration):
 
   val appName: String = config.get[String]("appName")
 
-  lazy val acknowledgeFilter: Seq[String]   =
+  lazy val acknowledgeFilter: Seq[String] =
     config.get[Seq[String]]("stub.endpoint.submission.cis.filing.acknowledgeFilter")
-  lazy val businessErrorFilter: Seq[String] =
-    config.get[Seq[String]]("stub.endpoint.submission.cis.filing.businessErrorFilter")
-  lazy val fatalErrorFilter: Seq[String]    =
+  lazy val fatalErrorFilter: Seq[String]  =
     config.get[Seq[String]]("stub.endpoint.submission.cis.filing.fatalErrorFilter")
-  lazy val perfMode: Boolean                = config.get[Boolean]("perfMode")
-  lazy val pollInterval: String             = if (perfMode) "0" else "2"
+  lazy val perfMode: Boolean              = config.get[Boolean]("perfMode")
+  lazy val pollInterval: String           = if (perfMode) "0" else "2"

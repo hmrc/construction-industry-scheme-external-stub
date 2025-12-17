@@ -51,6 +51,7 @@ class ChrisController @Inject() (
   def submitCISMessage(): Action[AnyContent] = Action { (request: Request[AnyContent]) =>
     val message                           = request.body.asXml.get
     val correlationId                     = (message \ "Header" \ "MessageDetails" \ "CorrelationID").text
+    val pollingUrlHost                    = config.callback
     val keys                              = message \ "GovTalkDetails" \ "Keys" \ "Key"
     def typeIs(value: String)(node: Node) = node \@ "Type" == value
     val taxOfficeNumber                   = (keys filter typeIs("TaxOfficeNumber")).text match {
@@ -179,7 +180,7 @@ class ChrisController @Inject() (
     Ok(xml)
   }
 
-  private def replaceCorrelationId(response: String, correlationId: String): String =
-    response.replace("[correlationId]", correlationId)
+  private def replaceCorrelationId(response: String, correlationId: String, pollingUrlHost: String): String =
+    response.replace("[correlationId]", correlationId).replace("[pollingUrlHost]", pollingUrlHost)
 
 }

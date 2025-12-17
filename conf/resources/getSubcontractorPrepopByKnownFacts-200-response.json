@@ -1,0 +1,22 @@
+{
+  "knownfacts": {
+    "taxOfficeNumber": "123",
+    "taxOfficeReference": "AB456",
+    "agentOwnReference": "1234567890"
+  },
+  "prePopSubcontractors": {
+    "response": 0,
+    "subcontractors": [
+      {
+        "subcontractorType": "I",
+        "utr": "1123456789",
+        "verificationNumber": "12345678901",
+        "verificationSuffix": "AB",
+        "title": "Mr",
+        "firstName": "First",
+        "secondName": "",
+        "surname": "Surname"
+      }
+    ]
+  }
+}

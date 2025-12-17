@@ -22,7 +22,7 @@ import play.api.Configuration
 @Singleton
 class AppConfig @Inject() (config: Configuration):
 
-  private lazy val callback: String = config.get[String]("stub.polling.callback")
+  lazy val callback: String = config.get[String]("stub.polling.callback")
 
   def responseUrl(service: String): String     = callback + config.get[String](s"stub.$service.response")
   def pollUrl(service: String): String         = callback + config.get[String](s"stub.$service.poll")

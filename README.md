@@ -410,6 +410,12 @@ To trigger the happy path, ensure you provide a valid request body:
 - Response status: `200`
 - Response body:
 
+**{environmentUrl}**:
+
+local = http://localhost:6997/
+
+staging = https://construction-industry-scheme-external-stub.protected.mdtp:443/
+
 ```xml
 <GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
     <EnvelopeVersion>2.0</EnvelopeVersion>
@@ -419,7 +425,7 @@ To trigger the happy path, ensure you provide a valid request body:
         <Qualifier>acknowledgement</Qualifier>
         <Function>submit</Function>
         <CorrelationID>FB2E47B242134FF289328EF8A39C3BDC</CorrelationID>
-        <ResponseEndPoint PollInterval="5">http://localhost:9712/submission/ChRIS/poll/IR-CIS-CIS300MR/0/false</ResponseEndPoint>
+        <ResponseEndPoint PollInterval="5">{environmentUrl}submission/ChRIS/poll/IR-CIS-CIS300MR/0/false</ResponseEndPoint>
         <GatewayTimestamp/>
         <Transformation>XML</Transformation>
       </MessageDetails>
@@ -459,6 +465,12 @@ To trigger the unhappy paths, ensure you provide the following auth login stub v
 - Response status: `200`
 - Response body:
 
+**{environmentUrl}**:
+
+local = http://localhost:6997/
+
+staging = https://construction-industry-scheme-external-stub.protected.mdtp:443/
+
 ```xml
 <GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
     <EnvelopeVersion>2.0</EnvelopeVersion>
@@ -469,7 +481,7 @@ To trigger the unhappy paths, ensure you provide the following auth login stub v
             <Function>submit</Function>
             <TransactionID></TransactionID>
             <CorrelationID>C0A341CF946B46A18BF01C270D15B1E6</CorrelationID>
-            <ResponseEndPoint PollInterval="2">http://localhost:9712/submission/ChRIS/IR-CIS-CIS300MR/Filing/data/true</ResponseEndPoint>
+            <ResponseEndPoint PollInterval="2">{environmentUrl}submission/ChRIS/IR-CIS-CIS300MR/Filing/data/true</ResponseEndPoint>
             <Transformation>XML</Transformation>
             <GatewayTimestamp>2025-11-25T12:03:25.242</GatewayTimestamp>
         </MessageDetails>
@@ -507,6 +519,13 @@ To trigger the unhappy paths, ensure you provide the following auth login stub v
 - Response status: `200`
 - Response body:
 
+**{environmentUrl}**:
+
+local = http://localhost:6997/
+
+staging = https://construction-industry-scheme-external-stub.protected.mdtp:443/
+
+
 ```xml
 <GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
     <EnvelopeVersion>2.0</EnvelopeVersion>
@@ -517,7 +536,7 @@ To trigger the unhappy paths, ensure you provide the following auth login stub v
             <Function>submit</Function>
             <TransactionID></TransactionID>
             <CorrelationID>0F3C0E6EB3D8400C89DED4C9AC8FAB95</CorrelationID>
-            <ResponseEndPoint PollInterval="2">http://localhost:9712/submission/ChRIS/IR-CIS-CIS300MR/Filing/data/true</ResponseEndPoint>
+            <ResponseEndPoint PollInterval="2">{environmentUrl}submission/ChRIS/IR-CIS-CIS300MR/Filing/data/true</ResponseEndPoint>
             <Transformation>XML</Transformation>
             <GatewayTimestamp>2025-11-25T12:08:20.586</GatewayTimestamp>
         </MessageDetails>
@@ -567,6 +586,12 @@ To trigger the unhappy paths, ensure you provide the following auth login stub v
 - Response status: `200`
 - Response body:
 
+**{environmentUrl}**:
+
+local = http://localhost:6997/
+
+staging = https://construction-industry-scheme-external-stub.protected.mdtp:443/
+
 ```xml
 <GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
     <EnvelopeVersion>2.0</EnvelopeVersion>
@@ -577,7 +602,7 @@ To trigger the unhappy paths, ensure you provide the following auth login stub v
             <Function>submit</Function>
             <TransactionID></TransactionID>
             <CorrelationID>6483DA820AA844D8A62B1AE43FFC6014</CorrelationID>
-            <ResponseEndPoint PollInterval="2">http://localhost:9712/submission/ChRIS/IR-CIS-CIS300MR/Filing/data/true</ResponseEndPoint>
+            <ResponseEndPoint PollInterval="2">{environmentUrl}submission/ChRIS/IR-CIS-CIS300MR/Filing/data/true</ResponseEndPoint>
             <Transformation>XML</Transformation>
             <GatewayTimestamp>2025-12-01T10:51:31.225</GatewayTimestamp>
         </MessageDetails>

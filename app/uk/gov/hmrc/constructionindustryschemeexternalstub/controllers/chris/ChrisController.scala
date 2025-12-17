@@ -65,7 +65,8 @@ class ChrisController @Inject() (
         Ok(
           replaceCorrelationId(
             resourceHelper.resourceAsString(submitCISMessage_fatalError_ResponsePath),
-            correlationId
+            correlationId,
+            pollingUrlHost
           )
         )
 
@@ -81,10 +82,11 @@ class ChrisController @Inject() (
           }
 
         val xml =
-          resourceHelper
-            .resourceAsString(submitCISMessage_acknowledgement_ResponsePath)
-            .replace("[correlationId]", correlationId)
-            .replace("[pollUrl]", pollUrlWith0)
+          replaceCorrelationId(
+            resourceHelper.resourceAsString(submitCISMessage_acknowledgement_ResponsePath),
+            correlationId,
+            pollingUrlHost
+          ).replace("[pollUrl]", pollUrlWith0)
 
         Ok(xml)
     }
@@ -143,6 +145,7 @@ class ChrisController @Inject() (
   def getCISResponse(count: Int): Action[AnyContent] = Action { request =>
     val message        = request.body.asXml.get
     val correlationId  = (message \ "Header" \ "MessageDetails" \ "CorrelationID").text
+    val pollingUrlHost = config.callback
     val finalStatusOpt = request.getQueryString("final")
     val isFinalPoll    = finalStatusOpt.isDefined && count >= 2
 
@@ -173,9 +176,9 @@ class ChrisController @Inject() (
         s"$basePollUrl/$nextCount$suffix"
       }
 
-    val xml = rawXml
-      .replace("[correlationId]", correlationId)
-      .replace("[pollUrl]", nextPollUrl)
+    val xml =
+      replaceCorrelationId(rawXml, correlationId, pollingUrlHost)
+        .replace("[pollUrl]", nextPollUrl)
 
     Ok(xml)
   }

@@ -34,14 +34,15 @@ class ContractorSchemeController @Inject() (
 ) extends BackendController(cc)
     with Logging {
 
-  private val basePath                          = "/resources/contractorSchemes"
-  private val getScheme_200_no_sub_ResponsePath = s"$basePath/getScheme-200-no-sub-response.json"
-  private val getScheme_sub1_ResponsePath       = s"$basePath/getScheme-200-sub1-response.json"
-  private val getScheme_nameOnly_ResponsePath   = s"$basePath/getScheme-200-name-only-response.json"
-  private val getScheme_utrOnly_ResponsePath    = s"$basePath/getScheme-200-utr-only-response.json"
-  private val getScheme_firstTime_ResponsePath  = s"$basePath/getScheme-200-first-time-response.json"
-  private val createScheme_201_ResponsePath     = s"$basePath/createScheme-201-response.json"
-  private val updateScheme_200_ResponsePath     = s"$basePath/updateScheme-200-response.json"
+  private val basePath                            = "/resources/contractorSchemes"
+  private val getScheme_200_no_sub_ResponsePath   = s"$basePath/getScheme-200-no-sub-response.json"
+  private val getScheme_sub1_ResponsePath         = s"$basePath/getScheme-200-sub1-response.json"
+  private val getScheme_sub1_rest_no_ResponsePath = s"$basePath/getScheme-200-sub1-rest-no-response.json"
+  private val getScheme_nameOnly_ResponsePath     = s"$basePath/getScheme-200-name-only-response.json"
+  private val getScheme_utrOnly_ResponsePath      = s"$basePath/getScheme-200-utr-only-response.json"
+  private val getScheme_firstTime_ResponsePath    = s"$basePath/getScheme-200-first-time-response.json"
+  private val createScheme_201_ResponsePath       = s"$basePath/createScheme-201-response.json"
+  private val updateScheme_200_ResponsePath       = s"$basePath/updateScheme-200-response.json"
 
   def getScheme(instanceId: String): Action[AnyContent] =
     authorise { implicit request =>
@@ -161,6 +162,10 @@ class ContractorSchemeController @Inject() (
     taxOfficeReference: String
   ): Result =
     (taxOfficeNumber, taxOfficeReference) match {
+      // 0) no utr, no name, prepopSuccessful = "N", subcontractorCounter = 1
+      case ("201", _)         =>
+        Ok(schemeJson(getScheme_sub1_rest_no_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
+
       // 1) no utr but there is a name, prepopSuccessful = "N", subcontractorCounter = 1
       case ("202", _)         =>
         Ok(schemeJson(getScheme_nameOnly_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
@@ -177,7 +182,7 @@ class ContractorSchemeController @Inject() (
       case ("204", "EZ00200") =>
         Ok(schemeJson(getScheme_sub1_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
 
-      // 5) unsuccessful prepoped scheme table, subcontractorCounter = 0
+      // 5) successful prepoped scheme table, subcontractorCounter = 0
       case ("204", "EZ00201") =>
         Ok(schemeJson(getScheme_200_no_sub_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
 
@@ -192,6 +197,10 @@ class ContractorSchemeController @Inject() (
 
   private def agentSchemeResult(agentRef: String): Result =
     agentRef match {
+      // 0) no utr, no name, prepopSuccessful = "N", subcontractorCounter = 1
+      case "AGT201" =>
+        Ok(schemeJson(getScheme_sub1_rest_no_ResponsePath))
+
       // 1) no utr but there is a name, prepopSuccessful = "N"
       case "AGT202" =>
         Ok(schemeJson(getScheme_nameOnly_ResponsePath))

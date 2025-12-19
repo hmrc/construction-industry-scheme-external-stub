@@ -163,7 +163,7 @@ To trigger the happy path, ensure you provide a valid request body:
 {
   "taxOfficeNumber": "205",
   "taxOfficeReference": "EZ00100",
-  "agentOwnReference": "123PA12345678"
+  "accountOfficeReference": "123PA12345678"
 }
 ```
 
@@ -174,7 +174,7 @@ To trigger the happy path, ensure you provide a valid request body:
   "knownfacts": {
     "taxOfficeNumber": "205",
     "taxOfficeReference": "EZ00100",
-    "agentOwnReference": "123PA12345678"
+    "accountOfficeReference": "123PA12345678"
   },
   "prePopContractor": {
     "schemeName": "PAL-355 Scheme",
@@ -206,7 +206,7 @@ To trigger the happy path, ensure you provide a valid request body:
 {
   "taxOfficeNumber": "204",
   "taxOfficeReference": "EZ00100",
-  "agentOwnReference": "123PA12345678"
+  "accountOfficeReference": "123PA12345678"
 }
 ```
 
@@ -244,7 +244,7 @@ To trigger the happy path, ensure you provide a valid request body:
 {
   "taxOfficeNumber": "204",
   "taxOfficeReference": "EZ00200",
-  "agentOwnReference": "123PA12345678"
+  "accountOfficeReference": "123PA12345678"
 }
 ```
 
@@ -255,7 +255,7 @@ To trigger the happy path, ensure you provide a valid request body:
   "knownfacts": {
     "taxOfficeNumber": "204",
     "taxOfficeReference": "EZ00200",
-    "agentOwnReference": "123PA12345678"
+    "accountOfficeReference": "123PA12345678"
   },
   "prePopSubcontractors": {
     "response": 0,
@@ -297,7 +297,7 @@ To trigger the happy path, ensure you provide a valid request body:
 {
   "taxOfficeNumber": "204",
   "taxOfficeReference": "EZ00201",
-  "agentOwnReference": "123PA12345678"
+  "accountOfficeReference": "123PA12345678"
 }
 ```
 
@@ -331,7 +331,7 @@ To trigger the happy path, ensure you provide a valid request body:
 {
   "taxOfficeNumber": "204",
   "taxOfficeReference": "EZ00100",
-  "agentOwnReference": "123PA12345678"
+  "accountOfficeReference": "123PA12345678"
 }
 ```
 

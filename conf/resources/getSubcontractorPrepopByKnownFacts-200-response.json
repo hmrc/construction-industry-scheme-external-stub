@@ -2,7 +2,7 @@
   "knownfacts": {
     "taxOfficeNumber": "123",
     "taxOfficeReference": "AB456",
-    "agentOwnReference": "1234567890"
+    "accountOfficeReference": "1234567890"
   },
   "prePopSubcontractors": {
     "response": 0,

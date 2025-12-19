@@ -44,9 +44,9 @@ class PrepopControllerSpec extends SpecBase with MockitoSugar {
 
         val stubJson = Json.obj(
           "knownfacts"       -> Json.obj(
-            "taxOfficeNumber"    -> "123",
-            "taxOfficeReference" -> "AB456",
-            "agentOwnReference"  -> "1234567890"
+            "taxOfficeNumber"        -> "123",
+            "taxOfficeReference"     -> "AB456",
+            "accountOfficeReference" -> "1234567890"
           ),
           "prePopContractor" -> Json.obj(
             "schemeName" -> "PAL-355 Scheme",
@@ -69,7 +69,7 @@ class PrepopControllerSpec extends SpecBase with MockitoSugar {
 
         (json \ "knownfacts" \ "taxOfficeNumber").as[String] mustBe "123"
         (json \ "knownfacts" \ "taxOfficeReference").as[String] mustBe "AB456"
-        (json \ "knownfacts" \ "agentOwnReference").as[String] mustBe "123PA12345678"
+        (json \ "knownfacts" \ "accountOfficeReference").as[String] mustBe "123PA12345678"
 
         (json \ "prePopContractor" \ "schemeName").as[String] mustBe "PAL-355 Scheme"
         (json \ "prePopContractor" \ "utr").as[String] mustBe "1123456789"
@@ -133,7 +133,7 @@ class PrepopControllerSpec extends SpecBase with MockitoSugar {
 
       "must return 400 when taxOfficeNumber is missing from request" in new Setup {
         val req: FakeRequest[JsValue] =
-          makeSchemeJsonRequest(Json.obj("taxOfficeReference" -> "AB456", "agentOwnReference" -> "123PA12345678"))
+          makeSchemeJsonRequest(Json.obj("taxOfficeReference" -> "AB456", "accountOfficeReference" -> "123PA12345678"))
         val res: Future[Result]       = controller.getSchemePrepopByKnownFacts(req)
 
         status(res) mustBe BAD_REQUEST
@@ -142,14 +142,14 @@ class PrepopControllerSpec extends SpecBase with MockitoSugar {
 
       "must return 400 when taxOfficeReference is missing from request" in new Setup {
         val req: FakeRequest[JsValue] =
-          makeSchemeJsonRequest(Json.obj("taxOfficeNumber" -> "123", "agentOwnReference" -> "123PA12345678"))
+          makeSchemeJsonRequest(Json.obj("taxOfficeNumber" -> "123", "accountOfficeReference" -> "123PA12345678"))
         val res: Future[Result]       = controller.getSchemePrepopByKnownFacts(req)
 
         status(res) mustBe BAD_REQUEST
         (contentAsJson(res) \ "message").as[String] mustBe "Invalid JSON body"
       }
 
-      "must return 400 when agentOwnReference is missing from request" in new Setup {
+      "must return 400 when accountOfficeReference is missing from request" in new Setup {
         val req: FakeRequest[JsValue] =
           makeSchemeJsonRequest(Json.obj("taxOfficeNumber" -> "123", "taxOfficeReference" -> "AB456"))
         val res: Future[Result]       = controller.getSchemePrepopByKnownFacts(req)
@@ -168,9 +168,9 @@ class PrepopControllerSpec extends SpecBase with MockitoSugar {
 
         val stubJson = Json.obj(
           "knownfacts"           -> Json.obj(
-            "taxOfficeNumber"    -> "123",
-            "taxOfficeReference" -> "AB456",
-            "agentOwnReference"  -> "1234567890"
+            "taxOfficeNumber"        -> "123",
+            "taxOfficeReference"     -> "AB456",
+            "accountOfficeReference" -> "1234567890"
           ),
           "prePopSubcontractors" -> Json.obj(
             "response"       -> 0,
@@ -203,7 +203,7 @@ class PrepopControllerSpec extends SpecBase with MockitoSugar {
 
         (json \ "knownfacts" \ "taxOfficeNumber").as[String] mustBe "204"
         (json \ "knownfacts" \ "taxOfficeReference").as[String] mustBe "EZ00200"
-        (json \ "knownfacts" \ "agentOwnReference").as[String] mustBe "123PA12345678"
+        (json \ "knownfacts" \ "accountOfficeReference").as[String] mustBe "123PA12345678"
 
         (json \ "prePopSubcontractors" \ "response").as[Int] mustBe 0
 
@@ -277,7 +277,7 @@ class PrepopControllerSpec extends SpecBase with MockitoSugar {
       "must return 400 when taxOfficeNumber is missing from request" in new Setup {
         val req: FakeRequest[JsValue] =
           makeSubcontractorJsonRequest(
-            Json.obj("taxOfficeReference" -> "AB456", "agentOwnReference" -> "123PA12345678")
+            Json.obj("taxOfficeReference" -> "AB456", "accountOfficeReference" -> "123PA12345678")
           )
         val res: Future[Result]       = controller.getSubcontractorPrepopByKnownFacts(req)
 
@@ -287,14 +287,16 @@ class PrepopControllerSpec extends SpecBase with MockitoSugar {
 
       "must return 400 when taxOfficeReference is missing from request" in new Setup {
         val req: FakeRequest[JsValue] =
-          makeSubcontractorJsonRequest(Json.obj("taxOfficeNumber" -> "123", "agentOwnReference" -> "123PA12345678"))
+          makeSubcontractorJsonRequest(
+            Json.obj("taxOfficeNumber" -> "123", "accountOfficeReference" -> "123PA12345678")
+          )
         val res: Future[Result]       = controller.getSubcontractorPrepopByKnownFacts(req)
 
         status(res) mustBe BAD_REQUEST
         (contentAsJson(res) \ "message").as[String] mustBe "Invalid JSON body"
       }
 
-      "must return 400 when agentOwnReference is missing from request" in new Setup {
+      "must return 400 when accountOfficeReference is missing from request" in new Setup {
         val req: FakeRequest[JsValue] =
           makeSubcontractorJsonRequest(Json.obj("taxOfficeNumber" -> "123", "taxOfficeReference" -> "AB456"))
         val res: Future[Result]       = controller.getSubcontractorPrepopByKnownFacts(req)
@@ -325,26 +327,26 @@ class PrepopControllerSpec extends SpecBase with MockitoSugar {
     def requestWithSchemePrepopKnownFactsJsonPayload(
       taxOfficeNumber: String,
       taxOfficeReference: String,
-      agentOwnReference: String
+      accountOfficeReference: String
     ): FakeRequest[JsValue] =
       makeSchemeJsonRequest(
         Json.obj(
-          "taxOfficeNumber"    -> taxOfficeNumber,
-          "taxOfficeReference" -> taxOfficeReference,
-          "agentOwnReference"  -> agentOwnReference
+          "taxOfficeNumber"        -> taxOfficeNumber,
+          "taxOfficeReference"     -> taxOfficeReference,
+          "accountOfficeReference" -> accountOfficeReference
         )
       )
 
     def requestWithSubconPrepopKnownFactsJsonPayload(
       taxOfficeNumber: String,
       taxOfficeReference: String,
-      agentOwnReference: String
+      accountOfficeReference: String
     ): FakeRequest[JsValue] =
       makeSubcontractorJsonRequest(
         Json.obj(
-          "taxOfficeNumber"    -> taxOfficeNumber,
-          "taxOfficeReference" -> taxOfficeReference,
-          "agentOwnReference"  -> agentOwnReference
+          "taxOfficeNumber"        -> taxOfficeNumber,
+          "taxOfficeReference"     -> taxOfficeReference,
+          "accountOfficeReference" -> accountOfficeReference
         )
       )
   }

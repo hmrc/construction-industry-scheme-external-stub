@@ -42,7 +42,7 @@ class PrepopController @Inject() (
     s"$resourcesBasePath/getSubcontractorPrepopByKnownFacts-200-response.json"
 
   private def context(knownFactsSummary: PrepopKnownFacts): String =
-    s"TON=${knownFactsSummary.taxOfficeNumber}, TOR=${knownFactsSummary.taxOfficeReference}, AO=${knownFactsSummary.agentOwnReference}"
+    s"TON=${knownFactsSummary.taxOfficeNumber}, TOR=${knownFactsSummary.taxOfficeReference}, AO=${knownFactsSummary.accountOfficeReference}"
 
   private def badJson(errs: Seq[(JsPath, Seq[JsonValidationError])]): Result =
     BadRequest(
@@ -75,7 +75,7 @@ class PrepopController @Inject() (
 
               case Some(_) =>
                 val orgMissingScheme   = knownFacts.taxOfficeNumber == "204" && knownFacts.taxOfficeReference == "EZ00100"
-                val agentMissingScheme = knownFacts.agentOwnReference == "AGT204"
+                val agentMissingScheme = knownFacts.accountOfficeReference == "AGT204"
 
                 if (orgMissingScheme || agentMissingScheme) {
                   NotFound(Json.obj("message" -> s"No CIS scheme pre-pop data found for ${context(knownFacts)}"))
@@ -110,15 +110,15 @@ class PrepopController @Inject() (
 
               case Some(_) =>
                 val orgNoContractor   = knownFacts.taxOfficeNumber == "204" && knownFacts.taxOfficeReference == "EZ00100"
-                val agentNoContractor = knownFacts.agentOwnReference == "AGT204"
+                val agentNoContractor = knownFacts.accountOfficeReference == "AGT204"
 
                 val orgContractorSubs1   =
                   knownFacts.taxOfficeNumber == "204" && knownFacts.taxOfficeReference == "EZ00200"
-                val agentContractorSubs1 = knownFacts.agentOwnReference == "AGT206"
+                val agentContractorSubs1 = knownFacts.accountOfficeReference == "AGT206"
 
                 val orgContractorSubs0   =
                   knownFacts.taxOfficeNumber == "204" && knownFacts.taxOfficeReference == "EZ00201"
-                val agentContractorSubs0 = knownFacts.agentOwnReference == "AGT207"
+                val agentContractorSubs0 = knownFacts.accountOfficeReference == "AGT207"
 
                 if (orgNoContractor || agentNoContractor || orgContractorSubs0 || agentContractorSubs0) {
                   NotFound(Json.obj("message" -> s"No CIS subcontractor pre-pop data found for ${context(knownFacts)}"))

@@ -20,7 +20,7 @@ import play.api.Logging
 import play.api.libs.json.{JsError, JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.SubcontractorCreateRequest
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.CreateSubcontractorRequest
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -40,7 +40,7 @@ class SubcontractorController @Inject() (
   def createSubcontractor(): Action[JsValue] =
     authorise(parse.json) { implicit request =>
       request.body
-        .validate[SubcontractorCreateRequest]
+        .validate[CreateSubcontractorRequest]
         .fold(
           errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
           body =>

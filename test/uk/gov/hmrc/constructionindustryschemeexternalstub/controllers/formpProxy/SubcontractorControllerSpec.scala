@@ -27,8 +27,8 @@ import play.api.test.Helpers.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.FakeAuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.base.SpecBase
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.EmployerReference
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.SubcontractorCreateRequest
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.response.SubcontractorCreateResponse
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.CreateSubcontractorRequest
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.response.CreateSubcontractorResponse
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 
 import scala.concurrent.Future
@@ -41,14 +41,14 @@ class SubcontractorControllerSpec extends SpecBase {
     "returns 201 Created with subbieResourceRef on valid payload" in new Setup {
 
       val json: JsValue = Json.toJson(
-        SubcontractorCreateRequest(
+        CreateSubcontractorRequest(
           schemeId = 1,
           subcontractorType = "trader",
           currentVersion = 0
         )
       )
 
-      val response              = SubcontractorCreateResponse(subbieResourceRef = 10)
+      val response              = CreateSubcontractorResponse(subbieResourceRef = 10)
       val responseJson: JsValue = Json.toJson(response)
 
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
@@ -67,7 +67,7 @@ class SubcontractorControllerSpec extends SpecBase {
     "propagates UpstreamErrorResponse for taxOfficeNumber = 502" in new Setup {
 
       val json: JsValue = Json.toJson(
-        SubcontractorCreateRequest(
+        CreateSubcontractorRequest(
           schemeId = 1,
           subcontractorType = "trader",
           currentVersion = 0
@@ -88,7 +88,7 @@ class SubcontractorControllerSpec extends SpecBase {
     "returns 500 with generic message for taxOfficeNumber = 500" in new Setup {
 
       val json: JsValue = Json.toJson(
-        SubcontractorCreateRequest(
+        CreateSubcontractorRequest(
           schemeId = 1,
           subcontractorType = "trader",
           currentVersion = 0

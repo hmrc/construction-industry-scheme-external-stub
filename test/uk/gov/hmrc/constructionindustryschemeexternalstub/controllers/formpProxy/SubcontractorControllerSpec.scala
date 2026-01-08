@@ -28,6 +28,7 @@ import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.FakeAuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.base.SpecBase
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.EmployerReference
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateNilMonthlyReturnRequest, SubcontractorCreateRequest}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.response.SubcontractorCreateResponse
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 
 import scala.concurrent.Future
@@ -45,13 +46,14 @@ class SubcontractorControllerSpec extends SpecBase {
         currentVersion = 0
       )
 
-      val response: JsObject = Json.obj("subbieResourceRef" -> 10)
+      val response              = SubcontractorCreateResponse(subbieResourceRef = 10)
+      val responseJson: JsValue = Json.toJson(response)
 
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
         .thenReturn(Some(EmployerReference("200", "")))
 
       when(mockResourceHelper.resourceAsString(any()))
-        .thenReturn(response.toString)
+        .thenReturn(responseJson.toString)
 
       val req: FakeRequest[SubcontractorCreateRequest] =
         FakeRequest(POST, createSubmissionUrl).withBody(request)
@@ -59,7 +61,7 @@ class SubcontractorControllerSpec extends SpecBase {
       val res: Future[Result] = controller.createSubContractor(req)
 
       status(res) mustBe CREATED
-      contentAsJson(res) mustBe response
+      contentAsJson(res) mustBe responseJson
     }
 
     "propagates UpstreamErrorResponse for taxOfficeNumber = 502" in new Setup {

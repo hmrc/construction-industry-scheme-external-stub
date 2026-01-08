@@ -17,10 +17,10 @@
 package uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy
 
 import play.api.Logging
-import play.api.libs.json.Json
+import play.api.libs.json.{JsError, JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.SubcontractorCreateRequest
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateSubmissionRequest, SubcontractorCreateRequest}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -37,17 +37,24 @@ class SubcontractorController @Inject() (
   private val subcontractorResponsePath            = "/resources/subcontractor"
   private val createSubcontractor_201_ResponsePath = s"$subcontractorResponsePath/createSubcontractor-201-response.json"
 
-  def createSubContractor: Action[SubcontractorCreateRequest] =
-    authorise(parse.json[SubcontractorCreateRequest]) { implicit request =>
-      val enrolments = enrolmentHelper.contractorEnrolmentsOpt(request)
-      enrolments match {
-        case Some(enrolmentReference) =>
-          (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {
-            case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
-            case ("502", _) => BadGateway(Json.obj("message" -> "formp failed"))
-            case _          => Created(resourceHelper.resourceAsString(createSubcontractor_201_ResponsePath))
-          }
-        case None                     => InternalServerError
-      }
+  def createSubcontractor(): Action[JsValue] =
+    authorise(parse.json) { implicit request =>
+      request.body
+        .validate[SubcontractorCreateRequest]
+        .fold(
+          errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
+          body =>
+            val enrolments = enrolmentHelper.contractorEnrolmentsOpt(request)
+            enrolments match {
+              case Some(enrolmentReference) =>
+                (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {
+                  case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
+                  case ("502", _) => BadGateway(Json.obj("message" -> "formp failed"))
+                  case _          => Created(resourceHelper.resourceAsString(createSubcontractor_201_ResponsePath))
+                }
+              case None                     => InternalServerError
+            }
+        )
+
     }
 }

@@ -36,14 +36,16 @@ import scala.concurrent.Future
 class SubcontractorControllerSpec extends SpecBase {
   ".createSubmission" - {
 
-    val createSubmissionUrl = "/cis/subcontractor/create"
+    val createSubcontractorUrl = "/cis/subcontractor/create"
 
     "returns 201 Created with subbieResourceRef on valid payload" in new Setup {
 
-      val request = SubcontractorCreateRequest(
-        schemeId = 1,
-        subcontractorType = "trader",
-        currentVersion = 0
+      val json: JsValue = Json.toJson(
+        SubcontractorCreateRequest(
+          schemeId = 1,
+          subcontractorType = "trader",
+          currentVersion = 0
+        )
       )
 
       val response              = SubcontractorCreateResponse(subbieResourceRef = 10)
@@ -55,10 +57,8 @@ class SubcontractorControllerSpec extends SpecBase {
       when(mockResourceHelper.resourceAsString(any()))
         .thenReturn(responseJson.toString)
 
-      val req: FakeRequest[SubcontractorCreateRequest] =
-        FakeRequest(POST, createSubmissionUrl).withBody(request)
-
-      val res: Future[Result] = controller.createSubContractor(req)
+      val req: FakeRequest[JsValue] = makeJsonRequest(json, createSubcontractorUrl)
+      val res: Future[Result]       = controller.createSubcontractor()(req)
 
       status(res) mustBe CREATED
       contentAsJson(res) mustBe responseJson
@@ -66,19 +66,19 @@ class SubcontractorControllerSpec extends SpecBase {
 
     "propagates UpstreamErrorResponse for taxOfficeNumber = 502" in new Setup {
 
-      val request = SubcontractorCreateRequest(
-        schemeId = 1,
-        subcontractorType = "trader",
-        currentVersion = 0
+      val json: JsValue = Json.toJson(
+        SubcontractorCreateRequest(
+          schemeId = 1,
+          subcontractorType = "trader",
+          currentVersion = 0
+        )
       )
 
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
         .thenReturn(Some(EmployerReference("502", "")))
 
-      val req: FakeRequest[SubcontractorCreateRequest] =
-        FakeRequest(POST, createSubmissionUrl).withBody(request)
-
-      val res: Future[Result] = controller.createSubContractor(req)
+      val req: FakeRequest[JsValue] = makeJsonRequest(json, createSubcontractorUrl)
+      val res: Future[Result]       = controller.createSubcontractor()(req)
 
       status(res) mustBe BAD_GATEWAY
       (contentAsJson(res) \ "message").as[String] must include("formp failed")
@@ -87,19 +87,19 @@ class SubcontractorControllerSpec extends SpecBase {
 
     "returns 500 with generic message for taxOfficeNumber = 500" in new Setup {
 
-      val request = SubcontractorCreateRequest(
-        schemeId = 1,
-        subcontractorType = "trader",
-        currentVersion = 0
+      val json: JsValue = Json.toJson(
+        SubcontractorCreateRequest(
+          schemeId = 1,
+          subcontractorType = "trader",
+          currentVersion = 0
+        )
       )
 
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
         .thenReturn(Some(EmployerReference("500", "")))
 
-      val req: FakeRequest[SubcontractorCreateRequest] =
-        FakeRequest(POST, createSubmissionUrl).withBody(request)
-
-      val res: Future[Result] = controller.createSubContractor(req)
+      val req: FakeRequest[JsValue] = makeJsonRequest(json, createSubcontractorUrl)
+      val res: Future[Result]       = controller.createSubcontractor()(req)
 
       status(res) mustBe INTERNAL_SERVER_ERROR
       (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
@@ -114,7 +114,7 @@ class SubcontractorControllerSpec extends SpecBase {
     lazy val controller      = new SubcontractorController(auth, mockResourceHelper, mockEnrolmentsHelper, cc)
 
     def makeJsonRequest(body: JsValue, url: String): FakeRequest[JsValue] =
-      FakeRequest(POST, "/cis/subcontractor")
+      FakeRequest(POST, "/cis/subcontractor/create")
         .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
         .withBody(body)
   }

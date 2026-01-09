@@ -2,7 +2,7 @@
   "knownfacts": {
     "taxOfficeNumber": "123",
     "taxOfficeReference": "AB456",
-    "agentOwnReference": "1234657890"
+    "accountOfficeReference": "1234657890"
   },
   "prePopContractor": {
     "schemeName": "PAL-355 Scheme",

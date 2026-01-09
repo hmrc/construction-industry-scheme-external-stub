@@ -18,11 +18,8 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests
 
 import play.api.libs.json.{Json, OFormat}
 
-final case class PrepopKnownFacts(
-  taxOfficeNumber: String,
-  taxOfficeReference: String,
-  accountOfficeReference: String
-)
-object PrepopKnownFacts {
-  implicit val format: OFormat[PrepopKnownFacts] = Json.format[PrepopKnownFacts]
+case class UpdateSchemeVersionRequest(instanceId: String, version: Int)
+
+object UpdateSchemeVersionRequest {
+  given format: OFormat[UpdateSchemeVersionRequest] = Json.format[UpdateSchemeVersionRequest]
 }

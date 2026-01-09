@@ -16,13 +16,25 @@
 
 package uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.*
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.SubcontractorType
 
-final case class PrepopKnownFacts(
+case class ApplyPrepopulationRequest(
+  schemeId: Int,
+  instanceId: String,
+  accountsOfficeReference: String,
   taxOfficeNumber: String,
   taxOfficeReference: String,
-  accountOfficeReference: String
+  utr: Option[String],
+  name: String,
+  emailAddress: Option[String],
+  displayWelcomePage: Option[String],
+  prePopCount: Int,
+  prePopSuccessful: String,
+  version: Int,
+  subcontractorTypes: Seq[SubcontractorType]
 )
-object PrepopKnownFacts {
-  implicit val format: OFormat[PrepopKnownFacts] = Json.format[PrepopKnownFacts]
+
+object ApplyPrepopulationRequest {
+  implicit val format: OFormat[ApplyPrepopulationRequest] = Json.format[ApplyPrepopulationRequest]
 }

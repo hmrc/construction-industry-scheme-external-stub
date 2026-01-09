@@ -42,7 +42,7 @@ class PrepopController @Inject() (
     s"$resourcesBasePath/getSubcontractorPrepopByKnownFacts-200-response.json"
 
   private def context(knownFactsSummary: PrepopKnownFacts): String =
-    s"TON=${knownFactsSummary.taxOfficeNumber}, TOR=${knownFactsSummary.taxOfficeReference}, AO=${knownFactsSummary.agentOwnReference}"
+    s"TON=${knownFactsSummary.taxOfficeNumber}, TOR=${knownFactsSummary.taxOfficeReference}, AO=${knownFactsSummary.accountOfficeReference}"
 
   private def badJson(errs: Seq[(JsPath, Seq[JsonValidationError])]): Result =
     BadRequest(
@@ -64,40 +64,29 @@ class PrepopController @Inject() (
         .fold(
           errs => badJson(errs),
           knownFacts => {
-            val ctx = context(knownFacts)
 
             val enrolments = enrolmentHelper
               .contractorEnrolmentsOpt(request)
               .orElse(enrolmentHelper.agentEnrolmentsOpt(request))
 
             enrolments match {
-              case Some(_) =>
-                (knownFacts.taxOfficeNumber, knownFacts.taxOfficeReference, knownFacts.agentOwnReference) match {
-                  case ("404", _, _) =>
-                    NotFound(
-                      Json.obj(
-                        "message" -> s"No CIS scheme pre-pop data found for $ctx"
-                      )
-                    )
-
-                  case ("500", _, _) =>
-                    InternalServerError(Json.obj("message" -> "Unexpected error"))
-
-                  case _ =>
-                    val json =
-                      Json
-                        .parse(
-                          resourceHelper.resourceAsString(getSchemePrepopByKnownFacts_200_ResponsePath)
-                        )
-                        .as[JsObject]
-
-                    val updated = json.deepMerge(knownfactsJson(knownFacts))
-
-                    Ok(updated)
-                }
-
               case None =>
-                InternalServerError
+                InternalServerError(Json.obj("message" -> "Missing enrolments"))
+
+              case Some(_) =>
+                val orgMissingScheme   = knownFacts.taxOfficeNumber == "204" && knownFacts.taxOfficeReference == "EZ00100"
+                val agentMissingScheme = knownFacts.accountOfficeReference == "AGT204"
+
+                if (orgMissingScheme || agentMissingScheme) {
+                  NotFound(Json.obj("message" -> s"No CIS scheme pre-pop data found for ${context(knownFacts)}"))
+                } else {
+                  val json = Json
+                    .parse(resourceHelper.resourceAsString(getSchemePrepopByKnownFacts_200_ResponsePath))
+                    .as[JsObject]
+                    .deepMerge(knownfactsJson(knownFacts))
+
+                  Ok(json)
+                }
             }
           }
         )
@@ -110,40 +99,39 @@ class PrepopController @Inject() (
         .fold(
           errs => badJson(errs),
           knownFacts => {
-            val ctx = context(knownFacts)
 
             val enrolments = enrolmentHelper
               .contractorEnrolmentsOpt(request)
               .orElse(enrolmentHelper.agentEnrolmentsOpt(request))
 
             enrolments match {
-              case Some(_) =>
-                (knownFacts.taxOfficeNumber, knownFacts.taxOfficeReference, knownFacts.agentOwnReference) match {
-                  case ("404", _, _) =>
-                    NotFound(
-                      Json.obj(
-                        "message" -> s"No CIS subcontractor pre-pop data found for $ctx"
-                      )
-                    )
-
-                  case ("500", _, _) =>
-                    InternalServerError(Json.obj("message" -> "Unexpected error"))
-
-                  case _ =>
-                    val json =
-                      Json
-                        .parse(
-                          resourceHelper.resourceAsString(getSubconPrepopByKnownFacts_200_ResponsePath)
-                        )
-                        .as[JsObject]
-
-                    val updated = json.deepMerge(knownfactsJson(knownFacts))
-
-                    Ok(updated)
-                }
-
               case None =>
-                InternalServerError
+                InternalServerError(Json.obj("message" -> "Missing enrolments"))
+
+              case Some(_) =>
+                val orgNoContractor   = knownFacts.taxOfficeNumber == "204" && knownFacts.taxOfficeReference == "EZ00100"
+                val agentNoContractor = knownFacts.accountOfficeReference == "AGT204"
+
+                val orgContractorSubs1   =
+                  knownFacts.taxOfficeNumber == "204" && knownFacts.taxOfficeReference == "EZ00200"
+                val agentContractorSubs1 = knownFacts.accountOfficeReference == "AGT206"
+
+                val orgContractorSubs0   =
+                  knownFacts.taxOfficeNumber == "204" && knownFacts.taxOfficeReference == "EZ00201"
+                val agentContractorSubs0 = knownFacts.accountOfficeReference == "AGT207"
+
+                if (orgNoContractor || agentNoContractor || orgContractorSubs0 || agentContractorSubs0) {
+                  NotFound(Json.obj("message" -> s"No CIS subcontractor pre-pop data found for ${context(knownFacts)}"))
+                } else if (orgContractorSubs1 || agentContractorSubs1) {
+                  val json = Json
+                    .parse(resourceHelper.resourceAsString(getSubconPrepopByKnownFacts_200_ResponsePath))
+                    .as[JsObject]
+                    .deepMerge(knownfactsJson(knownFacts))
+
+                  Ok(json)
+                } else {
+                  NotFound(Json.obj("message" -> s"No CIS subcontractor pre-pop data found for ${context(knownFacts)}"))
+                }
             }
           }
         )

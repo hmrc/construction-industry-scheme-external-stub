@@ -21,7 +21,7 @@ import play.api.mvc.{Action, AnyContent, ControllerComponents, Request}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.constructionindustryschemeexternalstub.config.AppConfig
 import uk.gov.hmrc.constructionindustryschemeexternalstub.services.ChrisService
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{FATAL_ERROR, SUCCESS}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.ResourceHelper
 
 import javax.inject.{Inject, Singleton}
@@ -60,16 +60,8 @@ class ChrisController @Inject() (
     }
     val taxOfficeReference                = (keys filter typeIs("TaxOfficeReference")).text
 
-    (taxOfficeNumber, taxOfficeReference) match {
-      case ("754", "EZ00100") =>
-        Ok(
-          replaceCorrelationId(
-            resourceHelper.resourceAsString(submitCISMessage_acknowledgement_ResponsePath),
-            correlationId,
-            pollingUrlHost
-          )
-        )
-      case ("754", "EZ00125") =>
+    service.initialCisStatus(taxOfficeNumber, taxOfficeReference) match {
+      case FATAL_ERROR =>
         Ok(
           replaceCorrelationId(
             resourceHelper.resourceAsString(submitCISMessage_fatalError_ResponsePath),
@@ -77,30 +69,26 @@ class ChrisController @Inject() (
             pollingUrlHost
           )
         )
-      case ("754", "EZ00150") =>
-        Ok(
+
+      case _ =>
+        val basePollUrl = config.pollUrl("IR-CIS-CIS300MR")
+
+        val pollUrlWith0 =
+          if (service.isForeverPending(taxOfficeNumber)) {
+            s"$basePollUrl/0"
+          } else {
+            val finalStatus = service.terminalStatusFor(taxOfficeNumber)
+            s"$basePollUrl/0?final=$finalStatus"
+          }
+
+        val xml =
           replaceCorrelationId(
-            resourceHelper.resourceAsString(submitCISMessage_businessError_ResponsePath),
+            resourceHelper.resourceAsString(submitCISMessage_acknowledgement_ResponsePath),
             correlationId,
             pollingUrlHost
-          )
-        )
-      case ("754", "EZ00200") =>
-        Ok(
-          replaceCorrelationId(
-            resourceHelper.resourceAsString(submitCISMessage_irMarkMismatchError_ResponsePath),
-            correlationId,
-            pollingUrlHost
-          )
-        )
-      case _                  =>
-        Ok(
-          replaceCorrelationId(
-            resourceHelper.resourceAsString(submitCISMessage_success_ResponsePath),
-            correlationId,
-            pollingUrlHost
-          )
-        )
+          ).replace("[pollUrl]", pollUrlWith0)
+
+        Ok(xml)
     }
 
   }
@@ -154,20 +142,45 @@ class ChrisController @Inject() (
       Ok(rootTextOpt.get)
   }
 
-  def getCISResponse(error: Boolean): Action[AnyContent] = Action { (request: Request[AnyContent]) =>
+  def getCISResponse(count: Int): Action[AnyContent] = Action { request =>
+    val message        = request.body.asXml.get
+    val correlationId  = (message \ "Header" \ "MessageDetails" \ "CorrelationID").text
+    val pollingUrlHost = config.callback
+    val finalStatusOpt = request.getQueryString("final")
+    val isFinalPoll    = finalStatusOpt.isDefined && count >= 2
 
-    val rootTextOpt = request.body.asXml.map(
-      service.responseMessageCISMRFiling(
-        _,
-        "IR-CIS-CIS300MR",
-        if (error) {
-          FATAL_ERROR
-        } else {
-          SUCCESS
-        }
-      )
-    )
-    Ok(rootTextOpt.get)
+    val finalStatusParam: String =
+      request.getQueryString("final").getOrElse("SUBMITTED")
+
+    val status =
+      if (!isFinalPoll) "ACKNOWLEDGE"
+      else finalStatusParam
+
+    val resourcePath = status match {
+      case "ACKNOWLEDGE"          => submitCISMessage_acknowledgement_ResponsePath
+      case "SUBMITTED_NO_RECEIPT" => submitCISMessage_irMarkMismatchError_ResponsePath
+      case "FATAL_ERROR"          => submitCISMessage_fatalError_ResponsePath
+      case "DEPARTMENTAL_ERROR"   => submitCISMessage_businessError_ResponsePath
+      case _                      => submitCISMessage_success_ResponsePath
+    }
+
+    val rawXml      = resourceHelper.resourceAsString(resourcePath)
+    val basePollUrl = config.pollUrl("IR-CIS-CIS300MR")
+
+    val nextPollUrl =
+      if (isFinalPoll) {
+        ""
+      } else {
+        val nextCount = count + 1
+        val suffix    = finalStatusOpt.map(fs => s"?final=$fs").getOrElse("")
+        s"$basePollUrl/$nextCount$suffix"
+      }
+
+    val xml =
+      replaceCorrelationId(rawXml, correlationId, pollingUrlHost)
+        .replace("[pollUrl]", nextPollUrl)
+
+    Ok(xml)
   }
 
   private def replaceCorrelationId(response: String, correlationId: String, pollingUrlHost: String): String =

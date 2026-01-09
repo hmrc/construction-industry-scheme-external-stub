@@ -22,6 +22,7 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.Configuration
 import uk.gov.hmrc.constructionindustryschemeexternalstub.config.AppConfig
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{ACKNOWLEDGE, FATAL_ERROR}
 
 class ChrisServiceSpec extends AnyWordSpec with Matchers with OneInstancePerTest {
 
@@ -343,5 +344,56 @@ class ChrisServiceSpec extends AnyWordSpec with Matchers with OneInstancePerTest
       response mustBe empty
     }
 
+    "ChrisService.initialCisStatus" should {
+
+      "return FATAL_ERROR when tax office / reference is in fatalErrorFilter" in {
+        val fatalKey                             = appConfig.fatalErrorFilter.headOption.getOrElse("754/EZ00125")
+        val Array(taxOfficeNumber, taxOfficeRef) = fatalKey.split("/")
+
+        val result = testInstance.initialCisStatus(taxOfficeNumber, taxOfficeRef)
+
+        result mustBe FATAL_ERROR
+      }
+
+      "return ACKNOWLEDGE when tax office / reference is not in fatalErrorFilter" in {
+        val ackKey                               = appConfig.acknowledgeFilter.headOption.getOrElse("754/EZ00100")
+        val Array(taxOfficeNumber, taxOfficeRef) = ackKey.split("/")
+
+        val result = testInstance.initialCisStatus(taxOfficeNumber, taxOfficeRef)
+
+        result mustBe ACKNOWLEDGE
+      }
+    }
+
+    "ChrisService.terminalStatusFor" should {
+
+      "return configured terminal status for a known tax office number" in {
+        val taxOfficeNumber = "754"
+        val expected        = appConfig.pollingStatus(taxOfficeNumber)
+
+        testInstance.terminalStatusFor(taxOfficeNumber) mustBe expected
+      }
+
+      "return SUBMITTED when tax office number is not configured" in {
+        val unknownTaxOfficeNumber = "99999"
+
+        appConfig.pollingStatus(unknownTaxOfficeNumber) mustBe "SUBMITTED"
+        testInstance.terminalStatusFor(unknownTaxOfficeNumber) mustBe "SUBMITTED"
+      }
+    }
+
+    "ChrisService.isForeverPending" should {
+
+      "return true when polling status is ACKNOWLEDGE" in {
+        val taxOfficeNumber = "758"
+        testInstance.terminalStatusFor(taxOfficeNumber) mustBe "ACKNOWLEDGE"
+        testInstance.isForeverPending(taxOfficeNumber) mustBe true
+      }
+
+      "return false when polling status is not ACKNOWLEDGE" in {
+        val taxOfficeNumber = "754"
+        testInstance.isForeverPending(taxOfficeNumber) mustBe false
+      }
+    }
   }
 }

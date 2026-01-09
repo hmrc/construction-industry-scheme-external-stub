@@ -47,14 +47,13 @@ class ChrisService @Inject() (config: AppConfig) {
     }
     val taxOfficeReference = (keys filter typeIs("TaxOfficeReference")).text
 
-    val acknowledge   = config.acknowledgeFilter.contains(taxOfficeNumber + "/" + taxOfficeReference)
-    val fatalError    = config.fatalErrorFilter.contains(taxOfficeNumber + "/" + taxOfficeReference)
-    val businessError = config.businessErrorFilter.contains(taxOfficeNumber + "/" + taxOfficeReference)
+    val acknowledge = config.acknowledgeFilter.contains(taxOfficeNumber + "/" + taxOfficeReference)
+    val fatalError  = config.fatalErrorFilter.contains(taxOfficeNumber + "/" + taxOfficeReference)
 
     val pollTerminalStatus = config.pollingStatus(taxOfficeNumber)
 
     val responseType: ChRISResponseType =
-      calculateResponseType(acknowledge = acknowledge, fatalError = fatalError, businessError = businessError)
+      calculateResponseType(acknowledge = acknowledge, fatalError = fatalError)
 
     if (messageClass == "IR-CIS-CIS300MR") {
       Some(sendCISMonthlyReturnMessage(message, messageClass, responseType, pollTerminalStatus))
@@ -220,6 +219,18 @@ class ChrisService @Inject() (config: AppConfig) {
     else if (businessError) BUSINESS_ERROR
     else SUCCESS
 
+  def initialCisStatus(taxOfficeNumber: String, taxOfficeReference: String): ChRISResponseType = {
+    val key = s"$taxOfficeNumber/$taxOfficeReference"
+
+    if (config.fatalErrorFilter.contains(key)) FATAL_ERROR
+    else ACKNOWLEDGE
+  }
+
+  def terminalStatusFor(taxOfficeNumber: String): String =
+    config.pollingStatus(taxOfficeNumber)
+
+  def isForeverPending(taxOfficeNumber: String): Boolean =
+    terminalStatusFor(taxOfficeNumber) == "ACKNOWLEDGE"
 }
 
 object CorrelationIDGenerator {

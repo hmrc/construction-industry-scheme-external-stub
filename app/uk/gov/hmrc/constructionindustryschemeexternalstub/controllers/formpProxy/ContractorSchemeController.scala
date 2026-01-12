@@ -18,7 +18,7 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProx
 
 import play.api.Logging
 import play.api.libs.json.{JsError, JsObject, JsValue, Json}
-import play.api.mvc.{Action, AnyContent, ControllerComponents, RequestHeader, Result}
+import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.AuthenticatedRequest
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{CreateContractorSchemeParams, EmployerReference, UpdateContractorSchemeParams}

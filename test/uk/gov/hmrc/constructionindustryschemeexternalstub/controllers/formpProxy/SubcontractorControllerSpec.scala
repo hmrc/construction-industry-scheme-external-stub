@@ -27,14 +27,14 @@ import play.api.test.Helpers.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.FakeAuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.base.SpecBase
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.EmployerReference
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.CreateSubcontractorRequest
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.response.CreateSubcontractorResponse
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateSubcontractorRequest, UpdateSubcontractorRequest}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.response.{CreateSubcontractorResponse, UpdateSubcontractorResponse}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 
 import scala.concurrent.Future
 
 class SubcontractorControllerSpec extends SpecBase {
-  ".createSubmission" - {
+  ".createSubcontractor" - {
 
     val createSubcontractorUrl = "/cis/subcontractor/create"
 
@@ -42,9 +42,8 @@ class SubcontractorControllerSpec extends SpecBase {
 
       val json: JsValue = Json.toJson(
         CreateSubcontractorRequest(
-          schemeId = 1,
-          subcontractorType = "trader",
-          currentVersion = 0
+          schemeId = "1",
+          subcontractorType = "trader"
         )
       )
 
@@ -68,9 +67,8 @@ class SubcontractorControllerSpec extends SpecBase {
 
       val json: JsValue = Json.toJson(
         CreateSubcontractorRequest(
-          schemeId = 1,
-          subcontractorType = "trader",
-          currentVersion = 0
+          schemeId = "1",
+          subcontractorType = "trader"
         )
       )
 
@@ -89,9 +87,8 @@ class SubcontractorControllerSpec extends SpecBase {
 
       val json: JsValue = Json.toJson(
         CreateSubcontractorRequest(
-          schemeId = 1,
-          subcontractorType = "trader",
-          currentVersion = 0
+          schemeId = "1",
+          subcontractorType = "trader"
         )
       )
 
@@ -100,6 +97,78 @@ class SubcontractorControllerSpec extends SpecBase {
 
       val req: FakeRequest[JsValue] = makeJsonRequest(json, createSubcontractorUrl)
       val res: Future[Result]       = controller.createSubcontractor()(req)
+
+      status(res) mustBe INTERNAL_SERVER_ERROR
+      (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
+    }
+  }
+
+  ".updateSubContractor" - {
+
+    val updateSubcontractorUrl = "/cis/subcontractor/update"
+
+    "returns 200 Update with valid payload" in new Setup {
+
+      val json: JsValue = Json.toJson(
+        UpdateSubcontractorRequest(
+          schemeId = "1",
+          subbieResourceRef = 10,
+          tradingName = Some("trading name")
+        )
+      )
+
+      val response              = UpdateSubcontractorResponse(newVersion = 20)
+      val responseJson: JsValue = Json.toJson(response)
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("200", "")))
+
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn(responseJson.toString)
+
+      val req: FakeRequest[JsValue] = makeJsonRequest(json, updateSubcontractorUrl)
+      val res: Future[Result]       = controller.updateSubcontractor()(req)
+
+      status(res) mustBe OK
+      contentAsJson(res) mustBe responseJson
+    }
+
+    "propagates UpstreamErrorResponse for taxOfficeNumber = 502" in new Setup {
+
+      val json: JsValue = Json.toJson(
+        UpdateSubcontractorRequest(
+          schemeId = "1",
+          subbieResourceRef = 10,
+          tradingName = Some("trading name")
+        )
+      )
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("502", "")))
+
+      val req: FakeRequest[JsValue] = makeJsonRequest(json, updateSubcontractorUrl)
+      val res: Future[Result]       = controller.updateSubcontractor()(req)
+
+      status(res) mustBe BAD_GATEWAY
+      (contentAsJson(res) \ "message").as[String] must include("formp failed")
+
+    }
+
+    "returns 500 with generic message for taxOfficeNumber = 500" in new Setup {
+
+      val json: JsValue = Json.toJson(
+        UpdateSubcontractorRequest(
+          schemeId = "1",
+          subbieResourceRef = 10,
+          tradingName = Some("trading name")
+        )
+      )
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("500", "")))
+
+      val req: FakeRequest[JsValue] = makeJsonRequest(json, updateSubcontractorUrl)
+      val res: Future[Result]       = controller.updateSubcontractor()(req)
 
       status(res) mustBe INTERNAL_SERVER_ERROR
       (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"

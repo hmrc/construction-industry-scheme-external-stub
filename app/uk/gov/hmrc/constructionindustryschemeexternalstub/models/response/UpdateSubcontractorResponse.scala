@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests
+package uk.gov.hmrc.constructionindustryschemeexternalstub.models.response
 
 import play.api.libs.json.{Json, OFormat}
 
-final case class CreateSubcontractorRequest(
-  schemeId: String,
-  subcontractorType: String
+final case class UpdateSubcontractorResponse(
+  newVersion: Int
 )
 
-object CreateSubcontractorRequest {
-  implicit val format: OFormat[CreateSubcontractorRequest] = Json.format[CreateSubcontractorRequest]
+object UpdateSubcontractorResponse {
+  implicit val format: OFormat[UpdateSubcontractorResponse] = Json.format[UpdateSubcontractorResponse]
 }

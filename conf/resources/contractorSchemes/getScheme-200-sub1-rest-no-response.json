@@ -1,17 +1,17 @@
 {
-  "schemeId": 2010,
+  "schemeId": 2040,
   "instanceId": "some-instance-id",
   "accountsOfficeReference": "123PA00123456",
-  "taxOfficeNumber": "201",
+  "taxOfficeNumber": "204",
   "taxOfficeReference": "AB1234",
   "utr": null,
   "name": null,
-  "emailAddress": "contact@example.com",
+  "emailAddress": null,
   "displayWelcomePage": null,
-  "prePopCount": 1,
+  "prePopCount": 0,
   "prePopSuccessful": "N",
   "subcontractorCounter": 1,
   "verificationBatchCounter": 0,
-  "lastUpdate": "2025-01-01T12:00:00Z",
-  "version": 1
+  "lastUpdate": null,
+  "version": 0
 }

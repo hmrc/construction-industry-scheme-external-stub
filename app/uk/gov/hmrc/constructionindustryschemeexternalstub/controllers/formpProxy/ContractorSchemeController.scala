@@ -20,11 +20,10 @@ import play.api.Logging
 import play.api.libs.json.{JsError, JsObject, JsValue, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.AuthenticatedRequest
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{ApplyPrepopulationRequest, AuthenticatedRequest, UpdateSchemeVersionRequest}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{CreateContractorSchemeParams, EmployerReference, UpdateContractorSchemeParams}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
-
 import javax.inject.Inject
 
 class ContractorSchemeController @Inject() (
@@ -35,15 +34,16 @@ class ContractorSchemeController @Inject() (
 ) extends BackendController(cc)
     with Logging {
 
-  private val basePath                            = "/resources/contractorSchemes"
-  private val getScheme_200_org_ResponsePath      = s"$basePath/getScheme-200-org-response.json"
-  private val getScheme_200_agent_ResponsePath    = s"$basePath/getScheme-200-agent-response.json"
-  private val getScheme_noNameNoUtr_sub1_Response = s"$basePath/getScheme-200-no-name-no-utr-response.json"
-  private val getScheme_nameOnly_Response         = s"$basePath/getScheme-200-name-only-response.json"
-  private val getScheme_utrOnly_Response          = s"$basePath/getScheme-200-utr-only-response.json"
-  private val getScheme_firstTime_Response        = s"$basePath/getScheme-200-first-time-response.json"
-  private val createScheme_201_ResponsePath       = s"$basePath/createScheme-201-response.json"
-  private val updateScheme_200_ResponsePath       = s"$basePath/updateScheme-200-response.json"
+  private val basePath                              = "/resources/contractorSchemes"
+  private val getScheme_200_no_sub_ResponsePath     = s"$basePath/getScheme-200-no-sub-response.json"
+  private val getScheme_sub1_ResponsePath           = s"$basePath/getScheme-200-sub1-response.json"
+  private val getScheme_sub1_rest_no_ResponsePath   = s"$basePath/getScheme-200-sub1-rest-no-response.json"
+  private val getScheme_nameOnly_ResponsePath       = s"$basePath/getScheme-200-name-only-response.json"
+  private val getScheme_utrOnly_ResponsePath        = s"$basePath/getScheme-200-utr-only-response.json"
+  private val getScheme_prepop_no_Only_ResponsePath = s"$basePath/getScheme-200-flag-no-only-response.json"
+  private val getScheme_firstTime_ResponsePath      = s"$basePath/getScheme-200-first-time-response.json"
+  private val createScheme_201_ResponsePath         = s"$basePath/createScheme-201-response.json"
+  private val updateScheme_200_ResponsePath         = s"$basePath/updateScheme-200-response.json"
 
   def getScheme(instanceId: String): Action[AnyContent] =
     authorise { implicit request =>
@@ -111,6 +111,49 @@ class ContractorSchemeController @Inject() (
         )
     }
 
+  def updateSchemeVersion: Action[JsValue] =
+    authorise(parse.json) { implicit request =>
+      request.body
+        .validate[UpdateSchemeVersionRequest]
+        .fold(
+          errs =>
+            BadRequest(
+              Json.obj(
+                "message" -> "Invalid JSON body",
+                "errors"  -> JsError.toJson(errs)
+              )
+            ),
+          req =>
+            if (hasAnyEnrolments) {
+              Ok(Json.obj("version" -> (req.version + 1)))
+            } else {
+              logger.warn("[ContractorSchemeController][updateSchemeVersion] Missing enrolments")
+              InternalServerError(Json.obj("message" -> "Missing enrolments"))
+            }
+        )
+    }
+
+  def applyPrepopulation: Action[JsValue] =
+    authorise(parse.json) { implicit request =>
+      if (!hasAnyEnrolments) {
+        logger.warn("[ContractorSchemeController][applyPrepopulation] Missing enrolments")
+        InternalServerError(Json.obj("message" -> "Missing enrolments"))
+      } else {
+        request.body
+          .validate[ApplyPrepopulationRequest]
+          .fold(
+            errs =>
+              BadRequest(
+                Json.obj(
+                  "message" -> "Invalid JSON body",
+                  "errors"  -> JsError.toJson(errs)
+                )
+              ),
+            req => Ok(Json.obj("version" -> (req.version + 1)))
+          )
+      }
+    }
+
   private def hasAnyEnrolments(implicit request: AuthenticatedRequest[_]): Boolean =
     enrolmentHelper.contractorEnrolmentsOpt(request).isDefined ||
       enrolmentHelper.agentEnrolmentsOpt(request).isDefined
@@ -119,57 +162,81 @@ class ContractorSchemeController @Inject() (
     taxOfficeNumber: String,
     taxOfficeReference: String
   ): Result =
-    taxOfficeNumber match {
-      // 1) no utr & no name, but subcontractorCounter = 1, prepopSuccessful = "N"
-      case "201" =>
-        Ok(schemeJson(getScheme_noNameNoUtr_sub1_Response, Some(taxOfficeNumber), Some(taxOfficeReference)))
+    (taxOfficeNumber, taxOfficeReference) match {
+      // 0) no utr, no name, prepopSuccessful = "N", subcontractorCounter = 1
+      case ("201", _)         =>
+        Ok(schemeJson(getScheme_sub1_rest_no_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
 
-      // 2) no utr but there is a name, prepopSuccessful = "N"
-      case "202" =>
-        Ok(schemeJson(getScheme_nameOnly_Response, Some(taxOfficeNumber), Some(taxOfficeReference)))
+      // 1) no utr but there is a name, prepopSuccessful = "N", subcontractorCounter = 1
+      case ("202", _)         =>
+        Ok(schemeJson(getScheme_nameOnly_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
 
-      // 3) there is an utr but no name, prepopSuccessful = "N"
-      case "203" =>
-        Ok(schemeJson(getScheme_utrOnly_Response, Some(taxOfficeNumber), Some(taxOfficeReference)))
+      // 2) there is an utr but no name, prepopSuccessful = "N", subcontractorCounter = 1
+      case ("203", _)         =>
+        Ok(schemeJson(getScheme_utrOnly_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
 
-      // 4) no utr, no name, subcontractorCounter = 0 (first-time user), prepopSuccessful = "N"
-      case "204" =>
-        Ok(schemeJson(getScheme_firstTime_Response, Some(taxOfficeNumber), Some(taxOfficeReference)))
+      // 3) no utr, no name, prepopSuccessful = "N", subcontractorCounter = 0
+      case ("204", "EZ00100") =>
+        Ok(schemeJson(getScheme_firstTime_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
 
-      // 5) Not found scheme, expected to call createScheme
-      case "205" =>
+      // 4) successful prepoped scheme table, subcontractorCounter = 1
+      case ("204", "EZ00200") =>
+        Ok(schemeJson(getScheme_sub1_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
+
+      // 5) successful prepoped scheme table, subcontractorCounter = 0
+      case ("204", "EZ00201") =>
+        Ok(schemeJson(getScheme_200_no_sub_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
+
+      // 6) Not found scheme, expected to call createScheme
+      case ("205", _)         =>
         NotFound(Json.obj("message" -> "Scheme not found"))
 
-      // default happy path with prepopSuccessful = "Y", expected to pass F1 check without update / create scheme
-      case _     =>
-        Ok(schemeJson(getScheme_200_org_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
+      // 7) name & utr exists, prepopSuccessful = "N", subcontractorCounter = 1
+      case ("206", _)         =>
+        Ok(schemeJson(getScheme_prepop_no_Only_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
+
+      // default happy path with successfully prepoped scheme and subcontractorCounter = 1
+      case (_, _)             =>
+        Ok(schemeJson(getScheme_sub1_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
     }
 
   private def agentSchemeResult(agentRef: String): Result =
     agentRef match {
-      // 1) no utr & no name, but subcontractorCounter = 1, prepopSuccessful = "N"
-      case "AGT201" =>
-        Ok(schemeJson(getScheme_noNameNoUtr_sub1_Response))
+      // 0) no utr, no name, prepopSuccessful = "N", subcontractorCounter = 1
+      case "AGT201"   =>
+        Ok(schemeJson(getScheme_sub1_rest_no_ResponsePath))
 
-      // 2) no utr but there is a name, prepopSuccessful = "N"
-      case "AGT202" =>
-        Ok(schemeJson(getScheme_nameOnly_Response))
+      // 1) no utr but there is a name, prepopSuccessful = "N"
+      case "AGT202"   =>
+        Ok(schemeJson(getScheme_nameOnly_ResponsePath))
 
-      // 3) there is an utr but no name, prepopSuccessful = "N"
-      case "AGT203" =>
-        Ok(schemeJson(getScheme_utrOnly_Response))
+      // 2) there is an utr but no name, prepopSuccessful = "N"
+      case "AGT203"   =>
+        Ok(schemeJson(getScheme_utrOnly_ResponsePath))
 
-      // 4) no utr, no name, subcontractorCounter = 0 (first-time user), prepopSuccessful = "N"
-      case "AGT204" =>
-        Ok(schemeJson(getScheme_firstTime_Response))
+      // 3) no utr, no name, prepopSuccessful = "N", subcontractorCounter = 0
+      case "AGT204"   =>
+        Ok(schemeJson(getScheme_firstTime_ResponsePath))
 
-      // 5) Not found scheme, expected to call createScheme endpoint
-      case "AGT205" =>
+      // 4) Not found scheme, expected to call createScheme endpoint
+      case "AGT205"   =>
         NotFound(Json.obj("message" -> "Scheme not found"))
 
-      // default happy path with prepopSuccessful = "Y", expected to pass F1 check without update / create scheme
-      case _        =>
-        Ok(schemeJson(getScheme_200_agent_ResponsePath))
+      // 5) successful prepoped scheme table, subcontractorCounter = 1
+      case "AGT206"   =>
+        Ok(schemeJson(getScheme_sub1_ResponsePath))
+
+      // 6) successful prepoped scheme table, subcontractorCounter = 0
+      case "AGT207"   =>
+        Ok(schemeJson(getScheme_200_no_sub_ResponsePath))
+
+      // 7) name & utr exists, prepopSuccessful = "N", subcontractorCounter = 1
+      case ("AGT208") =>
+        Ok(schemeJson(getScheme_prepop_no_Only_ResponsePath))
+
+      // default happy path with successfully prepoped scheme and subcontractorCounter = 1
+      case _          =>
+        Ok(schemeJson(getScheme_sub1_ResponsePath))
     }
 
   private def schemeJson(

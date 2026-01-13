@@ -9,6 +9,8 @@ POST       /submissions/update                                      uk.gov.hmrc.
 GET        /scheme/:instanceId                                      uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.ContractorSchemeController.getScheme(instanceId: String)
 POST       /scheme                                                  uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.ContractorSchemeController.createScheme
 POST       /scheme/update                                           uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.ContractorSchemeController.updateScheme
+POST       /scheme/version-update                                   uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.ContractorSchemeController.updateSchemeVersion
+POST       /scheme/prepopulate                                      uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.ContractorSchemeController.applyPrepopulation
 POST       /cis/subcontractor/create                                uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubcontractorController.createSubcontractor()
 POST       /cis/subcontractor/update                                uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubcontractorController.updateSubcontractor()
 

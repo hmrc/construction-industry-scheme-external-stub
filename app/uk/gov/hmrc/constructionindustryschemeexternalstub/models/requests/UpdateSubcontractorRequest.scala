@@ -19,7 +19,7 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests
 import play.api.libs.json.{Json, OFormat}
 
 final case class UpdateSubcontractorRequest(
-  schemeId: String,
+  schemeId: Int,
   subbieResourceRef: Int,
   firstName: Option[String] = None,
   secondName: Option[String] = None,

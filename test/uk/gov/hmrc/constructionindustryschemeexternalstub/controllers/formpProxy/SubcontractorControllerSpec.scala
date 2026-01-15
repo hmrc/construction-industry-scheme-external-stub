@@ -20,20 +20,21 @@ import org.mockito.ArgumentMatchers.*
 import org.mockito.Mockito.*
 import org.scalatest.freespec.AnyFreeSpec
 import play.api.http.Status.CREATED
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.FakeAuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.base.SpecBase
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.EmployerReference
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{EmployerReference, SoleTrader}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateSubcontractorRequest, UpdateSubcontractorRequest}
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.response.{CreateSubcontractorResponse, UpdateSubcontractorResponse}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 
 import scala.concurrent.Future
 
 class SubcontractorControllerSpec extends SpecBase {
+  val schemeId          = 1
+  val subbieResourceRef = 10
   ".createSubcontractor" - {
 
     val createSubcontractorUrl = "/cis/subcontractor/create"
@@ -42,13 +43,13 @@ class SubcontractorControllerSpec extends SpecBase {
 
       val json: JsValue = Json.toJson(
         CreateSubcontractorRequest(
-          schemeId = "1",
-          subcontractorType = "trader"
+          schemeId = schemeId,
+          subcontractorType = SoleTrader,
+          version = 0
         )
       )
 
-      val response              = CreateSubcontractorResponse(subbieResourceRef = 10)
-      val responseJson: JsValue = Json.toJson(response)
+      val responseJson: JsObject = Json.obj("subbieResourceRef" -> subbieResourceRef)
 
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
         .thenReturn(Some(EmployerReference("200", "")))
@@ -67,8 +68,9 @@ class SubcontractorControllerSpec extends SpecBase {
 
       val json: JsValue = Json.toJson(
         CreateSubcontractorRequest(
-          schemeId = "1",
-          subcontractorType = "trader"
+          schemeId = schemeId,
+          subcontractorType = SoleTrader,
+          version = 0
         )
       )
 
@@ -87,8 +89,9 @@ class SubcontractorControllerSpec extends SpecBase {
 
       val json: JsValue = Json.toJson(
         CreateSubcontractorRequest(
-          schemeId = "1",
-          subcontractorType = "trader"
+          schemeId = schemeId,
+          subcontractorType = SoleTrader,
+          version = 0
         )
       )
 
@@ -111,33 +114,26 @@ class SubcontractorControllerSpec extends SpecBase {
 
       val json: JsValue = Json.toJson(
         UpdateSubcontractorRequest(
-          schemeId = "1",
+          schemeId = schemeId,
           subbieResourceRef = 10,
           tradingName = Some("trading name")
         )
       )
 
-      val response              = UpdateSubcontractorResponse(newVersion = 20)
-      val responseJson: JsValue = Json.toJson(response)
-
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
         .thenReturn(Some(EmployerReference("200", "")))
-
-      when(mockResourceHelper.resourceAsString(any()))
-        .thenReturn(responseJson.toString)
 
       val req: FakeRequest[JsValue] = makeJsonRequest(json, updateSubcontractorUrl)
       val res: Future[Result]       = controller.updateSubcontractor()(req)
 
-      status(res) mustBe OK
-      contentAsJson(res) mustBe responseJson
+      status(res) mustBe NO_CONTENT
     }
 
     "propagates UpstreamErrorResponse for taxOfficeNumber = 502" in new Setup {
 
       val json: JsValue = Json.toJson(
         UpdateSubcontractorRequest(
-          schemeId = "1",
+          schemeId = schemeId,
           subbieResourceRef = 10,
           tradingName = Some("trading name")
         )
@@ -158,7 +154,7 @@ class SubcontractorControllerSpec extends SpecBase {
 
       val json: JsValue = Json.toJson(
         UpdateSubcontractorRequest(
-          schemeId = "1",
+          schemeId = schemeId,
           subbieResourceRef = 10,
           tradingName = Some("trading name")
         )

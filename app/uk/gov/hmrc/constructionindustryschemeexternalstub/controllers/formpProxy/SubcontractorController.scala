@@ -36,7 +36,6 @@ class SubcontractorController @Inject() (
 
   private val subcontractorResponsePath            = "/resources/subcontractor"
   private val createSubcontractor_201_ResponsePath = s"$subcontractorResponsePath/createSubcontractor-201-response.json"
-  private val updateSubcontractor_200_ResponsePath = s"$subcontractorResponsePath/updateSubcontractor-200-response.json"
 
   def createSubcontractor(): Action[JsValue] =
     authorise(parse.json) { implicit request =>
@@ -72,7 +71,7 @@ class SubcontractorController @Inject() (
                 (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {
                   case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
                   case ("502", _) => BadGateway(Json.obj("message" -> "formp failed"))
-                  case _          => Ok(resourceHelper.resourceAsString(updateSubcontractor_200_ResponsePath))
+                  case _          => NoContent
                 }
               case None                     => InternalServerError
             }

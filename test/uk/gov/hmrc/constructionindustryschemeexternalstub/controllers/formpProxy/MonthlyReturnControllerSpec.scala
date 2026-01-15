@@ -27,7 +27,7 @@ import play.api.mvc.{ControllerComponents, PlayBodyParsers, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.{AuthAction, FakeAuthAction}
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateNilMonthlyReturnRequest, InstanceIdRequest}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateMonthlyReturnRequest, CreateNilMonthlyReturnRequest, InstanceIdRequest}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.response.CreateNilMonthlyReturnResponse
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{EmployerReference, MonthlyReturn, UserMonthlyReturns, requests}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
@@ -236,6 +236,27 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
       (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
     }
 
+  }
+
+  ".createMonthlyReturn" - {
+
+    "returns 201 Created for a valid request body" in new Setup {
+      val requestBody = CreateMonthlyReturnRequest(
+        instanceId = "abc-123",
+        taxYear = 2025,
+        taxMonth = 2
+      )
+
+      val request: FakeRequest[CreateMonthlyReturnRequest] =
+        FakeRequest(POST, "/formp-proxy/monthly-return/create")
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(requestBody)
+
+      val result: Future[Result] = controller.createMonthlyReturn(request)
+
+      status(result) mustBe CREATED
+      contentAsString(result) mustBe ""
+    }
   }
 
   private trait Setup {

@@ -20,11 +20,12 @@ import play.api.Logging
 import play.api.libs.json.{JsError, JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateNilMonthlyReturnRequest, InstanceIdRequest}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateMonthlyReturnRequest, CreateNilMonthlyReturnRequest, InstanceIdRequest}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.Inject
+import scala.concurrent.Future
 
 class MonthlyReturnController @Inject() (
   authorise: AuthAction,
@@ -88,6 +89,11 @@ class MonthlyReturnController @Inject() (
           }
         case None                     => InternalServerError
       }
+    }
+
+  def createMonthlyReturn: Action[CreateMonthlyReturnRequest] =
+    authorise.async(parse.json[CreateMonthlyReturnRequest]) { _ =>
+      Future.successful(Created)
     }
 
   def getSchemeEmail: Action[InstanceIdRequest] =

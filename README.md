@@ -61,7 +61,7 @@ To trigger the happy path, ensure you provide a valid request body:
   "aoDistrict" : "123",
   "aoPayType" : "M",
   "aoCheckCode" : "XY",
-  "aoReference" : "1234567XY",
+  "aoReference" : "754PA87654350",
   "validBusinessAddr" : "Y",
   "correlation" : "corr-abc",
   "ggAgentId" : "AGENT-001",
@@ -1033,7 +1033,7 @@ To trigger the happy path, ensure you provide a valid request body:
             <CISreturn>
                 <Contractor>
                     <UTR>1234567890</UTR>
-                    <AOref>1234567XY</AOref>
+                    <AOref>754PA87654350</AOref>
                 </Contractor>
                 <NilReturn>yes</NilReturn>
                 <Declarations>

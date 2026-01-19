@@ -1,21 +1,727 @@
 {
-  "clients":
-    [
-      {
-        "uniqueId": "1",
-        "taxOfficeNumber": "123",
-        "taxOfficeRef": "AB001",
-        "employerName1": "ABC Ltd",
-        "schemeName": "ABC"
-      },
-      {
-        "uniqueId": "2",
-        "taxOfficeNumber": "456",
-        "taxOfficeRef": "CD002",
-        "employerName1": "XYZ Builders",
-        "schemeName": "XYZ"
-      }
-    ],
-  "totalCount": 2,
-  "clientNameStartingCharacters": ["A","X"]
+  "clients": [
+    {
+      "uniqueId": "1",
+      "taxOfficeNumber": "123",
+      "taxOfficeRef": "AB001",
+      "employerName1": "ABC Ltd",
+      "schemeName": "ABC"
+    },
+    {
+      "uniqueId": "2",
+      "taxOfficeNumber": "456",
+      "taxOfficeRef": "CD002",
+      "employerName1": "XYZ Builders",
+      "schemeName": "XYZ"
+    },
+    {
+      "uniqueId": "3",
+      "taxOfficeNumber": "541",
+      "taxOfficeRef": "UP374",
+      "employerName1": "Betelgeuse Construction 3",
+      "schemeName": "Betelgeuse"
+    },
+    {
+      "uniqueId": "4",
+      "taxOfficeNumber": "821",
+      "taxOfficeRef": "WY080",
+      "employerName1": "Heritage Contractors 4",
+      "schemeName": "Heritage"
+    },
+    {
+      "uniqueId": "5",
+      "taxOfficeNumber": "312",
+      "taxOfficeRef": "VV917",
+      "employerName1": "Bellatrix Builders 5",
+      "schemeName": "Bellatrix"
+    },
+    {
+      "uniqueId": "6",
+      "taxOfficeNumber": "491",
+      "taxOfficeRef": "EQ134",
+      "employerName1": "Zenith Builders 6",
+      "schemeName": "Zenith"
+    },
+    {
+      "uniqueId": "7",
+      "taxOfficeNumber": "658",
+      "taxOfficeRef": "SZ551",
+      "employerName1": "Castor Contractors 7",
+      "schemeName": "Castor"
+    },
+    {
+      "uniqueId": "8",
+      "taxOfficeNumber": "844",
+      "taxOfficeRef": "TB476",
+      "employerName1": "Omicron Builders 8",
+      "schemeName": "Omicron"
+    },
+    {
+      "uniqueId": "9",
+      "taxOfficeNumber": "646",
+      "taxOfficeRef": "AS214",
+      "employerName1": "Wasat Builders 9",
+      "schemeName": "Wasat"
+    },
+    {
+      "uniqueId": "10",
+      "taxOfficeNumber": "603",
+      "taxOfficeRef": "AG318",
+      "employerName1": "Royal Builders 10",
+      "schemeName": "Royal"
+    },
+    {
+      "uniqueId": "11",
+      "taxOfficeNumber": "783",
+      "taxOfficeRef": "BH844",
+      "employerName1": "Acme Construction 11",
+      "schemeName": "Acme"
+    },
+    {
+      "uniqueId": "12",
+      "taxOfficeNumber": "875",
+      "taxOfficeRef": "UU661",
+      "employerName1": "Peak Builders 12",
+      "schemeName": "Peak"
+    },
+    {
+      "uniqueId": "13",
+      "taxOfficeNumber": "294",
+      "taxOfficeRef": "EY777",
+      "employerName1": "Gamma Builders 13",
+      "schemeName": "Gamma"
+    },
+    {
+      "uniqueId": "14",
+      "taxOfficeNumber": "751",
+      "taxOfficeRef": "GE486",
+      "employerName1": "Mebsuta Contractors 14",
+      "schemeName": "Mebsuta"
+    },
+    {
+      "uniqueId": "15",
+      "taxOfficeNumber": "391",
+      "taxOfficeRef": "DB310",
+      "employerName1": "Adhara Contractors 15",
+      "schemeName": "Adhara"
+    },
+    {
+      "uniqueId": "16",
+      "taxOfficeNumber": "907",
+      "taxOfficeRef": "LQ425",
+      "employerName1": "Apex Builders 16",
+      "schemeName": "Apex"
+    },
+    {
+      "uniqueId": "17",
+      "taxOfficeNumber": "257",
+      "taxOfficeRef": "IY162",
+      "employerName1": "Pinnacle Construction 17",
+      "schemeName": "Pinnacle"
+    },
+    {
+      "uniqueId": "18",
+      "taxOfficeNumber": "191",
+      "taxOfficeRef": "DF829",
+      "employerName1": "Rigel Builders 18",
+      "schemeName": "Rigel"
+    },
+    {
+      "uniqueId": "19",
+      "taxOfficeNumber": "743",
+      "taxOfficeRef": "DS176",
+      "employerName1": "Acme Construction 19",
+      "schemeName": "Acme"
+    },
+    {
+      "uniqueId": "20",
+      "taxOfficeNumber": "303",
+      "taxOfficeRef": "KX994",
+      "employerName1": "Pinnacle Construction 20",
+      "schemeName": "Pinnacle"
+    },
+    {
+      "uniqueId": "21",
+      "taxOfficeNumber": "964",
+      "taxOfficeRef": "RV735",
+      "employerName1": "Capella Builders 21",
+      "schemeName": "Capella"
+    },
+    {
+      "uniqueId": "22",
+      "taxOfficeNumber": "145",
+      "taxOfficeRef": "KY919",
+      "employerName1": "Lambda Builders 22",
+      "schemeName": "Lambda"
+    },
+    {
+      "uniqueId": "23",
+      "taxOfficeNumber": "594",
+      "taxOfficeRef": "CH356",
+      "employerName1": "Royal Builders 23",
+      "schemeName": "Royal"
+    },
+    {
+      "uniqueId": "24",
+      "taxOfficeNumber": "171",
+      "taxOfficeRef": "RC019",
+      "employerName1": "XYZ Builders 24",
+      "schemeName": "XYZ"
+    },
+    {
+      "uniqueId": "25",
+      "taxOfficeNumber": "516",
+      "taxOfficeRef": "EI353",
+      "employerName1": "Regulus Construction 25",
+      "schemeName": "Regulus"
+    },
+    {
+      "uniqueId": "26",
+      "taxOfficeNumber": "647",
+      "taxOfficeRef": "AE728",
+      "employerName1": "Psi Builders 26",
+      "schemeName": "Psi"
+    },
+    {
+      "uniqueId": "27",
+      "taxOfficeNumber": "724",
+      "taxOfficeRef": "JA187",
+      "employerName1": "Galactic Builders 27",
+      "schemeName": "Galactic"
+    },
+    {
+      "uniqueId": "28",
+      "taxOfficeNumber": "952",
+      "taxOfficeRef": "HB606",
+      "employerName1": "Mintaka Contractors 28",
+      "schemeName": "Mintaka"
+    },
+    {
+      "uniqueId": "29",
+      "taxOfficeNumber": "184",
+      "taxOfficeRef": "RA753",
+      "employerName1": "Betelgeuse Construction 29",
+      "schemeName": "Betelgeuse"
+    },
+    {
+      "uniqueId": "30",
+      "taxOfficeNumber": "803",
+      "taxOfficeRef": "PD599",
+      "employerName1": "Altair Construction 30",
+      "schemeName": "Altair"
+    },
+    {
+      "uniqueId": "31",
+      "taxOfficeNumber": "580",
+      "taxOfficeRef": "ZN841",
+      "employerName1": "Vega Construction 31",
+      "schemeName": "Vega"
+    },
+    {
+      "uniqueId": "32",
+      "taxOfficeNumber": "111",
+      "taxOfficeRef": "JR792",
+      "employerName1": "Procyon Contractors 32",
+      "schemeName": "Procyon"
+    },
+    {
+      "uniqueId": "33",
+      "taxOfficeNumber": "400",
+      "taxOfficeRef": "XR870",
+      "employerName1": "Rigel Builders 33",
+      "schemeName": "Rigel"
+    },
+    {
+      "uniqueId": "34",
+      "taxOfficeNumber": "242",
+      "taxOfficeRef": "GT373",
+      "employerName1": "ABC Construction 34",
+      "schemeName": "ABC"
+    },
+    {
+      "uniqueId": "35",
+      "taxOfficeNumber": "181",
+      "taxOfficeRef": "VC625",
+      "employerName1": "XYZ Builders 35",
+      "schemeName": "XYZ"
+    },
+    {
+      "uniqueId": "36",
+      "taxOfficeNumber": "632",
+      "taxOfficeRef": "EH510",
+      "employerName1": "Wasat Builders 36",
+      "schemeName": "Wasat"
+    },
+    {
+      "uniqueId": "37",
+      "taxOfficeNumber": "139",
+      "taxOfficeRef": "YT476",
+      "employerName1": "Omega Construction 37",
+      "schemeName": "Omega"
+    },
+    {
+      "uniqueId": "38",
+      "taxOfficeNumber": "397",
+      "taxOfficeRef": "PV884",
+      "employerName1": "XYZ Builders 38",
+      "schemeName": "XYZ"
+    },
+    {
+      "uniqueId": "39",
+      "taxOfficeNumber": "472",
+      "taxOfficeRef": "YT224",
+      "employerName1": "Pollux Construction 39",
+      "schemeName": "Pollux"
+    },
+    {
+      "uniqueId": "40",
+      "taxOfficeNumber": "518",
+      "taxOfficeRef": "PH640",
+      "employerName1": "Psi Builders 40",
+      "schemeName": "Psi"
+    },
+    {
+      "uniqueId": "41",
+      "taxOfficeNumber": "173",
+      "taxOfficeRef": "EI853",
+      "employerName1": "Iota Builders 41",
+      "schemeName": "Iota"
+    },
+    {
+      "uniqueId": "42",
+      "taxOfficeNumber": "802",
+      "taxOfficeRef": "RW759",
+      "employerName1": "Sirius Builders 42",
+      "schemeName": "Sirius"
+    },
+    {
+      "uniqueId": "43",
+      "taxOfficeNumber": "998",
+      "taxOfficeRef": "XL778",
+      "employerName1": "Phi Builders 43",
+      "schemeName": "Phi"
+    },
+    {
+      "uniqueId": "44",
+      "taxOfficeNumber": "878",
+      "taxOfficeRef": "TH373",
+      "employerName1": "Legacy Builders 44",
+      "schemeName": "Legacy"
+    },
+    {
+      "uniqueId": "45",
+      "taxOfficeNumber": "519",
+      "taxOfficeRef": "FK722",
+      "employerName1": "Summit Builders 45",
+      "schemeName": "Summit"
+    },
+    {
+      "uniqueId": "46",
+      "taxOfficeNumber": "983",
+      "taxOfficeRef": "WW744",
+      "employerName1": "Iota Builders 46",
+      "schemeName": "Iota"
+    },
+    {
+      "uniqueId": "47",
+      "taxOfficeNumber": "805",
+      "taxOfficeRef": "FR180",
+      "employerName1": "Betelgeuse Construction 47",
+      "schemeName": "Betelgeuse"
+    },
+    {
+      "uniqueId": "48",
+      "taxOfficeNumber": "365",
+      "taxOfficeRef": "CI467",
+      "employerName1": "Chi Contractors 48",
+      "schemeName": "Chi"
+    },
+    {
+      "uniqueId": "49",
+      "taxOfficeNumber": "398",
+      "taxOfficeRef": "MJ341",
+      "employerName1": "Aludra Construction 49",
+      "schemeName": "Aludra"
+    },
+    {
+      "uniqueId": "50",
+      "taxOfficeNumber": "452",
+      "taxOfficeRef": "XD834",
+      "employerName1": "Wezen Builders 50",
+      "schemeName": "Wezen"
+    },
+    {
+      "uniqueId": "51",
+      "taxOfficeNumber": "569",
+      "taxOfficeRef": "MY619",
+      "employerName1": "Chi Contractors 51",
+      "schemeName": "Chi"
+    },
+    {
+      "uniqueId": "52",
+      "taxOfficeNumber": "395",
+      "taxOfficeRef": "IR691",
+      "employerName1": "Nova Contractors 52",
+      "schemeName": "Nova"
+    },
+    {
+      "uniqueId": "53",
+      "taxOfficeNumber": "627",
+      "taxOfficeRef": "PO664",
+      "employerName1": "Apex Construction 53",
+      "schemeName": "Apex"
+    },
+    {
+      "uniqueId": "54",
+      "taxOfficeNumber": "684",
+      "taxOfficeRef": "BH603",
+      "employerName1": "Procyon Contractors 54",
+      "schemeName": "Procyon"
+    },
+    {
+      "uniqueId": "55",
+      "taxOfficeNumber": "404",
+      "taxOfficeRef": "KX546",
+      "employerName1": "Wasat Builders 55",
+      "schemeName": "Wasat"
+    },
+    {
+      "uniqueId": "56",
+      "taxOfficeNumber": "220",
+      "taxOfficeRef": "LX602",
+      "employerName1": "Eta Builders 56",
+      "schemeName": "Eta"
+    },
+    {
+      "uniqueId": "57",
+      "taxOfficeNumber": "960",
+      "taxOfficeRef": "XO504",
+      "employerName1": "Wezen Builders 57",
+      "schemeName": "Wezen"
+    },
+    {
+      "uniqueId": "58",
+      "taxOfficeNumber": "242",
+      "taxOfficeRef": "HA579",
+      "employerName1": "Eta Builders 58",
+      "schemeName": "Eta"
+    },
+    {
+      "uniqueId": "59",
+      "taxOfficeNumber": "188",
+      "taxOfficeRef": "LJ947",
+      "employerName1": "Spica Builders 59",
+      "schemeName": "Spica"
+    },
+    {
+      "uniqueId": "60",
+      "taxOfficeNumber": "551",
+      "taxOfficeRef": "CH125",
+      "employerName1": "Zeta Contractors 60",
+      "schemeName": "Zeta"
+    },
+    {
+      "uniqueId": "61",
+      "taxOfficeNumber": "189",
+      "taxOfficeRef": "IW502",
+      "employerName1": "Imperial Construction 61",
+      "schemeName": "Imperial"
+    },
+    {
+      "uniqueId": "62",
+      "taxOfficeNumber": "759",
+      "taxOfficeRef": "MS847",
+      "employerName1": "Capella Builders 62",
+      "schemeName": "Capella"
+    },
+    {
+      "uniqueId": "63",
+      "taxOfficeNumber": "876",
+      "taxOfficeRef": "GP714",
+      "employerName1": "Bellatrix Builders 63",
+      "schemeName": "Bellatrix"
+    },
+    {
+      "uniqueId": "64",
+      "taxOfficeNumber": "750",
+      "taxOfficeRef": "CR484",
+      "employerName1": "Iota Builders 64",
+      "schemeName": "Iota"
+    },
+    {
+      "uniqueId": "65",
+      "taxOfficeNumber": "622",
+      "taxOfficeRef": "BC860",
+      "employerName1": "Procyon Construction 65",
+      "schemeName": "Procyon"
+    },
+    {
+      "uniqueId": "66",
+      "taxOfficeNumber": "400",
+      "taxOfficeRef": "MD619",
+      "employerName1": "Stellar Construction 66",
+      "schemeName": "Stellar"
+    },
+    {
+      "uniqueId": "67",
+      "taxOfficeNumber": "463",
+      "taxOfficeRef": "VE646",
+      "employerName1": "Pinnacle Construction 67",
+      "schemeName": "Pinnacle"
+    },
+    {
+      "uniqueId": "68",
+      "taxOfficeNumber": "334",
+      "taxOfficeRef": "UC755",
+      "employerName1": "Antares Construction 68",
+      "schemeName": "Antares"
+    },
+    {
+      "uniqueId": "69",
+      "taxOfficeNumber": "846",
+      "taxOfficeRef": "GX612",
+      "employerName1": "Zeta Contractors 69",
+      "schemeName": "Zeta"
+    },
+    {
+      "uniqueId": "70",
+      "taxOfficeNumber": "735",
+      "taxOfficeRef": "GF843",
+      "employerName1": "Adhara Contractors 70",
+      "schemeName": "Adhara"
+    },
+    {
+      "uniqueId": "71",
+      "taxOfficeNumber": "906",
+      "taxOfficeRef": "CM748",
+      "employerName1": "Sirius Builders 71",
+      "schemeName": "Sirius"
+    },
+    {
+      "uniqueId": "72",
+      "taxOfficeNumber": "823",
+      "taxOfficeRef": "GE330",
+      "employerName1": "Eta Builders 72",
+      "schemeName": "Eta"
+    },
+    {
+      "uniqueId": "73",
+      "taxOfficeNumber": "467",
+      "taxOfficeRef": "FM670",
+      "employerName1": "Antares Construction 73",
+      "schemeName": "Antares"
+    },
+    {
+      "uniqueId": "74",
+      "taxOfficeNumber": "672",
+      "taxOfficeRef": "IS417",
+      "employerName1": "Pi Construction 74",
+      "schemeName": "Pi"
+    },
+    {
+      "uniqueId": "75",
+      "taxOfficeNumber": "340",
+      "taxOfficeRef": "AV727",
+      "employerName1": "Betelgeuse Construction 75",
+      "schemeName": "Betelgeuse"
+    },
+    {
+      "uniqueId": "76",
+      "taxOfficeNumber": "214",
+      "taxOfficeRef": "MR400",
+      "employerName1": "Polaris Builders 76",
+      "schemeName": "Polaris"
+    },
+    {
+      "uniqueId": "77",
+      "taxOfficeNumber": "647",
+      "taxOfficeRef": "TH983",
+      "employerName1": "Alhena Builders 77",
+      "schemeName": "Alhena"
+    },
+    {
+      "uniqueId": "78",
+      "taxOfficeNumber": "171",
+      "taxOfficeRef": "JD014",
+      "employerName1": "Upsilon Construction 78",
+      "schemeName": "Upsilon"
+    },
+    {
+      "uniqueId": "79",
+      "taxOfficeNumber": "564",
+      "taxOfficeRef": "MY013",
+      "employerName1": "Delta Construction 79",
+      "schemeName": "Delta"
+    },
+    {
+      "uniqueId": "80",
+      "taxOfficeNumber": "468",
+      "taxOfficeRef": "YG236",
+      "employerName1": "Summit Builders 80",
+      "schemeName": "Summit"
+    },
+    {
+      "uniqueId": "81",
+      "taxOfficeNumber": "740",
+      "taxOfficeRef": "XQ104",
+      "employerName1": "Peak Builders 81",
+      "schemeName": "Peak"
+    },
+    {
+      "uniqueId": "82",
+      "taxOfficeNumber": "243",
+      "taxOfficeRef": "CV004",
+      "employerName1": "Pi Construction 82",
+      "schemeName": "Pi"
+    },
+    {
+      "uniqueId": "83",
+      "taxOfficeNumber": "167",
+      "taxOfficeRef": "KB161",
+      "employerName1": "Lunar Builders 83",
+      "schemeName": "Lunar"
+    },
+    {
+      "uniqueId": "84",
+      "taxOfficeNumber": "479",
+      "taxOfficeRef": "JD177",
+      "employerName1": "Cosmic Construction 84",
+      "schemeName": "Cosmic"
+    },
+    {
+      "uniqueId": "85",
+      "taxOfficeNumber": "281",
+      "taxOfficeRef": "II711",
+      "employerName1": "Pollux Construction 85",
+      "schemeName": "Pollux"
+    },
+    {
+      "uniqueId": "86",
+      "taxOfficeNumber": "613",
+      "taxOfficeRef": "KQ344",
+      "employerName1": "Lambda Builders 86",
+      "schemeName": "Lambda"
+    },
+    {
+      "uniqueId": "87",
+      "taxOfficeNumber": "729",
+      "taxOfficeRef": "EG983",
+      "employerName1": "Stellar Builders 87",
+      "schemeName": "Stellar"
+    },
+    {
+      "uniqueId": "88",
+      "taxOfficeNumber": "408",
+      "taxOfficeRef": "OL265",
+      "employerName1": "Prime Contractors 88",
+      "schemeName": "Prime"
+    },
+    {
+      "uniqueId": "89",
+      "taxOfficeNumber": "882",
+      "taxOfficeRef": "HG235",
+      "employerName1": "Stellar Builders 89",
+      "schemeName": "Stellar"
+    },
+    {
+      "uniqueId": "90",
+      "taxOfficeNumber": "168",
+      "taxOfficeRef": "EG840",
+      "employerName1": "Apex Builders 90",
+      "schemeName": "Apex"
+    },
+    {
+      "uniqueId": "91",
+      "taxOfficeNumber": "740",
+      "taxOfficeRef": "EL267",
+      "employerName1": "Wezen Builders 91",
+      "schemeName": "Wezen"
+    },
+    {
+      "uniqueId": "92",
+      "taxOfficeNumber": "179",
+      "taxOfficeRef": "ZA636",
+      "employerName1": "Prime Contractors 92",
+      "schemeName": "Prime"
+    },
+    {
+      "uniqueId": "93",
+      "taxOfficeNumber": "338",
+      "taxOfficeRef": "MZ710",
+      "employerName1": "Wezen Builders 93",
+      "schemeName": "Wezen"
+    },
+    {
+      "uniqueId": "94",
+      "taxOfficeNumber": "937",
+      "taxOfficeRef": "LD424",
+      "employerName1": "Alnitak Builders 94",
+      "schemeName": "Alnitak"
+    },
+    {
+      "uniqueId": "95",
+      "taxOfficeNumber": "217",
+      "taxOfficeRef": "HB917",
+      "employerName1": "Regulus Construction 95",
+      "schemeName": "Regulus"
+    },
+    {
+      "uniqueId": "96",
+      "taxOfficeNumber": "846",
+      "taxOfficeRef": "IS402",
+      "employerName1": "Orion Contractors 96",
+      "schemeName": "Orion"
+    },
+    {
+      "uniqueId": "97",
+      "taxOfficeNumber": "351",
+      "taxOfficeRef": "PJ927",
+      "employerName1": "Alnilam Builders 97",
+      "schemeName": "Alnilam"
+    },
+    {
+      "uniqueId": "98",
+      "taxOfficeNumber": "379",
+      "taxOfficeRef": "FQ670",
+      "employerName1": "Rigel Builders 98",
+      "schemeName": "Rigel"
+    },
+    {
+      "uniqueId": "99",
+      "taxOfficeNumber": "295",
+      "taxOfficeRef": "NB762",
+      "employerName1": "Phi Builders 99",
+      "schemeName": "Phi"
+    },
+    {
+      "uniqueId": "100",
+      "taxOfficeNumber": "132",
+      "taxOfficeRef": "TB390",
+      "employerName1": "Lambda Builders 100",
+      "schemeName": "Lambda"
+    }
+  ],
+  "totalCount": 100,
+  "clientNameStartingCharacters": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "G",
+    "H",
+    "I",
+    "L",
+    "M",
+    "N",
+    "O",
+    "P",
+    "R",
+    "S",
+    "U",
+    "V",
+    "W",
+    "X",
+    "Z"
+  ]
 }

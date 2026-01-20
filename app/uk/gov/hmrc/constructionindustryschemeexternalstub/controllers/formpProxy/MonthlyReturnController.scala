@@ -35,16 +35,18 @@ class MonthlyReturnController @Inject() (
 )() extends BackendController(cc)
     with Logging {
 
-  private val monthlyNilReturnResponsePath                  = "/resources/monthlyNilReturns"
-  private val retrieveMonthlyReturns_200_ResponsePath       =
+  private val monthlyNilReturnResponsePath                       = "/resources/monthlyNilReturns"
+  private val retrieveMonthlyReturns_200_ResponsePath            =
     s"$monthlyNilReturnResponsePath/retrieveMonthlyReturns-200-response.json"
-  private val retrieveMonthlyReturns_empty_200_ResponsePath =
+  private val retrieveMonthlyReturns_empty_200_ResponsePath      =
     s"$monthlyNilReturnResponsePath/retrieveMonthlyReturns-empty-200-response.json"
-  private val createNilMonthlyReturn_200_ResponsePath       =
+  private val createNilMonthlyReturn_200_ResponsePath            =
     s"$monthlyNilReturnResponsePath/createNilMonthlyReturn-200-response.json"
-  private val getSchemeEmail_200_ResponsePath               = s"$monthlyNilReturnResponsePath/getSchemeEmail-200-response.json"
-  private val getSchemeEmail_null_200_ResponsePath          =
+  private val getSchemeEmail_200_ResponsePath                    = s"$monthlyNilReturnResponsePath/getSchemeEmail-200-response.json"
+  private val getSchemeEmail_null_200_ResponsePath               =
     s"$monthlyNilReturnResponsePath/getSchemeEmail-null-200-response.json"
+  private val retrieveUnsubmittedMonthlyReturns_200_ResponsePath =
+    "/resources/retrieveUnsubmittedMonthlyReturns-200-response.json"
 
   def retrieveMonthlyReturns: Action[JsValue] =
     authorise(parse.json) { implicit request =>
@@ -111,5 +113,21 @@ class MonthlyReturnController @Inject() (
           }
         case None                     => InternalServerError
       }
+    }
+
+  def retrieveUnsubmittedMonthlyReturns: Action[JsValue] =
+    authorise(parse.json) { implicit request =>
+      request.body
+        .validate[InstanceIdRequest]
+        .fold(
+          errs =>
+            BadRequest(
+              Json.obj(
+                "message" -> "Invalid JSON body",
+                "errors"  -> JsError.toJson(errs)
+              )
+            ),
+          _ => Ok(resourceHelper.resourceAsString(retrieveUnsubmittedMonthlyReturns_200_ResponsePath))
+        )
     }
 }

@@ -61,7 +61,7 @@ To trigger the happy path, ensure you provide a valid request body:
   "aoDistrict" : "123",
   "aoPayType" : "M",
   "aoCheckCode" : "XY",
-  "aoReference" : "1234567XY",
+  "aoReference" : "754PA87654350",
   "validBusinessAddr" : "Y",
   "correlation" : "corr-abc",
   "ggAgentId" : "AGENT-001",
@@ -410,6 +410,81 @@ To trigger the happy path, ensure you provide a valid request body:
       "status": "STARTED",
       "lastUpdate": "2025-08-03T00:00:00",
       "amendment": "Y"
+    }
+  ]
+}
+```
+
+**Endpoint**: `POST /monthly-return `
+
+**Description**: Returns the full list of Unsubmitted Monthly Returns for the given scheme.
+
+#### Happy Path
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: any valid Tax Office no.
+- Identifier Name: TaxOfficeReference
+- Identifier Value: any valid Tax Office ref.
+
+To trigger the happy path, ensure you provide a valid request body:
+```json
+{
+  "instanceId": "any valid instanceId"
+}
+```
+- Response status: `200`
+- Response body:
+```json
+{
+  "scheme": {
+    "schemeId": 13343,
+    "instanceId": "900001",
+    "accountsOfficeReference": "125PA12345000",
+    "taxOfficeNumber": "101",
+    "taxOfficeReference": "AB0001",
+    "utr": "1234657890",
+    "name": "company",
+    "prePopCount": 3,
+    "prePopSuccessful": "Y",
+    "subcontractorCounter": 1,
+    "verificationBatchCounter": 0,
+    "version": 3
+  },
+  "monthlyReturn": [
+    {
+      "monthlyReturnId": 30001,
+      "taxYear": 2025,
+      "taxMonth": 1,
+      "nilReturnIndicator": "Y",
+      "decInformationCorrect": "Y",
+      "decNilReturnNoPayments": "N",
+      "status": "STARTED",
+      "lastUpdate": "2026-01-01T23:24:56",
+      "amendment": "N"
+    },
+    {
+      "monthlyReturnId": 30002,
+      "taxYear": 2025,
+      "taxMonth": 2,
+      "nilReturnIndicator": "Y",
+      "decInformationCorrect": "Y",
+      "decNilReturnNoPayments": "N",
+      "status": "VALIDATED",
+      "lastUpdate": "2026-01-02T23:24:56",
+      "amendment": "N"
+    },
+    {
+      "monthlyReturnId": 30003,
+      "taxYear": 2025,
+      "taxMonth": 3,
+      "nilReturnIndicator": "Y",
+      "decInformationCorrect": "Y",
+      "decNilReturnNoPayments": "N",
+      "status": "DEPARTMENTAL_ERROR",
+      "lastUpdate": "2026-01-03T23:24:56",
+      "amendment": "N"
     }
   ]
 }
@@ -1033,7 +1108,7 @@ To trigger the happy path, ensure you provide a valid request body:
             <CISreturn>
                 <Contractor>
                     <UTR>1234567890</UTR>
-                    <AOref>1234567XY</AOref>
+                    <AOref>754PA87654350</AOref>
                 </Contractor>
                 <NilReturn>yes</NilReturn>
                 <Declarations>

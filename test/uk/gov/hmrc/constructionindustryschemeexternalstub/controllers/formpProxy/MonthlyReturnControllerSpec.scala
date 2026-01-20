@@ -259,6 +259,25 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
     }
   }
 
+  ".retrieveUnsubmittedMonthlyReturns" - {
+
+    "returns 200 when JSON body is valid" in new Setup {
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn(
+          """{"scheme":{"schemeId":1,"instanceId":"123","accountsOfficeReference":"a","taxOfficeNumber":"1","taxOfficeReference":"b"},"monthlyReturn":[]}"""
+        )
+
+      val req: FakeRequest[JsValue] =
+        FakeRequest(POST, "/monthly-return")
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(Json.obj("instanceId" -> "abc-123"))
+
+      val res = controller.retrieveUnsubmittedMonthlyReturns(req)
+
+      status(res) mustBe OK
+    }
+  }
+
   private trait Setup {
     implicit val ec: ExecutionContext    = scala.concurrent.ExecutionContext.global
     private val cc: ControllerComponents = stubControllerComponents()

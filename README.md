@@ -521,6 +521,31 @@ To trigger the happy path, ensure you provide a valid request body:
 }
 ```
 
+**Endpoint**: `POST /cis/monthly-return/standard/create`
+
+**Description**: Creates a standard monthly return record in the monthly return table.
+
+#### Happy Path
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: any valid Tax Office no.
+- Identifier Name: TaxOfficeReference
+- Identifier Value: any valid Tax Office ref.
+
+To trigger the happy path, ensure you provide a valid request body:
+```json
+{
+  "instanceId":  "1",
+  "taxYear": 2025,
+  "taxMonth": 11
+}
+```
+- Response status: `201`
+- Response body: empty body
+```
+
 **Endpoint**: `POST /scheme/email`
 
 **Description**: Return a scheme email from the scheme table.

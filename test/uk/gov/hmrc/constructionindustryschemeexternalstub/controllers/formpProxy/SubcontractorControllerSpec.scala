@@ -33,7 +33,7 @@ import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelpe
 import scala.concurrent.Future
 
 class SubcontractorControllerSpec extends SpecBase {
-  val schemeId          = 1
+  val instanceId        = 1
   val subbieResourceRef = 10
   ".createSubcontractor" - {
 
@@ -43,7 +43,7 @@ class SubcontractorControllerSpec extends SpecBase {
 
       val json: JsValue = Json.toJson(
         CreateSubcontractorRequest(
-          schemeId = schemeId,
+          instanceId = instanceId,
           subcontractorType = SoleTrader,
           version = 0
         )
@@ -68,7 +68,7 @@ class SubcontractorControllerSpec extends SpecBase {
 
       val json: JsValue = Json.toJson(
         CreateSubcontractorRequest(
-          schemeId = schemeId,
+          instanceId = instanceId,
           subcontractorType = SoleTrader,
           version = 0
         )
@@ -89,7 +89,7 @@ class SubcontractorControllerSpec extends SpecBase {
 
       val json: JsValue = Json.toJson(
         CreateSubcontractorRequest(
-          schemeId = schemeId,
+          instanceId = instanceId,
           subcontractorType = SoleTrader,
           version = 0
         )
@@ -114,7 +114,7 @@ class SubcontractorControllerSpec extends SpecBase {
 
       val json: JsValue = Json.toJson(
         UpdateSubcontractorRequest(
-          schemeId = schemeId,
+          instanceId = instanceId,
           subbieResourceRef = 10,
           tradingName = Some("trading name")
         )
@@ -133,7 +133,7 @@ class SubcontractorControllerSpec extends SpecBase {
 
       val json: JsValue = Json.toJson(
         UpdateSubcontractorRequest(
-          schemeId = schemeId,
+          instanceId = instanceId,
           subbieResourceRef = 10,
           tradingName = Some("trading name")
         )
@@ -154,7 +154,7 @@ class SubcontractorControllerSpec extends SpecBase {
 
       val json: JsValue = Json.toJson(
         UpdateSubcontractorRequest(
-          schemeId = schemeId,
+          instanceId = instanceId,
           subbieResourceRef = 10,
           tradingName = Some("trading name")
         )

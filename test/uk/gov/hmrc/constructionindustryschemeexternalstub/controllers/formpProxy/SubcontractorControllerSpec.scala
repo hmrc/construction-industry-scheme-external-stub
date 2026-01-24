@@ -26,14 +26,14 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.FakeAuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.base.SpecBase
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{EmployerReference, SoleTrader}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{Company, EmployerReference, SoleTrader, Trust}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateAndUpdateSubcontractorRequest, CreateSubcontractorRequest}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 
 import scala.concurrent.Future
 
 class SubcontractorControllerSpec extends SpecBase {
-  val instanceId        = 1
+  val cisId             = "1"
   val subbieResourceRef = 10
   ".createSubcontractor" - {
 
@@ -43,7 +43,7 @@ class SubcontractorControllerSpec extends SpecBase {
 
       val json: JsValue = Json.toJson(
         CreateSubcontractorRequest(
-          instanceId = instanceId,
+          cisId = cisId,
           subcontractorType = SoleTrader,
           version = 0
         )
@@ -68,7 +68,7 @@ class SubcontractorControllerSpec extends SpecBase {
 
       val json: JsValue = Json.toJson(
         CreateSubcontractorRequest(
-          instanceId = instanceId,
+          cisId = cisId,
           subcontractorType = SoleTrader,
           version = 0
         )
@@ -89,7 +89,7 @@ class SubcontractorControllerSpec extends SpecBase {
 
       val json: JsValue = Json.toJson(
         CreateSubcontractorRequest(
-          instanceId = instanceId,
+          cisId = cisId,
           subcontractorType = SoleTrader,
           version = 0
         )
@@ -114,8 +114,8 @@ class SubcontractorControllerSpec extends SpecBase {
 
       val json: JsValue = Json.toJson(
         CreateAndUpdateSubcontractorRequest(
-          instanceId = instanceId,
-          subbieResourceRef = 10,
+          cisId = cisId,
+          subcontractorType = SoleTrader,
           tradingName = Some("trading name")
         )
       )
@@ -133,8 +133,8 @@ class SubcontractorControllerSpec extends SpecBase {
 
       val json: JsValue = Json.toJson(
         CreateAndUpdateSubcontractorRequest(
-          instanceId = instanceId,
-          subbieResourceRef = 10,
+          cisId = cisId,
+          subcontractorType = SoleTrader,
           tradingName = Some("trading name")
         )
       )
@@ -154,8 +154,8 @@ class SubcontractorControllerSpec extends SpecBase {
 
       val json: JsValue = Json.toJson(
         CreateAndUpdateSubcontractorRequest(
-          instanceId = instanceId,
-          subbieResourceRef = 10,
+          cisId = cisId,
+          subcontractorType = SoleTrader,
           tradingName = Some("trading name")
         )
       )

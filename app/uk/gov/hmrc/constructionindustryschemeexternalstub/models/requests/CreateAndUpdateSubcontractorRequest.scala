@@ -17,10 +17,11 @@
 package uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests
 
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.SubcontractorType
 
 final case class CreateAndUpdateSubcontractorRequest(
-  cisId: Int,
-  subcontractorType: String,
+  cisId: String,
+  subcontractorType: SubcontractorType,
   firstName: Option[String] = None,
   secondName: Option[String] = None,
   surname: Option[String] = None,

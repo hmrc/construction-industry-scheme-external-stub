@@ -5,9 +5,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.{JsSuccess, Json}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.GetMonthlyReturnForEditRequest
 
-class GetMonthlyReturnForEditRequestSpec
-  extends AnyWordSpec
-    with Matchers {
+class GetMonthlyReturnForEditRequestSpec extends AnyWordSpec with Matchers {
 
   "GetMonthlyReturnForEditRequest JSON format" should {
 
@@ -35,8 +33,8 @@ class GetMonthlyReturnForEditRequestSpec
 
       Json.toJson(model) shouldBe Json.obj(
         "instanceId" -> "900001",
-        "taxYear"   -> 2025,
-        "taxMonth"  -> 1
+        "taxYear"    -> 2025,
+        "taxMonth"   -> 1
       )
     }
   }

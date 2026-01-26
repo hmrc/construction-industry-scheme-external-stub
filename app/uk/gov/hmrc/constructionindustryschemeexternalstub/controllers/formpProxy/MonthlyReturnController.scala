@@ -20,7 +20,7 @@ import play.api.Logging
 import play.api.libs.json.{JsError, JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateNilMonthlyReturnRequest, InstanceIdRequest}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateNilMonthlyReturnRequest, GetMonthlyReturnForEditRequest, InstanceIdRequest}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -46,6 +46,8 @@ class MonthlyReturnController @Inject() (
     s"$monthlyNilReturnResponsePath/getSchemeEmail-null-200-response.json"
   private val retrieveUnsubmittedMonthlyReturns_200_ResponsePath =
     "/resources/retrieveUnsubmittedMonthlyReturns-200-response.json"
+  private val getMonthlyReturnForEdit_200_ResponsePath           =
+    "/resources/getMonthlyReturnForEdit-200-response.json"
 
   def retrieveMonthlyReturns: Action[JsValue] =
     authorise(parse.json) { implicit request =>
@@ -122,6 +124,22 @@ class MonthlyReturnController @Inject() (
               )
             ),
           _ => Ok(resourceHelper.resourceAsString(retrieveUnsubmittedMonthlyReturns_200_ResponsePath))
+        )
+    }
+
+  def getMonthlyReturnForEdit: Action[JsValue] =
+    authorise(parse.json) { implicit request =>
+      request.body
+        .validate[GetMonthlyReturnForEditRequest]
+        .fold(
+          errs =>
+            BadRequest(
+              Json.obj(
+                "message" -> "Invalid JSON body",
+                "errors"  -> JsError.toJson(errs)
+              )
+            ),
+          _ => Ok(resourceHelper.resourceAsString(getMonthlyReturnForEdit_200_ResponsePath))
         )
     }
 }

@@ -521,6 +521,140 @@ To trigger the happy path, ensure you provide a valid request body:
 }
 ```
 
+**Endpoint**: `POST /cis/monthly-return-edit `
+
+**Description**: Returns the Monthly Returns for Edit
+
+#### Happy Path
+
+- Affinity Group: Organisation / Agent
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber (for Organisation) or IRAgentReference (for Agent)
+- Identifier Value: any valid Tax Office no. or any valid IRAgentReference
+- Identifier Name: TaxOfficeReference (for Organisation) or none (for Agent)
+- Identifier Value: any valid Tax Office ref. (for Organisation)
+
+To trigger the happy path, ensure you provide a valid request body similar to example below:
+```json
+{
+  "instanceId": "900001",
+  "taxYear": 2025,
+  "taxMonth": 1 
+}
+```
+- Response status: `200`
+- Response body:
+```json
+{
+  "scheme": [
+    {
+      "schemeId": 13343,
+      "instanceId": "900001",
+      "accountsOfficeReference": "125PA12345000",
+      "taxOfficeNumber": "101",
+      "taxOfficeReference": "AB0001",
+      "utr": "1234657890",
+      "name": "company",
+      "emailAddress": "test@test",
+      "displayWelcomePage": "N",
+      "prePopCount": 3,
+      "prePopSuccessful": "Y",
+      "subcontractorCounter": 1,
+      "verificationBatchCounter": 0,
+      "lastUpdate": "2026-01-05T10:23:56Z",
+      "version": 3
+    }
+  ],
+  "monthlyReturn": [
+    {
+      "monthlyReturnId": 30001,
+      "taxYear": 2025,
+      "taxMonth": 1,
+      "nilReturnIndicator": "N",
+      "decEmpStatusConsidered": "Y",
+      "decAllSubsVerified": "Y",
+      "decInformationCorrect": "Y",
+      "decNoMoreSubPayments": "Y",
+      "decNilReturnNoPayments": "N",
+      "status": "STARTED",
+      "lastUpdate": "2026-01-01T23:24:56",
+      "amendment": "N"
+    }
+  ],
+  "subcontractors": [
+    {
+      "subcontractorId": 13377,
+      "utr": "1234567890",
+      "pageVisited": 0,
+      "partnerUtr": "1234567891",
+      "crn": "10000001",
+      "firstName": "First",
+      "nino": "AB623456C",
+      "secondName": "Second",
+      "surname": "Surname",
+      "partnershipTradingName": "Test Ptr",
+      "tradingName": "Test Tr",
+      "subcontractorType": "company",
+      "addressLine1": "one",
+      "addressLine2": "two ",
+      "addressLine3": "three",
+      "addressLine4": "four",
+      "country": "UK",
+      "postCode": "B1 2CD",
+      "emailAddress": "test@test.com",
+      "phoneNumber": "07123456789",
+      "mobilePhoneNumber": "7123456789",
+      "worksReferenceNumber": "123",
+      "createDate": "2026-01-05T10:23:56",
+      "lastUpdate": "2026-01-05T10:23:56",
+      "subbieResourceRef": 1,
+      "matched": "Y",
+      "autoVerified": "Y",
+      "verified": "Y",
+      "verificationNumber": "V1000000001",
+      "taxTreatment": "net",
+      "verificationDate": "2025-05-05T00:00:00",
+      "version": 0,
+      "updatedTaxTreatment": "TEST",
+      "lastMonthlyReturnDate": "2025-05-05T00:00:00",
+      "pendingVerifications": 0
+    }
+  ],
+  "monthlyReturnItems": [
+    {
+      "monthlyReturnId": 30001,
+      "monthlyReturnItemId": 1,
+      "totalPayments": "1,000.00",
+      "costOfMaterials": "100.00",
+      "totalDeducted": "100.00",
+      "unmatchedTaxRateIndicator": "Y",
+      "subcontractorId": 10903,
+      "subcontractorName": "Alice, A",
+      "verificationNumber": "V1000000001",
+      "itemResourceReference": 7
+    }
+  ],
+  "submission": [
+    {
+      "submissionId": 1,
+      "submissionType": "MONTHLY_RETURN",
+      "activeObjectId": 30001,
+      "status": "SUBMITTED",
+      "hmrcMarkGenerated": "9AjFBxlBohmcRZ8s/2IV0QaYzz0=",
+      "hmrcMarkGgis": "9AjFBxlBohmcRZ8s/2IV0QaYzz0=",
+      "emailRecipient": "test@test.com",
+      "acceptedTime": "2018-04-06T08:46:08.081",
+      "createDate": "2018-02-23T16:26:25",
+      "lastUpdate": "2018-02-23T16:26:30",
+      "schemeId": 13343,
+      "agentId": "-",
+      "l_Migrated": 1,
+      "submissionRequestDate": "2018-02-23T16:26:27"
+    }
+  ]
+}
+```
+
 **Endpoint**: `POST /scheme/email`
 
 **Description**: Return a scheme email from the scheme table.

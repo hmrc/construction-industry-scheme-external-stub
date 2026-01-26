@@ -59,9 +59,9 @@ To trigger the happy path, ensure you provide a valid request body:
   "taxOfficeNumber" : "123",
   "taxOfficeRef" : "AB123456",
   "aoDistrict" : "123",
-  "aoPayType" : "M",
-  "aoCheckCode" : "XY",
-  "aoReference" : "754PA87654350",
+  "aoPayType" : "P",
+  "aoCheckCode" : "A",
+  "aoReference" : "12345678",
   "validBusinessAddr" : "Y",
   "correlation" : "corr-abc",
   "ggAgentId" : "AGENT-001",
@@ -1108,7 +1108,7 @@ To trigger the happy path, ensure you provide a valid request body:
             <CISreturn>
                 <Contractor>
                     <UTR>1234567890</UTR>
-                    <AOref>754PA87654350</AOref>
+                    <AOref>123PA12345678</AOref>
                 </Contractor>
                 <NilReturn>yes</NilReturn>
                 <Declarations>

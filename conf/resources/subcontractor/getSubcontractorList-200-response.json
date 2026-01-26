@@ -1,0 +1,56 @@
+{
+  "subcontractors":
+  [
+    {
+      "subcontractorId": "10101",
+      "subbieResourceRef": "1",
+      "type": "soletrader",
+      "utr": "1111111111",
+      "tradingName": "AAA",
+      "version": "1"
+    },
+    {
+      "subcontractorId": "20202",
+      "subbieResourceRef": "2",
+      "type": "soletrader",
+      "utr": "2222222222",
+      "tradingName": "BBB",
+      "version": "2"
+    },
+    {
+      "subcontractorId": "30303",
+      "subbieResourceRef": "3",
+      "type": "soletrader",
+      "firstName": "John",
+      "surname": "Smith",
+      "addressLine1": "1 Main Street",
+      "country": "GB",
+      "postcode": "AA1 1AA",
+      "version": "3"
+    },
+    {
+      "subcontractorId": "40404",
+      "subbieResourceRef": "4",
+      "type": "soletrader",
+      "utr": "4444444444",
+      "tradingName": "CCC",
+      "version": "4"
+    },
+    {
+      "subcontractorId": "50505",
+      "subbieResourceRef": "5",
+      "type": "soletrader",
+      "utr": "1211317359",
+      "tradingName": "DDD",
+      "version": "5"
+    },
+    {
+      "subcontractorId": "60606",
+      "subbieResourceRef": "6",
+      "type": "soletrader",
+      "utr": "3536885673",
+      "tradingName": "EEE",
+      "version": "6"
+    }
+  ]
+}

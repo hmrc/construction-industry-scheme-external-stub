@@ -18,7 +18,7 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProx
 
 import play.api.Logging
 import play.api.libs.json.{JsError, JsValue, Json}
-import play.api.mvc.{Action, ControllerComponents}
+import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateSubcontractorRequest, UpdateSubcontractorRequest}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
@@ -34,8 +34,10 @@ class SubcontractorController @Inject() (
 )() extends BackendController(cc)
     with Logging {
 
-  private val subcontractorResponsePath            = "/resources/subcontractor"
-  private val createSubcontractor_201_ResponsePath = s"$subcontractorResponsePath/createSubcontractor-201-response.json"
+  private val subcontractorResponsePath             = "/resources/subcontractor"
+  private val createSubcontractor_201_ResponsePath  = s"$subcontractorResponsePath/createSubcontractor-201-response.json"
+  private val getSubcontractorList_200_ResponsePath =
+    s"$subcontractorResponsePath/getSubcontractorList-200-response.json"
 
   def createSubcontractor(): Action[JsValue] =
     authorise(parse.json) { implicit request =>
@@ -77,4 +79,19 @@ class SubcontractorController @Inject() (
             }
         )
     }
+
+  def getSubcontractorList(cisId: String): Action[AnyContent] =
+    authorise { implicit request =>
+      val enrolments = enrolmentHelper.contractorEnrolmentsOpt(request)
+      enrolments match {
+        case Some(enrolmentReference) =>
+          (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {
+            case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
+            case ("502", _) => BadGateway(Json.obj("message" -> "formp failed"))
+            case _          => Ok(resourceHelper.resourceAsString(getSubcontractorList_200_ResponsePath))
+          }
+        case None                     => InternalServerError
+      }
+    }
+
 }

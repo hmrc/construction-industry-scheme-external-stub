@@ -260,6 +260,18 @@ class SubcontractorControllerSpec extends SpecBase {
       status(res) mustBe INTERNAL_SERVER_ERROR
       (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
     }
+
+    "returns 500 with error message when no contractor enrolment found" in new Setup {
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      val req: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, getSubcontractorListUrl)
+      val res: Future[Result]                      = controller.getSubcontractorList(cisId)(req)
+
+      status(res) mustBe INTERNAL_SERVER_ERROR
+    }
+
   }
 
   private trait Setup {

@@ -20,43 +20,18 @@ import play.api.Logging
 import play.api.libs.json.{JsError, JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateAndUpdateSubcontractorRequest, CreateSubcontractorRequest}
-import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.CreateAndUpdateSubcontractorRequest
+import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.EnrolmentsHelper
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.Inject
 
 class SubcontractorController @Inject() (
   authorise: AuthAction,
-  resourceHelper: ResourceHelper,
   enrolmentHelper: EnrolmentsHelper,
   cc: ControllerComponents
 )() extends BackendController(cc)
     with Logging {
-
-  private val subcontractorResponsePath            = "/resources/subcontractor"
-  private val createSubcontractor_201_ResponsePath = s"$subcontractorResponsePath/createSubcontractor-201-response.json"
-
-  def createSubcontractor(): Action[JsValue] =
-    authorise(parse.json) { implicit request =>
-      request.body
-        .validate[CreateSubcontractorRequest]
-        .fold(
-          errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
-          body =>
-            val enrolments = enrolmentHelper.contractorEnrolmentsOpt(request)
-            enrolments match {
-              case Some(enrolmentReference) =>
-                (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {
-                  case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
-                  case ("502", _) => BadGateway(Json.obj("message" -> "formp failed"))
-                  case _          => Created(resourceHelper.resourceAsString(createSubcontractor_201_ResponsePath))
-                }
-              case None                     => InternalServerError
-            }
-        )
-
-    }
 
   def createAndUpdateSubcontractor(): Action[JsValue] =
     authorise(parse.json) { implicit request =>
@@ -73,7 +48,10 @@ class SubcontractorController @Inject() (
                   case ("502", _) => BadGateway(Json.obj("message" -> "formp failed"))
                   case _          => NoContent
                 }
-              case None                     => InternalServerError
+
+              case None =>
+                Forbidden(Json.obj("message" -> "Missing required enrolments"))
+
             }
         )
     }

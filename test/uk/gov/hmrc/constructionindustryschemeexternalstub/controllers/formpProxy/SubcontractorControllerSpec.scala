@@ -16,102 +16,29 @@
 
 package uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy
 
-import org.mockito.ArgumentMatchers.*
-import org.mockito.Mockito.*
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito._
 import org.scalatest.freespec.AnyFreeSpec
-import play.api.http.Status.CREATED
-import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.Result
 import play.api.test.FakeRequest
-import play.api.test.Helpers.*
+import play.api.test.Helpers._
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.FakeAuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.base.SpecBase
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{Company, EmployerReference, SoleTrader, Trust}
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateAndUpdateSubcontractorRequest, CreateSubcontractorRequest}
-import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{EmployerReference, SoleTrader}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.CreateAndUpdateSubcontractorRequest
+import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.EnrolmentsHelper
 
 import scala.concurrent.Future
 
 class SubcontractorControllerSpec extends SpecBase {
-  val cisId             = "1"
-  val subbieResourceRef = 10
-  ".createSubcontractor" - {
 
-    val createSubcontractorUrl = "/cis/subcontractor/create"
+  private val cisId                  = "1"
+  private val updateSubcontractorUrl = "/cis/subcontractor/update"
 
-    "returns 201 Created with subbieResourceRef on valid payload" in new Setup {
+  ".createAndUpdateSubcontractor" - {
 
-      val json: JsValue = Json.toJson(
-        CreateSubcontractorRequest(
-          cisId = cisId,
-          subcontractorType = SoleTrader,
-          version = 0
-        )
-      )
-
-      val responseJson: JsObject = Json.obj("subbieResourceRef" -> subbieResourceRef)
-
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(Some(EmployerReference("200", "")))
-
-      when(mockResourceHelper.resourceAsString(any()))
-        .thenReturn(responseJson.toString)
-
-      val req: FakeRequest[JsValue] = makeJsonRequest(json, createSubcontractorUrl)
-      val res: Future[Result]       = controller.createSubcontractor()(req)
-
-      status(res) mustBe CREATED
-      contentAsJson(res) mustBe responseJson
-    }
-
-    "propagates UpstreamErrorResponse for taxOfficeNumber = 502" in new Setup {
-
-      val json: JsValue = Json.toJson(
-        CreateSubcontractorRequest(
-          cisId = cisId,
-          subcontractorType = SoleTrader,
-          version = 0
-        )
-      )
-
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(Some(EmployerReference("502", "")))
-
-      val req: FakeRequest[JsValue] = makeJsonRequest(json, createSubcontractorUrl)
-      val res: Future[Result]       = controller.createSubcontractor()(req)
-
-      status(res) mustBe BAD_GATEWAY
-      (contentAsJson(res) \ "message").as[String] must include("formp failed")
-
-    }
-
-    "returns 500 with generic message for taxOfficeNumber = 500" in new Setup {
-
-      val json: JsValue = Json.toJson(
-        CreateSubcontractorRequest(
-          cisId = cisId,
-          subcontractorType = SoleTrader,
-          version = 0
-        )
-      )
-
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(Some(EmployerReference("500", "")))
-
-      val req: FakeRequest[JsValue] = makeJsonRequest(json, createSubcontractorUrl)
-      val res: Future[Result]       = controller.createSubcontractor()(req)
-
-      status(res) mustBe INTERNAL_SERVER_ERROR
-      (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
-    }
-  }
-
-  ".updateSubContractor" - {
-
-    val updateSubcontractorUrl = "/cis/subcontractor/update"
-
-    "returns 200 Update with valid payload" in new Setup {
-
+    "returns 204 NoContent with valid payload" in new Setup {
       val json: JsValue = Json.toJson(
         CreateAndUpdateSubcontractorRequest(
           cisId = cisId,
@@ -127,10 +54,10 @@ class SubcontractorControllerSpec extends SpecBase {
       val res: Future[Result]       = controller.createAndUpdateSubcontractor()(req)
 
       status(res) mustBe NO_CONTENT
+      contentAsString(res) mustBe ""
     }
 
-    "propagates UpstreamErrorResponse for taxOfficeNumber = 502" in new Setup {
-
+    "returns 502 BadGateway with message when taxOfficeNumber = 502" in new Setup {
       val json: JsValue = Json.toJson(
         CreateAndUpdateSubcontractorRequest(
           cisId = cisId,
@@ -147,11 +74,9 @@ class SubcontractorControllerSpec extends SpecBase {
 
       status(res) mustBe BAD_GATEWAY
       (contentAsJson(res) \ "message").as[String] must include("formp failed")
-
     }
 
-    "returns 500 with generic message for taxOfficeNumber = 500" in new Setup {
-
+    "returns 500 InternalServerError with message when taxOfficeNumber = 500" in new Setup {
       val json: JsValue = Json.toJson(
         CreateAndUpdateSubcontractorRequest(
           cisId = cisId,
@@ -169,17 +94,49 @@ class SubcontractorControllerSpec extends SpecBase {
       status(res) mustBe INTERNAL_SERVER_ERROR
       (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
     }
+
+    "returns 403 Forbidden with message when enrolments are missing" in new Setup {
+      val json: JsValue = Json.toJson(
+        CreateAndUpdateSubcontractorRequest(
+          cisId = cisId,
+          subcontractorType = SoleTrader,
+          tradingName = Some("trading name")
+        )
+      )
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      val req: FakeRequest[JsValue] = makeJsonRequest(json, updateSubcontractorUrl)
+      val res: Future[Result]       = controller.createAndUpdateSubcontractor()(req)
+
+      status(res) mustBe FORBIDDEN
+      (contentAsJson(res) \ "message").as[String].toLowerCase must include("enrolments")
+    }
+
+    "returns 400 BadRequest with validation errors when payload is invalid" in new Setup {
+      val invalidJson: JsValue = Json.obj(
+        "cisId"       -> cisId,
+        "tradingName" -> "name-only"
+      )
+
+      val req: FakeRequest[JsValue] = makeJsonRequest(invalidJson, updateSubcontractorUrl)
+      val res: Future[Result]       = controller.createAndUpdateSubcontractor()(req)
+
+      status(res) mustBe BAD_REQUEST
+      (contentAsJson(res) \ "message").as[String] mustBe "Invalid payload"
+      (contentAsJson(res) \ "errors").isDefined mustBe true
+    }
   }
 
   private trait Setup {
-    val mockResourceHelper: ResourceHelper     = mock[ResourceHelper]
     val mockEnrolmentsHelper: EnrolmentsHelper = mock[EnrolmentsHelper]
 
     val auth: FakeAuthAction = new FakeAuthAction(cc.parsers)
-    lazy val controller      = new SubcontractorController(auth, mockResourceHelper, mockEnrolmentsHelper, cc)
+    lazy val controller      = new SubcontractorController(auth, mockEnrolmentsHelper, cc)
 
     def makeJsonRequest(body: JsValue, url: String): FakeRequest[JsValue] =
-      FakeRequest(POST, "/cis/subcontractor/create")
+      FakeRequest(POST, url)
         .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
         .withBody(body)
   }

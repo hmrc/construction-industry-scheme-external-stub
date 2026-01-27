@@ -18,7 +18,8 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub.models.response
 
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.must.Matchers
-import play.api.libs.json.{JsSuccess, Json}
+import play.api.libs.json.Format.GenericFormat
+import play.api.libs.json.{JsSuccess, Json, Reads}
 
 import java.time.LocalDateTime
 
@@ -113,11 +114,13 @@ final class GetSubcontractorListResponseSpec extends AnyWordSpec with Matchers {
 
       val json = Json.toJson(model)
 
+      implicit val optStringReads: Reads[Option[String]] = Reads.optionWithNull[String]
+
       (json \ "subcontractors").as[List[play.api.libs.json.JsValue]] must have size 1
       ((json \ "subcontractors")(0) \ "subcontractorId").as[Long] mustBe 1L
       ((json \ "subcontractors")(0) \ "subbieResourceRef").as[Int] mustBe 10
       ((json \ "subcontractors")(0) \ "type").as[String] mustBe "soletrader"
-      ((json \ "subcontractors")(0) \ "utr").as[String] mustBe "1234567890"
+      ((json \ "subcontractors")(0) \ "utr").as[Option[String]] mustBe Some("1234567890")
       ((json \ "subcontractors")(0) \ "pageVisited").as[Int] mustBe 1
       ((json \ "subcontractors")(0) \ "version").as[Int] mustBe 2
     }

@@ -59,9 +59,9 @@ To trigger the happy path, ensure you provide a valid request body:
   "taxOfficeNumber" : "123",
   "taxOfficeRef" : "AB123456",
   "aoDistrict" : "123",
-  "aoPayType" : "M",
-  "aoCheckCode" : "XY",
-  "aoReference" : "754PA87654350",
+  "aoPayType" : "P",
+  "aoCheckCode" : "A",
+  "aoReference" : "12345678",
   "validBusinessAddr" : "Y",
   "correlation" : "corr-abc",
   "ggAgentId" : "AGENT-001",
@@ -1060,7 +1060,88 @@ To trigger the happy path, ensure you provide a valid request body:
 }
 ```
 
+**Endpoint**: `GET /cis/subcontractors/:cisId`
 
+**Description**: Return a subcontractors list.
+
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: Any valid value
+
+or
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: Any valid value
+- Identifier Name: TaxOfficeReference
+- Identifier Value: Any valid value
+
+- Request body: N/A
+
+#### Happy Path
+
+- Response status: `200`
+- Response body:
+```json
+{
+  "subcontractors":
+  [
+    {
+      "subcontractorId": "10101",
+      "subbieResourceRef": "1",
+      "type": "soletrader",
+      "utr": "1111111111",
+      "tradingName": "AAA",
+      "version": "1"
+    },
+    {
+      "subcontractorId": "20202",
+      "subbieResourceRef": "2",
+      "type": "soletrader",
+      "utr": "2222222222",
+      "tradingName": "BBB",
+      "version": "2"
+    },
+    {
+      "subcontractorId": "30303",
+      "subbieResourceRef": "3",
+      "type": "soletrader",
+      "firstName": "John",
+      "surname": "Smith",
+      "addressLine1": "1 Main Street",
+      "country": "GB",
+      "postcode": "AA1 1AA",
+      "version": "3"
+    },
+    {
+      "subcontractorId": "40404",
+      "subbieResourceRef": "4",
+      "type": "soletrader",
+      "utr": "4444444444",
+      "tradingName": "CCC",
+      "version": "4"
+    },
+    {
+      "subcontractorId": "50505",
+      "subbieResourceRef": "5",
+      "type": "soletrader",
+      "utr": "1211317359",
+      "tradingName": "DDD",
+      "version": "5"
+    },
+    {
+      "subcontractorId": "60606",
+      "subbieResourceRef": "6",
+      "type": "soletrader",
+      "utr": "3536885673",
+      "tradingName": "EEE",
+      "version": "6"
+    }
+  ]
+}
+```
 
 ### ChRIS
 
@@ -1133,7 +1214,7 @@ To trigger the happy path, ensure you provide a valid request body:
             <CISreturn>
                 <Contractor>
                     <UTR>1234567890</UTR>
-                    <AOref>754PA87654350</AOref>
+                    <AOref>123PA12345678</AOref>
                 </Contractor>
                 <NilReturn>yes</NilReturn>
                 <Declarations>

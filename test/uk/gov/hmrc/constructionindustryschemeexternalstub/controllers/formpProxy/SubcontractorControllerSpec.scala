@@ -34,7 +34,7 @@ import scala.concurrent.Future
 class SubcontractorControllerSpec extends SpecBase {
 
   private val cisId                  = "1"
-  private val updateSubcontractorUrl = "/cis/subcontractor/update"
+  private val updateSubcontractorUrl = "/cis/subcontractor/create-and-update"
 
   ".createAndUpdateSubcontractor" - {
 

@@ -278,6 +278,45 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
     }
   }
 
+  ".getMonthlyReturnForEdit" - {
+
+    "returns 200 when JSON body is valid" in new Setup {
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn("""{"ok":true}""")
+
+      val req: FakeRequest[JsValue] =
+        FakeRequest(POST, "/formp-proxy/cis/monthly-return-edit")
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(
+            Json.obj(
+              "instanceId" -> "abc-123",
+              "taxYear"    -> 2025,
+              "taxMonth"   -> 1
+            )
+          )
+
+      val res: Future[Result] = controller.getMonthlyReturnForEdit(req)
+
+      status(res) mustBe OK
+    }
+
+    "returns 400 when JSON body is invalid" in new Setup {
+      val req: FakeRequest[JsValue] =
+        FakeRequest(POST, "/formp-proxy/cis/monthly-return-edit")
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(
+            Json.obj(
+              "instanceId" -> "abc-123"
+            )
+          )
+
+      val res: Future[Result] = controller.getMonthlyReturnForEdit(req)
+
+      status(res) mustBe BAD_REQUEST
+      (contentAsJson(res) \ "message").as[String] mustBe "Invalid JSON body"
+    }
+  }
+
   private trait Setup {
     implicit val ec: ExecutionContext    = scala.concurrent.ExecutionContext.global
     private val cc: ControllerComponents = stubControllerComponents()

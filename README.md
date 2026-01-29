@@ -655,6 +655,31 @@ To trigger the happy path, ensure you provide a valid request body similar to ex
 }
 ```
 
+**Endpoint**: `POST /cis/monthly-return/standard/create`
+
+**Description**: Creates a standard monthly return record in the monthly return table.
+
+#### Happy Path
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: any valid Tax Office no.
+- Identifier Name: TaxOfficeReference
+- Identifier Value: any valid Tax Office ref.
+
+To trigger the happy path, ensure you provide a valid request body:
+```json
+{
+  "instanceId":  "1",
+  "taxYear": 2025,
+  "taxMonth": 11
+}
+```
+- Response status: `201`
+- Response body: empty body
+```
+
 **Endpoint**: `POST /scheme/email`
 
 **Description**: Return a scheme email from the scheme table.
@@ -1169,7 +1194,88 @@ To trigger the happy path, ensure you provide a valid request body:
 }
 ```
 
+**Endpoint**: `GET /cis/subcontractors/:cisId`
 
+**Description**: Return a subcontractors list.
+
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: Any valid value
+
+or
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: Any valid value
+- Identifier Name: TaxOfficeReference
+- Identifier Value: Any valid value
+
+- Request body: N/A
+
+#### Happy Path
+
+- Response status: `200`
+- Response body:
+```json
+{
+  "subcontractors":
+  [
+    {
+      "subcontractorId": "10101",
+      "subbieResourceRef": "1",
+      "type": "soletrader",
+      "utr": "1111111111",
+      "tradingName": "AAA",
+      "version": "1"
+    },
+    {
+      "subcontractorId": "20202",
+      "subbieResourceRef": "2",
+      "type": "soletrader",
+      "utr": "2222222222",
+      "tradingName": "BBB",
+      "version": "2"
+    },
+    {
+      "subcontractorId": "30303",
+      "subbieResourceRef": "3",
+      "type": "soletrader",
+      "firstName": "John",
+      "surname": "Smith",
+      "addressLine1": "1 Main Street",
+      "country": "GB",
+      "postcode": "AA1 1AA",
+      "version": "3"
+    },
+    {
+      "subcontractorId": "40404",
+      "subbieResourceRef": "4",
+      "type": "soletrader",
+      "utr": "4444444444",
+      "tradingName": "CCC",
+      "version": "4"
+    },
+    {
+      "subcontractorId": "50505",
+      "subbieResourceRef": "5",
+      "type": "soletrader",
+      "utr": "1211317359",
+      "tradingName": "DDD",
+      "version": "5"
+    },
+    {
+      "subcontractorId": "60606",
+      "subbieResourceRef": "6",
+      "type": "soletrader",
+      "utr": "3536885673",
+      "tradingName": "EEE",
+      "version": "6"
+    }
+  ]
+}
+```
 
 ### ChRIS
 

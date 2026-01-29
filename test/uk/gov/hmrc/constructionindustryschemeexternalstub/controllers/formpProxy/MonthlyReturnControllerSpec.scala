@@ -27,7 +27,7 @@ import play.api.mvc.{ControllerComponents, PlayBodyParsers, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.{AuthAction, FakeAuthAction}
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateNilMonthlyReturnRequest, InstanceIdRequest}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateMonthlyReturnRequest, CreateNilMonthlyReturnRequest, InstanceIdRequest}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.response.CreateNilMonthlyReturnResponse
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{EmployerReference, MonthlyReturn, UserMonthlyReturns, requests}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
@@ -238,6 +238,27 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
 
   }
 
+  ".createMonthlyReturn" - {
+
+    "returns 201 Created for a valid request body" in new Setup {
+      val requestBody = CreateMonthlyReturnRequest(
+        instanceId = "abc-123",
+        taxYear = 2025,
+        taxMonth = 2
+      )
+
+      val request: FakeRequest[CreateMonthlyReturnRequest] =
+        FakeRequest(POST, "/formp-proxy/monthly-return/create")
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(requestBody)
+
+      val result: Future[Result] = controller.createMonthlyReturn(request)
+
+      status(result) mustBe CREATED
+      contentAsString(result) mustBe ""
+    }
+  }
+
   ".retrieveUnsubmittedMonthlyReturns" - {
 
     "returns 200 when JSON body is valid" in new Setup {
@@ -254,6 +275,45 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
       val res = controller.retrieveUnsubmittedMonthlyReturns(req)
 
       status(res) mustBe OK
+    }
+  }
+
+  ".getMonthlyReturnForEdit" - {
+
+    "returns 200 when JSON body is valid" in new Setup {
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn("""{"ok":true}""")
+
+      val req: FakeRequest[JsValue] =
+        FakeRequest(POST, "/formp-proxy/cis/monthly-return-edit")
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(
+            Json.obj(
+              "instanceId" -> "abc-123",
+              "taxYear"    -> 2025,
+              "taxMonth"   -> 1
+            )
+          )
+
+      val res: Future[Result] = controller.getMonthlyReturnForEdit(req)
+
+      status(res) mustBe OK
+    }
+
+    "returns 400 when JSON body is invalid" in new Setup {
+      val req: FakeRequest[JsValue] =
+        FakeRequest(POST, "/formp-proxy/cis/monthly-return-edit")
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(
+            Json.obj(
+              "instanceId" -> "abc-123"
+            )
+          )
+
+      val res: Future[Result] = controller.getMonthlyReturnForEdit(req)
+
+      status(res) mustBe BAD_REQUEST
+      (contentAsJson(res) \ "message").as[String] mustBe "Invalid JSON body"
     }
   }
 

@@ -20,7 +20,7 @@ import play.api.Logging
 import play.api.libs.json.{JsError, JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateSubmissionRequest, UpdateSubmissionRequest}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -36,6 +36,7 @@ class SubmissionController @Inject() (
 
   private val monthlyNilReturnResponsePath      = "/resources/monthlyNilReturns"
   private val createSubmission_200_ResponsePath = s"$monthlyNilReturnResponsePath/createSubmission-200-response.json"
+  private val getGovTalkStatus_200_ResponsePath = s"$monthlyNilReturnResponsePath/getGovTalkStatus-200-response.json"
 
   def createSubmission(): Action[JsValue] =
     authorise(parse.json) { implicit request =>
@@ -73,6 +74,25 @@ class SubmissionController @Inject() (
 //                  case ("404", _) => NotFound(Json.obj("message" -> "CIS taxpayer not found"))
                   case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
                   case _          => NoContent
+                }
+              case None                     => InternalServerError
+            }
+        )
+    }
+
+  def getGovTalkStatus: Action[JsValue] =
+    authorise(parse.json) { implicit request =>
+      request.body
+        .validate[GetGovTalkStatusRequest]
+        .fold(
+          errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
+          body =>
+            val enrolments = enrolmentHelper.contractorEnrolmentsOpt(request)
+            enrolments match {
+              case Some(enrolmentReference) =>
+                (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {
+                  case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
+                  case _          => Ok(resourceHelper.resourceAsString(getGovTalkStatus_200_ResponsePath))
                 }
               case None                     => InternalServerError
             }

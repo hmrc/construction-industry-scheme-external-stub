@@ -20,13 +20,13 @@ import play.api.Logging
 import play.api.libs.json.{JsError, JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateSubmissionRequest, UpdateSubmissionRequest}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.Inject
 
-class SubmissionController @Inject() (
+class GovTalkController @Inject() (
   authorise: AuthAction,
   resourceHelper: ResourceHelper,
   enrolmentHelper: EnrolmentsHelper,
@@ -34,13 +34,14 @@ class SubmissionController @Inject() (
 )() extends BackendController(cc)
     with Logging {
 
-  private val monthlyNilReturnResponsePath      = "/resources/monthlyNilReturns"
-  private val createSubmission_200_ResponsePath = s"$monthlyNilReturnResponsePath/createSubmission-200-response.json"
+  private val govTalkReturnResponsePath         = "/resources/govTalk"
+  private val getGovTalkStatus_200_ResponsePath = s"$govTalkReturnResponsePath/getGovTalkStatus-200-response.json"
+  private val getGovTalkStatus_404_ResponsePath = s"$govTalkReturnResponsePath/getGovTalkStatus-404-response.json"
 
-  def createSubmission(): Action[JsValue] =
+  def getGovTalkStatus: Action[JsValue] =
     authorise(parse.json) { implicit request =>
       request.body
-        .validate[CreateSubmissionRequest]
+        .validate[GetGovTalkStatusRequest]
         .fold(
           errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
           body =>
@@ -48,31 +49,10 @@ class SubmissionController @Inject() (
             enrolments match {
               case Some(enrolmentReference) =>
                 (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {
-//                    case ("400", _) => BadRequest(Json.obj("message" -> "Missing CIS enrolment identifiers"))
-//                    case ("404", _) => NotFound(Json.obj("message" -> "CIS taxpayer not found"))
                   case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
-                  case _          => Created(resourceHelper.resourceAsString(createSubmission_200_ResponsePath))
-                }
-              case None                     => InternalServerError
-            }
-        )
-    }
-
-  def updateSubmission(): Action[JsValue] =
-    authorise(parse.json) { implicit request =>
-      request.body
-        .validate[UpdateSubmissionRequest]
-        .fold(
-          errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
-          body =>
-            val enrolments = enrolmentHelper.contractorEnrolmentsOpt(request)
-            enrolments match {
-              case Some(enrolmentReference) =>
-                (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {
-//                  case ("400", _) => BadRequest(Json.obj("message" -> "Missing CIS enrolment identifiers"))
-//                  case ("404", _) => NotFound(Json.obj("message" -> "CIS taxpayer not found"))
-                  case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
-                  case _          => NoContent
+                  case ("502", _) => BadGateway(Json.obj("message" -> "formp failed"))
+                  case ("404", _) => NotFound(resourceHelper.resourceAsString(getGovTalkStatus_404_ResponsePath))
+                  case _          => Ok(resourceHelper.resourceAsString(getGovTalkStatus_200_ResponsePath))
                 }
               case None                     => InternalServerError
             }

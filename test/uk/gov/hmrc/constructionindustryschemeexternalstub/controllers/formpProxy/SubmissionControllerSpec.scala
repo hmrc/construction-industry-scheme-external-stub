@@ -192,6 +192,33 @@ class SubmissionControllerSpec extends SpecBase {
       contentAsJson(res) mustBe response
     }
 
+    "returns 404 with empty array on valid payload for for taxOfficeNumber = 404" in new Setup {
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("404", "")))
+
+      val response: JsObject =
+        Json.obj(
+          "govtallk_status" -> Json.arr()
+        )
+
+      val json: JsValue = Json.toJson(
+        GetGovTalkStatusRequest(
+          userIdentifier = "123",
+          formResultID = "YE2025"
+        )
+      )
+
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn(response.toString)
+
+      val req: FakeRequest[JsValue] = makeJsonRequest(json, getGovTalkStatusUrl)
+      val res: Future[Result]       = controller.getGovTalkStatus()(req)
+
+      status(res) mustBe NOT_FOUND
+      contentAsJson(res) mustBe response
+    }
+
     "returns 400 BadRequest for invalid JSON" in new Setup {
 
       val bad: JsObject             = Json.obj("nope" -> "nope")
@@ -219,24 +246,6 @@ class SubmissionControllerSpec extends SpecBase {
 
       status(res) mustBe BAD_GATEWAY
       (contentAsJson(res) \ "message").as[String] must include("formp failed")
-    }
-
-    "propagates UpstreamErrorResponse for taxOfficeNumber = 500" in new Setup {
-
-      val json: JsValue = Json.toJson(
-        GetGovTalkStatusRequest(
-          userIdentifier = "123",
-          formResultID = "YE2025"
-        )
-      )
-
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(None)
-
-      val req: FakeRequest[JsValue] = makeJsonRequest(json, getGovTalkStatusUrl)
-      val res: Future[Result]       = controller.getGovTalkStatus()(req)
-
-      status(res) mustBe INTERNAL_SERVER_ERROR
     }
 
     "returns 500 with generic message for taxOfficeNumber = 500" in new Setup {

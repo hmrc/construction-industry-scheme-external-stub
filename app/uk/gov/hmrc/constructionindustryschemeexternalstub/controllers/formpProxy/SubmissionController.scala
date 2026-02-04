@@ -37,6 +37,7 @@ class SubmissionController @Inject() (
   private val monthlyNilReturnResponsePath      = "/resources/monthlyNilReturns"
   private val createSubmission_200_ResponsePath = s"$monthlyNilReturnResponsePath/createSubmission-200-response.json"
   private val getGovTalkStatus_200_ResponsePath = s"$monthlyNilReturnResponsePath/getGovTalkStatus-200-response.json"
+  private val getGovTalkStatus_404_ResponsePath = s"$monthlyNilReturnResponsePath/getGovTalkStatus-404-response.json"
 
   def createSubmission(): Action[JsValue] =
     authorise(parse.json) { implicit request =>
@@ -93,6 +94,7 @@ class SubmissionController @Inject() (
                 (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {
                   case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
                   case ("502", _) => BadGateway(Json.obj("message" -> "formp failed"))
+                  case ("404", _) => NotFound(resourceHelper.resourceAsString(getGovTalkStatus_404_ResponsePath))
                   case _          => Ok(resourceHelper.resourceAsString(getGovTalkStatus_200_ResponsePath))
                 }
               case None                     => InternalServerError

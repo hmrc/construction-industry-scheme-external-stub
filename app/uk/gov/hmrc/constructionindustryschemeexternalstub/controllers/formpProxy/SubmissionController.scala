@@ -92,6 +92,7 @@ class SubmissionController @Inject() (
               case Some(enrolmentReference) =>
                 (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {
                   case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
+                  case ("502", _) => BadGateway(Json.obj("message" -> "formp failed"))
                   case _          => Ok(resourceHelper.resourceAsString(getGovTalkStatus_200_ResponsePath))
                 }
               case None                     => InternalServerError

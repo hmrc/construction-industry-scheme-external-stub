@@ -78,7 +78,7 @@ class GovTalkControllerSpec extends SpecBase {
       contentAsJson(res) mustBe response
     }
 
-    "returns 404 with empty array on valid payload for for taxOfficeNumber = 404" in new Setup {
+    "returns 200 with empty array on valid payload for for taxOfficeNumber = 404" in new Setup {
 
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
         .thenReturn(Some(EmployerReference("404", "")))
@@ -101,7 +101,7 @@ class GovTalkControllerSpec extends SpecBase {
       val req: FakeRequest[JsValue] = makeJsonRequest(json, getGovTalkStatusUrl)
       val res: Future[Result]       = controller.getGovTalkStatus()(req)
 
-      status(res) mustBe NOT_FOUND
+      status(res) mustBe OK
       contentAsJson(res) mustBe response
     }
 

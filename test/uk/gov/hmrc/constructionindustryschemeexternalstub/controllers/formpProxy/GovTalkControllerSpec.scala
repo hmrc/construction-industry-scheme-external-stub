@@ -26,7 +26,7 @@ import play.api.test.Helpers.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.FakeAuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.base.SpecBase
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.EmployerReference
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{GetGovTalkStatusRequest, ResetGovTalkStatusRequest}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateGovTalkStatusRecordRequest, GetGovTalkStatusRequest, ResetGovTalkStatusRequest}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 
 import java.time.LocalDateTime
@@ -250,6 +250,104 @@ class GovTalkControllerSpec extends SpecBase {
 
       val req: FakeRequest[JsValue] = makeJsonRequest(json, resetGovTalkStatusUrl)
       val res: Future[Result]       = controller.resetGovTalkStatus()(req)
+
+      status(res) mustBe INTERNAL_SERVER_ERROR
+      (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
+    }
+  }
+
+  ".createGovTalkStatusRecord" - {
+
+    val createGovTalkStatusUrl = "/cis/govtalkstatus/create"
+
+    "returns 204 on valid payload for an unknown taxOfficeNumber / taxOfficeReference" in new Setup {
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("204", "")))
+
+      val json: JsValue = Json.toJson(
+        CreateGovTalkStatusRecordRequest(
+          userIdentifier = "1",
+          formResultID = "12890",
+          correlationID = "C742D5DEE7EB4D15B4F7EFD50B890525",
+          formLock = "N",
+          createDate = Some(LocalDateTime.parse("2025-02-05T00:00:00")),
+          endStateDate = None,
+          lastMessageDate = LocalDateTime.parse("2025-02-05T00:00:00"),
+          numPolls = 0,
+          pollInterval = 0,
+          protocolStatus = "dataRequest",
+          gatewayURL = "http://localhost:9712/submission/ChRIS/CISR/Filing/sync/CIS300MR"
+        )
+      )
+
+      val req: FakeRequest[JsValue] = makeJsonRequest(json, createGovTalkStatusUrl)
+      val res: Future[Result]       = controller.createGovTalkStatusRecord()(req)
+
+      status(res) mustBe CREATED
+    }
+
+    "returns 400 BadRequest for invalid JSON" in new Setup {
+
+      val bad: JsObject             = Json.obj("nope" -> "nope")
+      val req: FakeRequest[JsValue] = makeJsonRequest(bad, createGovTalkStatusUrl)
+      val res: Future[Result]       = controller.createGovTalkStatusRecord()(req)
+
+      status(res) mustBe BAD_REQUEST
+      (contentAsJson(res) \ "message").as[String] mustBe "Invalid payload"
+    }
+
+    "propagates UpstreamErrorResponse for taxOfficeNumber = 502" in new Setup {
+
+      val json: JsValue = Json.toJson(
+        CreateGovTalkStatusRecordRequest(
+          userIdentifier = "1",
+          formResultID = "12890",
+          correlationID = "C742D5DEE7EB4D15B4F7EFD50B890525",
+          formLock = "N",
+          createDate = Some(LocalDateTime.parse("2025-02-05T00:00:00")),
+          endStateDate = None,
+          lastMessageDate = LocalDateTime.parse("2025-02-05T00:00:00"),
+          numPolls = 0,
+          pollInterval = 0,
+          protocolStatus = "dataRequest",
+          gatewayURL = "http://localhost:9712/submission/ChRIS/CISR/Filing/sync/CIS300MR"
+        )
+      )
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("502", "")))
+
+      val req: FakeRequest[JsValue] = makeJsonRequest(json, createGovTalkStatusUrl)
+      val res: Future[Result]       = controller.createGovTalkStatusRecord()(req)
+
+      status(res) mustBe BAD_GATEWAY
+      (contentAsJson(res) \ "message").as[String] must include("formp failed")
+    }
+
+    "returns 500 with generic message for taxOfficeNumber = 500" in new Setup {
+
+      val json: JsValue = Json.toJson(
+        CreateGovTalkStatusRecordRequest(
+          userIdentifier = "1",
+          formResultID = "12890",
+          correlationID = "C742D5DEE7EB4D15B4F7EFD50B890525",
+          formLock = "N",
+          createDate = Some(LocalDateTime.parse("2025-02-05T00:00:00")),
+          endStateDate = None,
+          lastMessageDate = LocalDateTime.parse("2025-02-05T00:00:00"),
+          numPolls = 0,
+          pollInterval = 0,
+          protocolStatus = "dataRequest",
+          gatewayURL = "http://localhost:9712/submission/ChRIS/CISR/Filing/sync/CIS300MR"
+        )
+      )
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("500", "")))
+
+      val req: FakeRequest[JsValue] = makeJsonRequest(json, createGovTalkStatusUrl)
+      val res: Future[Result]       = controller.createGovTalkStatusRecord()(req)
 
       status(res) mustBe INTERNAL_SERVER_ERROR
       (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"

@@ -843,6 +843,33 @@ To trigger the happy path, ensure you provide a valid request body:
 }
 ```
 
+**Endpoint**: `POST /monthly-return/nil/create`
+
+**Description**: Creates a monthly return record in the monthly return table.
+
+#### Happy Path
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 200
+- Identifier Name: TaxOfficeReference
+- Identifier Value: AB123456
+
+To trigger the happy path, ensure you provide a valid request body, below is an example of a valid request body:
+```json
+{
+  "instanceId":  1,
+  "taxYear": 2025,
+  "taxMonth": 11,
+  "amendment": "N",
+  "createResourceReferences": [1,2,3],
+  "deleteResourceReferences": [4,5,6]
+}
+```
+- Response status: `204`
+- Response body: empty body
+
 **Endpoint**: `POST /submissions/create`
 
 **Description**: Creates a new submission record in the submission table.

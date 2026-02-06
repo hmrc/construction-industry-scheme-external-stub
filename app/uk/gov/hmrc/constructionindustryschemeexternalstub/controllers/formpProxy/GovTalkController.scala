@@ -58,4 +58,24 @@ class GovTalkController @Inject() (
             }
         )
     }
+
+  def resetGovTalkStatus: Action[JsValue] =
+    authorise(parse.json) { implicit request =>
+      request.body
+        .validate[ResetGovTalkStatusRequest]
+        .fold(
+          errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
+          body =>
+            val enrolments = enrolmentHelper.contractorEnrolmentsOpt(request)
+            enrolments match {
+              case Some(enrolmentReference) =>
+                (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {
+                  case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
+                  case ("502", _) => BadGateway(Json.obj("message" -> "formp failed"))
+                  case _          => NoContent
+                }
+              case None                     => InternalServerError
+            }
+        )
+    }
 }

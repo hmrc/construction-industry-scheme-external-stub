@@ -107,6 +107,11 @@ class MonthlyReturnController @Inject() (
       }
     }
 
+  def updateMonthlyReturnItem(): Action[UpdateMonthlyReturnItemRequest] =
+    authorise(parse.json[UpdateMonthlyReturnItemRequest]) { _ =>
+      NoContent
+    }
+
   def createMonthlyReturn: Action[CreateMonthlyReturnRequest] =
     authorise.async(parse.json[CreateMonthlyReturnRequest]) { _ =>
       Future.successful(Created)

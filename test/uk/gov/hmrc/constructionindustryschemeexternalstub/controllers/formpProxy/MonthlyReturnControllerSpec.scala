@@ -27,7 +27,7 @@ import play.api.mvc.{ControllerComponents, PlayBodyParsers, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.{AuthAction, FakeAuthAction}
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateMonthlyReturnRequest, CreateNilMonthlyReturnRequest, InstanceIdRequest}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateMonthlyReturnRequest, CreateNilMonthlyReturnRequest, InstanceIdRequest, UpdateMonthlyReturnItemRequest}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.response.CreateNilMonthlyReturnResponse
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{EmployerReference, MonthlyReturn, UserMonthlyReturns, requests}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
@@ -278,6 +278,36 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
     }
   }
 
+  ".updateMonthlyReturnItem" - {
+
+    "returns 204 NoContent for a valid UpdateMonthlyReturnItemRequest" in new Setup {
+
+      val body = UpdateMonthlyReturnItemRequest(
+        instanceId = "abc-123",
+        taxYear = 2025,
+        taxMonth = 2,
+        amendment = "N",
+        itemResourceReference = 987654321L,
+        totalPayments = "15000.00",
+        costOfMaterials = "5000.00",
+        totalDeducted = "2500.00",
+        subcontractorName = "Example Subbie Ltd",
+        verificationNumber = "V12345678",
+        version = 1
+      )
+
+      val req =
+        FakeRequest(POST, "/formp-proxy/monthly-return/update")
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(body)
+
+      val res = controller.updateMonthlyReturnItem()(req)
+
+      status(res) mustBe NO_CONTENT
+      contentAsString(res) mustBe "" // NoContent returns empty body
+    }
+  }
+
   ".getMonthlyReturnForEdit" - {
 
     "returns 200 when JSON body is valid" in new Setup {
@@ -353,4 +383,5 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
     val nonEmptyWrapper: UserMonthlyReturns =
       UserMonthlyReturns(Seq(mkReturn(66666L, 1), mkReturn(66667L, 7)))
   }
+
 }

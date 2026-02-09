@@ -1185,7 +1185,7 @@ To trigger the happy path, ensure you provide a valid request body:
 - Response body:
 ```json
 {
-  "govtallk_status": [
+  "govtalk_status": [
     {
       "userIdentifier": "1",
       "formResultID": "12890",
@@ -1226,7 +1226,7 @@ To trigger the happy path, ensure you provide a valid request body:
 - Response body:
 ```json
 {
-  "govtallk_status": []
+  "govtalk_status": []
 }
 ```
 

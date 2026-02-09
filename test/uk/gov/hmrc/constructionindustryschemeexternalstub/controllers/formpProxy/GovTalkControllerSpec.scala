@@ -44,7 +44,7 @@ class GovTalkControllerSpec extends SpecBase {
 
       val response: JsObject =
         Json.obj(
-          "govtallk_status" -> Json.arr(
+          "govtalk_status" -> Json.arr(
             Json.obj(
               "userIdentifier"  -> "1",
               "formResultID"    -> "12890",
@@ -85,7 +85,7 @@ class GovTalkControllerSpec extends SpecBase {
 
       val response: JsObject =
         Json.obj(
-          "govtallk_status" -> Json.arr()
+          "govtalk_status" -> Json.arr()
         )
 
       val json: JsValue = Json.toJson(

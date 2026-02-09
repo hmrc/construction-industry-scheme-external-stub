@@ -152,6 +152,24 @@ class GovTalkControllerSpec extends SpecBase {
       status(res) mustBe INTERNAL_SERVER_ERROR
       (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
     }
+
+    "returns 500 with generic message for an unknown taxOfficeNumber / taxOfficeReference" in new Setup {
+
+      val json: JsValue = Json.toJson(
+        GetGovTalkStatusRequest(
+          userIdentifier = "123",
+          formResultID = "YE2025"
+        )
+      )
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      val req: FakeRequest[JsValue] = makeJsonRequest(json, getGovTalkStatusUrl)
+      val res: Future[Result]       = controller.getGovTalkStatus()(req)
+
+      status(res) mustBe INTERNAL_SERVER_ERROR
+    }
   }
 
   private trait Setup {

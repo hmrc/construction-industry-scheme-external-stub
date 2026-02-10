@@ -178,44 +178,35 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
   ".updateNilMonthlyReturn" - {
 
     "returns 204 when service succeeds for an unknown taxOfficeNumber / taxOfficeReference" in new Setup {
-      val request: CreateNilMonthlyReturnRequest = CreateNilMonthlyReturnRequest(
-        instanceId = "abc-123",
-        taxYear = 2025,
-        taxMonth = 2,
-        decInformationCorrect = "Y",
-        decNilReturnNoPayments = "Y"
+      val body = Json.obj(
+        "instanceId"             -> "abc-123",
+        "taxYear"                -> 2025,
+        "taxMonth"               -> 2,
+        "decInformationCorrect"  -> "Y",
+        "decNilReturnNoPayments" -> "Y"
       )
 
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(Some(EmployerReference("200", "")))
-
-      val req: FakeRequest[CreateNilMonthlyReturnRequest] =
-        FakeRequest(POST, "/formp-proxy/cis/monthly-return/nil/update").withBody(request)
+      val req: FakeRequest[JsValue] =
+        FakeRequest(POST, "/formp-proxy/cis/monthly-return/nil/update")
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(body)
 
       val res: Future[Result] = controller.updateNilMonthlyReturn(req)
 
       status(res) mustBe NO_CONTENT
+      contentAsString(res) mustBe ""
     }
 
-    "propagates UpstreamErrorResponse for taxOfficeNumber = 502" in new Setup {
-      val request: CreateNilMonthlyReturnRequest = CreateNilMonthlyReturnRequest(
-        instanceId = "abc-123",
-        taxYear = 2025,
-        taxMonth = 2,
-        decInformationCorrect = "Y",
-        decNilReturnNoPayments = "Y"
-      )
-
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(Some(EmployerReference("502", "")))
-
-      val req: FakeRequest[CreateNilMonthlyReturnRequest] =
-        FakeRequest(POST, "/formp-proxy/cis/monthly-return/nil/update").withBody(request)
+    "returns 400 when JSON body is invalid" in new Setup {
+      val req: FakeRequest[JsValue] =
+        FakeRequest(POST, "/formp-proxy/cis/monthly-return/nil/update")
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(Json.obj("instanceId" -> "abc-123"))
 
       val res: Future[Result] = controller.updateNilMonthlyReturn(req)
 
-      status(res) mustBe BAD_GATEWAY
-      (contentAsJson(res) \ "message").as[String] must include("formp failed")
+      status(res) mustBe BAD_REQUEST
+      (contentAsJson(res) \ "message").as[String] mustBe "Invalid JSON body"
     }
   }
 

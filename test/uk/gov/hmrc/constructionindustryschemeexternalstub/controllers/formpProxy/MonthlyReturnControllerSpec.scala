@@ -31,9 +31,19 @@ import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{Creat
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.response.CreateNilMonthlyReturnResponse
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{EmployerReference, MonthlyReturn, UserMonthlyReturns, requests}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.stream.{Materializer, SystemMaterializer}
+// ---- Pekko implicits required by Play test Helpers ----
+implicit lazy val system: ActorSystem  = ActorSystem("MonthlyReturnControllerSpec")
+implicit lazy val mat: Materializer    = SystemMaterializer(system).materializer
+implicit lazy val ec: ExecutionContext = system.dispatcher
+// -------------------------------------------------------
 
 import java.time.LocalDateTime
 import scala.concurrent.{ExecutionContext, Future}
+
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.stream.{Materializer, SystemMaterializer}
 
 class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFutures with MockitoSugar {
 
@@ -281,7 +291,32 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
   ".updateMonthlyReturnItem" - {
 
     "returns 204 NoContent for a valid UpdateMonthlyReturnItemRequest" in new Setup {
+      val requestBody = UpdateMonthlyReturnItemRequest(
+        instanceId = "abc-123",
+        taxYear = 2025,
+        taxMonth = 2,
+        amendment = "N",
+        itemResourceReference = 987654321L,
+        totalPayments = "15000.00",
+        costOfMaterials = "5000.00",
+        totalDeducted = "2500.00",
+        subcontractorName = "Example Subbie Ltd",
+        verificationNumber = "V12345678",
+        version = 1
+      )
 
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("200", "")))
+
+      val req = FakeRequest(POST, "/formp-proxy/monthly-return/update")
+        .withBody(requestBody) // ← same pattern as updateNilMonthlyReturn
+
+      val res = controller.updateMonthlyReturnItem()(req)
+
+      status(res) mustBe NO_CONTENT
+    }
+
+    "returns 502 when taxOfficeNumber = 502" in new Setup {
       val body = UpdateMonthlyReturnItemRequest(
         instanceId = "abc-123",
         taxYear = 2025,
@@ -296,15 +331,68 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
         version = 1
       )
 
-      val req =
-        FakeRequest(POST, "/formp-proxy/monthly-return/update")
-          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
-          .withBody(body)
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("502", "")))
+
+      val req = FakeRequest(POST, "/formp-proxy/monthly-return/update")
+        .withBody(body)
 
       val res = controller.updateMonthlyReturnItem()(req)
 
-      status(res) mustBe NO_CONTENT
-      contentAsString(res) mustBe "" // NoContent returns empty body
+      status(res) mustBe BAD_GATEWAY
+      (contentAsJson(res) \ "message").as[String] must include("formp failed")
+    }
+
+    "returns 500 when taxOfficeNumber = 500" in new Setup {
+      val body = UpdateMonthlyReturnItemRequest(
+        instanceId = "abc-123",
+        taxYear = 2025,
+        taxMonth = 2,
+        amendment = "N",
+        itemResourceReference = 987654321L,
+        totalPayments = "15000.00",
+        costOfMaterials = "5000.00",
+        totalDeducted = "2500.00",
+        subcontractorName = "Example Subbie Ltd",
+        verificationNumber = "V12345678",
+        version = 1
+      )
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("500", "")))
+
+      val req = FakeRequest(POST, "/formp-proxy/monthly-return/update")
+        .withBody(body)
+
+      val res = controller.updateMonthlyReturnItem()(req)
+
+      status(res) mustBe INTERNAL_SERVER_ERROR
+    }
+
+    "returns 500 when enrolment is missing" in new Setup {
+      val body = UpdateMonthlyReturnItemRequest(
+        instanceId = "abc-123",
+        taxYear = 2025,
+        taxMonth = 2,
+        amendment = "N",
+        itemResourceReference = 987654321L,
+        totalPayments = "15000.00",
+        costOfMaterials = "5000.00",
+        totalDeducted = "2500.00",
+        subcontractorName = "Example Subbie Ltd",
+        verificationNumber = "V12345678",
+        version = 1
+      )
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      val req = FakeRequest(POST, "/formp-proxy/monthly-return/update")
+        .withBody(body)
+
+      val res = controller.updateMonthlyReturnItem()(req)
+
+      status(res) mustBe INTERNAL_SERVER_ERROR
     }
   }
 

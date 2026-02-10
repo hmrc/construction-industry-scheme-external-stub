@@ -26,7 +26,7 @@ class ResetGovTalkStatusRequestSpec extends AnyWordSpec with Matchers {
 
   "ResetGovTalkStatusRequest (JSON)" should {
 
-    "read and write with mandatory data" in {
+    "read and write with mandatory fields" in {
       val json = Json.parse("""
           |{
           |  "userIdentifier": "1",

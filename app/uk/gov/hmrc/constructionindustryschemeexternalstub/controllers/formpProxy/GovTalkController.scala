@@ -46,8 +46,7 @@ class GovTalkController @Inject() (
         .fold(
           errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
           body =>
-            val enrolments = enrolmentHelper.contractorEnrolmentsOpt(request)
-            enrolments match {
+            enrolmentHelper.contractorEnrolmentsOpt(request) match {
               case Some(enrolmentReference) =>
                 (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {
                   case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
@@ -55,7 +54,11 @@ class GovTalkController @Inject() (
                   case ("404", _) => Ok(resourceHelper.resourceAsString(getGovTalkStatus_200_EmptyResponsePath))
                   case _          => Ok(resourceHelper.resourceAsString(getGovTalkStatus_200_ResponsePath))
                 }
-              case None                     => InternalServerError
+              case None                     =>
+                enrolmentHelper.agentEnrolmentsOpt(request) match {
+                  case Some(agentEnrollment) => Ok(resourceHelper.resourceAsString(getGovTalkStatus_200_ResponsePath))
+                  case _                     => InternalServerError
+                }
             }
         )
     }

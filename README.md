@@ -1171,6 +1171,12 @@ or
 - Identifier Name: TaxOfficeReference
 - Identifier Value: Any valid value
 
+or 
+
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: Any valid value
 
 To trigger the happy path, ensure you provide a valid request body:
 ```json
@@ -1185,7 +1191,7 @@ To trigger the happy path, ensure you provide a valid request body:
 - Response body:
 ```json
 {
-  "govtallk_status": [
+  "govtalk_status": [
     {
       "userIdentifier": "1",
       "formResultID": "12890",
@@ -1226,7 +1232,7 @@ To trigger the happy path, ensure you provide a valid request body:
 - Response body:
 ```json
 {
-  "govtallk_status": []
+  "govtalk_status": []
 }
 ```
 

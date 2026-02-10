@@ -34,9 +34,10 @@ class GovTalkController @Inject() (
 )() extends BackendController(cc)
     with Logging {
 
-  private val govTalkReturnResponsePath         = "/resources/govTalk"
-  private val getGovTalkStatus_200_ResponsePath = s"$govTalkReturnResponsePath/getGovTalkStatus-200-response.json"
-  private val getGovTalkStatus_404_ResponsePath = s"$govTalkReturnResponsePath/getGovTalkStatus-404-response.json"
+  private val govTalkReturnResponsePath              = "/resources/govTalk"
+  private val getGovTalkStatus_200_ResponsePath      = s"$govTalkReturnResponsePath/getGovTalkStatus-200-response.json"
+  private val getGovTalkStatus_200_EmptyResponsePath =
+    s"$govTalkReturnResponsePath/getGovTalkStatus-200-empty-response.json"
 
   def getGovTalkStatus: Action[JsValue] =
     authorise(parse.json) { implicit request =>
@@ -45,16 +46,19 @@ class GovTalkController @Inject() (
         .fold(
           errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
           body =>
-            val enrolments = enrolmentHelper.contractorEnrolmentsOpt(request)
-            enrolments match {
+            enrolmentHelper.contractorEnrolmentsOpt(request) match {
               case Some(enrolmentReference) =>
                 (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {
                   case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
                   case ("502", _) => BadGateway(Json.obj("message" -> "formp failed"))
-                  case ("404", _) => Ok(resourceHelper.resourceAsString(getGovTalkStatus_404_ResponsePath))
+                  case ("404", _) => Ok(resourceHelper.resourceAsString(getGovTalkStatus_200_EmptyResponsePath))
                   case _          => Ok(resourceHelper.resourceAsString(getGovTalkStatus_200_ResponsePath))
                 }
-              case None                     => InternalServerError
+              case None                     =>
+                enrolmentHelper.agentEnrolmentsOpt(request) match {
+                  case Some(_) => Ok(resourceHelper.resourceAsString(getGovTalkStatus_200_ResponsePath))
+                  case None    => InternalServerError
+                }
             }
         )
     }

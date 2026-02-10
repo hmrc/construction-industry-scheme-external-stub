@@ -29,4 +29,3 @@ final case class UpdateNilMonthlyReturnRequest(
 object UpdateNilMonthlyReturnRequest {
   implicit val format: OFormat[UpdateNilMonthlyReturnRequest] = Json.format[UpdateNilMonthlyReturnRequest]
 }
-

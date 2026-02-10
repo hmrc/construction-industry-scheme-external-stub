@@ -24,7 +24,7 @@ class GetGovTalkStatusRequestSpec extends AnyWordSpec with Matchers {
 
   "GetGovTalkStatusRequest (JSON)" should {
 
-    "read and write with SoleTrader type" in {
+    "read and write with mandatory" in {
       val json = Json.parse("""
                               |{
                               |  "userIdentifier": "1",

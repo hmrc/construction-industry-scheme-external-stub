@@ -31,19 +31,9 @@ import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{Creat
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.response.CreateNilMonthlyReturnResponse
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{EmployerReference, MonthlyReturn, UserMonthlyReturns, requests}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
-import org.apache.pekko.actor.ActorSystem
-import org.apache.pekko.stream.{Materializer, SystemMaterializer}
-// ---- Pekko implicits required by Play test Helpers ----
-implicit lazy val system: ActorSystem  = ActorSystem("MonthlyReturnControllerSpec")
-implicit lazy val mat: Materializer    = SystemMaterializer(system).materializer
-implicit lazy val ec: ExecutionContext = system.dispatcher
-// -------------------------------------------------------
 
 import java.time.LocalDateTime
 import scala.concurrent.{ExecutionContext, Future}
-
-import org.apache.pekko.actor.ActorSystem
-import org.apache.pekko.stream.{Materializer, SystemMaterializer}
 
 class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFutures with MockitoSugar {
 

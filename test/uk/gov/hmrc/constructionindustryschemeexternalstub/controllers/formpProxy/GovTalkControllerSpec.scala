@@ -208,6 +208,8 @@ class GovTalkControllerSpec extends SpecBase {
 
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
         .thenReturn(None)
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
 
       val req: FakeRequest[JsValue] = makeJsonRequest(json, getGovTalkStatusUrl)
       val res: Future[Result]       = controller.getGovTalkStatus()(req)

@@ -843,6 +843,33 @@ To trigger the happy path, ensure you provide a valid request body:
 }
 ```
 
+**Endpoint**: `POST /monthly-return/nil/create`
+
+**Description**: Creates a monthly return record in the monthly return table.
+
+#### Happy Path
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 200
+- Identifier Name: TaxOfficeReference
+- Identifier Value: AB123456
+
+To trigger the happy path, ensure you provide a valid request body, below is an example of a valid request body:
+```json
+{
+  "instanceId":  1,
+  "taxYear": 2025,
+  "taxMonth": 11,
+  "amendment": "N",
+  "createResourceReferences": [1,2,3],
+  "deleteResourceReferences": [4,5,6]
+}
+```
+- Response status: `204`
+- Response body: empty body
+
 **Endpoint**: `POST /submissions/create`
 
 **Description**: Creates a new submission record in the submission table.
@@ -1171,6 +1198,12 @@ or
 - Identifier Name: TaxOfficeReference
 - Identifier Value: Any valid value
 
+or 
+
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: Any valid value
 
 To trigger the happy path, ensure you provide a valid request body:
 ```json
@@ -1185,7 +1218,7 @@ To trigger the happy path, ensure you provide a valid request body:
 - Response body:
 ```json
 {
-  "govtallk_status": [
+  "govtalk_status": [
     {
       "userIdentifier": "1",
       "formResultID": "12890",
@@ -1212,6 +1245,12 @@ To trigger the happy path, ensure you provide a valid request body:
 - Identifier Name: TaxOfficeReference
 - Identifier Value: Any valid value
 
+or
+
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: 404
 
 To trigger the happy path, ensure you provide a valid request body:
 ```json
@@ -1226,7 +1265,7 @@ To trigger the happy path, ensure you provide a valid request body:
 - Response body:
 ```json
 {
-  "govtallk_status": []
+  "govtalk_status": []
 }
 ```
 
@@ -1235,6 +1274,13 @@ To trigger the happy path, ensure you provide a valid request body:
 **Description**: Resets the record in the GovTalk status.
 
 #### Happy Path
+
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: Any valid value
+
+or
 
 - Affinity Group: Organisation
 - Enrolment Key: HMRC-CIS-ORG
@@ -1252,7 +1298,8 @@ To trigger the happy path, ensure you provide a valid request body:
   "correlationID": "128903445",
   "formLock": "N",
   "createDate": "2019-01-01T00:00:00",
-  "lastMessageDate": "2019-01-01T00:00:00",
+  "endStateDate": "2027-01-01T00:00:00",
+  "lastMessageDate": "2026-01-01T00:00:00",
   "numPolls": 0,
   "pollInterval": 0,
   "oldProtocolStatus": "dataRequest",

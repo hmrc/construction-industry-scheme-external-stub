@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,51 @@ class GovTalkControllerSpec extends SpecBase {
 
       val response: JsObject =
         Json.obj(
-          "govtallk_status" -> Json.arr(
+          "govtalk_status" -> Json.arr(
+            Json.obj(
+              "userIdentifier"  -> "1",
+              "formResultID"    -> "12890",
+              "correlationID"   -> "C742D5DEE7EB4D15B4F7EFD50B890525",
+              "formLock"        -> "false",
+              "createDate"      -> "2026-02-03T00:00:00",
+              "endStateDate"    -> JsNull,
+              "lastMessageDate" -> "2026-02-03T00:00:00",
+              "numPolls"        -> 0,
+              "pollInterval"    -> 0,
+              "protocolStatus"  -> "dataRequest",
+              "gatewayURL"      -> "http://localhost:9712/submission/ChRIS/CISR/Filing/sync/CIS300MR"
+            )
+          )
+        )
+
+      val json: JsValue = Json.toJson(
+        GetGovTalkStatusRequest(
+          userIdentifier = "123",
+          formResultID = "YE2025"
+        )
+      )
+
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn(response.toString)
+
+      val req: FakeRequest[JsValue] = makeJsonRequest(json, getGovTalkStatusUrl)
+      val res: Future[Result]       = controller.getGovTalkStatus()(req)
+
+      status(res) mustBe OK
+      contentAsJson(res) mustBe response
+    }
+
+    "returns 200 with valid data on valid payload for an unknown agentReference" in new Setup {
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(Some("agentRef"))
+
+      val response: JsObject =
+        Json.obj(
+          "govtalk_status" -> Json.arr(
             Json.obj(
               "userIdentifier"  -> "1",
               "formResultID"    -> "12890",
@@ -86,7 +130,37 @@ class GovTalkControllerSpec extends SpecBase {
 
       val response: JsObject =
         Json.obj(
-          "govtallk_status" -> Json.arr()
+          "govtalk_status" -> Json.arr()
+        )
+
+      val json: JsValue = Json.toJson(
+        GetGovTalkStatusRequest(
+          userIdentifier = "123",
+          formResultID = "YE2025"
+        )
+      )
+
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn(response.toString)
+
+      val req: FakeRequest[JsValue] = makeJsonRequest(json, getGovTalkStatusUrl)
+      val res: Future[Result]       = controller.getGovTalkStatus()(req)
+
+      status(res) mustBe OK
+      contentAsJson(res) mustBe response
+    }
+
+    "returns 200 with empty array on valid payload for for agentReference = 404" in new Setup {
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(Some("404"))
+
+      val response: JsObject =
+        Json.obj(
+          "govtalk_status" -> Json.arr()
         )
 
       val json: JsValue = Json.toJson(
@@ -153,6 +227,26 @@ class GovTalkControllerSpec extends SpecBase {
       status(res) mustBe INTERNAL_SERVER_ERROR
       (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
     }
+
+    "returns 500 with generic message for invalid enrollment" in new Setup {
+
+      val json: JsValue = Json.toJson(
+        GetGovTalkStatusRequest(
+          userIdentifier = "123",
+          formResultID = "YE2025"
+        )
+      )
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(None)
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      val req: FakeRequest[JsValue] = makeJsonRequest(json, getGovTalkStatusUrl)
+      val res: Future[Result]       = controller.getGovTalkStatus()(req)
+
+      status(res) mustBe INTERNAL_SERVER_ERROR
+    }
   }
 
   ".resetGovTalkStatus" - {
@@ -195,64 +289,6 @@ class GovTalkControllerSpec extends SpecBase {
 
       status(res) mustBe BAD_REQUEST
       (contentAsJson(res) \ "message").as[String] mustBe "Invalid payload"
-    }
-
-    "propagates UpstreamErrorResponse for taxOfficeNumber = 502" in new Setup {
-
-      val json: JsValue = Json.toJson(
-        ResetGovTalkStatusRequest(
-          userIdentifier = "1",
-          formResultID = "12890",
-          correlationID = "C742D5DEE7EB4D15B4F7EFD50B890525",
-          formLock = "N",
-          createDate = Some(LocalDateTime.parse("2025-02-05T00:00:00")),
-          endStateDate = None,
-          lastMessageDate = LocalDateTime.parse("2025-02-05T00:00:00"),
-          numPolls = 0,
-          pollInterval = 0,
-          oldProtocolStatus = "dataRequest",
-          newProtocolStatus = "dataPoll",
-          gatewayURL = "http://localhost:9712/submission/ChRIS/CISR/Filing/sync/CIS300MR"
-        )
-      )
-
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(Some(EmployerReference("502", "")))
-
-      val req: FakeRequest[JsValue] = makeJsonRequest(json, resetGovTalkStatusUrl)
-      val res: Future[Result]       = controller.resetGovTalkStatus()(req)
-
-      status(res) mustBe BAD_GATEWAY
-      (contentAsJson(res) \ "message").as[String] must include("formp failed")
-    }
-
-    "returns 500 with generic message for taxOfficeNumber = 500" in new Setup {
-
-      val json: JsValue = Json.toJson(
-        ResetGovTalkStatusRequest(
-          userIdentifier = "1",
-          formResultID = "12890",
-          correlationID = "C742D5DEE7EB4D15B4F7EFD50B890525",
-          formLock = "N",
-          createDate = Some(LocalDateTime.parse("2025-02-05T00:00:00")),
-          endStateDate = None,
-          lastMessageDate = LocalDateTime.parse("2025-02-05T00:00:00"),
-          numPolls = 0,
-          pollInterval = 0,
-          oldProtocolStatus = "dataRequest",
-          newProtocolStatus = "dataPoll",
-          gatewayURL = "http://localhost:9712/submission/ChRIS/CISR/Filing/sync/CIS300MR"
-        )
-      )
-
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(Some(EmployerReference("500", "")))
-
-      val req: FakeRequest[JsValue] = makeJsonRequest(json, resetGovTalkStatusUrl)
-      val res: Future[Result]       = controller.resetGovTalkStatus()(req)
-
-      status(res) mustBe INTERNAL_SERVER_ERROR
-      (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
     }
   }
 

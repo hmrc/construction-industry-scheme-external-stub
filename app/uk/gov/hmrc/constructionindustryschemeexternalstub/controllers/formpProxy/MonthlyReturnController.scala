@@ -108,6 +108,20 @@ class MonthlyReturnController @Inject() (
       Future.successful(Created)
     }
 
+  def updateNilMonthlyReturn: Action[CreateNilMonthlyReturnRequest] =
+    authorise(parse.json[CreateNilMonthlyReturnRequest]) { implicit request =>
+      val enrolments = enrolmentHelper.contractorEnrolmentsOpt(request)
+      enrolments match {
+        case Some(enrolmentReference) =>
+          (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {
+            case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
+            case ("502", _) => BadGateway(Json.obj("message" -> "formp failed"))
+            case _          => NoContent
+          }
+        case None                     => InternalServerError
+      }
+    }
+
   def getSchemeEmail: Action[InstanceIdRequest] =
     authorise(parse.json[InstanceIdRequest]) { implicit request =>
       val enrolments = enrolmentHelper.contractorEnrolmentsOpt(request)

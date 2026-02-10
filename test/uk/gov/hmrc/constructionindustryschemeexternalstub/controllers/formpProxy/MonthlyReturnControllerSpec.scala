@@ -129,7 +129,7 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
         .thenReturn(Json.toJson(response).toString)
 
       val req: FakeRequest[CreateNilMonthlyReturnRequest] =
-        FakeRequest(POST, "/formp-proxy/monthly-return/nil/create").withBody(request)
+        FakeRequest(POST, "/formp-proxy/cis/monthly-return/nil/create").withBody(request)
 
       val res: Future[Result] = controller.createNilMonthlyReturn(req)
 
@@ -152,7 +152,7 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
         .thenReturn(Some(EmployerReference("502", "")))
 
       val req: FakeRequest[CreateNilMonthlyReturnRequest] =
-        FakeRequest(POST, "/formp-proxy/monthly-return/nil/create").withBody(request)
+        FakeRequest(POST, "/formp-proxy/cis/monthly-return/nil/create").withBody(request)
 
       val res: Future[Result] = controller.createNilMonthlyReturn(req)
 
@@ -173,6 +173,50 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
       (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
     }
 
+  }
+
+  ".updateNilMonthlyReturn" - {
+
+    "returns 204 when service succeeds for an unknown taxOfficeNumber / taxOfficeReference" in new Setup {
+      val request: CreateNilMonthlyReturnRequest = CreateNilMonthlyReturnRequest(
+        instanceId = "abc-123",
+        taxYear = 2025,
+        taxMonth = 2,
+        decInformationCorrect = "Y",
+        decNilReturnNoPayments = "Y"
+      )
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("200", "")))
+
+      val req: FakeRequest[CreateNilMonthlyReturnRequest] =
+        FakeRequest(POST, "/formp-proxy/cis/monthly-return/nil/update").withBody(request)
+
+      val res: Future[Result] = controller.updateNilMonthlyReturn(req)
+
+      status(res) mustBe NO_CONTENT
+    }
+
+    "propagates UpstreamErrorResponse for taxOfficeNumber = 502" in new Setup {
+      val request: CreateNilMonthlyReturnRequest = CreateNilMonthlyReturnRequest(
+        instanceId = "abc-123",
+        taxYear = 2025,
+        taxMonth = 2,
+        decInformationCorrect = "Y",
+        decNilReturnNoPayments = "Y"
+      )
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("502", "")))
+
+      val req: FakeRequest[CreateNilMonthlyReturnRequest] =
+        FakeRequest(POST, "/formp-proxy/cis/monthly-return/nil/update").withBody(request)
+
+      val res: Future[Result] = controller.updateNilMonthlyReturn(req)
+
+      status(res) mustBe BAD_GATEWAY
+      (contentAsJson(res) \ "message").as[String] must include("formp failed")
+    }
   }
 
   ".getSchemeEmail" - {

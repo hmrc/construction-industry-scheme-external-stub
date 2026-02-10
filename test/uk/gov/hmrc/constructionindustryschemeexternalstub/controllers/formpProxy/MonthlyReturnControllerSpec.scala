@@ -298,8 +298,8 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
         .thenReturn(Some(EmployerReference("200", "")))
 
-      val req = FakeRequest(POST, "/formp-proxy/monthly-return/update")
-        .withBody(requestBody) // ← same pattern as updateNilMonthlyReturn
+      val req = FakeRequest(POST, "/cis/monthly-return/update")
+        .withBody(requestBody)
 
       val res = controller.updateMonthlyReturnItem()(req)
 
@@ -324,7 +324,7 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
         .thenReturn(Some(EmployerReference("502", "")))
 
-      val req = FakeRequest(POST, "/formp-proxy/monthly-return/update")
+      val req = FakeRequest(POST, "/cis/monthly-return/update")
         .withBody(body)
 
       val res = controller.updateMonthlyReturnItem()(req)
@@ -351,7 +351,7 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
         .thenReturn(Some(EmployerReference("500", "")))
 
-      val req = FakeRequest(POST, "/formp-proxy/monthly-return/update")
+      val req = FakeRequest(POST, "/cis/monthly-return/update")
         .withBody(body)
 
       val res = controller.updateMonthlyReturnItem()(req)
@@ -377,7 +377,7 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
         .thenReturn(None)
 
-      val req = FakeRequest(POST, "/formp-proxy/monthly-return/update")
+      val req = FakeRequest(POST, "/cis/monthly-return/update")
         .withBody(body)
 
       val res = controller.updateMonthlyReturnItem()(req)

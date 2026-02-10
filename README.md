@@ -1171,6 +1171,12 @@ or
 - Identifier Name: TaxOfficeReference
 - Identifier Value: Any valid value
 
+or 
+
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: Any valid value
 
 To trigger the happy path, ensure you provide a valid request body:
 ```json

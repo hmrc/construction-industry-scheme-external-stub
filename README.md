@@ -1185,6 +1185,90 @@ or
 }
 ```
 
+**Endpoint**: `/cis/govtalkstatus/get`
+
+**Description**: Get GovTalk Status Record.
+
+#### Happy Path
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: Any valid value
+- Identifier Name: TaxOfficeReference
+- Identifier Value: Any valid value
+
+or 
+
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: Any valid value
+
+To trigger the happy path, ensure you provide a valid request body:
+```json
+{
+  "userIdentifier": "123",
+  "formResultID": "YE2025"
+}
+```
+- Enrolments: request must have either HMRC-CIS-ORG or IR-PAYE-AGENT Enrolment
+
+- Response status: `200`
+- Response body:
+```json
+{
+  "govtalk_status": [
+    {
+      "userIdentifier": "1",
+      "formResultID": "12890",
+      "correlationID": "C742D5DEE7EB4D15B4F7EFD50B890525",
+      "formLock": "false",
+      "createDate": "2026-02-03T00:00:00",
+      "endStateDate": null,
+      "lastMessageDate": "2026-02-03T00:00:00",
+      "numPolls": 0,
+      "pollInterval": 0,
+      "protocolStatus": "dataRequest",
+      "gatewayURL": "http://localhost:9712/submission/ChRIS/CISR/Filing/sync/CIS300MR"
+    }
+  ]
+}
+```
+
+#### Happy Path (No data found)
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 404
+- Identifier Name: TaxOfficeReference
+- Identifier Value: Any valid value
+
+or
+
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: 404
+
+To trigger the happy path, ensure you provide a valid request body:
+```json
+{
+  "userIdentifier": "123",
+  "formResultID": "YE2025"
+}
+```
+- Enrolments: request must have either HMRC-CIS-ORG or IR-PAYE-AGENT Enrolment
+
+- Response status: `200`
+- Response body:
+```json
+{
+  "govtalk_status": []
+}
+```
+
 **Endpoint**: `POST /scheme`
 
 **Description**: Create a new Scheme.

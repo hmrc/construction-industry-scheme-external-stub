@@ -1248,6 +1248,13 @@ To trigger the happy path, ensure you provide a valid request body:
 
 #### Happy Path
 
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: Any valid value
+
+or
+
 - Affinity Group: Organisation
 - Enrolment Key: HMRC-CIS-ORG
 - Identifier Name: TaxOfficeNumber

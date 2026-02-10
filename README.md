@@ -1218,6 +1218,12 @@ To trigger the happy path, ensure you provide a valid request body:
 - Identifier Name: TaxOfficeReference
 - Identifier Value: Any valid value
 
+or
+
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: 404
 
 To trigger the happy path, ensure you provide a valid request body:
 ```json

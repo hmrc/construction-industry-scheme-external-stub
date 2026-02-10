@@ -56,8 +56,9 @@ class GovTalkController @Inject() (
                 }
               case None                     =>
                 enrolmentHelper.agentEnrolmentsOpt(request) match {
-                  case Some(_) => Ok(resourceHelper.resourceAsString(getGovTalkStatus_200_ResponsePath))
-                  case None    => InternalServerError
+                  case Some("404") => Ok(resourceHelper.resourceAsString(getGovTalkStatus_200_EmptyResponsePath))
+                  case Some(_)     => Ok(resourceHelper.resourceAsString(getGovTalkStatus_200_ResponsePath))
+                  case None        => InternalServerError
                 }
             }
         )

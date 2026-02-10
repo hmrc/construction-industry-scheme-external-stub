@@ -17,14 +17,17 @@
 package uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy
 
 import play.api.Logging
-import play.api.libs.json.{JsError, JsObject, JsValue, Json}
+import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{ApplyPrepopulationRequest, AuthenticatedRequest, UpdateSchemeVersionRequest}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{ApplyPrepopulationRequest, UpdateSchemeVersionRequest}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{CreateContractorSchemeParams, EmployerReference, UpdateContractorSchemeParams}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.JsResultUtils.foldErrorsIntoBadRequest
+
 import javax.inject.Inject
+import scala.concurrent.Future
 
 class ContractorSchemeController @Inject() (
   authorise: AuthAction,
@@ -34,16 +37,17 @@ class ContractorSchemeController @Inject() (
 ) extends BackendController(cc)
     with Logging {
 
-  private val basePath                                  = "/resources/contractorSchemes"
-  private val getScheme_200_no_sub_ResponsePath         = s"$basePath/getScheme-200-no-sub-response.json"
-  private val getScheme_sub1_ResponsePath               = s"$basePath/getScheme-200-sub1-response.json"
-  private val getScheme_sub1_rest_no_ResponsePath       = s"$basePath/getScheme-200-sub1-rest-no-response.json"
-  private val getScheme_nameOnly_ResponsePath           = s"$basePath/getScheme-200-name-only-response.json"
-  private val getScheme_utrOnly_ResponsePath            = s"$basePath/getScheme-200-utr-only-response.json"
-  private val getScheme_prepop_no_Only_ResponsePath     = s"$basePath/getScheme-200-flag-no-only-response.json"
-  private val getScheme_firstTime_ResponsePath          = s"$basePath/getScheme-200-first-time-response.json"
-  private val createScheme_201_ResponsePath             = s"$basePath/createScheme-201-response.json"
-  private val updateScheme_200_ResponsePath             = s"$basePath/updateScheme-200-response.json"
+  private val basePath                              = "/resources/contractorSchemes"
+  private val getScheme_200_no_sub_ResponsePath     = s"$basePath/getScheme-200-no-sub-response.json"
+  private val getScheme_sub1_ResponsePath           = s"$basePath/getScheme-200-sub1-response.json"
+  private val getScheme_sub1_rest_no_ResponsePath   = s"$basePath/getScheme-200-sub1-rest-no-response.json"
+  private val getScheme_nameOnly_ResponsePath       = s"$basePath/getScheme-200-name-only-response.json"
+  private val getScheme_utrOnly_ResponsePath        = s"$basePath/getScheme-200-utr-only-response.json"
+  private val getScheme_prepop_no_Only_ResponsePath = s"$basePath/getScheme-200-flag-no-only-response.json"
+  private val getScheme_firstTime_ResponsePath      = s"$basePath/getScheme-200-first-time-response.json"
+  private val createScheme_201_ResponsePath         = s"$basePath/createScheme-201-response.json"
+  private val updateScheme_200_ResponsePath         = s"$basePath/updateScheme-200-response.json"
+
   def getScheme(instanceId: String): Action[AnyContent] =
     authorise { implicit request =>
       val contractorRefOpt: Option[EmployerReference] = enrolmentHelper.contractorEnrolmentsOpt(request)
@@ -67,95 +71,48 @@ class ContractorSchemeController @Inject() (
     }
 
   def createScheme: Action[JsValue] =
-    authorise(parse.json) { implicit request =>
+    authorise.async(parse.json) { implicit request =>
       request.body
         .validate[CreateContractorSchemeParams]
-        .fold(
-          errs =>
-            BadRequest(
-              Json.obj(
-                "message" -> "Invalid JSON body",
-                "errors"  -> JsError.toJson(errs)
-              )
-            ),
-          _ =>
-            if (hasAnyEnrolments) {
-              Created(resourceHelper.resourceAsString(createScheme_201_ResponsePath))
-            } else {
-              logger.warn("[ContractorSchemeController][createScheme] Missing contractor enrolments")
-              InternalServerError(Json.obj("message" -> "Missing enrolments"))
-            }
-        )
+        .foldErrorsIntoBadRequest { _ =>
+          Future.successful(
+            Created(resourceHelper.resourceAsString(createScheme_201_ResponsePath))
+          )
+        }
     }
 
   def updateScheme: Action[JsValue] =
-    authorise(parse.json) { implicit request =>
+    authorise.async(parse.json) { implicit request =>
       request.body
         .validate[UpdateContractorSchemeParams]
-        .fold(
-          errs =>
-            BadRequest(
-              Json.obj(
-                "message" -> "Invalid JSON body",
-                "errors"  -> JsError.toJson(errs)
-              )
-            ),
-          _ =>
-            if (hasAnyEnrolments) {
-              Ok(resourceHelper.resourceAsString(updateScheme_200_ResponsePath))
-            } else {
-              logger.warn("[ContractorSchemeController][updateScheme] Missing contractor enrolments")
-              InternalServerError(Json.obj("message" -> "Missing enrolments"))
-            }
-        )
+        .foldErrorsIntoBadRequest { _ =>
+          Future.successful(
+            Ok(resourceHelper.resourceAsString(updateScheme_200_ResponsePath))
+          )
+        }
     }
 
   def updateSchemeVersion: Action[JsValue] =
-    authorise(parse.json) { implicit request =>
+    authorise.async(parse.json) { implicit request =>
       request.body
         .validate[UpdateSchemeVersionRequest]
-        .fold(
-          errs =>
-            BadRequest(
-              Json.obj(
-                "message" -> "Invalid JSON body",
-                "errors"  -> JsError.toJson(errs)
-              )
-            ),
-          req =>
-            if (hasAnyEnrolments) {
-              Ok(Json.obj("version" -> (req.version + 1)))
-            } else {
-              logger.warn("[ContractorSchemeController][updateSchemeVersion] Missing enrolments")
-              InternalServerError(Json.obj("message" -> "Missing enrolments"))
-            }
-        )
+        .foldErrorsIntoBadRequest { payload =>
+          Future.successful(
+            Ok(Json.obj("version" -> (payload.version + 1)))
+          )
+        }
     }
 
   def applyPrepopulation: Action[JsValue] =
-    authorise(parse.json) { implicit request =>
-      if (!hasAnyEnrolments) {
-        logger.warn("[ContractorSchemeController][applyPrepopulation] Missing enrolments")
-        InternalServerError(Json.obj("message" -> "Missing enrolments"))
-      } else {
-        request.body
-          .validate[ApplyPrepopulationRequest]
-          .fold(
-            errs =>
-              BadRequest(
-                Json.obj(
-                  "message" -> "Invalid JSON body",
-                  "errors"  -> JsError.toJson(errs)
-                )
-              ),
-            req => Ok(Json.obj("version" -> (req.version + 1)))
+    authorise.async(parse.json) { implicit request =>
+      request.body
+        .validate[ApplyPrepopulationRequest]
+        .foldErrorsIntoBadRequest { payload =>
+          Future.successful(
+            Ok(Json.obj("version" -> (payload.version + 1)))
           )
-      }
+        }
     }
-
-  private def hasAnyEnrolments(implicit request: AuthenticatedRequest[_]): Boolean =
-    enrolmentHelper.contractorEnrolmentsOpt(request).isDefined ||
-      enrolmentHelper.agentEnrolmentsOpt(request).isDefined
 
   private def contractorSchemeResult(
     taxOfficeNumber: String,

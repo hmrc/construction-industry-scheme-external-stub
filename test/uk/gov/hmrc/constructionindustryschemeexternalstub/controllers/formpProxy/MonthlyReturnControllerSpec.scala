@@ -297,7 +297,7 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
           version = 1
         )
 
-      val req = FakeRequest(POST, "/formp-proxy/monthly-return/item/update")
+      val req = FakeRequest(POST, "/cis/monthly-return-item/update")
         .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
         .withBody(Json.toJson(validRequest))
 
@@ -313,7 +313,7 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
         "instanceId" -> "abc-123"
       )
 
-      val req = FakeRequest(POST, "/formp-proxy/monthly-return/item/update")
+      val req = FakeRequest(POST, "/cis/monthly-return-item/update")
         .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
         .withBody(invalidBody)
 

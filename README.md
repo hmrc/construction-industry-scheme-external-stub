@@ -1289,7 +1289,6 @@ or
 - Identifier Name: TaxOfficeReference
 - Identifier Value: Any valid value
 
-
 To trigger the happy path, ensure you provide a valid request body:
 ```json
 {
@@ -1309,6 +1308,13 @@ To trigger the happy path, ensure you provide a valid request body:
 
 #### Happy Path
 
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: Any valid value
+
+or
+
 - Affinity Group: Organisation
 - Enrolment Key: HMRC-CIS-ORG
 - Identifier Name: TaxOfficeNumber
@@ -1316,20 +1322,12 @@ To trigger the happy path, ensure you provide a valid request body:
 - Identifier Name: TaxOfficeReference
 - Identifier Value: Any valid value
 
-
 To trigger the happy path, ensure you provide a valid request body:
 ```json
 {
   "userIdentifier": "1",
   "formResultID": "12890",
   "correlationID": "128903445",
-  "formLock": "N",
-  "createDate": "2026-04-06T00:00:00",
-  "endStateDate": "2026-04-06T00:00:00",
-  "lastMessageDate": "2026-04-06T00:00:00",
-  "numPolls": 0,
-  "pollInterval": 0,
-  "protocolStatus": "dataRequest",
   "gatewayURL": "http://vat.chris.hmrc.gov.uk:9102/ChRIS/UKVAT/Filing/action/VATDEC"
 }
 ```

@@ -20,8 +20,6 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.Json
 
-import java.time.LocalDateTime
-
 class CreateGovTalkStatusRecordRequestSpec extends AnyWordSpec with Matchers {
 
   "CreateGovTalkStatusRecordRequest (JSON)" should {
@@ -32,11 +30,6 @@ class CreateGovTalkStatusRecordRequestSpec extends AnyWordSpec with Matchers {
           |  "userIdentifier": "1",
           |  "formResultID": "12890",
           |  "correlationID": "128903445",
-          |  "formLock": "N",
-          |  "lastMessageDate": "2019-01-01T00:00:00",
-          |  "numPolls": 0,
-          |  "pollInterval": 0,
-          |  "protocolStatus": "dataRequest",
           |  "gatewayURL": "http://vat.chris.hmrc.gov.uk:9102/ChRIS/UKVAT/Filing/action/VATDEC"
           |}
         """.stripMargin)
@@ -45,13 +38,6 @@ class CreateGovTalkStatusRecordRequestSpec extends AnyWordSpec with Matchers {
       model.userIdentifier mustBe "1"
       model.formResultID mustBe "12890"
       model.correlationID mustBe "128903445"
-      model.formLock mustBe "N"
-      model.createDate mustBe None
-      model.endStateDate mustBe None
-      model.lastMessageDate mustBe LocalDateTime.parse("2019-01-01T00:00:00")
-      model.numPolls mustBe 0
-      model.pollInterval mustBe 0
-      model.protocolStatus mustBe "dataRequest"
       model.gatewayURL mustBe "http://vat.chris.hmrc.gov.uk:9102/ChRIS/UKVAT/Filing/action/VATDEC"
       Json.toJson(model) mustBe json
     }
@@ -61,11 +47,6 @@ class CreateGovTalkStatusRecordRequestSpec extends AnyWordSpec with Matchers {
                               |{
                               |  "formResultID": "12890",
                               |  "correlationID": "128903445",
-                              |  "formLock": "N",
-                              |  "lastMessageDate": "2019-01-01T00:00:00",
-                              |  "numPolls": 0,
-                              |  "pollInterval": 0,
-                              |  "protocolStatus": "dataRequest",
                               |  "gatewayURL": "http://vat.chris.hmrc.gov.uk:9102/ChRIS/UKVAT/Filing/action/VATDEC"
                               |}
         """.stripMargin)
@@ -79,11 +60,6 @@ class CreateGovTalkStatusRecordRequestSpec extends AnyWordSpec with Matchers {
                               |{
                               |  "userIdentifier": "1",
                               |  "correlationID": "128903445",
-                              |  "formLock": "N",
-                              |  "lastMessageDate": "2019-01-01T00:00:00",
-                              |  "numPolls": 0,
-                              |  "pollInterval": 0,
-                              |  "protocolStatus": "dataRequest",
                               |  "gatewayURL": "http://vat.chris.hmrc.gov.uk:9102/ChRIS/UKVAT/Filing/action/VATDEC"
                               |}
         """.stripMargin)
@@ -97,106 +73,11 @@ class CreateGovTalkStatusRecordRequestSpec extends AnyWordSpec with Matchers {
                               |{
                               |  "userIdentifier": "1",
                               |  "formResultID": "12890",
-                              |  "formLock": "N",
-                              |  "lastMessageDate": "2019-01-01T00:00:00",
-                              |  "numPolls": 0,
-                              |  "pollInterval": 0,
-                              |  "protocolStatus": "dataRequest",
                               |  "gatewayURL": "http://vat.chris.hmrc.gov.uk:9102/ChRIS/UKVAT/Filing/action/VATDEC"
                               |}
         """.stripMargin)
 
       val result = json.validate[CreateGovTalkStatusRecordRequest]
-      result.isError mustBe true
-    }
-
-    "fail to read missing formLock" in {
-      val json = Json.parse("""
-                              |{
-                              |  "userIdentifier": "1",
-                              |  "formResultID": "12890",
-                              |  "correlationID": "128903445",
-                              |  "lastMessageDate": "2019-01-01T00:00:00",
-                              |  "numPolls": 0,
-                              |  "pollInterval": 0,
-                              |  "protocolStatus": "dataRequest",
-                              |  "gatewayURL": "http://vat.chris.hmrc.gov.uk:9102/ChRIS/UKVAT/Filing/action/VATDEC"
-                              |}
-        """.stripMargin)
-
-      val result = json.validate[CreateGovTalkStatusRecordRequest]
-      result.isError mustBe true
-    }
-
-    "fail to read missing lastMessageDate" in {
-      val json = Json.parse("""
-                              |{
-                              |  "userIdentifier": "1",
-                              |  "formResultID": "12890",
-                              |  "correlationID": "128903445",
-                              |  "formLock": "N",
-                              |  "numPolls": 0,
-                              |  "pollInterval": 0,
-                              |  "protocolStatus": "dataRequest",
-                              |  "gatewayURL": "http://vat.chris.hmrc.gov.uk:9102/ChRIS/UKVAT/Filing/action/VATDEC"
-                              |}
-        """.stripMargin)
-
-      val result = json.validate[CreateGovTalkStatusRecordRequest]
-      result.isError mustBe true
-    }
-
-    "fail to read missing numPolls" in {
-      val json = Json.parse("""
-                              |{
-                              |  "userIdentifier": "1",
-                              |  "formResultID": "12890",
-                              |  "correlationID": "128903445",
-                              |  "formLock": "N",
-                              |  "lastMessageDate": "2019-01-01T00:00:00",
-                              |  "pollInterval": 0,
-                              |  "protocolStatus": "dataRequest",
-                              |  "gatewayURL": "http://vat.chris.hmrc.gov.uk:9102/ChRIS/UKVAT/Filing/action/VATDEC"
-                              |}
-        """.stripMargin)
-
-      val result = json.validate[CreateGovTalkStatusRecordRequest]
-      result.isError mustBe true
-    }
-
-    "fail to read missing pollInterval" in {
-      val json = Json.parse("""
-                              |{
-                              |  "userIdentifier": "1",
-                              |  "formResultID": "12890",
-                              |  "correlationID": "128903445",
-                              |  "formLock": "N",
-                              |  "lastMessageDate": "2019-01-01T00:00:00",
-                              |  "numPolls": 0,
-                              |  "protocolStatus": "dataRequest",
-                              |  "gatewayURL": "http://vat.chris.hmrc.gov.uk:9102/ChRIS/UKVAT/Filing/action/VATDEC"
-                              |}
-        """.stripMargin)
-
-      val result = json.validate[CreateGovTalkStatusRecordRequest]
-      result.isError mustBe true
-    }
-
-    "fail to read missing protocolStatus" in {
-      val json = Json.parse("""
-                              |{
-                              |  "userIdentifier": "1",
-                              |  "formResultID": "12890",
-                              |  "correlationID": "128903445",
-                              |  "formLock": "N",
-                              |  "lastMessageDate": "2019-01-01T00:00:00",
-                              |  "numPolls": 0,
-                              |  "pollInterval": 0,
-                              |  "gatewayURL": "http://vat.chris.hmrc.gov.uk:9102/ChRIS/UKVAT/Filing/action/VATDEC"
-                              |}
-        """.stripMargin)
-
-      val result = json.validate[ResetGovTalkStatusRequest]
       result.isError mustBe true
     }
 
@@ -205,12 +86,7 @@ class CreateGovTalkStatusRecordRequestSpec extends AnyWordSpec with Matchers {
                               |{
                               |  "userIdentifier": "1",
                               |  "formResultID": "12890",
-                              |  "correlationID": "128903445",
-                              |  "formLock": "N",
-                              |  "lastMessageDate": "2019-01-01T00:00:00",
-                              |  "numPolls": 0,
-                              |  "pollInterval": 0,
-                              |  "protocolStatus": "dataRequest"
+                              |  "correlationID": "128903445"
                               |}
         """.stripMargin)
 

@@ -490,7 +490,7 @@ To trigger the happy path, ensure you provide a valid request body:
 }
 ```
 
-**Endpoint**: `POST /monthly-return/nil/create`
+**Endpoint**: `POST /cis/monthly-return/nil/create`
 
 **Description**: Creates a monthly return record in the monthly return table.
 
@@ -814,6 +814,33 @@ To trigger the happy path, ensure you provide a valid request body:
 - Response status: `201`
 - Response body: empty body
 ```
+
+**Endpoint**: `POST /cis/monthly-return/nil/update`
+
+**Description**: Updates an existing nil monthly return record.
+
+#### Happy Path
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 200
+- Identifier Name: TaxOfficeReference
+- Identifier Value: AB123456
+
+To trigger the happy path, ensure you provide a valid request body (same shape as create):
+```json
+{
+  "instanceId":  "1",
+  "taxYear": 2025,
+  "taxMonth": 11,
+  "decInformationCorrect": "true",
+  "decNilReturnNoPayments": "true"
+}
+```
+- Response status: `204`
+- Response body: _empty_
+
 
 **Endpoint**: `POST /scheme/email`
 

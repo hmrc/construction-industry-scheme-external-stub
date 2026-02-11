@@ -29,7 +29,6 @@ import uk.gov.hmrc.constructionindustryschemeexternalstub.models.EmployerReferen
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateGovTalkStatusRecordRequest, GetGovTalkStatusRequest, ResetGovTalkStatusRequest}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 
-import java.time.LocalDateTime
 import scala.concurrent.Future
 
 class GovTalkControllerSpec extends SpecBase {
@@ -262,15 +261,7 @@ class GovTalkControllerSpec extends SpecBase {
         ResetGovTalkStatusRequest(
           userIdentifier = "1",
           formResultID = "12890",
-          correlationID = "C742D5DEE7EB4D15B4F7EFD50B890525",
-          formLock = "N",
-          createDate = Some(LocalDateTime.parse("2025-02-05T00:00:00")),
-          endStateDate = None,
-          lastMessageDate = LocalDateTime.parse("2025-02-05T00:00:00"),
-          numPolls = 0,
-          pollInterval = 0,
           oldProtocolStatus = "dataRequest",
-          newProtocolStatus = "dataPoll",
           gatewayURL = "http://localhost:9712/submission/ChRIS/CISR/Filing/sync/CIS300MR"
         )
       )
@@ -394,8 +385,8 @@ class GovTalkControllerSpec extends SpecBase {
     val mockResourceHelper: ResourceHelper     = mock[ResourceHelper]
     val mockEnrolmentsHelper: EnrolmentsHelper = mock[EnrolmentsHelper]
 
-    val auth: FakeAuthAction = new FakeAuthAction(cc.parsers)
-    lazy val controller      = new GovTalkController(auth, mockResourceHelper, mockEnrolmentsHelper, cc)
+    private val auth: FakeAuthAction = new FakeAuthAction(cc.parsers)
+    lazy val controller              = new GovTalkController(auth, mockResourceHelper, mockEnrolmentsHelper, cc)
 
     def makeJsonRequest(body: JsValue, url: String): FakeRequest[JsValue] =
       FakeRequest(POST, url)

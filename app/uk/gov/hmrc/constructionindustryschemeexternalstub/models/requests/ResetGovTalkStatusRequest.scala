@@ -18,20 +18,10 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests
 
 import play.api.libs.json.{Json, OFormat}
 
-import java.time.LocalDateTime
-
 case class ResetGovTalkStatusRequest(
   userIdentifier: String,
   formResultID: String,
-  correlationID: String,
-  formLock: String,
-  createDate: Option[LocalDateTime],
-  endStateDate: Option[LocalDateTime],
-  lastMessageDate: LocalDateTime,
-  numPolls: Int,
-  pollInterval: Int,
   oldProtocolStatus: String,
-  newProtocolStatus: String,
   gatewayURL: String
 )
 

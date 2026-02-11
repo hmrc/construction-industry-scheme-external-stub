@@ -1295,15 +1295,7 @@ To trigger the happy path, ensure you provide a valid request body:
 {
   "userIdentifier": "1",
   "formResultID": "12890",
-  "correlationID": "128903445",
-  "formLock": "N",
-  "createDate": "2019-01-01T00:00:00",
-  "endStateDate": "2027-01-01T00:00:00",
-  "lastMessageDate": "2026-01-01T00:00:00",
-  "numPolls": 0,
-  "pollInterval": 0,
   "oldProtocolStatus": "dataRequest",
-  "newProtocolStatus": "dataRequest",
   "gatewayURL": "http://vat.chris.hmrc.gov.uk:9102/ChRIS/UKVAT/Filing/action/VATDEC"
 }
 ```

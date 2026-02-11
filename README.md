@@ -1413,7 +1413,7 @@ or
 ```
 
 
-**Endpoint**: `POST /cis/monthly-return/update`
+**Endpoint**: `POST /cis/monthly-return-item/update `
 
 **Description**: Updates the monthly return.
 

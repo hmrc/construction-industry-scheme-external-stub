@@ -18,7 +18,7 @@ POST       /cis/subcontractor/create                                uk.gov.hmrc.
 POST       /cis/subcontractor/update                                uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubcontractorController.updateSubcontractor()
 GET        /cis/subcontractors/:cisId                               uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubcontractorController.getSubcontractorList(cisId: String)
 
-POST       /cis/monthly-return/update                              uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.updateMonthlyReturnItem()
+POST       /cis/monthly-return-item/update                              uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.updateMonthlyReturnItem()
 
 
 

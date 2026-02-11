@@ -117,7 +117,11 @@ class UpdateMonthlyReturnItemRequestFormatSpec extends AnyWordSpec with Matchers
       val result = wrongTypeJson.validate[UpdateMonthlyReturnItemRequest]
       result.isError mustBe true
 
-      val paths = result.asEither.left.get.map(_._1.toString())
+      val paths = result.fold(
+        invalid = errs => errs.map(_._1.toString),
+        valid = _ => Seq.empty
+      )
+
       paths must contain("/taxYear")
     }
 

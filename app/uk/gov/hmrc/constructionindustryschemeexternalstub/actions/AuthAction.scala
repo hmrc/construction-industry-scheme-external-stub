@@ -22,6 +22,7 @@ import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisationException, AuthorisedFunctions}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.AuthenticatedRequest
+import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.EnrolmentsHelper
 import uk.gov.hmrc.http.{HeaderCarrier, UnauthorizedException}
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
@@ -30,7 +31,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class DefaultAuthAction @Inject() (
   override val authConnector: AuthConnector,
-  val parser: BodyParsers.Default
+  val parser: BodyParsers.Default,
+  enrolmentsHelper: EnrolmentsHelper
 )(implicit val executionContext: ExecutionContext)
     extends AuthAction
     with AuthorisedFunctions
@@ -45,8 +47,12 @@ class DefaultAuthAction @Inject() (
     authorised()
       .retrieve(Retrievals.internalId and Retrievals.credentials and Retrievals.allEnrolments) {
         case Some(internalId) ~ Some(credentials) ~ enrolments =>
-          block(AuthenticatedRequest(request, internalId, credentials.providerId, sessionId, enrolments))
-        case _                                                 =>
+          val authRequest = AuthenticatedRequest(request, internalId, credentials.providerId, sessionId, enrolments)
+
+          if (hasAnyCisEnrolment(authRequest)) block(authRequest)
+          else Future.successful(Results.Forbidden)
+
+        case _ =>
           throw new UnauthorizedException("Unable to retrieve credential or internal Id")
       }
       .recover { case ae: AuthorisationException =>
@@ -54,6 +60,11 @@ class DefaultAuthAction @Inject() (
         Results.Unauthorized
       }
   }
+
+  private def hasAnyCisEnrolment(request: AuthenticatedRequest[_]): Boolean =
+    enrolmentsHelper.contractorEnrolmentsOpt(request).isDefined || enrolmentsHelper
+      .agentEnrolmentsOpt(request)
+      .isDefined
 }
 
 trait AuthAction

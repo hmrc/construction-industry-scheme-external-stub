@@ -317,6 +317,48 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
     }
   }
 
+  "MonthlyReturnController syncMonthlyReturnItems" - {
+
+    "returns 204 when JSON body is valid" in new Setup {
+
+      val body = Json.obj(
+        "instanceId"               -> "abc-123",
+        "taxYear"                  -> 2025,
+        "taxMonth"                 -> 1,
+        "amendment"                -> "N",
+        "createResourceReferences" -> Json.arr(5, 6),
+        "deleteResourceReferences" -> Json.arr(1, 2)
+      )
+
+      val req: FakeRequest[JsValue] =
+        FakeRequest(POST, "/cis/monthly-return-item/sync")
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(body)
+
+      val res: Future[Result] = controller.syncMonthlyReturnItems(req)
+
+      status(res) mustBe NO_CONTENT
+      contentAsString(res) mustBe ""
+    }
+
+    "returns 400 when JSON body is invalid" in new Setup {
+
+      val body = Json.obj(
+        "instanceId" -> "abc-123"
+      )
+
+      val req: FakeRequest[JsValue] =
+        FakeRequest(POST, "/cis/monthly-return-item/sync")
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(body)
+
+      val res: Future[Result] = controller.syncMonthlyReturnItems(req)
+
+      status(res) mustBe BAD_REQUEST
+      (contentAsJson(res) \ "message").as[String] mustBe "Invalid JSON body"
+    }
+  }
+
   private trait Setup {
     implicit val ec: ExecutionContext    = scala.concurrent.ExecutionContext.global
     private val cc: ControllerComponents = stubControllerComponents()

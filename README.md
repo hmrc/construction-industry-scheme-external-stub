@@ -618,6 +618,117 @@ To trigger the happy path, ensure you provide a valid request body similar to ex
       "updatedTaxTreatment": "TEST",
       "lastMonthlyReturnDate": "2025-05-05T00:00:00",
       "pendingVerifications": 0
+    },
+    {
+      "subcontractorId": 13378,
+      "utr": "1234567890",
+      "pageVisited": 0,
+      "partnerUtr": "1234567891",
+      "crn": "10000001",
+      "firstName": "First",
+      "nino": "AB623456C",
+      "secondName": "Second",
+      "surname": "Surname",
+      "partnershipTradingName": "Test Ptr 2",
+      "tradingName": "Test Tr 2",
+      "subcontractorType": "company",
+      "addressLine1": "one",
+      "addressLine2": "two ",
+      "addressLine3": "three",
+      "addressLine4": "four",
+      "country": "UK",
+      "postCode": "B1 2CD",
+      "emailAddress": "test@test.com",
+      "phoneNumber": "07123456789",
+      "mobilePhoneNumber": "7123456789",
+      "worksReferenceNumber": "123",
+      "createDate": "2026-01-05T10:23:56",
+      "lastUpdate": "2026-01-05T10:23:56",
+      "subbieResourceRef": 2,
+      "matched": "Y",
+      "autoVerified": "Y",
+      "verified": "Y",
+      "verificationNumber": "V1000000001",
+      "taxTreatment": "net",
+      "verificationDate": "2025-05-05T00:00:00",
+      "version": 0,
+      "updatedTaxTreatment": "TEST",
+      "lastMonthlyReturnDate": "2025-05-05T00:00:00",
+      "pendingVerifications": 0
+    },
+    {
+      "subcontractorId": 13379,
+      "utr": "1234567890",
+      "pageVisited": 0,
+      "partnerUtr": "1234567891",
+      "crn": "10000001",
+      "firstName": "First",
+      "nino": "AB623456C",
+      "secondName": "Second",
+      "surname": "Surname",
+      "partnershipTradingName": "Test Ptr 3",
+      "tradingName": "Test Tr 3",
+      "subcontractorType": "company",
+      "addressLine1": "one",
+      "addressLine2": "two ",
+      "addressLine3": "three",
+      "addressLine4": "four",
+      "country": "UK",
+      "postCode": "B1 2CD",
+      "emailAddress": "test@test.com",
+      "phoneNumber": "07123456789",
+      "mobilePhoneNumber": "7123456789",
+      "worksReferenceNumber": "123",
+      "createDate": "2026-01-05T10:23:56",
+      "lastUpdate": "2026-01-05T10:23:56",
+      "subbieResourceRef": 7,
+      "matched": "Y",
+      "autoVerified": "Y",
+      "verified": "Y",
+      "verificationNumber": "V1000000001",
+      "taxTreatment": "net",
+      "verificationDate": "2025-05-05T00:00:00",
+      "version": 0,
+      "updatedTaxTreatment": "TEST",
+      "lastMonthlyReturnDate": "2025-05-05T00:00:00",
+      "pendingVerifications": 0
+    },
+    {
+      "subcontractorId": 13380,
+      "utr": "1234567890",
+      "pageVisited": 0,
+      "partnerUtr": "1234567891",
+      "crn": "10000001",
+      "firstName": "First",
+      "nino": "AB623456C",
+      "secondName": "Second",
+      "surname": "Surname",
+      "partnershipTradingName": "Test Ptr 4",
+      "tradingName": "Test Tr 4",
+      "subcontractorType": "company",
+      "addressLine1": "one",
+      "addressLine2": "two ",
+      "addressLine3": "three",
+      "addressLine4": "four",
+      "country": "UK",
+      "postCode": "B1 2CD",
+      "emailAddress": "test@test.com",
+      "phoneNumber": "07123456789",
+      "mobilePhoneNumber": "7123456789",
+      "worksReferenceNumber": "123",
+      "createDate": "2026-01-05T10:23:56",
+      "lastUpdate": "2026-01-05T10:23:56",
+      "subbieResourceRef": 3,
+      "matched": "Y",
+      "autoVerified": "Y",
+      "verified": "Y",
+      "verificationNumber": "V1000000001",
+      "taxTreatment": "net",
+      "verificationDate": "2025-05-05T00:00:00",
+      "version": 0,
+      "updatedTaxTreatment": "TEST",
+      "lastMonthlyReturnDate": "2025-05-05T00:00:00",
+      "pendingVerifications": 0
     }
   ],
   "monthlyReturnItems": [
@@ -631,7 +742,31 @@ To trigger the happy path, ensure you provide a valid request body similar to ex
       "subcontractorId": 10903,
       "subcontractorName": "Alice, A",
       "verificationNumber": "V1000000001",
-      "itemResourceReference": 7
+      "itemResourceReference": 1
+    },
+    {
+      "monthlyReturnId": 30001,
+      "monthlyReturnItemId": 2,
+      "totalPayments": "2,000.00",
+      "costOfMaterials": "200.00",
+      "totalDeducted": "200.00",
+      "unmatchedTaxRateIndicator": "Y",
+      "subcontractorId": 10903,
+      "subcontractorName": "Alice, A",
+      "verificationNumber": "V1000000001",
+      "itemResourceReference": 2
+    },
+    {
+      "monthlyReturnId": 30001,
+      "monthlyReturnItemId": 3,
+      "totalPayments": "3,000.00",
+      "costOfMaterials": "300.00",
+      "totalDeducted": "300.00",
+      "unmatchedTaxRateIndicator": "Y",
+      "subcontractorId": 10903,
+      "subcontractorName": "Alice, A",
+      "verificationNumber": "V1000000001",
+      "itemResourceReference": 3
     }
   ],
   "submission": [
@@ -707,6 +842,33 @@ To trigger the happy path, ensure you provide a valid request body:
   "email": "test@test.com" 
 }
 ```
+
+**Endpoint**: `POST /monthly-return/nil/create`
+
+**Description**: Creates a monthly return record in the monthly return table.
+
+#### Happy Path
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 200
+- Identifier Name: TaxOfficeReference
+- Identifier Value: AB123456
+
+To trigger the happy path, ensure you provide a valid request body, below is an example of a valid request body:
+```json
+{
+  "instanceId":  1,
+  "taxYear": 2025,
+  "taxMonth": 11,
+  "amendment": "N",
+  "createResourceReferences": [1,2,3],
+  "deleteResourceReferences": [4,5,6]
+}
+```
+- Response status: `204`
+- Response body: empty body
 
 **Endpoint**: `POST /submissions/create`
 
@@ -1020,6 +1182,90 @@ or
   "verificationBatchCounter": 0,
   "lastUpdate": "2025-01-01T12:00:00Z",
   "version": 1
+}
+```
+
+**Endpoint**: `/cis/govtalkstatus/get`
+
+**Description**: Get GovTalk Status Record.
+
+#### Happy Path
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: Any valid value
+- Identifier Name: TaxOfficeReference
+- Identifier Value: Any valid value
+
+or 
+
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: Any valid value
+
+To trigger the happy path, ensure you provide a valid request body:
+```json
+{
+  "userIdentifier": "123",
+  "formResultID": "YE2025"
+}
+```
+- Enrolments: request must have either HMRC-CIS-ORG or IR-PAYE-AGENT Enrolment
+
+- Response status: `200`
+- Response body:
+```json
+{
+  "govtalk_status": [
+    {
+      "userIdentifier": "1",
+      "formResultID": "12890",
+      "correlationID": "C742D5DEE7EB4D15B4F7EFD50B890525",
+      "formLock": "false",
+      "createDate": "2026-02-03T00:00:00",
+      "endStateDate": null,
+      "lastMessageDate": "2026-02-03T00:00:00",
+      "numPolls": 0,
+      "pollInterval": 0,
+      "protocolStatus": "dataRequest",
+      "gatewayURL": "http://localhost:9712/submission/ChRIS/CISR/Filing/sync/CIS300MR"
+    }
+  ]
+}
+```
+
+#### Happy Path (No data found)
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 404
+- Identifier Name: TaxOfficeReference
+- Identifier Value: Any valid value
+
+or
+
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: 404
+
+To trigger the happy path, ensure you provide a valid request body:
+```json
+{
+  "userIdentifier": "123",
+  "formResultID": "YE2025"
+}
+```
+- Enrolments: request must have either HMRC-CIS-ORG or IR-PAYE-AGENT Enrolment
+
+- Response status: `200`
+- Response body:
+```json
+{
+  "govtalk_status": []
 }
 ```
 

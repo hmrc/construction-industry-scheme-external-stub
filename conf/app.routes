@@ -6,6 +6,7 @@ POST       /cis/retrieve-unsubmitted-monthly-returns                uk.gov.hmrc.
 POST       /monthly-return/nil/create                               uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.createNilMonthlyReturn
 POST       /cis/monthly-return-edit                                 uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.getMonthlyReturnForEdit
 POST       /cis/monthly-return/standard/create                      uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.createMonthlyReturn
+POST       /cis/monthly-return-item/sync                            uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.syncMonthlyReturnItems
 POST       /scheme/email                                            uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.getSchemeEmail
 POST       /submissions/create                                      uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubmissionController.createSubmission()
 POST       /submissions/update                                      uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubmissionController.updateSubmission()
@@ -14,6 +15,7 @@ POST       /scheme                                                  uk.gov.hmrc.
 POST       /scheme/update                                           uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.ContractorSchemeController.updateScheme
 POST       /scheme/version-update                                   uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.ContractorSchemeController.updateSchemeVersion
 POST       /scheme/prepopulate                                      uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.ContractorSchemeController.applyPrepopulation
+POST       /cis/govtalkstatus/get                                   uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.GovTalkController.getGovTalkStatus
 POST       /cis/subcontractor/create-and-update                      uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubcontractorController.createAndUpdateSubcontractor()
 GET        /cis/subcontractors/:cisId                               uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubcontractorController.getSubcontractorList(cisId: String)
 

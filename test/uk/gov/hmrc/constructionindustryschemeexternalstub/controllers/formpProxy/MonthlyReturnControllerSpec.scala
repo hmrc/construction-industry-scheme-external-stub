@@ -280,109 +280,48 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
 
   ".updateMonthlyReturnItem" - {
 
-    "returns 204 NoContent for a valid UpdateMonthlyReturnItemRequest" in new Setup {
-      val requestBody = UpdateMonthlyReturnItemRequest(
-        instanceId = "abc-123",
-        taxYear = 2025,
-        taxMonth = 2,
-        amendment = "N",
-        itemResourceReference = 987654321L,
-        totalPayments = "15000.00",
-        costOfMaterials = "5000.00",
-        totalDeducted = "2500.00",
-        subcontractorName = "Example Subbie Ltd",
-        verificationNumber = "V12345678",
-        version = 1
-      )
+    "returns 204 NO_CONTENT when payload is valid" in new Setup {
 
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(Some(EmployerReference("200", "")))
+      val validRequest =
+        UpdateMonthlyReturnItemRequest(
+          instanceId = "abc-123",
+          taxYear = 2025,
+          taxMonth = 2,
+          amendment = "N",
+          itemResourceReference = 999L,
+          totalPayments = "1000.00",
+          costOfMaterials = "200.00",
+          totalDeducted = "80.00",
+          subcontractorName = "ABC Ltd",
+          verificationNumber = "V123456",
+          version = 1
+        )
 
-      val req = FakeRequest(POST, "/cis/monthly-return/update")
-        .withBody(requestBody)
+      val req = FakeRequest(POST, "/formp-proxy/monthly-return/item/update")
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(Json.toJson(validRequest))
 
-      val res = controller.updateMonthlyReturnItem()(req)
+      val result = controller.updateMonthlyReturnItem()(req)
 
-      status(res) mustBe NO_CONTENT
+      status(result) mustBe NO_CONTENT
+      contentAsString(result) mustBe ""
     }
 
-    "returns 502 when taxOfficeNumber = 502" in new Setup {
-      val body = UpdateMonthlyReturnItemRequest(
-        instanceId = "abc-123",
-        taxYear = 2025,
-        taxMonth = 2,
-        amendment = "N",
-        itemResourceReference = 987654321L,
-        totalPayments = "15000.00",
-        costOfMaterials = "5000.00",
-        totalDeducted = "2500.00",
-        subcontractorName = "Example Subbie Ltd",
-        verificationNumber = "V12345678",
-        version = 1
+    "returns 400 BAD_REQUEST when payload is invalid" in new Setup {
+
+      val invalidBody = Json.obj(
+        "instanceId" -> "abc-123"
       )
 
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(Some(EmployerReference("502", "")))
+      val req = FakeRequest(POST, "/formp-proxy/monthly-return/item/update")
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(invalidBody)
 
-      val req = FakeRequest(POST, "/cis/monthly-return/update")
-        .withBody(body)
+      val result = controller.updateMonthlyReturnItem()(req)
 
-      val res = controller.updateMonthlyReturnItem()(req)
-
-      status(res) mustBe BAD_GATEWAY
-      (contentAsJson(res) \ "message").as[String] must include("formp failed")
-    }
-
-    "returns 500 when taxOfficeNumber = 500" in new Setup {
-      val body = UpdateMonthlyReturnItemRequest(
-        instanceId = "abc-123",
-        taxYear = 2025,
-        taxMonth = 2,
-        amendment = "N",
-        itemResourceReference = 987654321L,
-        totalPayments = "15000.00",
-        costOfMaterials = "5000.00",
-        totalDeducted = "2500.00",
-        subcontractorName = "Example Subbie Ltd",
-        verificationNumber = "V12345678",
-        version = 1
-      )
-
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(Some(EmployerReference("500", "")))
-
-      val req = FakeRequest(POST, "/cis/monthly-return/update")
-        .withBody(body)
-
-      val res = controller.updateMonthlyReturnItem()(req)
-
-      status(res) mustBe INTERNAL_SERVER_ERROR
-    }
-
-    "returns 500 when enrolment is missing" in new Setup {
-      val body = UpdateMonthlyReturnItemRequest(
-        instanceId = "abc-123",
-        taxYear = 2025,
-        taxMonth = 2,
-        amendment = "N",
-        itemResourceReference = 987654321L,
-        totalPayments = "15000.00",
-        costOfMaterials = "5000.00",
-        totalDeducted = "2500.00",
-        subcontractorName = "Example Subbie Ltd",
-        verificationNumber = "V12345678",
-        version = 1
-      )
-
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(None)
-
-      val req = FakeRequest(POST, "/cis/monthly-return/update")
-        .withBody(body)
-
-      val res = controller.updateMonthlyReturnItem()(req)
-
-      status(res) mustBe INTERNAL_SERVER_ERROR
+      status(result) mustBe BAD_REQUEST
+      (contentAsJson(result) \ "message").as[String] mustBe "Invalid payload"
+      (contentAsJson(result) \ "errors").isDefined mustBe true
     }
   }
 

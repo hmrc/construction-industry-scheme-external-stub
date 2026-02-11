@@ -58,63 +58,6 @@ class SubcontractorControllerSpec extends SpecBase {
       contentAsString(res) mustBe ""
     }
 
-    "returns 502 BadGateway with message when taxOfficeNumber = 502" in new Setup {
-      val json: JsValue = Json.toJson(
-        CreateAndUpdateSubcontractorRequest(
-          cisId = cisId,
-          subcontractorType = SoleTrader,
-          tradingName = Some("trading name")
-        )
-      )
-
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(Some(EmployerReference("502", "")))
-
-      val req: FakeRequest[JsValue] = makeJsonRequest(json, updateSubcontractorUrl)
-      val res: Future[Result]       = controller.createAndUpdateSubcontractor()(req)
-
-      status(res) mustBe BAD_GATEWAY
-      (contentAsJson(res) \ "message").as[String] must include("formp failed")
-    }
-
-    "returns 500 InternalServerError with message when taxOfficeNumber = 500" in new Setup {
-      val json: JsValue = Json.toJson(
-        CreateAndUpdateSubcontractorRequest(
-          cisId = cisId,
-          subcontractorType = SoleTrader,
-          tradingName = Some("trading name")
-        )
-      )
-
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(Some(EmployerReference("500", "")))
-
-      val req: FakeRequest[JsValue] = makeJsonRequest(json, updateSubcontractorUrl)
-      val res: Future[Result]       = controller.createAndUpdateSubcontractor()(req)
-
-      status(res) mustBe INTERNAL_SERVER_ERROR
-      (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
-    }
-
-    "returns 403 Forbidden with message when enrolments are missing" in new Setup {
-      val json: JsValue = Json.toJson(
-        CreateAndUpdateSubcontractorRequest(
-          cisId = cisId,
-          subcontractorType = SoleTrader,
-          tradingName = Some("trading name")
-        )
-      )
-
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(None)
-
-      val req: FakeRequest[JsValue] = makeJsonRequest(json, updateSubcontractorUrl)
-      val res: Future[Result]       = controller.createAndUpdateSubcontractor()(req)
-
-      status(res) mustBe FORBIDDEN
-      (contentAsJson(res) \ "message").as[String].toLowerCase must include("enrolments")
-    }
-
     "returns 400 BadRequest with validation errors when payload is invalid" in new Setup {
       val invalidJson: JsValue = Json.obj(
         "cisId"       -> cisId,

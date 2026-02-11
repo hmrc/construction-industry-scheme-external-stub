@@ -44,20 +44,7 @@ class SubcontractorController @Inject() (
         .validate[CreateAndUpdateSubcontractorRequest]
         .fold(
           errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
-          body =>
-            val enrolments = enrolmentHelper.contractorEnrolmentsOpt(request)
-            enrolments match {
-              case Some(enrolmentReference) =>
-                (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {
-                  case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
-                  case ("502", _) => BadGateway(Json.obj("message" -> "formp failed"))
-                  case _          => NoContent
-                }
-
-              case None =>
-                Forbidden(Json.obj("message" -> "Missing required enrolments"))
-
-            }
+          body => NoContent
         )
     }
 

@@ -26,7 +26,6 @@ import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelpe
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.JsResultUtils.foldErrorsIntoBadRequest
 
-
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 import scala.concurrent.Future

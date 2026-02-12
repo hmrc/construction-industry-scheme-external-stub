@@ -1509,6 +1509,70 @@ To trigger the happy path, ensure you provide a valid request body:
 }
 ```
 
+**Endpoint**: `POST /cis/subcontractor/create-and-update`
+
+**Description**: Create and update subcontractor
+
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: Any valid value
+
+or
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: Any valid value
+- Identifier Name: TaxOfficeReference
+- Identifier Value: Any valid value
+
+- Request body: N/A
+
+#### Happy Path
+
+To trigger the happy path, ensure you provide a valid request body:
+```json
+{
+  "cisId": "200",
+  "subcontractorType": "soletrader",
+  "firstName": "Steve",
+  "secondName": "James",
+  "surname": "Smith",
+  "addressLine1": "No 32",
+  "addressLine2": "Street 1",
+  "addressLine3": "Main Place",
+  "addressLine4": "London",
+  "postcode": "ABC 123",
+  "nino": "AA1234567A",
+  "utr": "8888888888",
+  "worksReferenceNumber": "1234567-AB",
+  "emailAddress": "test@test.com",
+  "phoneNumber": "07446677888"
+}
+```
+or 
+
+```json
+{
+  "cisId": "200",
+  "subcontractorType": "soletrader",
+  "tradingName": "ABD Ltd",
+  "addressLine1": "No 32",
+  "addressLine2": "Street 1",
+  "addressLine3": "Main Place",
+  "addressLine4": "London",
+  "postcode": "ABC 123",
+  "nino": "AA1234567A",
+  "utr": "8888888888",
+  "worksReferenceNumber": "1234567-AB",
+  "emailAddress": "test@test.com",
+  "phoneNumber": "07446677888"
+}
+```
+
+- Response status: `204`
+
 **Endpoint**: `GET /cis/subcontractors/:cisId`
 
 **Description**: Return a subcontractors list.

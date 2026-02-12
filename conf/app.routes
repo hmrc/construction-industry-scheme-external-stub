@@ -17,8 +17,7 @@ POST       /scheme/update                                           uk.gov.hmrc.
 POST       /scheme/version-update                                   uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.ContractorSchemeController.updateSchemeVersion
 POST       /scheme/prepopulate                                      uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.ContractorSchemeController.applyPrepopulation
 POST       /cis/govtalkstatus/get                                   uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.GovTalkController.getGovTalkStatus
-POST       /cis/subcontractor/create                                uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubcontractorController.createSubcontractor()
-POST       /cis/subcontractor/update                                uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubcontractorController.updateSubcontractor()
+POST       /cis/subcontractor/create-and-update                      uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubcontractorController.createAndUpdateSubcontractor()
 GET        /cis/subcontractors/:cisId                               uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubcontractorController.getSubcontractorList(cisId: String)
 
 # stubbed rds-datacache-proxy routes

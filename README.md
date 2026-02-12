@@ -970,9 +970,9 @@ or
 - Affinity Group: Organisation
 - Enrolment Key: HMRC-CIS-ORG
 - Identifier Name: TaxOfficeNumber
-- Identifier Value: 202
+- Identifier Value: 754
 - Identifier Name: TaxOfficeReference
-- Identifier Value: Any valid value
+- Identifier Value: EZ10650
 
 
 - Request body: N/A
@@ -1012,9 +1012,9 @@ or
 - Affinity Group: Organisation
 - Enrolment Key: HMRC-CIS-ORG
 - Identifier Name: TaxOfficeNumber
-- Identifier Value: 203
+- Identifier Value: 754
 - Identifier Name: TaxOfficeReference
-- Identifier Value: Any valid value
+- Identifier Value: EZ10550
 
 
 - Request body: N/A
@@ -1027,8 +1027,8 @@ or
   "schemeId": 2020,
   "instanceId": "some-instance-id",
   "accountsOfficeReference": "123PA00123456",
-  "taxOfficeNumber": "203",
-  "taxOfficeReference": "Tax office Ref. in the request enrollment",
+  "taxOfficeNumber": "754",
+  "taxOfficeReference": "EZ10550",
   "utr": null,
   "name": "ABC Construction Ltd",
   "emailAddress": "contact@example.com",
@@ -1055,9 +1055,9 @@ or
 - Affinity Group: Organisation
 - Enrolment Key: HMRC-CIS-ORG
 - Identifier Name: TaxOfficeNumber
-- Identifier Value: 204
+- Identifier Value: 754
 - Identifier Name: TaxOfficeReference
-- Identifier Value: EZ00100
+- Identifier Value: EZ10450
 
 
 - Request body: N/A
@@ -1070,8 +1070,8 @@ or
   "schemeId": 2040,
   "instanceId": "some-instance-id",
   "accountsOfficeReference": "123PA00123456",
-  "taxOfficeNumber": "204",
-  "taxOfficeReference": "EZ00100",
+  "taxOfficeNumber": "754",
+  "taxOfficeReference": "EZ10450",
   "utr": null,
   "name": null,
   "emailAddress": null,
@@ -1098,9 +1098,9 @@ or
 - Affinity Group: Organisation
 - Enrolment Key: HMRC-CIS-ORG
 - Identifier Name: TaxOfficeNumber
-- Identifier Value: 204
+- Identifier Value: 754
 - Identifier Name: TaxOfficeReference
-- Identifier Value: EZ00200
+- Identifier Value: EZ10400 / EZ10750
 
 
 - Request body: N/A
@@ -1113,8 +1113,8 @@ or
   "schemeId": 2010,
   "instanceId": "some-instance-id",
   "accountsOfficeReference": "123PA00123456",
-  "taxOfficeNumber": "201",
-  "taxOfficeReference": "AB1234",
+  "taxOfficeNumber": "754",
+  "taxOfficeReference": "tax office ref in the request enrollment",
   "utr": "1234567890",
   "name": "ABC Construction Ltd",
   "emailAddress": "contact@example.com",
@@ -1140,9 +1140,9 @@ or
 - Affinity Group: Organisation
 - Enrolment Key: HMRC-CIS-ORG
 - Identifier Name: TaxOfficeNumber
-- Identifier Value: 204
+- Identifier Value: 754
 - Identifier Name: TaxOfficeReference
-- Identifier Value: EZ00201
+- Identifier Value: EZ10350
 
 
 - Request body: N/A
@@ -1155,8 +1155,8 @@ or
   "schemeId": 1000,
   "instanceId": "CIS-123",
   "accountsOfficeReference": "123MXY1234567XY",
-  "taxOfficeNumber": "123",
-  "taxOfficeReference": "AB1234",
+  "taxOfficeNumber": "754",
+  "taxOfficeReference": "EZ10350",
   "utr": "1234567890",
   "name": "ABC Construction Ltd",
   "emailAddress": "test@test.com",
@@ -1182,9 +1182,9 @@ or
 - Affinity Group: Organisation
 - Enrolment Key: HMRC-CIS-ORG
 - Identifier Name: TaxOfficeNumber
-- Identifier Value: 204
+- Identifier Value: 754
 - Identifier Name: TaxOfficeReference
-- Identifier Value: EZ00201
+- Identifier Value: EZ10700
 
 
 - Request body: N/A
@@ -1197,8 +1197,8 @@ or
   "schemeId": 1000,
   "instanceId": "CIS-123",
   "accountsOfficeReference": "123MXY1234567XY",
-  "taxOfficeNumber": "123",
-  "taxOfficeReference": "AB1234",
+  "taxOfficeNumber": "754",
+  "taxOfficeReference": "EZ10700",
   "utr": "1234567890",
   "name": "ABC Construction Ltd",
   "emailAddress": "test@test.com",
@@ -1209,6 +1209,48 @@ or
   "verificationBatchCounter": 0,
   "lastUpdate": "2025-01-01T12:00:00Z",
   "version": 1
+}
+```
+
+#### Happy Path (name & utr is null, prepopSuccessful = 'N', subcontractorCounter = 1)
+
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: AGT207
+
+or
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 754
+- Identifier Name: TaxOfficeReference
+- Identifier Value: EZ10500
+
+
+- Request body: N/A
+- Enrolments: request must have either HMRC-CIS-ORG or IR-PAYE-AGENT Enrolment
+
+- Response status: `200`
+- Response body:
+```json
+{
+  "schemeId": 2040,
+  "instanceId": "some-instance-id",
+  "accountsOfficeReference": "123PA00123456",
+  "taxOfficeNumber": "754",
+  "taxOfficeReference": "EZ10500",
+  "utr": null,
+  "name": null,
+  "emailAddress": null,
+  "displayWelcomePage": null,
+  "prePopCount": 0,
+  "prePopSuccessful": "N",
+  "subcontractorCounter": 1,
+  "verificationBatchCounter": 0,
+  "lastUpdate": null,
+  "version": 0
 }
 ```
 

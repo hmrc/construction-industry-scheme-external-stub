@@ -17,12 +17,13 @@
 package uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy
 
 import play.api.Logging
-import play.api.libs.json.{JsError, JsValue, Json}
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.JsResultUtils.foldErrorsIntoBadRequest
 
 import javax.inject.Inject
 import scala.concurrent.Future
@@ -51,18 +52,11 @@ class MonthlyReturnController @Inject() (
     "/resources/getMonthlyReturnForEdit-200-response.json"
 
   def retrieveMonthlyReturns: Action[JsValue] =
-    authorise(parse.json) { implicit request =>
+    authorise.async(parse.json) { implicit request =>
       request.body
         .validate[InstanceIdRequest]
-        .fold(
-          errs =>
-            BadRequest(
-              Json.obj(
-                "message" -> "Invalid JSON body",
-                "errors"  -> JsError.toJson(errs)
-              )
-            ),
-          instanceIdRequest =>
+        .foldErrorsIntoBadRequest { _ =>
+          Future.successful {
             enrolmentHelper.contractorEnrolmentsOpt(request) match {
               // Org journey
               case Some(orgEmployerRef) =>
@@ -73,6 +67,7 @@ class MonthlyReturnController @Inject() (
                   case ("000", _) => Ok(resourceHelper.resourceAsString(retrieveMonthlyReturns_empty_200_ResponsePath))
                   case _          => Ok(resourceHelper.resourceAsString(retrieveMonthlyReturns_200_ResponsePath))
                 }
+
               // Agent journey
               case None                 =>
                 enrolmentHelper.agentEnrolmentsOpt(request) match {
@@ -88,7 +83,8 @@ class MonthlyReturnController @Inject() (
                   case None => InternalServerError(Json.obj("message" -> "Missing enrolment"))
                 }
             }
-        )
+          }
+        }
     }
 
   def createNilMonthlyReturn: Action[CreateNilMonthlyReturnRequest] =
@@ -112,6 +108,15 @@ class MonthlyReturnController @Inject() (
       Future.successful(Created)
     }
 
+  def updateNilMonthlyReturn: Action[JsValue] =
+    authorise.async(parse.json) { implicit request =>
+      request.body
+        .validate[UpdateNilMonthlyReturnRequest]
+        .foldErrorsIntoBadRequest { _ =>
+          Future.successful(NoContent)
+        }
+    }
+
   def getSchemeEmail: Action[InstanceIdRequest] =
     authorise(parse.json[InstanceIdRequest]) { implicit request =>
       val enrolments = enrolmentHelper.contractorEnrolmentsOpt(request)
@@ -130,34 +135,29 @@ class MonthlyReturnController @Inject() (
     }
 
   def retrieveUnsubmittedMonthlyReturns: Action[JsValue] =
-    authorise(parse.json) { implicit request =>
+    authorise.async(parse.json) { implicit request =>
       request.body
         .validate[InstanceIdRequest]
-        .fold(
-          errs =>
-            BadRequest(
-              Json.obj(
-                "message" -> "Invalid JSON body",
-                "errors"  -> JsError.toJson(errs)
-              )
-            ),
-          _ => Ok(resourceHelper.resourceAsString(retrieveUnsubmittedMonthlyReturns_200_ResponsePath))
-        )
+        .foldErrorsIntoBadRequest { _ =>
+          Future.successful(Ok(resourceHelper.resourceAsString(retrieveUnsubmittedMonthlyReturns_200_ResponsePath)))
+        }
     }
 
   def getMonthlyReturnForEdit: Action[JsValue] =
-    authorise(parse.json) { implicit request =>
+    authorise.async(parse.json) { implicit request =>
       request.body
         .validate[GetMonthlyReturnForEditRequest]
-        .fold(
-          errs =>
-            BadRequest(
-              Json.obj(
-                "message" -> "Invalid JSON body",
-                "errors"  -> JsError.toJson(errs)
-              )
-            ),
-          _ => Ok(resourceHelper.resourceAsString(getMonthlyReturnForEdit_200_ResponsePath))
-        )
+        .foldErrorsIntoBadRequest { _ =>
+          Future.successful(Ok(resourceHelper.resourceAsString(getMonthlyReturnForEdit_200_ResponsePath)))
+        }
+    }
+
+  def syncMonthlyReturnItems: Action[JsValue] =
+    authorise.async(parse.json) { implicit request =>
+      request.body
+        .validate[SyncMonthlyReturnItemsRequest]
+        .foldErrorsIntoBadRequest { _ =>
+          Future.successful(NoContent)
+        }
     }
 }

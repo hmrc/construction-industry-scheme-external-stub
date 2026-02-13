@@ -129,7 +129,7 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
         .thenReturn(Json.toJson(response).toString)
 
       val req: FakeRequest[CreateNilMonthlyReturnRequest] =
-        FakeRequest(POST, "/formp-proxy/monthly-return/nil/create").withBody(request)
+        FakeRequest(POST, "/formp-proxy/cis/monthly-return/nil/create").withBody(request)
 
       val res: Future[Result] = controller.createNilMonthlyReturn(req)
 
@@ -152,7 +152,7 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
         .thenReturn(Some(EmployerReference("502", "")))
 
       val req: FakeRequest[CreateNilMonthlyReturnRequest] =
-        FakeRequest(POST, "/formp-proxy/monthly-return/nil/create").withBody(request)
+        FakeRequest(POST, "/formp-proxy/cis/monthly-return/nil/create").withBody(request)
 
       val res: Future[Result] = controller.createNilMonthlyReturn(req)
 
@@ -173,6 +173,41 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
       (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
     }
 
+  }
+
+  ".updateNilMonthlyReturn" - {
+
+    "returns 204 when service succeeds for an unknown taxOfficeNumber / taxOfficeReference" in new Setup {
+      val body = Json.obj(
+        "instanceId"             -> "abc-123",
+        "taxYear"                -> 2025,
+        "taxMonth"               -> 2,
+        "decInformationCorrect"  -> "Y",
+        "decNilReturnNoPayments" -> "Y"
+      )
+
+      val req: FakeRequest[JsValue] =
+        FakeRequest(POST, "/formp-proxy/cis/monthly-return/nil/update")
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(body)
+
+      val res: Future[Result] = controller.updateNilMonthlyReturn(req)
+
+      status(res) mustBe NO_CONTENT
+      contentAsString(res) mustBe ""
+    }
+
+    "returns 400 when JSON body is invalid" in new Setup {
+      val req: FakeRequest[JsValue] =
+        FakeRequest(POST, "/formp-proxy/cis/monthly-return/nil/update")
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(Json.obj("instanceId" -> "abc-123"))
+
+      val res: Future[Result] = controller.updateNilMonthlyReturn(req)
+
+      status(res) mustBe BAD_REQUEST
+      (contentAsJson(res) \ "message").as[String] mustBe "Invalid JSON body"
+    }
   }
 
   ".getSchemeEmail" - {

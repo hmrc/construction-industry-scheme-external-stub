@@ -17,14 +17,19 @@
 package uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy
 
 import play.api.Logging
-import play.api.libs.json.{JsError, JsObject, JsValue, Json}
+import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{ApplyPrepopulationRequest, AuthenticatedRequest, UpdateSchemeVersionRequest}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{ApplyPrepopulationRequest, UpdateSchemeVersionRequest}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{CreateContractorSchemeParams, EmployerReference, UpdateContractorSchemeParams}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.JsResultUtils.foldErrorsIntoBadRequest
+
+import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
+import scala.concurrent.Future
+import scala.collection.concurrent.TrieMap
 
 class ContractorSchemeController @Inject() (
   authorise: AuthAction,
@@ -68,137 +73,107 @@ class ContractorSchemeController @Inject() (
     }
 
   def createScheme: Action[JsValue] =
-    authorise(parse.json) { implicit request =>
+    authorise.async(parse.json) { implicit request =>
       request.body
         .validate[CreateContractorSchemeParams]
-        .fold(
-          errs =>
-            BadRequest(
-              Json.obj(
-                "message" -> "Invalid JSON body",
-                "errors"  -> JsError.toJson(errs)
-              )
-            ),
-          _ =>
-            if (hasAnyEnrolments) {
-              Created(resourceHelper.resourceAsString(createScheme_201_ResponsePath))
-            } else {
-              logger.warn("[ContractorSchemeController][createScheme] Missing contractor enrolments")
-              InternalServerError(Json.obj("message" -> "Missing enrolments"))
-            }
-        )
+        .foldErrorsIntoBadRequest { _ =>
+          Future.successful(
+            Created(resourceHelper.resourceAsString(createScheme_201_ResponsePath))
+          )
+        }
     }
 
   def updateScheme: Action[JsValue] =
-    authorise(parse.json) { implicit request =>
+    authorise.async(parse.json) { implicit request =>
       request.body
         .validate[UpdateContractorSchemeParams]
-        .fold(
-          errs =>
-            BadRequest(
-              Json.obj(
-                "message" -> "Invalid JSON body",
-                "errors"  -> JsError.toJson(errs)
-              )
-            ),
-          _ =>
-            if (hasAnyEnrolments) {
-              Ok(resourceHelper.resourceAsString(updateScheme_200_ResponsePath))
-            } else {
-              logger.warn("[ContractorSchemeController][updateScheme] Missing contractor enrolments")
-              InternalServerError(Json.obj("message" -> "Missing enrolments"))
-            }
-        )
+        .foldErrorsIntoBadRequest { _ =>
+          Future.successful(
+            Ok(resourceHelper.resourceAsString(updateScheme_200_ResponsePath))
+          )
+        }
     }
 
   def updateSchemeVersion: Action[JsValue] =
-    authorise(parse.json) { implicit request =>
+    authorise.async(parse.json) { implicit request =>
       request.body
         .validate[UpdateSchemeVersionRequest]
-        .fold(
-          errs =>
-            BadRequest(
-              Json.obj(
-                "message" -> "Invalid JSON body",
-                "errors"  -> JsError.toJson(errs)
-              )
-            ),
-          req =>
-            if (hasAnyEnrolments) {
-              Ok(Json.obj("version" -> (req.version + 1)))
-            } else {
-              logger.warn("[ContractorSchemeController][updateSchemeVersion] Missing enrolments")
-              InternalServerError(Json.obj("message" -> "Missing enrolments"))
-            }
-        )
+        .foldErrorsIntoBadRequest { payload =>
+          Future.successful(
+            Ok(Json.obj("version" -> (payload.version + 1)))
+          )
+        }
     }
 
   def applyPrepopulation: Action[JsValue] =
-    authorise(parse.json) { implicit request =>
-      if (!hasAnyEnrolments) {
-        logger.warn("[ContractorSchemeController][applyPrepopulation] Missing enrolments")
-        InternalServerError(Json.obj("message" -> "Missing enrolments"))
-      } else {
-        request.body
-          .validate[ApplyPrepopulationRequest]
-          .fold(
-            errs =>
-              BadRequest(
-                Json.obj(
-                  "message" -> "Invalid JSON body",
-                  "errors"  -> JsError.toJson(errs)
-                )
-              ),
-            req => Ok(Json.obj("version" -> (req.version + 1)))
+    authorise.async(parse.json) { implicit request =>
+      request.body
+        .validate[ApplyPrepopulationRequest]
+        .foldErrorsIntoBadRequest { payload =>
+          Future.successful(
+            Ok(Json.obj("version" -> (payload.version + 1)))
           )
-      }
+        }
     }
 
-  private def hasAnyEnrolments(implicit request: AuthenticatedRequest[_]): Boolean =
-    enrolmentHelper.contractorEnrolmentsOpt(request).isDefined ||
-      enrolmentHelper.agentEnrolmentsOpt(request).isDefined
+  private def contractorSchemeResult(taxOfficeNumber: String, taxOfficeReference: String): Result = {
 
-  private def contractorSchemeResult(
-    taxOfficeNumber: String,
-    taxOfficeReference: String
-  ): Result =
-    (taxOfficeNumber, taxOfficeReference) match {
-      // 0) no utr, no name, prepopSuccessful = "N", subcontractorCounter = 1
-      case ("201", _)         =>
-        Ok(schemeJson(getScheme_sub1_rest_no_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
+    val key = s"$taxOfficeNumber|$taxOfficeReference"
 
-      // 1) no utr but there is a name, prepopSuccessful = "N", subcontractorCounter = 1
-      case ("202", _)         =>
-        Ok(schemeJson(getScheme_nameOnly_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
+    taxOfficeReference match {
+      // multiple call scenarios, only for local & Jenkins pipelines runs, DO NOT USE IN STAGING
 
-      // 2) there is an utr but no name, prepopSuccessful = "N", subcontractorCounter = 1
-      case ("203", _)         =>
-        Ok(schemeJson(getScheme_utrOnly_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
+      // cis-ui-tests PrepopulationSpec Scenario 1
+      case "EZ10350"             =>
+        val callNumber = nextCallAndResetAfterFour(key)
+        logger.info(s"[getScheme] ref=$taxOfficeReference callNumber=$callNumber")
+        if (callNumber <= 4) {
+          Ok(schemeJson(getScheme_firstTime_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
+        } else {
+          Ok(schemeJson(getScheme_200_no_sub_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
+        }
 
-      // 3) no utr, no name, prepopSuccessful = "N", subcontractorCounter = 0
-      case ("204", "EZ00100") =>
+      // cis-ui-tests PrepopulationSpec Scenario 2 & 9
+      case "EZ10400" | "EZ10750" =>
+        val callNumber = nextCallAndResetAfterFour(key)
+        logger.info(s"[getScheme] ref=$taxOfficeReference callNumber=$callNumber")
+        if (callNumber <= 4) {
+          Ok(schemeJson(getScheme_firstTime_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
+        } else {
+          Ok(schemeJson(getScheme_sub1_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
+        }
+
+      // 1 call scenarios
+
+      // cis-ui-tests PrepopulationSpec Scenario 3
+      case "EZ10450"             =>
         Ok(schemeJson(getScheme_firstTime_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
 
-      // 4) successful prepoped scheme table, subcontractorCounter = 1
-      case ("204", "EZ00200") =>
-        Ok(schemeJson(getScheme_sub1_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
+      // cis-ui-tests PrepopulationSpec Scenario 4
+      case "EZ10500"             =>
+        Ok(schemeJson(getScheme_sub1_rest_no_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
 
-      // 5) successful prepoped scheme table, subcontractorCounter = 0
-      case ("204", "EZ00201") =>
-        Ok(schemeJson(getScheme_200_no_sub_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
+      // cis-ui-tests PrepopulationSpec Scenario 5
+      case "EZ10550"             =>
+        Ok(schemeJson(getScheme_utrOnly_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
 
-      // 6) Not found scheme, expected to call createScheme
-      case ("205", _)         =>
-        NotFound(Json.obj("message" -> "Scheme not found"))
-
-      // 7) name & utr exists, prepopSuccessful = "N", subcontractorCounter = 1
-      case ("206", _)         =>
+      // cis-ui-tests PrepopulationSpec Scenario 6
+      case "EZ10600"             =>
         Ok(schemeJson(getScheme_prepop_no_Only_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
 
+      // cis-ui-tests PrepopulationSpec Scenario 7
+      case "EZ10650"             =>
+        Ok(schemeJson(getScheme_nameOnly_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
+
+      // cis-ui-tests PrepopulationSpec Scenario 8
+      case "EZ10700"             =>
+        Ok(schemeJson(getScheme_sub1_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
+
       // default happy path with successfully prepoped scheme and subcontractorCounter = 1
-      case (_, _)             =>
+      case _                     =>
         Ok(schemeJson(getScheme_sub1_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
     }
+  }
 
   private def agentSchemeResult(agentRef: String): Result =
     agentRef match {
@@ -257,5 +232,16 @@ class ContractorSchemeController @Inject() (
       case _                                                 =>
         base
     }
+  }
+
+  private val schemeCounters = TrieMap.empty[String, AtomicInteger]
+
+  private def nextCallAndResetAfterFour(key: String): Int = {
+    val counter    = schemeCounters.getOrElseUpdate(key, new AtomicInteger(0))
+    val callNumber = counter.incrementAndGet()
+    if (callNumber >= 6) {
+      schemeCounters.remove(key)
+    }
+    callNumber
   }
 }

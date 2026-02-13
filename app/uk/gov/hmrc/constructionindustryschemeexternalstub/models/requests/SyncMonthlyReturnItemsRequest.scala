@@ -17,14 +17,16 @@
 package uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests
 
 import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.SubcontractorType
 
-final case class CreateSubcontractorRequest(
-  schemeId: Int,
-  subcontractorType: SubcontractorType,
-  version: Int
+case class SyncMonthlyReturnItemsRequest(
+  instanceId: String,
+  taxYear: Int,
+  taxMonth: Int,
+  amendment: String,
+  createResourceReferences: Seq[Long],
+  deleteResourceReferences: Seq[Long]
 )
 
-object CreateSubcontractorRequest {
-  implicit val format: OFormat[CreateSubcontractorRequest] = Json.format[CreateSubcontractorRequest]
+object SyncMonthlyReturnItemsRequest {
+  given format: OFormat[SyncMonthlyReturnItemsRequest] = Json.format[SyncMonthlyReturnItemsRequest]
 }

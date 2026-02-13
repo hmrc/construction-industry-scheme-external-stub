@@ -63,4 +63,14 @@ class GovTalkController @Inject() (
             }
         )
     }
+
+  def updateGovTalkStatus: Action[JsValue] =
+    authorise(parse.json) { implicit request =>
+      request.body
+        .validate[UpdateGovTalkStatusRequest]
+        .fold(
+          errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
+          body => NoContent
+        )
+    }
 }

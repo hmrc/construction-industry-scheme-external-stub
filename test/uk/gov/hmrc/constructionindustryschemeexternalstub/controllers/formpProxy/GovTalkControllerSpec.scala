@@ -26,9 +26,10 @@ import play.api.test.Helpers.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.FakeAuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.base.SpecBase
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.EmployerReference
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.GetGovTalkStatusRequest
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{GetGovTalkStatusRequest, UpdateGovTalkStatusRequest}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 
+import java.time.LocalDateTime
 import scala.concurrent.Future
 
 class GovTalkControllerSpec extends SpecBase {
@@ -245,6 +246,50 @@ class GovTalkControllerSpec extends SpecBase {
       val res: Future[Result]       = controller.getGovTalkStatus()(req)
 
       status(res) mustBe INTERNAL_SERVER_ERROR
+    }
+  }
+
+  ".updateGovTalkStatus" - {
+
+    val updateGovTalkStatusUrl = "/cis/govtalkstatus/update-status"
+
+    "returns 204 with valid data on valid payload for an unknown taxOfficeNumber / taxOfficeReference / agent enrollments" in new Setup {
+
+      val response: JsObject =
+        Json.obj(
+          "govtalk_status" -> Json.arr(
+            Json.obj(
+              "userIdentifier" -> "1",
+              "formResultID"   -> "12890",
+              "endStateDate"   -> "2026-02-03T00:00:00",
+              "protocolStatus" -> "dataRequest"
+            )
+          )
+        )
+
+      val json: JsValue = Json.toJson(
+        UpdateGovTalkStatusRequest(
+          userIdentifier = "123",
+          formResultID = "YE2025",
+          endStateDate = LocalDateTime.parse("2026-02-03T00:00:00"),
+          protocolStatus = "dataRequest"
+        )
+      )
+
+      val req: FakeRequest[JsValue] = makeJsonRequest(json, updateGovTalkStatusUrl)
+      val res: Future[Result]       = controller.updateGovTalkStatus()(req)
+
+      status(res) mustBe NO_CONTENT
+    }
+
+    "returns 400 BadRequest for invalid JSON" in new Setup {
+
+      val bad: JsObject             = Json.obj("nope" -> "nope")
+      val req: FakeRequest[JsValue] = makeJsonRequest(bad, updateGovTalkStatusUrl)
+      val res: Future[Result]       = controller.updateGovTalkStatus()(req)
+
+      status(res) mustBe BAD_REQUEST
+      (contentAsJson(res) \ "message").as[String] mustBe "Invalid payload"
     }
   }
 

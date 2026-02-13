@@ -253,7 +253,7 @@ class GovTalkControllerSpec extends SpecBase {
 
     val updateGovTalkStatusUrl = "/cis/govtalkstatus/update-status"
 
-    "returns 204 with valid data on valid payload for an unknown taxOfficeNumber / taxOfficeReference / agent enrollments" in new Setup {
+    "returns 204 on valid payload for an unknown taxOfficeNumber / taxOfficeReference / agent enrollments" in new Setup {
 
       val response: JsObject =
         Json.obj(

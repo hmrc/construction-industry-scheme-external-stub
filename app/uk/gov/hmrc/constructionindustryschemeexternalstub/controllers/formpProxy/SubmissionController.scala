@@ -44,16 +44,18 @@ class SubmissionController @Inject() (
         .fold(
           errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
           body =>
-            val enrolments = enrolmentHelper.contractorEnrolmentsOpt(request)
-            enrolments match {
-              case Some(enrolmentReference) =>
+            val orgEnrolments   = enrolmentHelper.contractorEnrolmentsOpt(request)
+            val agentEnrolments = enrolmentHelper.agentEnrolmentsOpt(request)
+            (orgEnrolments, agentEnrolments) match {
+              case (Some(enrolmentReference), _) =>
                 (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {
 //                    case ("400", _) => BadRequest(Json.obj("message" -> "Missing CIS enrolment identifiers"))
 //                    case ("404", _) => NotFound(Json.obj("message" -> "CIS taxpayer not found"))
                   case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
                   case _          => Created(resourceHelper.resourceAsString(createSubmission_200_ResponsePath))
                 }
-              case None                     => InternalServerError
+              case (_, Some(_))                  => Created(resourceHelper.resourceAsString(createSubmission_200_ResponsePath))
+              case (None, None)                  => InternalServerError
             }
         )
     }
@@ -65,16 +67,18 @@ class SubmissionController @Inject() (
         .fold(
           errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
           body =>
-            val enrolments = enrolmentHelper.contractorEnrolmentsOpt(request)
-            enrolments match {
-              case Some(enrolmentReference) =>
+            val orgEnrolments   = enrolmentHelper.contractorEnrolmentsOpt(request)
+            val agentEnrolments = enrolmentHelper.agentEnrolmentsOpt(request)
+            (orgEnrolments, agentEnrolments) match {
+              case (Some(enrolmentReference), _) =>
                 (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {
 //                  case ("400", _) => BadRequest(Json.obj("message" -> "Missing CIS enrolment identifiers"))
 //                  case ("404", _) => NotFound(Json.obj("message" -> "CIS taxpayer not found"))
                   case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
                   case _          => NoContent
                 }
-              case None                     => InternalServerError
+              case (_, Some(_))                  => NoContent
+              case (None, None)                  => InternalServerError
             }
         )
     }

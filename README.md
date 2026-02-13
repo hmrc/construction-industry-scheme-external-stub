@@ -1305,6 +1305,41 @@ To trigger the happy path, ensure you provide a valid request body:
 }
 ```
 
+**Endpoint**: `/cis/govtalkstatus/update-correlationID`
+
+**Description**: Update correlationID, pollInterval, and gatewayUrl of GovTalk Status Record when userIdentifier and formResultId matches request.
+
+#### Happy Path
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: Any valid value
+- Identifier Name: TaxOfficeReference
+- Identifier Value: Any valid value
+
+or
+
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: Any valid value
+
+To trigger the happy path, ensure you provide a valid request body:
+```json
+{
+  "userIdentifier": "123",
+  "formResultID": "YE2025",
+  "correlationId": "1234567890",
+  "pollInterval": 5,
+  "gatewayUrl": "https://example.com/govtalk"
+}
+```
+- Enrolments: request must have either HMRC-CIS-ORG or IR-PAYE-AGENT Enrolment
+
+- Response status: `204`
+- Response body: N/A
+
 #### Happy Path (No data found)
 
 - Affinity Group: Organisation

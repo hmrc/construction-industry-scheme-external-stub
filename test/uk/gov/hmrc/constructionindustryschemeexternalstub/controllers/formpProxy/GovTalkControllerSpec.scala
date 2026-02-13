@@ -248,6 +248,35 @@ class GovTalkControllerSpec extends SpecBase {
     }
   }
 
+  ".updateGovTalkStatusCorrelationId" - {
+
+    val updateUrl = "/cis/govtalkstatus/update-correlationID"
+
+    "returns 204 NoContent for valid JSON payload" in new Setup {
+      val json: JsValue = Json.obj(
+        "userIdentifier" -> "1",
+        "formResultId"   -> "12890",
+        "correlationId"  -> "C742D5DEE7EB4D15B4F7EFD50B890525",
+        "pollInterval"   -> 1,
+        "gatewayUrl"     -> "http://example.com"
+      )
+
+      val req: FakeRequest[JsValue] = makeJsonRequest(json, updateUrl)
+      val res: Future[Result]       = controller.updateGovTalkStatusCorrelationId(req)
+
+      status(res) mustBe NO_CONTENT
+    }
+
+    "returns 400 BadRequest for invalid JSON payload" in new Setup {
+      val bad: JsValue = Json.obj("nope" -> "nope")
+
+      val req: FakeRequest[JsValue] = makeJsonRequest(bad, updateUrl)
+      val res: Future[Result]       = controller.updateGovTalkStatusCorrelationId(req)
+
+      status(res) mustBe BAD_REQUEST
+    }
+  }
+
   private trait Setup {
     val mockResourceHelper: ResourceHelper     = mock[ResourceHelper]
     val mockEnrolmentsHelper: EnrolmentsHelper = mock[EnrolmentsHelper]

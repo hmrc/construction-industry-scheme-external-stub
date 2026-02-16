@@ -1371,6 +1371,7 @@ To trigger the happy path, ensure you provide a valid request body:
 - Enrolments: request must have either HMRC-CIS-ORG or IR-PAYE-AGENT Enrolment
 
 - Response status: `204`
+- Response body: N/A
 
 **Endpoint**: `POST /cis/govtalkstatus/create`
 
@@ -1404,6 +1405,7 @@ To trigger the happy path, ensure you provide a valid request body:
 - Enrolments: request must have either HMRC-CIS-ORG or IR-PAYE-AGENT Enrolment
 
 - Response status: `201`
+- Response body: N/A
 
 **Endpoint**: `POST /scheme`
 

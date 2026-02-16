@@ -287,7 +287,7 @@ class GovTalkControllerSpec extends SpecBase {
 
     val createGovTalkStatusUrl = "/cis/govtalkstatus/create"
 
-    "returns 204 on valid payload for an unknown taxOfficeNumber / taxOfficeReference" in new Setup {
+    "returns 201 on valid payload for an unknown taxOfficeNumber / taxOfficeReference" in new Setup {
 
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
         .thenReturn(Some(EmployerReference("204", "")))

@@ -490,7 +490,7 @@ To trigger the happy path, ensure you provide a valid request body:
 }
 ```
 
-**Endpoint**: `POST /monthly-return/nil/create`
+**Endpoint**: `POST /cis/monthly-return/nil/create`
 
 **Description**: Creates a monthly return record in the monthly return table.
 
@@ -815,6 +815,33 @@ To trigger the happy path, ensure you provide a valid request body:
 - Response body: empty body
 ```
 
+**Endpoint**: `POST /cis/monthly-return/nil/update`
+
+**Description**: Updates an existing nil monthly return record.
+
+#### Happy Path
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 200
+- Identifier Name: TaxOfficeReference
+- Identifier Value: AB123456
+
+To trigger the happy path, ensure you provide a valid request body (same shape as create):
+```json
+{
+  "instanceId":  "1",
+  "taxYear": 2025,
+  "taxMonth": 11,
+  "decInformationCorrect": "true",
+  "decNilReturnNoPayments": "true"
+}
+```
+- Response status: `204`
+- Response body: _empty_
+
+
 **Endpoint**: `POST /scheme/email`
 
 **Description**: Return a scheme email from the scheme table.
@@ -943,9 +970,9 @@ or
 - Affinity Group: Organisation
 - Enrolment Key: HMRC-CIS-ORG
 - Identifier Name: TaxOfficeNumber
-- Identifier Value: 202
+- Identifier Value: 754
 - Identifier Name: TaxOfficeReference
-- Identifier Value: Any valid value
+- Identifier Value: EZ10650
 
 
 - Request body: N/A
@@ -985,9 +1012,9 @@ or
 - Affinity Group: Organisation
 - Enrolment Key: HMRC-CIS-ORG
 - Identifier Name: TaxOfficeNumber
-- Identifier Value: 203
+- Identifier Value: 754
 - Identifier Name: TaxOfficeReference
-- Identifier Value: Any valid value
+- Identifier Value: EZ10550
 
 
 - Request body: N/A
@@ -1000,8 +1027,8 @@ or
   "schemeId": 2020,
   "instanceId": "some-instance-id",
   "accountsOfficeReference": "123PA00123456",
-  "taxOfficeNumber": "203",
-  "taxOfficeReference": "Tax office Ref. in the request enrollment",
+  "taxOfficeNumber": "754",
+  "taxOfficeReference": "EZ10550",
   "utr": null,
   "name": "ABC Construction Ltd",
   "emailAddress": "contact@example.com",
@@ -1028,9 +1055,9 @@ or
 - Affinity Group: Organisation
 - Enrolment Key: HMRC-CIS-ORG
 - Identifier Name: TaxOfficeNumber
-- Identifier Value: 204
+- Identifier Value: 754
 - Identifier Name: TaxOfficeReference
-- Identifier Value: EZ00100
+- Identifier Value: EZ10450
 
 
 - Request body: N/A
@@ -1043,8 +1070,8 @@ or
   "schemeId": 2040,
   "instanceId": "some-instance-id",
   "accountsOfficeReference": "123PA00123456",
-  "taxOfficeNumber": "204",
-  "taxOfficeReference": "EZ00100",
+  "taxOfficeNumber": "754",
+  "taxOfficeReference": "EZ10450",
   "utr": null,
   "name": null,
   "emailAddress": null,
@@ -1071,9 +1098,9 @@ or
 - Affinity Group: Organisation
 - Enrolment Key: HMRC-CIS-ORG
 - Identifier Name: TaxOfficeNumber
-- Identifier Value: 204
+- Identifier Value: 754
 - Identifier Name: TaxOfficeReference
-- Identifier Value: EZ00200
+- Identifier Value: EZ10400 / EZ10750
 
 
 - Request body: N/A
@@ -1086,8 +1113,8 @@ or
   "schemeId": 2010,
   "instanceId": "some-instance-id",
   "accountsOfficeReference": "123PA00123456",
-  "taxOfficeNumber": "201",
-  "taxOfficeReference": "AB1234",
+  "taxOfficeNumber": "754",
+  "taxOfficeReference": "tax office ref in the request enrollment",
   "utr": "1234567890",
   "name": "ABC Construction Ltd",
   "emailAddress": "contact@example.com",
@@ -1113,9 +1140,9 @@ or
 - Affinity Group: Organisation
 - Enrolment Key: HMRC-CIS-ORG
 - Identifier Name: TaxOfficeNumber
-- Identifier Value: 204
+- Identifier Value: 754
 - Identifier Name: TaxOfficeReference
-- Identifier Value: EZ00201
+- Identifier Value: EZ10350
 
 
 - Request body: N/A
@@ -1128,8 +1155,8 @@ or
   "schemeId": 1000,
   "instanceId": "CIS-123",
   "accountsOfficeReference": "123MXY1234567XY",
-  "taxOfficeNumber": "123",
-  "taxOfficeReference": "AB1234",
+  "taxOfficeNumber": "754",
+  "taxOfficeReference": "EZ10350",
   "utr": "1234567890",
   "name": "ABC Construction Ltd",
   "emailAddress": "test@test.com",
@@ -1155,9 +1182,9 @@ or
 - Affinity Group: Organisation
 - Enrolment Key: HMRC-CIS-ORG
 - Identifier Name: TaxOfficeNumber
-- Identifier Value: 204
+- Identifier Value: 754
 - Identifier Name: TaxOfficeReference
-- Identifier Value: EZ00201
+- Identifier Value: EZ10700
 
 
 - Request body: N/A
@@ -1170,8 +1197,8 @@ or
   "schemeId": 1000,
   "instanceId": "CIS-123",
   "accountsOfficeReference": "123MXY1234567XY",
-  "taxOfficeNumber": "123",
-  "taxOfficeReference": "AB1234",
+  "taxOfficeNumber": "754",
+  "taxOfficeReference": "EZ10700",
   "utr": "1234567890",
   "name": "ABC Construction Ltd",
   "emailAddress": "test@test.com",
@@ -1182,6 +1209,48 @@ or
   "verificationBatchCounter": 0,
   "lastUpdate": "2025-01-01T12:00:00Z",
   "version": 1
+}
+```
+
+#### Happy Path (name & utr is null, prepopSuccessful = 'N', subcontractorCounter = 1)
+
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: AGT207
+
+or
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 754
+- Identifier Name: TaxOfficeReference
+- Identifier Value: EZ10500
+
+
+- Request body: N/A
+- Enrolments: request must have either HMRC-CIS-ORG or IR-PAYE-AGENT Enrolment
+
+- Response status: `200`
+- Response body:
+```json
+{
+  "schemeId": 2040,
+  "instanceId": "some-instance-id",
+  "accountsOfficeReference": "123PA00123456",
+  "taxOfficeNumber": "754",
+  "taxOfficeReference": "EZ10500",
+  "utr": null,
+  "name": null,
+  "emailAddress": null,
+  "displayWelcomePage": null,
+  "prePopCount": 0,
+  "prePopSuccessful": "N",
+  "subcontractorCounter": 1,
+  "verificationBatchCounter": 0,
+  "lastUpdate": null,
+  "version": 0
 }
 ```
 
@@ -1288,6 +1357,7 @@ or
 - Identifier Value: Any valid value
 - Identifier Name: TaxOfficeReference
 - Identifier Value: Any valid value
+
 
 To trigger the happy path, ensure you provide a valid request body:
 ```json
@@ -1505,6 +1575,70 @@ To trigger the happy path, ensure you provide a valid request body:
   "version": 2 
 }
 ```
+
+**Endpoint**: `POST /cis/subcontractor/create-and-update`
+
+**Description**: Create and update subcontractor
+
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: Any valid value
+
+or
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: Any valid value
+- Identifier Name: TaxOfficeReference
+- Identifier Value: Any valid value
+
+- Request body: N/A
+
+#### Happy Path
+
+To trigger the happy path, ensure you provide a valid request body:
+```json
+{
+  "cisId": "200",
+  "subcontractorType": "soletrader",
+  "firstName": "Steve",
+  "secondName": "James",
+  "surname": "Smith",
+  "addressLine1": "No 32",
+  "addressLine2": "Street 1",
+  "addressLine3": "Main Place",
+  "addressLine4": "London",
+  "postcode": "ABC 123",
+  "nino": "AA1234567A",
+  "utr": "8888888888",
+  "worksReferenceNumber": "1234567-AB",
+  "emailAddress": "test@test.com",
+  "phoneNumber": "07446677888"
+}
+```
+or 
+
+```json
+{
+  "cisId": "200",
+  "subcontractorType": "soletrader",
+  "tradingName": "ABD Ltd",
+  "addressLine1": "No 32",
+  "addressLine2": "Street 1",
+  "addressLine3": "Main Place",
+  "addressLine4": "London",
+  "postcode": "ABC 123",
+  "nino": "AA1234567A",
+  "utr": "8888888888",
+  "worksReferenceNumber": "1234567-AB",
+  "emailAddress": "test@test.com",
+  "phoneNumber": "07446677888"
+}
+```
+
+- Response status: `204`
 
 **Endpoint**: `GET /cis/subcontractors/:cisId`
 

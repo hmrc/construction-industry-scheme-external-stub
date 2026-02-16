@@ -108,6 +108,15 @@ class MonthlyReturnController @Inject() (
       Future.successful(Created)
     }
 
+  def updateNilMonthlyReturn: Action[JsValue] =
+    authorise.async(parse.json) { implicit request =>
+      request.body
+        .validate[UpdateNilMonthlyReturnRequest]
+        .foldErrorsIntoBadRequest { _ =>
+          Future.successful(NoContent)
+        }
+    }
+
   def getSchemeEmail: Action[InstanceIdRequest] =
     authorise(parse.json[InstanceIdRequest]) { implicit request =>
       val enrolments = enrolmentHelper.contractorEnrolmentsOpt(request)

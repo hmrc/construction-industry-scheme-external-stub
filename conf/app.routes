@@ -3,7 +3,8 @@
 # stubbed formp-proxy routes
 POST       /monthly-returns                                         uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.retrieveMonthlyReturns
 POST       /cis/retrieve-unsubmitted-monthly-returns                uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.retrieveUnsubmittedMonthlyReturns
-POST       /monthly-return/nil/create                               uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.createNilMonthlyReturn
+POST       /cis/monthly-return/nil/create                           uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.createNilMonthlyReturn
+POST       /cis/monthly-return/nil/update                           uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.updateNilMonthlyReturn
 POST       /cis/monthly-return-edit                                 uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.getMonthlyReturnForEdit
 POST       /cis/monthly-return/standard/create                      uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.createMonthlyReturn
 POST       /cis/monthly-return-item/sync                            uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.syncMonthlyReturnItems
@@ -18,8 +19,7 @@ POST       /scheme/prepopulate                                      uk.gov.hmrc.
 POST       /cis/govtalkstatus/get                                   uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.GovTalkController.getGovTalkStatus
 POST       /cis/govtalkstatus/reset                                 uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.GovTalkController.resetGovTalkStatus
 POST       /cis/govtalkstatus/create                                uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.GovTalkController.createGovTalkStatusRecord
-POST       /cis/subcontractor/create                                uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubcontractorController.createSubcontractor()
-POST       /cis/subcontractor/update                                uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubcontractorController.updateSubcontractor()
+POST       /cis/subcontractor/create-and-update                      uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubcontractorController.createAndUpdateSubcontractor()
 GET        /cis/subcontractors/:cisId                               uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubcontractorController.getSubcontractorList(cisId: String)
 
 # stubbed rds-datacache-proxy routes

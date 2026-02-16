@@ -26,14 +26,12 @@ class UpdateMonthlyReturnItemRequestFormatSpec extends AnyWordSpec with Matchers
     instanceId = "abc-123",
     taxYear = 2024,
     taxMonth = 5,
-    amendment = "Original",
     itemResourceReference = 9876543210L,
     totalPayments = "1000.00",
     costOfMaterials = "250.00",
     totalDeducted = "150.00",
     subcontractorName = "John Smith Ltd",
-    verificationNumber = "V1234567",
-    version = 2
+    verificationNumber = "V1234567"
   )
 
   private val json: JsValue = Json.parse("""
@@ -41,14 +39,12 @@ class UpdateMonthlyReturnItemRequestFormatSpec extends AnyWordSpec with Matchers
       |  "instanceId": "abc-123",
       |  "taxYear": 2024,
       |  "taxMonth": 5,
-      |  "amendment": "Original",
       |  "itemResourceReference": 9876543210,
       |  "totalPayments": "1000.00",
       |  "costOfMaterials": "250.00",
       |  "totalDeducted": "150.00",
       |  "subcontractorName": "John Smith Ltd",
-      |  "verificationNumber": "V1234567",
-      |  "version": 2
+      |  "verificationNumber": "V1234567"
       |}
       |""".stripMargin)
 
@@ -84,14 +80,12 @@ class UpdateMonthlyReturnItemRequestFormatSpec extends AnyWordSpec with Matchers
         case JsError(errors) =>
           val paths: Set[String] = errors.map { case (p, _) => p.toString() }.toSet
           paths must contain("/taxMonth")
-          paths must contain("/amendment")
           paths must contain("/itemResourceReference")
           paths must contain("/totalPayments")
           paths must contain("/costOfMaterials")
           paths must contain("/totalDeducted")
           paths must contain("/subcontractorName")
           paths must contain("/verificationNumber")
-          paths must contain("/version")
         case JsSuccess(_, _) =>
           fail("Expected JsError for missing fields")
       }
@@ -103,14 +97,12 @@ class UpdateMonthlyReturnItemRequestFormatSpec extends AnyWordSpec with Matchers
           |  "instanceId": "abc-123",
           |  "taxYear": "2024",
           |  "taxMonth": 5,
-          |  "amendment": "Original",
           |  "itemResourceReference": 9876543210,
           |  "totalPayments": "1000.00",
           |  "costOfMaterials": "250.00",
           |  "totalDeducted": "150.00",
           |  "subcontractorName": "John Smith Ltd",
-          |  "verificationNumber": "V1234567",
-          |  "version": 2
+          |  "verificationNumber": "V1234567"
           |}
           |""".stripMargin)
 

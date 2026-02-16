@@ -287,14 +287,12 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
           instanceId = "abc-123",
           taxYear = 2025,
           taxMonth = 2,
-          amendment = "N",
           itemResourceReference = 999L,
           totalPayments = "1000.00",
           costOfMaterials = "200.00",
           totalDeducted = "80.00",
           subcontractorName = "ABC Ltd",
-          verificationNumber = "V123456",
-          version = 1
+          verificationNumber = "V123456"
         )
 
       val req = FakeRequest(POST, "/cis/monthly-return-item/update")

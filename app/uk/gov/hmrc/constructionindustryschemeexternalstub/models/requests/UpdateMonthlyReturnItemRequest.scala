@@ -22,6 +22,7 @@ case class UpdateMonthlyReturnItemRequest(
   instanceId: String,
   taxYear: Int,
   taxMonth: Int,
+  amendment: String,
   itemResourceReference: Long,
   totalPayments: String,
   costOfMaterials: String,

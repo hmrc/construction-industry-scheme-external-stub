@@ -287,6 +287,7 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
           instanceId = "abc-123",
           taxYear = 2025,
           taxMonth = 2,
+          amendment = "N",
           itemResourceReference = 999L,
           totalPayments = "1000.00",
           costOfMaterials = "200.00",

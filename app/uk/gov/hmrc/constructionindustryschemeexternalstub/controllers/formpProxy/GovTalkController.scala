@@ -23,8 +23,10 @@ import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.JsResultUtils.foldErrorsIntoBadRequest
 
 import javax.inject.Inject
+import scala.concurrent.Future
 
 class GovTalkController @Inject() (
   authorise: AuthAction,
@@ -62,6 +64,15 @@ class GovTalkController @Inject() (
                 }
             }
         )
+    }
+
+  def updateGovTalkStatusCorrelationId: Action[JsValue] =
+    authorise(parse.json).async { implicit request =>
+      request.body
+        .validate[UpdateGovTalkStatusCorrelationIdRequest]
+        .foldErrorsIntoBadRequest { _ =>
+          Future.successful(NoContent)
+        }
     }
 
   def resetGovTalkStatus: Action[JsValue] =

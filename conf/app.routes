@@ -17,6 +17,7 @@ POST       /scheme/update                                           uk.gov.hmrc.
 POST       /scheme/version-update                                   uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.ContractorSchemeController.updateSchemeVersion
 POST       /scheme/prepopulate                                      uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.ContractorSchemeController.applyPrepopulation
 POST       /cis/govtalkstatus/get                                   uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.GovTalkController.getGovTalkStatus
+POST       /cis/govtalkstatus/update-correlationID                  uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.GovTalkController.updateGovTalkStatusCorrelationId
 POST       /cis/govtalkstatus/reset                                 uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.GovTalkController.resetGovTalkStatus
 POST       /cis/govtalkstatus/update-status                         uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.GovTalkController.updateGovTalkStatus
 POST       /cis/govtalkstatus/create                                uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.GovTalkController.createGovTalkStatusRecord

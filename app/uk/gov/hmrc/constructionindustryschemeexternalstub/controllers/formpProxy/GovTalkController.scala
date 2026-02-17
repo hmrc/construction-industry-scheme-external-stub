@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,5 +73,25 @@ class GovTalkController @Inject() (
         .foldErrorsIntoBadRequest { _ =>
           Future.successful(NoContent)
         }
+    }
+
+  def resetGovTalkStatus: Action[JsValue] =
+    authorise(parse.json) { implicit request =>
+      request.body
+        .validate[ResetGovTalkStatusRequest]
+        .fold(
+          errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
+          body => NoContent
+        )
+    }
+
+  def updateGovTalkStatus: Action[JsValue] =
+    authorise(parse.json) { implicit request =>
+      request.body
+        .validate[UpdateGovTalkStatusRequest]
+        .fold(
+          errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
+          body => NoContent
+        )
     }
 }

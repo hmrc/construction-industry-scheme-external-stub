@@ -1413,7 +1413,7 @@ or
 ```
 
 
-**Endpoint**: `POST /cis/monthly-return-item/update `
+**Endpoint**: `POST cis/monthly-return-item/update `
 
 **Description**: Updates the monthly return.
 
@@ -1438,8 +1438,7 @@ To trigger the happy path, ensure you provide a valid request body:
   "costOfMaterials" : "5000.00",
   "totalDeducted" : "2500.00",
   "subcontractorName" : "Example Subbie Ltd",
-  "verificationNumber" : "V12345678",
-  "version" : 1
+  "verificationNumber" : "V12345678"
 }
 ```
 - Response status: `200`

@@ -1406,7 +1406,6 @@ To trigger the happy path, ensure you provide a valid request body:
 
 - Response status: `204`
 - Response body: N/A
-- Response body: N/A
 
 **Endpoint**: `POST /cis/govtalkstatus/create`
 

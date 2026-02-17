@@ -1330,9 +1330,9 @@ To trigger the happy path, ensure you provide a valid request body:
 {
   "userIdentifier": "123",
   "formResultID": "YE2025",
-  "correlationId": "1234567890",
+  "correlationID": "1234567890",
   "pollInterval": 5,
-  "gatewayUrl": "https://example.com/govtalk"
+  "gatewayURL": "https://example.com/govtalk"
 }
 ```
 - Enrolments: request must have either HMRC-CIS-ORG or IR-PAYE-AGENT Enrolment

@@ -255,10 +255,10 @@ class GovTalkControllerSpec extends SpecBase {
     "returns 204 NoContent for valid JSON payload" in new Setup {
       val json: JsValue = Json.obj(
         "userIdentifier" -> "1",
-        "formResultId"   -> "12890",
-        "correlationId"  -> "C742D5DEE7EB4D15B4F7EFD50B890525",
+        "formResultID"   -> "12890",
+        "correlationID"  -> "C742D5DEE7EB4D15B4F7EFD50B890525",
         "pollInterval"   -> 1,
-        "gatewayUrl"     -> "http://example.com"
+        "gatewayURL"     -> "http://example.com"
       )
 
       val req: FakeRequest[JsValue] = makeJsonRequest(json, updateUrl)

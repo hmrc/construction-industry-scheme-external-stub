@@ -341,14 +341,14 @@ class GovTalkControllerSpec extends SpecBase {
       )
 
       val req: FakeRequest[JsValue] = makeJsonRequest(json, createGovTalkStatusUrl)
-      val res: Future[Result] = controller.createGovTalkStatusRecord()(req)
+      val res: Future[Result]       = controller.createGovTalkStatusRecord()(req)
 
       status(res) mustBe CREATED
     }
 
     "returns 400 BadRequest for invalid JSON" in new Setup {
 
-      val bad: JsObject = Json.obj("nope" -> "nope")
+      val bad: JsObject             = Json.obj("nope" -> "nope")
       val req: FakeRequest[JsValue] = makeJsonRequest(bad, createGovTalkStatusUrl)
       val res: Future[Result]       = controller.createGovTalkStatusRecord()(req)
 

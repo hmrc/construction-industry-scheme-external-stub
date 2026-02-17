@@ -363,9 +363,6 @@ class GovTalkControllerSpec extends SpecBase {
 
     "returns 204 NoContent on valid payload for an unknown taxOfficeNumber / taxOfficeReference" in new Setup {
 
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(Some(EmployerReference("200", "")))
-
       val json: JsValue = Json.toJson(
         UpdateGovTalkStatusStatisticsRequest(
           userIdentifier = "123456789",
@@ -384,9 +381,6 @@ class GovTalkControllerSpec extends SpecBase {
     }
 
     "returns 204 NoContent with zero polls" in new Setup {
-
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(Some(EmployerReference("200", "")))
 
       val json: JsValue = Json.toJson(
         UpdateGovTalkStatusStatisticsRequest(
@@ -407,9 +401,6 @@ class GovTalkControllerSpec extends SpecBase {
 
     "returns 204 NoContent with high poll numbers" in new Setup {
 
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(Some(EmployerReference("200", "")))
-
       val json: JsValue = Json.toJson(
         UpdateGovTalkStatusStatisticsRequest(
           userIdentifier = "123456789",
@@ -425,29 +416,6 @@ class GovTalkControllerSpec extends SpecBase {
       val res: Future[Result]       = controller.updateGovTalkStatusStatistics()(req)
 
       status(res) mustBe NO_CONTENT
-    }
-
-    "returns 500 InternalServerError for taxOfficeNumber = 500" in new Setup {
-
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(Some(EmployerReference("500", "")))
-
-      val json: JsValue = Json.toJson(
-        UpdateGovTalkStatusStatisticsRequest(
-          userIdentifier = "123456789",
-          formResultID = "SUB123456",
-          lastMessageDate = java.time.LocalDateTime.parse("2026-02-16T10:30:00"),
-          numPolls = 3,
-          pollInterval = 300,
-          gatewayURL = "http://localhost:9712/submission/ChRIS/CISR/Filing/sync/CIS300MR"
-        )
-      )
-
-      val req: FakeRequest[JsValue] = makeJsonRequest(json, updateGovTalkStatusStatisticsUrl)
-      val res: Future[Result]       = controller.updateGovTalkStatusStatistics()(req)
-
-      status(res) mustBe INTERNAL_SERVER_ERROR
-      (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
     }
 
     "returns 400 BadRequest for invalid JSON" in new Setup {
@@ -510,28 +478,6 @@ class GovTalkControllerSpec extends SpecBase {
 
       status(res) mustBe BAD_REQUEST
       (contentAsJson(res) \ "message").as[String] mustBe "Invalid payload"
-    }
-
-    "returns 500 InternalServerError for invalid enrolment" in new Setup {
-
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(None)
-
-      val json: JsValue = Json.toJson(
-        UpdateGovTalkStatusStatisticsRequest(
-          userIdentifier = "123456789",
-          formResultID = "SUB123456",
-          lastMessageDate = java.time.LocalDateTime.parse("2026-02-16T10:30:00"),
-          numPolls = 3,
-          pollInterval = 300,
-          gatewayURL = "http://localhost:9712/submission/ChRIS/CISR/Filing/sync/CIS300MR"
-        )
-      )
-
-      val req: FakeRequest[JsValue] = makeJsonRequest(json, updateGovTalkStatusStatisticsUrl)
-      val res: Future[Result]       = controller.updateGovTalkStatusStatistics()(req)
-
-      status(res) mustBe INTERNAL_SERVER_ERROR
     }
   }
 

@@ -1373,6 +1373,41 @@ To trigger the happy path, ensure you provide a valid request body:
 - Response status: `204`
 - Response body: N/A
 
+**Endpoint**: `/cis/govtalkstatus/update-status`
+
+**Description**: Update GovTalk Status Record.
+
+#### Happy Path
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: Any valid value
+- Identifier Name: TaxOfficeReference
+- Identifier Value: Any valid value
+
+or
+
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: Any valid value
+
+To trigger the happy path, ensure you provide a valid request body:
+```json
+{
+  "userIdentifier": "123",
+  "formResultID": "YE2025",
+  "endStateDate": "2026-02-03T00:00:00",
+  "protocolStatus": "dataRequest"
+}
+```
+- Enrolments: request must have either HMRC-CIS-ORG or IR-PAYE-AGENT Enrolment
+
+- Response status: `204`
+- Response body: N/A
+- Response body: N/A
+
 **Endpoint**: `POST /cis/govtalkstatus/create`
 
 **Description**: Creates a record in the GovTalk status.

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,10 @@ import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.JsResultUtils.foldErrorsIntoBadRequest
 
 import javax.inject.Inject
+import scala.concurrent.Future
 
 class GovTalkController @Inject() (
   authorise: AuthAction,
@@ -61,6 +63,35 @@ class GovTalkController @Inject() (
                   case None        => InternalServerError
                 }
             }
+        )
+    }
+
+  def updateGovTalkStatusCorrelationId: Action[JsValue] =
+    authorise(parse.json).async { implicit request =>
+      request.body
+        .validate[UpdateGovTalkStatusCorrelationIdRequest]
+        .foldErrorsIntoBadRequest { _ =>
+          Future.successful(NoContent)
+        }
+    }
+
+  def resetGovTalkStatus: Action[JsValue] =
+    authorise(parse.json) { implicit request =>
+      request.body
+        .validate[ResetGovTalkStatusRequest]
+        .fold(
+          errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
+          body => NoContent
+        )
+    }
+
+  def updateGovTalkStatus: Action[JsValue] =
+    authorise(parse.json) { implicit request =>
+      request.body
+        .validate[UpdateGovTalkStatusRequest]
+        .fold(
+          errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
+          body => NoContent
         )
     }
 }

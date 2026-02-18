@@ -27,7 +27,7 @@ import play.api.mvc.{ControllerComponents, PlayBodyParsers, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.{AuthAction, FakeAuthAction}
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateMonthlyReturnRequest, CreateNilMonthlyReturnRequest, InstanceIdRequest}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateMonthlyReturnRequest, CreateNilMonthlyReturnRequest, InstanceIdRequest, UpdateMonthlyReturnItemRequest}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.response.CreateNilMonthlyReturnResponse
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{EmployerReference, MonthlyReturn, UserMonthlyReturns, requests}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
@@ -313,6 +313,52 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
     }
   }
 
+  ".updateMonthlyReturnItem" - {
+
+    "returns 204 NO_CONTENT when payload is valid" in new Setup {
+
+      val validRequest =
+        UpdateMonthlyReturnItemRequest(
+          instanceId = "abc-123",
+          taxYear = 2025,
+          taxMonth = 2,
+          amendment = "N",
+          itemResourceReference = 999L,
+          totalPayments = "1000.00",
+          costOfMaterials = "200.00",
+          totalDeducted = "80.00",
+          subcontractorName = "ABC Ltd",
+          verificationNumber = "V123456"
+        )
+
+      val req = FakeRequest(POST, "/cis/monthly-return-item/update")
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(Json.toJson(validRequest))
+
+      val result = controller.updateMonthlyReturnItem()(req)
+
+      status(result) mustBe NO_CONTENT
+      contentAsString(result) mustBe ""
+    }
+
+    "returns 400 BAD_REQUEST when payload is invalid" in new Setup {
+
+      val invalidBody = Json.obj(
+        "instanceId" -> "abc-123"
+      )
+
+      val req = FakeRequest(POST, "/cis/monthly-return-item/update")
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(invalidBody)
+
+      val result = controller.updateMonthlyReturnItem()(req)
+
+      status(result) mustBe BAD_REQUEST
+      (contentAsJson(result) \ "message").as[String] mustBe "Invalid payload"
+      (contentAsJson(result) \ "errors").isDefined mustBe true
+    }
+  }
+
   ".getMonthlyReturnForEdit" - {
 
     "returns 200 when JSON body is valid" in new Setup {
@@ -430,4 +476,5 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
     val nonEmptyWrapper: UserMonthlyReturns =
       UserMonthlyReturns(Seq(mkReturn(66666L, 1), mkReturn(66667L, 7)))
   }
+
 }

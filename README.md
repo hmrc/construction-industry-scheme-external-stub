@@ -1760,6 +1760,39 @@ or
 }
 ```
 
+
+**Endpoint**: `POST cis/monthly-return-item/update `
+
+**Description**: Updates the monthly return.
+
+#### Happy Path
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 200
+- Identifier Name: TaxOfficeReference
+- Identifier Value: AB123456
+
+To trigger the happy path, ensure you provide a valid request body:
+```json
+{
+  "instanceId" :"abc-123",
+  "taxYear" : 2025,
+  "taxMonth" : 2,
+  "amendment" : "N",
+  "itemResourceReference" : "987654321L",
+  "totalPayments" : "15000.00",
+  "costOfMaterials" : "5000.00",
+  "totalDeducted" : "2500.00",
+  "subcontractorName" : "Example Subbie Ltd",
+  "verificationNumber" : "V12345678"
+}
+```
+- Response status: `200`
+- Response body: N/A
+
+
 ### ChRIS
 
 **Endpoint**: `POST /submission/ChRIS/CISR/Filing/sync/CIS300MR`

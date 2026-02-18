@@ -23,6 +23,10 @@ POST       /cis/govtalkstatus/update-status                         uk.gov.hmrc.
 POST       /cis/subcontractor/create-and-update                     uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubcontractorController.createAndUpdateSubcontractor()
 GET        /cis/subcontractors/:cisId                               uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubcontractorController.getSubcontractorList(cisId: String)
 
+POST       /cis/monthly-return-item/update                              uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.updateMonthlyReturnItem()
+
+
+
 # stubbed rds-datacache-proxy routes
 POST       /cis-taxpayer                                            uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.rdsDataCacheProxy.CisTaxpayerController.getCisTaxpayerByTaxReference
 GET        /cis/client-list-status                                  uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.rdsDataCacheProxy.ClientController.getClientListDownloadStatus(credentialId: String, serviceName: String, gracePeriod: Int = 14400)

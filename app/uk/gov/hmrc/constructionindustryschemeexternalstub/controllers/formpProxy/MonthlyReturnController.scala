@@ -103,6 +103,22 @@ class MonthlyReturnController @Inject() (
       }
     }
 
+  def updateMonthlyReturnItem(): Action[JsValue] =
+    authorise(parse.json) { implicit request =>
+      request.body
+        .validate[UpdateMonthlyReturnItemRequest]
+        .fold(
+          errs =>
+            BadRequest(
+              Json.obj(
+                "message" -> "Invalid payload",
+                "errors"  -> JsError.toJson(errs)
+              )
+            ),
+          _ => NoContent
+        )
+    }
+
   def createMonthlyReturn: Action[CreateMonthlyReturnRequest] =
     authorise.async(parse.json[CreateMonthlyReturnRequest]) { _ =>
       Future.successful(Created)

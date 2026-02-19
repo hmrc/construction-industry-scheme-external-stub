@@ -17,7 +17,7 @@
 package uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy
 
 import play.api.Logging
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsError, JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.*
@@ -101,6 +101,22 @@ class MonthlyReturnController @Inject() (
           }
         case None                     => InternalServerError
       }
+    }
+
+  def updateMonthlyReturnItem(): Action[JsValue] =
+    authorise(parse.json) { implicit request =>
+      request.body
+        .validate[UpdateMonthlyReturnItemRequest]
+        .fold(
+          errs =>
+            BadRequest(
+              Json.obj(
+                "message" -> "Invalid payload",
+                "errors"  -> JsError.toJson(errs)
+              )
+            ),
+          _ => NoContent
+        )
     }
 
   def createMonthlyReturn: Action[CreateMonthlyReturnRequest] =

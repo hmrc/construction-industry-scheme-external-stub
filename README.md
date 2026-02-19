@@ -1338,6 +1338,41 @@ To trigger the happy path, ensure you provide a valid request body:
 }
 ```
 
+**Endpoint**: `/cis/govtalkstatus/update-correlationID`
+
+**Description**: Update correlationID, pollInterval, and gatewayUrl of GovTalk Status Record when userIdentifier and formResultId matches request.
+
+#### Happy Path
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: Any valid value
+- Identifier Name: TaxOfficeReference
+- Identifier Value: Any valid value
+
+or
+
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: Any valid value
+
+To trigger the happy path, ensure you provide a valid request body:
+```json
+{
+  "userIdentifier": "123",
+  "formResultID": "YE2025",
+  "correlationID": "1234567890",
+  "pollInterval": 5,
+  "gatewayURL": "https://example.com/govtalk"
+}
+```
+- Enrolments: request must have either HMRC-CIS-ORG or IR-PAYE-AGENT Enrolment
+
+- Response status: `204`
+- Response body: N/A
+
 #### Happy Path (No data found)
 
 - Affinity Group: Organisation
@@ -1439,6 +1474,42 @@ To trigger the happy path, ensure you provide a valid request body:
 
 - Response status: `204`
 - Response body: N/A
+
+**Endpoint**: `/cis/govtalkstatus/update-statistics`
+
+**Description**: Updates the GovTalk status statistics including polling information.
+
+#### Happy Path
+
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: Any valid value
+
+or
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: Any valid value
+- Identifier Name: TaxOfficeReference
+- Identifier Value: Any valid value
+
+
+To trigger the happy path, ensure you provide a valid request body:
+```json
+{
+  "userIdentifier": "test-user-123",
+  "formResultID": "FORM-12345",
+  "lastMessageDate": "2026-02-16T10:30:00",
+  "numPolls": 5,
+  "pollInterval": 30,
+  "gatewayURL": "http://localhost:9712/submission/ChRIS/CISR/Filing/sync/CIS300MR"
+}
+```
+- Enrolments: request must have either HMRC-CIS-ORG or IR-PAYE-AGENT Enrolment
+
+- Response status: `204`
 
 **Endpoint**: `POST /scheme`
 
@@ -1757,6 +1828,39 @@ or
   ]
 }
 ```
+
+
+**Endpoint**: `POST cis/monthly-return-item/update `
+
+**Description**: Updates the monthly return.
+
+#### Happy Path
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 200
+- Identifier Name: TaxOfficeReference
+- Identifier Value: AB123456
+
+To trigger the happy path, ensure you provide a valid request body:
+```json
+{
+  "instanceId" :"abc-123",
+  "taxYear" : 2025,
+  "taxMonth" : 2,
+  "amendment" : "N",
+  "itemResourceReference" : "987654321L",
+  "totalPayments" : "15000.00",
+  "costOfMaterials" : "5000.00",
+  "totalDeducted" : "2500.00",
+  "subcontractorName" : "Example Subbie Ltd",
+  "verificationNumber" : "V12345678"
+}
+```
+- Response status: `200`
+- Response body: N/A
+
 
 ### ChRIS
 

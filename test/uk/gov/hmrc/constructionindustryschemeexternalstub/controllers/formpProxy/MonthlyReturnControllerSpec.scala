@@ -445,10 +445,10 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
     "returns 204 when JSON body is valid" in new Setup {
 
       val body = Json.obj(
-        "instanceId" -> "abc-123",
-        "taxYear" -> 2025,
-        "taxMonth" -> 1,
-        "amendment" -> "N",
+        "instanceId"        -> "abc-123",
+        "taxYear"           -> 2025,
+        "taxMonth"          -> 1,
+        "amendment"         -> "N",
         "resourceReference" -> 12345
       )
 

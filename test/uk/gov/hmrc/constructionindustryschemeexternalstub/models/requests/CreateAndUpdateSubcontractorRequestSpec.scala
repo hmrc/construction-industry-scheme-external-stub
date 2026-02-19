@@ -16,10 +16,10 @@
 
 package uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests
 
-import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.must.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.*
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{SoleTrader, SubcontractorType}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.SoleTrader
 
 class CreateAndUpdateSubcontractorRequestSpec extends AnyWordSpec with Matchers {
 
@@ -29,21 +29,21 @@ class CreateAndUpdateSubcontractorRequestSpec extends AnyWordSpec with Matchers 
       val model = CreateAndUpdateSubcontractorRequest(
         cisId = "CIS-123",
         subcontractorType = SoleTrader,
-        firstName = Some("Jane"),
-        secondName = Some("Q"),
-        surname = Some("Doe"),
+        utr = Some("1234567890"),
+        partnerUtr = Some("9999999999"),
+        crn = Some("CRN123"),
+        nino = Some("AB123456C"),
+        partnershipTradingName = Some("My Partnership"),
         tradingName = Some("ABC Ltd"),
         addressLine1 = Some("10 Downing Street"),
         addressLine2 = Some("Westminster"),
-        addressLine3 = Some("London"),
-        addressLine4 = Some("UK"),
-        country = Some("GB"),
+        city = Some("London"),
+        county = Some("Greater London"),
         postcode = Some("SW1A 2AA"),
-        nino = Some("AB123456C"),
-        utr = Some("1234567890"),
-        worksReferenceNumber = Some("WRN-001"),
         emailAddress = Some("jane.doe@example.com"),
-        phoneNumber = Some("0123456789")
+        phoneNumber = Some("0123456789"),
+        mobilePhoneNumber = Some("07123456789"),
+        worksReferenceNumber = Some("WRN-001")
       )
 
       val json = Json.toJson(model)
@@ -51,10 +51,10 @@ class CreateAndUpdateSubcontractorRequestSpec extends AnyWordSpec with Matchers 
 
       back mustEqual model
 
-      // spot-check a couple of fields
       (json \ "cisId").as[String] mustBe "CIS-123"
-      (json \ "subcontractorType").isDefined mustBe true // exact value depends on your enum format
+      (json \ "subcontractorType").as[String] mustBe SoleTrader.toString
       (json \ "postcode").as[String] mustBe "SW1A 2AA"
+      (json \ "county").as[String] mustBe "Greater London"
     }
 
     "read minimal valid JSON (only required fields)" in {
@@ -74,9 +74,10 @@ class CreateAndUpdateSubcontractorRequestSpec extends AnyWordSpec with Matchers 
       val model = result.get
       model.cisId mustBe "CIS-999"
       model.subcontractorType mustBe SoleTrader
-      model.firstName mustBe None
       model.tradingName mustBe None
       model.postcode mustBe None
+      model.utr mustBe None
+      model.mobilePhoneNumber mustBe None
     }
 
     "fail to read when 'cisId' is missing" in {
@@ -126,9 +127,14 @@ class CreateAndUpdateSubcontractorRequestSpec extends AnyWordSpec with Matchers 
 
       val json = Json.toJson(model).as[JsObject]
       json.keys must contain allOf ("cisId", "subcontractorType")
-      json.keys must not contain "firstName"
+
+      json.keys must not contain "utr"
+      json.keys must not contain "partnerUtr"
+      json.keys must not contain "crn"
       json.keys must not contain "emailAddress"
       json.keys must not contain "postcode"
+      json.keys must not contain "mobilePhoneNumber"
+      json.keys must not contain "worksReferenceNumber"
     }
 
     "ignore unknown JSON fields (forward compatibility)" in {

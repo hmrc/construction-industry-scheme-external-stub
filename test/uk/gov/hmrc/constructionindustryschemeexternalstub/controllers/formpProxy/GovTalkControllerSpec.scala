@@ -282,10 +282,7 @@ class GovTalkControllerSpec extends SpecBase {
 
     val resetGovTalkStatusUrl = "/cis/govtalkstatus/reset"
 
-    "returns 204 on valid payload for an unknown taxOfficeNumber / taxOfficeReference" in new Setup {
-
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(Some(EmployerReference("204", "")))
+    "returns 204 on valid payload for an unknown taxOfficeNumber / taxOfficeReference / agent" in new Setup {
 
       val json: JsValue = Json.toJson(
         ResetGovTalkStatusRequest(
@@ -475,6 +472,38 @@ class GovTalkControllerSpec extends SpecBase {
 
       val req: FakeRequest[JsValue] = makeJsonRequest(json, updateGovTalkStatusStatisticsUrl)
       val res: Future[Result]       = controller.updateGovTalkStatusStatistics()(req)
+
+      status(res) mustBe BAD_REQUEST
+      (contentAsJson(res) \ "message").as[String] mustBe "Invalid payload"
+    }
+  }
+
+  ".createGovTalkStatusRecord" - {
+
+    val createGovTalkStatusUrl = "/cis/govtalkstatus/create"
+
+    "returns 201 on valid payload for an unknown taxOfficeNumber / taxOfficeReference / agent" in new Setup {
+
+      val json: JsValue = Json.toJson(
+        CreateGovTalkStatusRecordRequest(
+          userIdentifier = "1",
+          formResultID = "12890",
+          correlationID = "C742D5DEE7EB4D15B4F7EFD50B890525",
+          gatewayURL = "http://localhost:9712/submission/ChRIS/CISR/Filing/sync/CIS300MR"
+        )
+      )
+
+      val req: FakeRequest[JsValue] = makeJsonRequest(json, createGovTalkStatusUrl)
+      val res: Future[Result]       = controller.createGovTalkStatusRecord()(req)
+
+      status(res) mustBe CREATED
+    }
+
+    "returns 400 BadRequest for invalid JSON" in new Setup {
+
+      val bad: JsObject             = Json.obj("nope" -> "nope")
+      val req: FakeRequest[JsValue] = makeJsonRequest(bad, createGovTalkStatusUrl)
+      val res: Future[Result]       = controller.createGovTalkStatusRecord()(req)
 
       status(res) mustBe BAD_REQUEST
       (contentAsJson(res) \ "message").as[String] mustBe "Invalid payload"

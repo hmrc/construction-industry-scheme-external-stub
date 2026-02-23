@@ -1478,6 +1478,40 @@ To trigger the happy path, ensure you provide a valid request body:
 
 - Response status: `204`
 
+**Endpoint**: `POST /cis/govtalkstatus/create`
+
+**Description**: Creates a record in the GovTalk status.
+
+#### Happy Path
+
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: Any valid value
+
+or
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: Any valid value
+- Identifier Name: TaxOfficeReference
+- Identifier Value: Any valid value
+
+To trigger the happy path, ensure you provide a valid request body:
+```json
+{
+  "userIdentifier": "1",
+  "formResultID": "12890",
+  "correlationID": "128903445",
+  "gatewayURL": "http://vat.chris.hmrc.gov.uk:9102/ChRIS/UKVAT/Filing/action/VATDEC"
+}
+```
+- Enrolments: request must have either HMRC-CIS-ORG or IR-PAYE-AGENT Enrolment
+
+- Response status: `201`
+- Response body: N/A
+
 **Endpoint**: `POST /scheme`
 
 **Description**: Create a new Scheme.

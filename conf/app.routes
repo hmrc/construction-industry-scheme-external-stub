@@ -21,6 +21,7 @@ POST       /cis/govtalkstatus/update-correlationID                  uk.gov.hmrc.
 POST       /cis/govtalkstatus/reset                                 uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.GovTalkController.resetGovTalkStatus
 POST       /cis/govtalkstatus/update-status                         uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.GovTalkController.updateGovTalkStatus
 POST       /cis/govtalkstatus/update-statistics                     uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.GovTalkController.updateGovTalkStatusStatistics()
+POST       /cis/govtalkstatus/create                                uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.GovTalkController.createGovTalkStatusRecord
 POST       /cis/subcontractor/create-and-update                     uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubcontractorController.createAndUpdateSubcontractor()
 GET        /cis/subcontractors/:cisId                               uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubcontractorController.getSubcontractorList(cisId: String)
 

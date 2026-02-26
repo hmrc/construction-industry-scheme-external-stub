@@ -89,9 +89,10 @@ class MonthlyReturnController @Inject() (
 
   def createNilMonthlyReturn: Action[CreateNilMonthlyReturnRequest] =
     authorise(parse.json[CreateNilMonthlyReturnRequest]) { implicit request =>
-      val enrolments = enrolmentHelper.contractorEnrolmentsOpt(request)
-      enrolments match {
-        case Some(enrolmentReference) =>
+      val orgEnrolments   = enrolmentHelper.contractorEnrolmentsOpt(request)
+      val agentEnrolments = enrolmentHelper.agentEnrolmentsOpt(request)
+      (orgEnrolments, agentEnrolments) match {
+        case (Some(enrolmentReference), _) =>
           (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {
 //            case ("400", _) => BadRequest(Json.obj("message" -> "Missing CIS enrolment identifiers"))
 //            case ("404", _) => NotFound(Json.obj("message" -> "CIS taxpayer not found"))
@@ -99,7 +100,8 @@ class MonthlyReturnController @Inject() (
             case ("502", _) => BadGateway(Json.obj("message" -> "formp failed"))
             case _          => Created(resourceHelper.resourceAsString(createNilMonthlyReturn_200_ResponsePath))
           }
-        case None                     => InternalServerError
+        case (_, Some(_))                  => Created(resourceHelper.resourceAsString(createNilMonthlyReturn_200_ResponsePath))
+        case (None, None)                  => InternalServerError
       }
     }
 

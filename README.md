@@ -841,6 +841,39 @@ To trigger the happy path, ensure you provide a valid request body (same shape a
 - Response status: `204`
 - Response body: _empty_
 
+**Endpoint**: `POST /cis/monthly-return-item/delete`
+
+**Description**: Delete a record in the monthly return item table.
+
+#### Happy Path
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: any valid Tax Office no.
+- Identifier Name: TaxOfficeReference
+- Identifier Value: any valid Tax Office ref.
+
+- or
+
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: Any valid value
+
+To trigger the happy path, ensure you provide a valid request body:
+```json
+{
+  "instanceId":  "1",
+  "taxYear": 2025,
+  "taxMonth": 11,
+  "amendment": "N",
+  "resourceReference": "123"
+}
+```
+- Response status: `204`
+- Response body: empty body
+```
 
 **Endpoint**: `POST /scheme/email`
 

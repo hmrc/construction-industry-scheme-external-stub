@@ -8,6 +8,7 @@ POST       /cis/monthly-return/nil/update                           uk.gov.hmrc.
 POST       /cis/monthly-return-edit                                 uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.getMonthlyReturnForEdit
 POST       /cis/monthly-return/standard/create                      uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.createMonthlyReturn
 POST       /cis/monthly-return-item/sync                            uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.syncMonthlyReturnItems
+POST       /cis/monthly-return-item/delete                          uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.deleteMonthlyReturnItem
 POST       /scheme/email                                            uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.getSchemeEmail
 POST       /submissions/create                                      uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubmissionController.createSubmission()
 POST       /submissions/update                                      uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubmissionController.updateSubmission()

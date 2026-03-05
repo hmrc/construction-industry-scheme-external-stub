@@ -182,16 +182,19 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
         "instanceId"             -> "abc-123",
         "taxYear"                -> 2025,
         "taxMonth"               -> 2,
+        "amendment"              -> "N",
         "decInformationCorrect"  -> "Y",
-        "decNilReturnNoPayments" -> "Y"
+        "decNilReturnNoPayments" -> "Y",
+        "nilReturnIndicator"     -> "Y",
+        "status"                 -> "STARTED"
       )
 
       val req: FakeRequest[JsValue] =
-        FakeRequest(POST, "/formp-proxy/cis/monthly-return/nil/update")
+        FakeRequest(POST, "/formp-proxy/cis/monthly-return/update")
           .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
           .withBody(body)
 
-      val res: Future[Result] = controller.updateNilMonthlyReturn(req)
+      val res: Future[Result] = controller.updateMonthlyReturn(req)
 
       status(res) mustBe NO_CONTENT
       contentAsString(res) mustBe ""
@@ -199,11 +202,11 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
 
     "returns 400 when JSON body is invalid" in new Setup {
       val req: FakeRequest[JsValue] =
-        FakeRequest(POST, "/formp-proxy/cis/monthly-return/nil/update")
+        FakeRequest(POST, "/formp-proxy/cis/monthly-return/update")
           .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
           .withBody(Json.obj("instanceId" -> "abc-123"))
 
-      val res: Future[Result] = controller.updateNilMonthlyReturn(req)
+      val res: Future[Result] = controller.updateMonthlyReturn(req)
 
       status(res) mustBe BAD_REQUEST
       (contentAsJson(res) \ "message").as[String] mustBe "Invalid JSON body"

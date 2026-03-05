@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.constructionindustryschemeexternalstub.models.request
+package uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests
 
-import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.SyncMonthlyReturnItemsRequest
 

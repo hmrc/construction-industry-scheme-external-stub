@@ -126,10 +126,10 @@ class MonthlyReturnController @Inject() (
       Future.successful(Created)
     }
 
-  def updateNilMonthlyReturn: Action[JsValue] =
+  def updateMonthlyReturn: Action[JsValue] =
     authorise.async(parse.json) { implicit request =>
       request.body
-        .validate[UpdateNilMonthlyReturnRequest]
+        .validate[UpdateMonthlyReturnRequest]
         .foldErrorsIntoBadRequest { _ =>
           Future.successful(NoContent)
         }

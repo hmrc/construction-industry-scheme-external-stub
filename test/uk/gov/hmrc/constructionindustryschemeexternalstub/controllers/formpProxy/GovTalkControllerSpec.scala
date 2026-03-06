@@ -123,15 +123,10 @@ class GovTalkControllerSpec extends SpecBase {
       contentAsJson(res) mustBe response
     }
 
-    "returns 200 with empty array on valid payload for for taxOfficeNumber = 404" in new Setup {
+    "returns 404 on valid payload for taxOfficeNumber = 404" in new Setup {
 
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
         .thenReturn(Some(EmployerReference("404", "")))
-
-      val response: JsObject =
-        Json.obj(
-          "govtalk_status" -> Json.arr()
-        )
 
       val json: JsValue = Json.toJson(
         GetGovTalkStatusRequest(
@@ -140,28 +135,19 @@ class GovTalkControllerSpec extends SpecBase {
         )
       )
 
-      when(mockResourceHelper.resourceAsString(any()))
-        .thenReturn(response.toString)
-
       val req: FakeRequest[JsValue] = makeJsonRequest(json, getGovTalkStatusUrl)
       val res: Future[Result]       = controller.getGovTalkStatus()(req)
 
-      status(res) mustBe OK
-      contentAsJson(res) mustBe response
+      status(res) mustBe NOT_FOUND
     }
 
-    "returns 200 with empty array on valid payload for for agentReference = 404" in new Setup {
+    "returns 404 on valid payload for agentReference = AGT404" in new Setup {
 
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
         .thenReturn(None)
 
       when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
-        .thenReturn(Some("404"))
-
-      val response: JsObject =
-        Json.obj(
-          "govtalk_status" -> Json.arr()
-        )
+        .thenReturn(Some("AGT404"))
 
       val json: JsValue = Json.toJson(
         GetGovTalkStatusRequest(
@@ -170,14 +156,10 @@ class GovTalkControllerSpec extends SpecBase {
         )
       )
 
-      when(mockResourceHelper.resourceAsString(any()))
-        .thenReturn(response.toString)
-
       val req: FakeRequest[JsValue] = makeJsonRequest(json, getGovTalkStatusUrl)
       val res: Future[Result]       = controller.getGovTalkStatus()(req)
 
-      status(res) mustBe OK
-      contentAsJson(res) mustBe response
+      status(res) mustBe NOT_FOUND
     }
 
     "returns 400 BadRequest for invalid JSON" in new Setup {

@@ -36,10 +36,8 @@ class GovTalkController @Inject() (
 )() extends BackendController(cc)
     with Logging {
 
-  private val govTalkReturnResponsePath              = "/resources/govTalk"
-  private val getGovTalkStatus_200_ResponsePath      = s"$govTalkReturnResponsePath/getGovTalkStatus-200-response.json"
-  private val getGovTalkStatus_200_EmptyResponsePath =
-    s"$govTalkReturnResponsePath/getGovTalkStatus-200-empty-response.json"
+  private val govTalkReturnResponsePath         = "/resources/govTalk"
+  private val getGovTalkStatus_200_ResponsePath = s"$govTalkReturnResponsePath/getGovTalkStatus-200-response.json"
 
   def getGovTalkStatus: Action[JsValue] =
     authorise(parse.json) { implicit request =>
@@ -53,14 +51,14 @@ class GovTalkController @Inject() (
                 (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {
                   case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
                   case ("502", _) => BadGateway(Json.obj("message" -> "formp failed"))
-                  case ("404", _) => Ok(resourceHelper.resourceAsString(getGovTalkStatus_200_EmptyResponsePath))
+                  case ("404", _) => NotFound
                   case _          => Ok(resourceHelper.resourceAsString(getGovTalkStatus_200_ResponsePath))
                 }
               case None                     =>
                 enrolmentHelper.agentEnrolmentsOpt(request) match {
-                  case Some("404") => Ok(resourceHelper.resourceAsString(getGovTalkStatus_200_EmptyResponsePath))
-                  case Some(_)     => Ok(resourceHelper.resourceAsString(getGovTalkStatus_200_ResponsePath))
-                  case None        => InternalServerError
+                  case Some("AGT404") => NotFound
+                  case Some(_)        => Ok(resourceHelper.resourceAsString(getGovTalkStatus_200_ResponsePath))
+                  case None           => InternalServerError
                 }
             }
         )

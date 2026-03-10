@@ -16,12 +16,13 @@
 
 package uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests
 
+import org.scalatest.EitherValues
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{Company, Partnership, SoleTrader}
 
-class CreateAndUpdateSubcontractorRequestSpec extends AnyWordSpec with Matchers {
+class CreateAndUpdateSubcontractorRequestSpec extends AnyWordSpec with Matchers with EitherValues {
 
   "CreateAndUpdateSubcontractorRequest JSON format" should {
 
@@ -165,6 +166,26 @@ class CreateAndUpdateSubcontractorRequestSpec extends AnyWordSpec with Matchers 
     "fail to read when 'subcontractorType' is missing" in {
       val json = Json.parse("""{ "cisId": "CIS-123" }""")
       json.validate[CreateAndUpdateSubcontractorRequest].isError mustBe true
+    }
+
+    "should fail to read when subcontractorType is unsupported" in {
+      val json = Json.parse("""
+                              |{
+                              |  "cisId": "CIS-123",
+                              |  "subcontractorType": "banana"
+                              |}
+                              |""".stripMargin)
+
+      val result = json.validate[CreateAndUpdateSubcontractorRequest]
+      result.isError mustBe true
+
+      val errs = result match {
+        case JsError(e) => e
+        case _          => fail("Expected JsError")
+      }
+
+      val msg = errs.flatMap(_._2).flatMap(_.messages).mkString(" | ")
+      msg must include("Invalid SubcontractorType value")
     }
 
     "write should omit None fields (SoleTraderRequest)" in {

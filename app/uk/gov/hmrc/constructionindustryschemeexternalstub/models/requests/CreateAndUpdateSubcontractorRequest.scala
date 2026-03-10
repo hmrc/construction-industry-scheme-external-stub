@@ -96,11 +96,11 @@ object CreateAndUpdateSubcontractorRequest {
   given OFormat[CreateAndUpdateSubcontractorRequest] = new OFormat[CreateAndUpdateSubcontractorRequest] {
 
     override def reads(json: JsValue): JsResult[CreateAndUpdateSubcontractorRequest] =
-      (json \ "subcontractorType").validate[SubcontractorType].flatMap {
-        case SoleTrader  => json.validate[SoleTraderRequest]
-        case Company     => json.validate[CompanyRequest]
-        case Partnership => json.validate[PartnershipRequest]
-        case other       => JsError(s"Unsupported subcontractorType: $other")
+      (json \ "subcontractorType").validate[String].map(_.toLowerCase).flatMap {
+        case SoleTrader.toString  => json.validate[SoleTraderRequest]
+        case Company.toString     => json.validate[CompanyRequest]
+        case Partnership.toString => json.validate[PartnershipRequest]
+        case other                => JsError(s"Unsupported subcontractorType: $other")
       }
 
     override def writes(o: CreateAndUpdateSubcontractorRequest): JsObject = o match {

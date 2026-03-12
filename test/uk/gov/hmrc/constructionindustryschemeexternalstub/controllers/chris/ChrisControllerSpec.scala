@@ -275,5 +275,28 @@ class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
           s"$correlationId--$statusValue"
       }
     }
+
+    "return delete response when function is delete" in {
+      val correlationId = "CORR-DELETE"
+
+      val deleteRequestXml =
+        <GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
+          <Header>
+            <MessageDetails>
+              <Function>delete</Function>
+              <CorrelationID>{correlationId}</CorrelationID>
+            </MessageDetails>
+          </Header>
+        </GovTalkMessage>
+
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn("DELETE-[correlationId]")
+
+      val request = postRequest.withXmlBody(deleteRequestXml)
+      val response = testInstance.getCISResponse(0).apply(request)
+
+      status(response) mustBe OK
+      contentAsString(response) mustBe s"DELETE-$correlationId"
+    }
   }
 }

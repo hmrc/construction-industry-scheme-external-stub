@@ -292,7 +292,7 @@ class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
       when(mockResourceHelper.resourceAsString(any()))
         .thenReturn("DELETE-[correlationId]")
 
-      val request = postRequest.withXmlBody(deleteRequestXml)
+      val request  = postRequest.withXmlBody(deleteRequestXml)
       val response = testInstance.getCISResponse(0).apply(request)
 
       status(response) mustBe OK

@@ -95,6 +95,8 @@ class CreateAndUpdateSubcontractorRequestSpec extends AnyWordSpec with Matchers 
           cisId = "CIS-789",
           utr = Some("1234567890"),
           partnerUtr = Some("9999999999"),
+          crn = Some("CRN123"),
+          nino = Some("AA123456A"),
           partnershipTradingName = Some("My Partnership"),
           tradingName = Some("Nominated Partner"),
           addressLine1 = Some("1 Partnership Lane"),
@@ -115,6 +117,8 @@ class CreateAndUpdateSubcontractorRequestSpec extends AnyWordSpec with Matchers 
       (json \ "subcontractorType").as[String] mustBe Partnership.toString
       (json \ "partnerUtr").as[String] mustBe "9999999999"
       (json \ "partnershipTradingName").as[String] mustBe "My Partnership"
+      (json \ "crn").as[String] mustBe "CRN123"
+      (json \ "nino").as[String] mustBe "AA123456A"
     }
 
     "read minimal valid JSON (only required fields) for SoleTraderRequest" in {

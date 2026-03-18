@@ -815,7 +815,7 @@ To trigger the happy path, ensure you provide a valid request body:
 - Response body: empty body
 ```
 
-**Endpoint**: `POST /cis/monthly-return/nil/update`
+**Endpoint**: `POST /cis/monthly-return/update`
 
 **Description**: Updates an existing nil monthly return record.
 
@@ -834,8 +834,11 @@ To trigger the happy path, ensure you provide a valid request body (same shape a
   "instanceId":  "1",
   "taxYear": 2025,
   "taxMonth": 11,
+  "amendment": "N",
   "decInformationCorrect": "true",
-  "decNilReturnNoPayments": "true"
+  "decNilReturnNoPayments": "true",
+  "nilReturnIndicator": "Y",
+  "status": "STARTED"
 }
 ```
 - Response status: `204`

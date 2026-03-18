@@ -4,7 +4,7 @@
 POST       /monthly-returns                                         uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.retrieveMonthlyReturns
 POST       /cis/retrieve-unsubmitted-monthly-returns                uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.retrieveUnsubmittedMonthlyReturns
 POST       /cis/monthly-return/nil/create                           uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.createNilMonthlyReturn
-POST       /cis/monthly-return/nil/update                           uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.updateNilMonthlyReturn
+POST       /cis/monthly-return/update                               uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.updateMonthlyReturn
 POST       /cis/monthly-return-edit                                 uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.getMonthlyReturnForEdit
 POST       /cis/monthly-return/standard/create                      uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.createMonthlyReturn
 POST       /cis/monthly-return-item/sync                            uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.syncMonthlyReturnItems

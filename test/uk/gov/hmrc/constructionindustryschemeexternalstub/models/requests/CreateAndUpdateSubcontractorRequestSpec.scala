@@ -16,39 +16,37 @@
 
 package uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests
 
+import org.scalatest.EitherValues
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.*
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.SoleTrader
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{Company, Partnership, SoleTrader}
 
-class CreateAndUpdateSubcontractorRequestSpec extends AnyWordSpec with Matchers {
+class CreateAndUpdateSubcontractorRequestSpec extends AnyWordSpec with Matchers with EitherValues {
 
   "CreateAndUpdateSubcontractorRequest JSON format" should {
 
-    "round-trip (write then read) with all fields populated" in {
-      val model = CreateAndUpdateSubcontractorRequest(
-        cisId = "CIS-123",
-        subcontractorType = SoleTrader,
-        utr = Some("1234567890"),
-        partnerUtr = Some("9999999999"),
-        crn = Some("CRN123"),
-        nino = Some("AB123456C"),
-        firstName = Some("Jane"),
-        secondName = Some("Q"),
-        surname = Some("Doe"),
-        partnershipTradingName = Some("My Partnership"),
-        tradingName = Some("ABC Ltd"),
-        addressLine1 = Some("10 Downing Street"),
-        addressLine2 = Some("Westminster"),
-        city = Some("London"),
-        county = Some("Greater London"),
-        country = Some("United Kingdom"),
-        postcode = Some("SW1A 2AA"),
-        emailAddress = Some("jane.doe@example.com"),
-        phoneNumber = Some("0123456789"),
-        mobilePhoneNumber = Some("07123456789"),
-        worksReferenceNumber = Some("WRN-001")
-      )
+    "round-trip (write then read) for SoleTraderRequest with fields populated" in {
+      val model: CreateAndUpdateSubcontractorRequest =
+        CreateAndUpdateSubcontractorRequest.SoleTraderRequest(
+          cisId = "CIS-123",
+          utr = Some("1234567890"),
+          nino = Some("AB123456C"),
+          firstName = Some("Jane"),
+          secondName = Some("Q"),
+          surname = Some("Doe"),
+          tradingName = Some("ABC Ltd"),
+          addressLine1 = Some("10 Downing Street"),
+          addressLine2 = Some("Westminster"),
+          city = Some("London"),
+          county = Some("Greater London"),
+          country = Some("United Kingdom"),
+          postcode = Some("SW1A 2AA"),
+          emailAddress = Some("jane.doe@example.com"),
+          phoneNumber = Some("0123456789"),
+          mobilePhoneNumber = Some("07123456789"),
+          worksReferenceNumber = Some("WRN-001")
+        )
 
       val json = Json.toJson(model)
       val back = json.as[CreateAndUpdateSubcontractorRequest]
@@ -65,7 +63,61 @@ class CreateAndUpdateSubcontractorRequestSpec extends AnyWordSpec with Matchers 
       (json \ "country").as[String] mustBe "United Kingdom"
     }
 
-    "read minimal valid JSON (only required fields)" in {
+    "round-trip (write then read) for CompanyRequest with fields populated" in {
+      val model: CreateAndUpdateSubcontractorRequest =
+        CreateAndUpdateSubcontractorRequest.CompanyRequest(
+          cisId = "CIS-456",
+          utr = Some("1234567890"),
+          crn = Some("CRN123"),
+          tradingName = Some("ACME LTD"),
+          addressLine1 = Some("1 Company Street"),
+          city = Some("London"),
+          county = Some("Greater London"),
+          country = Some("United Kingdom"),
+          postcode = Some("EC1A 1AA"),
+          emailAddress = Some("company@example.com"),
+          phoneNumber = Some("02000000000"),
+          mobilePhoneNumber = Some("07111111111"),
+          worksReferenceNumber = Some("WRN-999")
+        )
+
+      val json = Json.toJson(model)
+      val back = json.as[CreateAndUpdateSubcontractorRequest]
+
+      back mustEqual model
+      (json \ "subcontractorType").as[String] mustBe Company.toString
+      (json \ "crn").as[String] mustBe "CRN123"
+    }
+
+    "round-trip (write then read) for PartnershipRequest with fields populated" in {
+      val model: CreateAndUpdateSubcontractorRequest =
+        CreateAndUpdateSubcontractorRequest.PartnershipRequest(
+          cisId = "CIS-789",
+          utr = Some("1234567890"),
+          partnerUtr = Some("9999999999"),
+          partnershipTradingName = Some("My Partnership"),
+          tradingName = Some("Nominated Partner"),
+          addressLine1 = Some("1 Partnership Lane"),
+          city = Some("London"),
+          county = Some("Greater London"),
+          country = Some("United Kingdom"),
+          postcode = Some("SE1 1AA"),
+          emailAddress = Some("partner@example.com"),
+          phoneNumber = Some("02011111111"),
+          mobilePhoneNumber = Some("07222222222"),
+          worksReferenceNumber = Some("WRN-123")
+        )
+
+      val json = Json.toJson(model)
+      val back = json.as[CreateAndUpdateSubcontractorRequest]
+
+      back mustEqual model
+      (json \ "subcontractorType").as[String] mustBe Partnership.toString
+      (json \ "partnerUtr").as[String] mustBe "9999999999"
+      (json \ "partnershipTradingName").as[String] mustBe "My Partnership"
+    }
+
+    "read minimal valid JSON (only required fields) for SoleTraderRequest" in {
       val json =
         Json.parse(
           s"""
@@ -82,10 +134,16 @@ class CreateAndUpdateSubcontractorRequestSpec extends AnyWordSpec with Matchers 
       val model = result.get
       model.cisId mustBe "CIS-999"
       model.subcontractorType mustBe SoleTrader
-      model.tradingName mustBe None
-      model.postcode mustBe None
-      model.utr mustBe None
-      model.mobilePhoneNumber mustBe None
+
+      model match {
+        case st: CreateAndUpdateSubcontractorRequest.SoleTraderRequest =>
+          st.tradingName mustBe None
+          st.postcode mustBe None
+          st.utr mustBe None
+          st.mobilePhoneNumber mustBe None
+        case other                                                     =>
+          fail(s"Expected SoleTraderRequest but got: ${other.getClass.getSimpleName}")
+      }
     }
 
     "fail to read when 'cisId' is missing" in {
@@ -101,39 +159,37 @@ class CreateAndUpdateSubcontractorRequestSpec extends AnyWordSpec with Matchers 
       val result = json.validate[CreateAndUpdateSubcontractorRequest]
       result.isError mustBe true
 
-      val errors = result.asEither.swap.getOrElse {
-        fail("Expected validation errors but JSON validated successfully")
-      }
-
+      val errors = result.asEither.swap.getOrElse(fail("Expected validation errors but JSON validated successfully"))
       errors.map(_._1.toString()) must contain("/cisId")
     }
 
     "fail to read when 'subcontractorType' is missing" in {
-      val json =
-        Json.parse(
-          s"""
-             |{
-             |  "cisId": "CIS-123"
-             |}
-             |""".stripMargin
-        )
+      val json = Json.parse("""{ "cisId": "CIS-123" }""")
+      json.validate[CreateAndUpdateSubcontractorRequest].isError mustBe true
+    }
+
+    "should fail to read when subcontractorType is unsupported" in {
+      val json = Json.parse("""{ "cisId": "CIS-123", "subcontractorType": "banana" }""")
 
       val result = json.validate[CreateAndUpdateSubcontractorRequest]
       result.isError mustBe true
 
-      val errors = result.asEither.swap.getOrElse {
-        fail("Expected validation errors but JSON validated successfully")
+      val msg = result match {
+        case JsError(errs) => errs.flatMap(_._2).flatMap(_.messages).mkString(" | ")
+        case _             => fail("Expected JsError")
       }
-      errors.map(_._1.toString()) must contain("/subcontractorType")
+
+      msg must include("Unsupported subcontractorType: banana")
     }
 
-    "write should omit None fields" in {
-      val model = CreateAndUpdateSubcontractorRequest(
-        cisId = "CIS-omit-nones",
-        subcontractorType = SoleTrader
-      )
+    "write should omit None fields (SoleTraderRequest)" in {
+      val model: CreateAndUpdateSubcontractorRequest =
+        CreateAndUpdateSubcontractorRequest.SoleTraderRequest(
+          cisId = "CIS-omit-nones"
+        )
 
       val json = Json.toJson(model).as[JsObject]
+
       json.keys must contain allOf ("cisId", "subcontractorType")
 
       json.keys must not contain "utr"
@@ -143,6 +199,10 @@ class CreateAndUpdateSubcontractorRequestSpec extends AnyWordSpec with Matchers 
       json.keys must not contain "postcode"
       json.keys must not contain "mobilePhoneNumber"
       json.keys must not contain "worksReferenceNumber"
+      json.keys must not contain "firstName"
+      json.keys must not contain "secondName"
+      json.keys must not contain "surname"
+      json.keys must not contain "country"
     }
 
     "ignore unknown JSON fields (forward compatibility)" in {

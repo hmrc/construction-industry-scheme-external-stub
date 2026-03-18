@@ -90,7 +90,7 @@ class SubcontractorControllerSpec extends SpecBase {
           utr = Some("1234567890"),
           partnerUtr = Some("9999999999"),
           partnershipTradingName = Some("My Partnership"),
-          tradingName = Some("Nominated Partner"),
+          partnerTradingName = Some("Nominated Partner"),
           country = Some("United Kingdom")
         )
       )

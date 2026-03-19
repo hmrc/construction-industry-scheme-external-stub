@@ -39,7 +39,7 @@ class UpdateGovTalkStatusRequestSpec extends AnyWordSpec with Matchers {
       val model = json.as[UpdateGovTalkStatusRequest]
       model.userIdentifier mustBe "1"
       model.formResultID mustBe "12890"
-      model.endStateDate mustBe LocalDateTime.parse("2026-02-03T00:00:00")
+      model.endStateDate mustBe Some(LocalDateTime.parse("2026-02-03T00:00:00"))
       model.protocolStatus mustBe "dataRequest"
       Json.toJson(model) mustBe json
     }
@@ -70,17 +70,18 @@ class UpdateGovTalkStatusRequestSpec extends AnyWordSpec with Matchers {
       result.isError mustBe true
     }
 
-    "fail to read missing endStateDate" in {
+    "read missing endStateDate as None" in {
       val json = Json.parse("""
-                              |{
-                              |  "userIdentifier": "1",
-                              |  "formResultID": "12890",
-                              |  "protocolStatus": "dataRequest"
-                              |}
+          |{
+          |  "userIdentifier": "1",
+          |  "formResultID": "12890",
+          |  "protocolStatus": "dataRequest"
+          |}
             """.stripMargin)
 
       val result = json.validate[UpdateGovTalkStatusRequest]
-      result.isError mustBe true
+      result.isSuccess mustBe true
+      result.get.endStateDate mustBe None
     }
 
     "fail to read missing protocolStatus" in {

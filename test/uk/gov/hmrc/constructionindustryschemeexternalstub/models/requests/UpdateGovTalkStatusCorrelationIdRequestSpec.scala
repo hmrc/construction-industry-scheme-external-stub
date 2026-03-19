@@ -19,7 +19,6 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.libs.json.Json
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.UpdateGovTalkStatusCorrelationIdRequest
 
 class UpdateGovTalkStatusCorrelationIdRequestSpec extends AnyFreeSpec with Matchers {
 

@@ -314,7 +314,7 @@ class GovTalkControllerSpec extends SpecBase {
         UpdateGovTalkStatusRequest(
           userIdentifier = "123",
           formResultID = "YE2025",
-          endStateDate = LocalDateTime.parse("2026-02-03T00:00:00"),
+          endStateDate = Some(LocalDateTime.parse("2026-02-03T00:00:00")),
           protocolStatus = "dataRequest"
         )
       )

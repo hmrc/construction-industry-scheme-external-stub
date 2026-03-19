@@ -19,7 +19,6 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.*
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.SyncMonthlyReturnItemsRequest
 
 class SyncMonthlyReturnItemsRequestSpec extends AnyWordSpec with Matchers {
 

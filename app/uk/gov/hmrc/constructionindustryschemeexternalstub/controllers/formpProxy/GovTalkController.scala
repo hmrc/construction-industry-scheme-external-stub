@@ -52,12 +52,12 @@ class GovTalkController @Inject() (
                   case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
                   case ("502", _) => BadGateway(Json.obj("message" -> "formp failed"))
                   case ("404", _) => NotFound
-                  case _          => Ok(resourceHelper.resourceAsString(getGovTalkStatus_200_ResponsePath))
+                  case _          => NotFound
                 }
               case None                     =>
                 enrolmentHelper.agentEnrolmentsOpt(request) match {
                   case Some("AGT404") => NotFound
-                  case Some(_)        => Ok(resourceHelper.resourceAsString(getGovTalkStatus_200_ResponsePath))
+                  case Some(_)        => NotFound
                   case None           => InternalServerError
                 }
             }

@@ -25,7 +25,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.FakeAuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.base.SpecBase
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{EmployerReference, SoleTrader}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.EmployerReference
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.CreateAndUpdateSubcontractorRequest
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.response.{GetSubcontractorListResponse, Subcontractor}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
@@ -39,12 +39,59 @@ class SubcontractorControllerSpec extends SpecBase {
 
   ".createAndUpdateSubcontractor" - {
 
-    "returns 204 NoContent with valid payload" in new Setup {
+    "returns 204 NoContent with valid SoleTrader payload" in new Setup {
       val json: JsValue = Json.toJson(
-        CreateAndUpdateSubcontractorRequest(
+        CreateAndUpdateSubcontractorRequest.SoleTraderRequest(
           cisId = cisId,
-          subcontractorType = SoleTrader,
-          tradingName = Some("trading name")
+          tradingName = Some("trading name"),
+          utr = Some("1234567890"),
+          nino = Some("AA123456A"),
+          firstName = Some("John"),
+          surname = Some("Smith"),
+          country = Some("United Kingdom")
+        )
+      )
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("200", "")))
+
+      val req: FakeRequest[JsValue] = makeJsonRequest(json, updateSubcontractorUrl)
+      val res: Future[Result]       = controller.createAndUpdateSubcontractor()(req)
+
+      status(res) mustBe NO_CONTENT
+      contentAsString(res) mustBe ""
+    }
+
+    "returns 204 NoContent with valid Company payload" in new Setup {
+      val json: JsValue = Json.toJson(
+        CreateAndUpdateSubcontractorRequest.CompanyRequest(
+          cisId = cisId,
+          tradingName = Some("ACME LTD"),
+          utr = Some("1234567890"),
+          crn = Some("CRN123"),
+          country = Some("United Kingdom")
+        )
+      )
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("200", "")))
+
+      val req: FakeRequest[JsValue] = makeJsonRequest(json, updateSubcontractorUrl)
+      val res: Future[Result]       = controller.createAndUpdateSubcontractor()(req)
+
+      status(res) mustBe NO_CONTENT
+      contentAsString(res) mustBe ""
+    }
+
+    "returns 204 NoContent with valid Partnership payload" in new Setup {
+      val json: JsValue = Json.toJson(
+        CreateAndUpdateSubcontractorRequest.PartnershipRequest(
+          cisId = cisId,
+          utr = Some("1234567890"),
+          partnerUtr = Some("9999999999"),
+          partnershipTradingName = Some("My Partnership"),
+          partnerTradingName = Some("Nominated Partner"),
+          country = Some("United Kingdom")
         )
       )
 
@@ -71,6 +118,20 @@ class SubcontractorControllerSpec extends SpecBase {
       (contentAsJson(res) \ "message").as[String] mustBe "Invalid payload"
       (contentAsJson(res) \ "errors").isDefined mustBe true
     }
+  }
+
+  "returns 400 BadRequest with validation errors when payload is invalid" in new Setup {
+    val invalidJson: JsValue = Json.obj(
+      "cisId"       -> cisId,
+      "tradingName" -> "name-only"
+    )
+
+    val req: FakeRequest[JsValue] = makeJsonRequest(invalidJson, updateSubcontractorUrl)
+    val res: Future[Result]       = controller.createAndUpdateSubcontractor()(req)
+
+    status(res) mustBe BAD_REQUEST
+    (contentAsJson(res) \ "message").as[String] mustBe "Invalid payload"
+    (contentAsJson(res) \ "errors").isDefined mustBe true
   }
 
   ".getSubcontractorList" - {

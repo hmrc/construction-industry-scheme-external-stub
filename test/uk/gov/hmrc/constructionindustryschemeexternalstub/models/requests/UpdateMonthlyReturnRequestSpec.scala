@@ -16,16 +16,26 @@
 
 package uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests
 
-import play.api.libs.json.{Json, OFormat}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
+import play.api.libs.json.{JsSuccess, Json}
 
-import java.time.LocalDateTime
+class UpdateMonthlyReturnRequestSpec extends AnyWordSpec with Matchers {
 
-case class UpdateGovTalkStatusRequest(
-  userIdentifier: String,
-  formResultID: String,
-  endStateDate: Option[LocalDateTime] = None,
-  protocolStatus: String
-)
+  "UpdateMonthlyReturnRequest.format" should {
 
-object UpdateGovTalkStatusRequest:
-  given format: OFormat[UpdateGovTalkStatusRequest] = Json.format[UpdateGovTalkStatusRequest]
+    "serialize and deserialize (round-trip) model" in {
+      val model = UpdateMonthlyReturnRequest(
+        instanceId = "instance-123",
+        taxYear = 2024,
+        taxMonth = 1,
+        amendment = "N",
+        nilReturnIndicator = "Y",
+        status = "STARTED"
+      )
+
+      val json = Json.toJson(model)
+      json.validate[UpdateMonthlyReturnRequest] shouldBe JsSuccess(model)
+    }
+  }
+}

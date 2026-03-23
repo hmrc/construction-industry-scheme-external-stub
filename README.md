@@ -815,7 +815,7 @@ To trigger the happy path, ensure you provide a valid request body:
 - Response body: empty body
 ```
 
-**Endpoint**: `POST /cis/monthly-return/nil/update`
+**Endpoint**: `POST /cis/monthly-return/update`
 
 **Description**: Updates an existing nil monthly return record.
 
@@ -834,8 +834,11 @@ To trigger the happy path, ensure you provide a valid request body (same shape a
   "instanceId":  "1",
   "taxYear": 2025,
   "taxMonth": 11,
+  "amendment": "N",
   "decInformationCorrect": "true",
-  "decNilReturnNoPayments": "true"
+  "decNilReturnNoPayments": "true",
+  "nilReturnIndicator": "Y",
+  "status": "STARTED"
 }
 ```
 - Response status: `204`
@@ -1289,7 +1292,7 @@ or
 
 **Endpoint**: `/cis/govtalkstatus/get`
 
-**Description**: Get GovTalk Status Record.
+**Description**: Get GovTalk Status Record. The stub allows triggering specific HTTP responses by providing special enrolment identifiers
 
 #### Happy Path
 
@@ -1337,6 +1340,35 @@ To trigger the happy path, ensure you provide a valid request body:
   ]
 }
 ```
+
+#### Error Scenario: 404 Not Found
+
+Contractor scenario:
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 404
+- Identifier Name: TaxOfficeReference
+- Identifier Value: Any valid value
+
+or
+
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: AGT404
+
+To trigger the happy path, ensure you provide a valid request body:
+```json
+{
+  "userIdentifier": "123",
+  "formResultID": "YE2025"
+}
+```
+- Enrolments: request must have either HMRC-CIS-ORG or IR-PAYE-AGENT Enrolment
+
+- Response status: `404`
 
 **Endpoint**: `/cis/govtalkstatus/update-correlationID`
 

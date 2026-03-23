@@ -16,16 +16,25 @@
 
 package uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests
 
-import play.api.libs.json.{Json, OFormat}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
+import play.api.libs.json.*
 
-final case class UpdateNilMonthlyReturnRequest(
-  instanceId: String,
-  taxYear: Int,
-  taxMonth: Int,
-  decInformationCorrect: String,
-  decNilReturnNoPayments: String
-)
+class SyncMonthlyReturnItemsRequestSpec extends AnyWordSpec with Matchers {
 
-object UpdateNilMonthlyReturnRequest {
-  implicit val format: OFormat[UpdateNilMonthlyReturnRequest] = Json.format[UpdateNilMonthlyReturnRequest]
+  "SyncMonthlyReturnItemsRequest JSON format" should {
+    "serialize and deserialize" in {
+      val model = SyncMonthlyReturnItemsRequest(
+        instanceId = "instance-1",
+        taxYear = 2026,
+        taxMonth = 2,
+        amendment = "amendment-1",
+        createResourceReferences = Seq(10L, 20L),
+        deleteResourceReferences = Seq(30L)
+      )
+
+      val json = Json.toJson(model)
+      json.validate[SyncMonthlyReturnItemsRequest].asOpt shouldBe Some(model)
+    }
+  }
 }

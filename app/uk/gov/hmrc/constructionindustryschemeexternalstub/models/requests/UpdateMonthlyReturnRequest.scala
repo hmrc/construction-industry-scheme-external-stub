@@ -18,14 +18,21 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests
 
 import play.api.libs.json.{Json, OFormat}
 
-import java.time.LocalDateTime
-
-case class UpdateGovTalkStatusRequest(
-  userIdentifier: String,
-  formResultID: String,
-  endStateDate: Option[LocalDateTime] = None,
-  protocolStatus: String
+case class UpdateMonthlyReturnRequest(
+  instanceId: String,
+  taxYear: Int,
+  taxMonth: Int,
+  amendment: String,
+  decEmpStatusConsidered: Option[String] = None,
+  decAllSubsVerified: Option[String] = None,
+  decNoMoreSubPayments: Option[String] = None,
+  decNilReturnNoPayments: Option[String] = None,
+  decInformationCorrect: Option[String] = None,
+  nilReturnIndicator: String,
+  status: String,
+  version: Option[Long] = None
 )
 
-object UpdateGovTalkStatusRequest:
-  given format: OFormat[UpdateGovTalkStatusRequest] = Json.format[UpdateGovTalkStatusRequest]
+object UpdateMonthlyReturnRequest {
+  given format: OFormat[UpdateMonthlyReturnRequest] = Json.format[UpdateMonthlyReturnRequest]
+}

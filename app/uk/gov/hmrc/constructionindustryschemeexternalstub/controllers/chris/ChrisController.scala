@@ -24,7 +24,7 @@ import uk.gov.hmrc.constructionindustryschemeexternalstub.services.ChrisService
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.ResourceHelper
 
-import java.time.Instant
+import java.time.LocalDateTime
 import javax.inject.{Inject, Singleton}
 import scala.xml.{Node, NodeSeq}
 
@@ -53,7 +53,7 @@ class ChrisController @Inject() (
     val message                           = request.body.asXml.get
     val correlationId                     = (message \ "Header" \ "MessageDetails" \ "CorrelationID").text
     val pollingUrlHost                    = config.callback
-    val gatewayTimestamp                  = Instant.now().toString
+    val gatewayTimestamp                  = LocalDateTime.now().toString
     val keys                              = message \ "GovTalkDetails" \ "Keys" \ "Key"
     def typeIs(value: String)(node: Node) = node \@ "Type" == value
     val taxOfficeNumber                   = (keys filter typeIs("TaxOfficeNumber")).text match {
@@ -150,7 +150,7 @@ class ChrisController @Inject() (
     val message          = request.body.asXml.get
     val correlationId    = (message \ "Header" \ "MessageDetails" \ "CorrelationID").text
     val pollingUrlHost   = config.callback
-    val gatewayTimestamp = Instant.now().toString
+    val gatewayTimestamp = LocalDateTime.now().toString
     val finalStatusOpt   = request.getQueryString("final")
     val isFinalPoll      = finalStatusOpt.isDefined && count >= 2
 

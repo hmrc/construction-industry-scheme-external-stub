@@ -9,7 +9,7 @@
             <CorrelationID>[correlationId]</CorrelationID>
             <ResponseEndPoint PollInterval="2">[pollingUrlHost]submission/ChRIS/IR-CIS-CIS300MR/Filing/data/true</ResponseEndPoint>
             <Transformation>XML</Transformation>
-            <GatewayTimestamp>2025-12-01T10:51:31.225Z</GatewayTimestamp>
+            <GatewayTimestamp>2025-12-01T10:51:31.225</GatewayTimestamp>
         </MessageDetails>
     </Header>
     <GovTalkDetails>

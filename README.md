@@ -2331,6 +2331,43 @@ staging = https://construction-industry-scheme-external-stub.protected.mdtp:443/
 </GovTalkMessage>
 ```
 
+**Endpoint**: `/hmrc/email`
+
+**Description**: Send email.
+
+#### Happy Path
+
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: Any valid value
+
+or
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: Any valid value
+- Identifier Name: TaxOfficeReference
+- Identifier Value: Any valid value
+
+
+To trigger the happy path, ensure you provide a valid request body:
+```json
+{
+  "to": ["email1@test.com", "email2@test.com"],
+  "templateId": "emailTemplateId",
+  "parameters": {
+    "year": "2026",
+    "month": "March"
+  }
+}
+```
+- Enrolments: request must have either HMRC-CIS-ORG or IR-PAYE-AGENT Enrolment
+
+- Response status: `202`
+- Response body: N/A
+
 ### Iass 
 
 

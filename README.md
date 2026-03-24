@@ -2094,7 +2094,7 @@ staging = https://construction-industry-scheme-external-stub.protected.mdtp:443/
         <GovTalkErrors>
             <Error>
                 <RaisedBy>Gateway</RaisedBy>
-                <Number>3000</Number>
+                <Number>1001</Number>
                 <Type>fatal</Type>
                 <Text>Forced fatal error (stub)</Text>
                 <Location></Location>
@@ -2104,7 +2104,168 @@ staging = https://construction-industry-scheme-external-stub.protected.mdtp:443/
     <Body/>
 </GovTalkMessage>
 ```
+###### HTTP 200 - Recoverable Error with error number 3000 (will trigger polling)
 
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 759
+- Identifier Name: TaxOfficeReference
+- Identifier Value: **EZ00100**
+
+
+- Request body: **See valid request body above.**
+
+
+- Response status: `200`
+- Response body:
+
+**{environmentUrl}**:
+
+local = http://localhost:6997/
+
+staging = https://construction-industry-scheme-external-stub.protected.mdtp:443/
+
+```xml
+<GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
+    <EnvelopeVersion>2.0</EnvelopeVersion>
+    <Header>
+        <MessageDetails>
+            <Class>IR-CIS-CIS300MR</Class>
+            <Qualifier>error</Qualifier>
+            <Function>submit</Function>
+            <TransactionID></TransactionID>
+            <CorrelationID>C0A341CF946B46A18BF01C270D15B1E6</CorrelationID>
+            <ResponseEndPoint PollInterval="2">{environmentUrl}submission/ChRIS/IR-CIS-CIS300MR/Filing/data/true</ResponseEndPoint>
+            <Transformation>XML</Transformation>
+            <GatewayTimestamp>2025-11-25T12:03:25.242</GatewayTimestamp>
+        </MessageDetails>
+    </Header>
+    <GovTalkDetails>
+        <Keys/>
+        <GovTalkErrors>
+            <Error>
+                <RaisedBy>Gateway</RaisedBy>
+                <Number>3000</Number>
+                <Type>fatal</Type>
+                <Text>The processing of your document submission failed. Please re-submit</Text>
+                <Location></Location>
+            </Error>
+        </GovTalkErrors>
+    </GovTalkDetails>
+    <Body/>
+</GovTalkMessage>
+```
+
+###### HTTP 200 - Recoverable Error with error number 2005 (will trigger polling)
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 760
+- Identifier Name: TaxOfficeReference
+- Identifier Value: **EZ00100**
+
+
+- Request body: **See valid request body above.**
+
+
+- Response status: `200`
+- Response body:
+
+**{environmentUrl}**:
+
+local = http://localhost:6997/
+
+staging = https://construction-industry-scheme-external-stub.protected.mdtp:443/
+
+```xml
+<GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
+    <EnvelopeVersion>2.0</EnvelopeVersion>
+    <Header>
+        <MessageDetails>
+            <Class>IR-CIS-CIS300MR</Class>
+            <Qualifier>error</Qualifier>
+            <Function>submit</Function>
+            <TransactionID></TransactionID>
+            <CorrelationID>C0A341CF946B46A18BF01C270D15B1E6</CorrelationID>
+            <ResponseEndPoint PollInterval="2">{environmentUrl}submission/ChRIS/IR-CIS-CIS300MR/Filing/data/true</ResponseEndPoint>
+            <Transformation>XML</Transformation>
+            <GatewayTimestamp>2025-11-25T12:03:25.242</GatewayTimestamp>
+        </MessageDetails>
+    </Header>
+    <GovTalkDetails>
+        <Keys/>
+        <GovTalkErrors>
+            <Error>
+                <RaisedBy>Gateway</RaisedBy>
+                <Number>3000</Number>
+                <Type>fatal</Type>
+                <Text>
+                    The Transaction Engine has not received an acknowledgement of your submission from
+                    the back-end system within the permitted timescale. Either resubmit or contact the
+                    appropriate organisation directly to determine if your submission has been accepted.
+                </Text>
+                <Location></Location>
+            </Error>
+        </GovTalkErrors>
+    </GovTalkDetails>
+    <Body/>
+</GovTalkMessage>
+```
+
+###### HTTP 200 - Recoverable Error with error number 1000 (will trigger polling)
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 761
+- Identifier Name: TaxOfficeReference
+- Identifier Value: **EZ00100**
+
+
+- Request body: **See valid request body above.**
+
+
+- Response status: `200`
+- Response body:
+
+**{environmentUrl}**:
+
+local = http://localhost:6997/
+
+staging = https://construction-industry-scheme-external-stub.protected.mdtp:443/
+
+```xml
+<GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
+    <EnvelopeVersion>2.0</EnvelopeVersion>
+    <Header>
+        <MessageDetails>
+            <Class>IR-CIS-CIS300MR</Class>
+            <Qualifier>error</Qualifier>
+            <Function>submit</Function>
+            <TransactionID></TransactionID>
+            <CorrelationID>C0A341CF946B46A18BF01C270D15B1E6</CorrelationID>
+            <ResponseEndPoint PollInterval="2">{environmentUrl}submission/ChRIS/IR-CIS-CIS300MR/Filing/data/true</ResponseEndPoint>
+            <Transformation>XML</Transformation>
+            <GatewayTimestamp>2025-11-25T12:03:25.242</GatewayTimestamp>
+        </MessageDetails>
+    </Header>
+    <GovTalkDetails>
+        <Keys/>
+        <GovTalkErrors>
+            <Error>
+                <RaisedBy>Gateway</RaisedBy>
+                <Number>3000</Number>
+                <Type>fatal</Type>
+                <Text>System failure. The submission of this document has failed due to an internal system error.</Text>
+                <Location></Location>
+            </Error>
+        </GovTalkErrors>
+    </GovTalkDetails>
+    <Body/>
+</GovTalkMessage>
+```
 
 ###### HTTP 200 - Department Error (will trigger Polling)
 

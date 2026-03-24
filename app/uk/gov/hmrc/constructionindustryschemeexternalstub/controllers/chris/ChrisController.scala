@@ -36,16 +36,16 @@ class ChrisController @Inject() (
 ) extends BackendController(cc) {
   private val logger = Logger(classOf[ChrisController])
 
-  private val monthlyNilReturnResponsePath                      = "/resources/monthlyNilReturns"
-  private val submitCISMessage_acknowledgement_ResponsePath     =
+  private val monthlyNilReturnResponsePath                        = "/resources/monthlyNilReturns"
+  private val submitCISMessage_acknowledgement_ResponsePath       =
     s"$monthlyNilReturnResponsePath/submitCISMessage-acknowledgement-response.xml"
-  private val submitCISMessage_success_ResponsePath             =
+  private val submitCISMessage_success_ResponsePath               =
     s"$monthlyNilReturnResponsePath/submitCISMessage-success-response.xml"
-  private val submitCISMessage_fatalError_ResponsePath          =
+  private val submitCISMessage_fatalError_ResponsePath            =
     s"$monthlyNilReturnResponsePath/submitCISMessage-fatalError-response.xml"
-  private val submitCISMessage_businessError_ResponsePath       =
+  private val submitCISMessage_businessError_ResponsePath         =
     s"$monthlyNilReturnResponsePath/submitCISMessage-businessError-response.xml"
-  private val submitCISMessage_irMarkMismatchError_ResponsePath =
+  private val submitCISMessage_irMarkMismatchError_ResponsePath   =
     s"$monthlyNilReturnResponsePath/submitCISMessage-irMarkMismatchError-response.xml"
   private val submitCISMessage_recoverableError_3000_ResponsePath =
     s"$monthlyNilReturnResponsePath/submitCISMessage-recoverableError-3000-response.xml"
@@ -163,14 +163,14 @@ class ChrisController @Inject() (
       else finalStatusParam
 
     val resourcePath = status match {
-      case "ACKNOWLEDGE"                => submitCISMessage_acknowledgement_ResponsePath
-      case "SUBMITTED_NO_RECEIPT"       => submitCISMessage_irMarkMismatchError_ResponsePath
-      case "FATAL_ERROR"                => submitCISMessage_fatalError_ResponsePath
-      case "DEPARTMENTAL_ERROR"         => submitCISMessage_businessError_ResponsePath
-      case "RECOVERABLE_ERROR_3000"     => submitCISMessage_recoverableError_3000_ResponsePath
-      case "RECOVERABLE_ERROR_2005"     => submitCISMessage_recoverableError_2005_ResponsePath
-      case "RECOVERABLE_ERROR_1000"     => submitCISMessage_recoverableError_1000_ResponsePath
-      case _                      => submitCISMessage_success_ResponsePath
+      case "ACKNOWLEDGE"            => submitCISMessage_acknowledgement_ResponsePath
+      case "SUBMITTED_NO_RECEIPT"   => submitCISMessage_irMarkMismatchError_ResponsePath
+      case "FATAL_ERROR"            => submitCISMessage_fatalError_ResponsePath
+      case "DEPARTMENTAL_ERROR"     => submitCISMessage_businessError_ResponsePath
+      case "RECOVERABLE_ERROR_3000" => submitCISMessage_recoverableError_3000_ResponsePath
+      case "RECOVERABLE_ERROR_2005" => submitCISMessage_recoverableError_2005_ResponsePath
+      case "RECOVERABLE_ERROR_1000" => submitCISMessage_recoverableError_1000_ResponsePath
+      case _                        => submitCISMessage_success_ResponsePath
     }
 
     val rawXml      = resourceHelper.resourceAsString(resourcePath)

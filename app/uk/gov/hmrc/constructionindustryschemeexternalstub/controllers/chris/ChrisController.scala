@@ -17,6 +17,7 @@
 package uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.chris
 
 import play.api.Logger
+import play.api.mvc.Results.Ok
 import play.api.mvc.{Action, AnyContent, ControllerComponents, Request}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.constructionindustryschemeexternalstub.config.AppConfig
@@ -48,6 +49,8 @@ class ChrisController @Inject() (
     s"$monthlyNilReturnResponsePath/submitCISMessage-businessError-response.xml"
   private val submitCISMessage_irMarkMismatchError_ResponsePath =
     s"$monthlyNilReturnResponsePath/submitCISMessage-irMarkMismatchError-response.xml"
+  private val submitCISMessage_delete_ResponsePath              =
+    s"$monthlyNilReturnResponsePath/submitCISMessage-delete-response.xml"
 
   def submitCISMessage(): Action[AnyContent] = Action { (request: Request[AnyContent]) =>
     val message                           = request.body.asXml.get
@@ -151,42 +154,51 @@ class ChrisController @Inject() (
     val correlationId    = (message \ "Header" \ "MessageDetails" \ "CorrelationID").text
     val pollingUrlHost   = config.callback
     val gatewayTimestamp = LocalDateTime.now().toString
-    val finalStatusOpt   = request.getQueryString("final")
-    val isFinalPoll      = finalStatusOpt.isDefined && count >= 2
+    val function         = (message \ "Header" \ "MessageDetails" \ "Function").text
+    logger.info(s"[ChrisStub] getCISResponse function=$function, correlationId=$correlationId, count=$count")
 
-    val finalStatusParam: String =
-      request.getQueryString("final").getOrElse("SUBMITTED")
+    if (function == "delete") {
+      val rawXml = resourceHelper.resourceAsString(submitCISMessage_delete_ResponsePath)
+      val xml    = replaceCorrelationId(rawXml, correlationId, pollingUrlHost)
+      Ok(xml)
+    } else {
+      val finalStatusOpt = request.getQueryString("final")
+      val isFinalPoll    = finalStatusOpt.isDefined && count >= 2
 
-    val status =
-      if (!isFinalPoll) "ACKNOWLEDGE"
-      else finalStatusParam
+      val finalStatusParam: String =
+        request.getQueryString("final").getOrElse("SUBMITTED")
 
-    val resourcePath = status match {
-      case "ACKNOWLEDGE"          => submitCISMessage_acknowledgement_ResponsePath
-      case "SUBMITTED_NO_RECEIPT" => submitCISMessage_irMarkMismatchError_ResponsePath
-      case "FATAL_ERROR"          => submitCISMessage_fatalError_ResponsePath
-      case "DEPARTMENTAL_ERROR"   => submitCISMessage_businessError_ResponsePath
-      case _                      => submitCISMessage_success_ResponsePath
-    }
+      val status =
+        if (!isFinalPoll) "ACKNOWLEDGE"
+        else finalStatusParam
 
-    val rawXml      = resourceHelper.resourceAsString(resourcePath)
-    val basePollUrl = config.pollUrl("IR-CIS-CIS300MR")
-
-    val nextPollUrl =
-      if (isFinalPoll) {
-        ""
-      } else {
-        val nextCount = count + 1
-        val suffix    = finalStatusOpt.map(fs => s"?final=$fs").getOrElse("")
-        s"$basePollUrl/$nextCount$suffix"
+      val resourcePath = status match {
+        case "ACKNOWLEDGE"          => submitCISMessage_acknowledgement_ResponsePath
+        case "SUBMITTED_NO_RECEIPT" => submitCISMessage_irMarkMismatchError_ResponsePath
+        case "FATAL_ERROR"          => submitCISMessage_fatalError_ResponsePath
+        case "DEPARTMENTAL_ERROR"   => submitCISMessage_businessError_ResponsePath
+        case _                      => submitCISMessage_success_ResponsePath
       }
 
-    val xml =
-      replaceCorrelationId(rawXml, correlationId, pollingUrlHost)
-        .replace("[pollUrl]", nextPollUrl)
-        .replace("[gatewayTimestamp]", gatewayTimestamp)
+      val rawXml      = resourceHelper.resourceAsString(resourcePath)
+      val basePollUrl = config.pollUrl("IR-CIS-CIS300MR")
 
-    Ok(xml)
+      val nextPollUrl =
+        if (isFinalPoll) {
+          ""
+        } else {
+          val nextCount = count + 1
+          val suffix    = finalStatusOpt.map(fs => s"?final=$fs").getOrElse("")
+          s"$basePollUrl/$nextCount$suffix"
+        }
+
+      val xml =
+        replaceCorrelationId(rawXml, correlationId, pollingUrlHost)
+          .replace("[pollUrl]", nextPollUrl)
+          .replace("[gatewayTimestamp]", gatewayTimestamp)
+
+      Ok(xml)
+    }
   }
 
   private def replaceCorrelationId(response: String, correlationId: String, pollingUrlHost: String): String =

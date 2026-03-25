@@ -25,6 +25,7 @@ import uk.gov.hmrc.constructionindustryschemeexternalstub.services.ChrisService
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.ResourceHelper
 
+import java.time.LocalDateTime
 import javax.inject.{Inject, Singleton}
 import scala.xml.{Node, NodeSeq}
 
@@ -55,6 +56,7 @@ class ChrisController @Inject() (
     val message                           = request.body.asXml.get
     val correlationId                     = (message \ "Header" \ "MessageDetails" \ "CorrelationID").text
     val pollingUrlHost                    = config.callback
+    val gatewayTimestamp                  = LocalDateTime.now().toString
     val keys                              = message \ "GovTalkDetails" \ "Keys" \ "Key"
     def typeIs(value: String)(node: Node) = node \@ "Type" == value
     val taxOfficeNumber                   = (keys filter typeIs("TaxOfficeNumber")).text match {
@@ -89,7 +91,9 @@ class ChrisController @Inject() (
             resourceHelper.resourceAsString(submitCISMessage_acknowledgement_ResponsePath),
             correlationId,
             pollingUrlHost
-          ).replace("[pollUrl]", pollUrlWith0)
+          )
+            .replace("[pollUrl]", pollUrlWith0)
+            .replace("[gatewayTimestamp]", gatewayTimestamp)
 
         Ok(xml)
     }
@@ -146,10 +150,11 @@ class ChrisController @Inject() (
   }
 
   def getCISResponse(count: Int): Action[AnyContent] = Action { request =>
-    val message        = request.body.asXml.get
-    val correlationId  = (message \ "Header" \ "MessageDetails" \ "CorrelationID").text
-    val pollingUrlHost = config.callback
-    val function       = (message \ "Header" \ "MessageDetails" \ "Function").text
+    val message          = request.body.asXml.get
+    val correlationId    = (message \ "Header" \ "MessageDetails" \ "CorrelationID").text
+    val pollingUrlHost   = config.callback
+    val gatewayTimestamp = LocalDateTime.now().toString
+    val function         = (message \ "Header" \ "MessageDetails" \ "Function").text
     logger.info(s"[ChrisStub] getCISResponse function=$function, correlationId=$correlationId, count=$count")
 
     if (function == "delete") {
@@ -157,8 +162,8 @@ class ChrisController @Inject() (
       val xml    = replaceCorrelationId(rawXml, correlationId, pollingUrlHost)
       Ok(xml)
     } else {
-      val finalStatusOpt = request.getQueryString("final")
-      val isFinalPoll    = finalStatusOpt.isDefined && count >= 2
+      val finalStatusOpt   = request.getQueryString("final")
+      val isFinalPoll      = finalStatusOpt.isDefined && count >= 2
 
       val finalStatusParam: String =
         request.getQueryString("final").getOrElse("SUBMITTED")
@@ -190,6 +195,7 @@ class ChrisController @Inject() (
       val xml =
         replaceCorrelationId(rawXml, correlationId, pollingUrlHost)
           .replace("[pollUrl]", nextPollUrl)
+          .replace("[gatewayTimestamp]", gatewayTimestamp)
 
       Ok(xml)
     }

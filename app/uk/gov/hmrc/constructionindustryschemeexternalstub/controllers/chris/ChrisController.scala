@@ -162,8 +162,8 @@ class ChrisController @Inject() (
       val xml    = replaceCorrelationId(rawXml, correlationId, pollingUrlHost)
       Ok(xml)
     } else {
-      val finalStatusOpt   = request.getQueryString("final")
-      val isFinalPoll      = finalStatusOpt.isDefined && count >= 2
+      val finalStatusOpt = request.getQueryString("final")
+      val isFinalPoll    = finalStatusOpt.isDefined && count >= 2
 
       val finalStatusParam: String =
         request.getQueryString("final").getOrElse("SUBMITTED")

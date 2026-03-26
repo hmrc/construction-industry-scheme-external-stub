@@ -2199,7 +2199,7 @@ staging = https://construction-industry-scheme-external-stub.protected.mdtp:443/
         <GovTalkErrors>
             <Error>
                 <RaisedBy>Gateway</RaisedBy>
-                <Number>3000</Number>
+                <Number>2005</Number>
                 <Type>fatal</Type>
                 <Text>
                     The Transaction Engine has not received an acknowledgement of your submission from
@@ -2256,7 +2256,7 @@ staging = https://construction-industry-scheme-external-stub.protected.mdtp:443/
         <GovTalkErrors>
             <Error>
                 <RaisedBy>Gateway</RaisedBy>
-                <Number>3000</Number>
+                <Number>1000</Number>
                 <Type>fatal</Type>
                 <Text>System failure. The submission of this document has failed due to an internal system error.</Text>
                 <Location></Location>

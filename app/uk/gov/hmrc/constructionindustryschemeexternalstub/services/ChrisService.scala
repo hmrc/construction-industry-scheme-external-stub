@@ -65,7 +65,7 @@ class ChrisService @Inject() (config: AppConfig) {
   def responseCISVerifyMessage(message: NodeSeq): Option[NodeSeq] = {
     val messageClass = (message \ "Header" \ "MessageDetails" \ "Class").text
     if (messageClass == "IR-CIS-VERIFY") {
-      Some(sendCISVerifyMessage(message, "IR-CIS-VERIFY", SUCCESS))
+      Some(sendCISVerifyMessage(message, SUCCESS))
     } else {
       None
     }
@@ -91,7 +91,7 @@ class ChrisService @Inject() (config: AppConfig) {
   private def sendCISActionMonthlyReturnMessage(message: NodeSeq, service: String): NodeSeq =
     responseMessageCISMRFiling(message, service)
 
-  private def sendCISVerifyMessage(message: NodeSeq, service: String, responseType: ChRISResponseType): NodeSeq =
+  private def sendCISVerifyMessage(message: NodeSeq, responseType: ChRISResponseType): NodeSeq =
     responseMessageCISVerify(message, responseType)
 
   private def isError(rt: ChRISResponseType): Boolean =

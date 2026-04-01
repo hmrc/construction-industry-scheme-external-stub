@@ -253,6 +253,9 @@ class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
         "SUBMITTED_NO_RECEIPT",
         "FATAL_ERROR",
         "DEPARTMENTAL_ERROR",
+        "RECOVERABLE_ERROR_3000",
+        "RECOVERABLE_ERROR_2005",
+        "RECOVERABLE_ERROR_1000",
         "SUBMITTED"
       )
 

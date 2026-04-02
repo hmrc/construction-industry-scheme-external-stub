@@ -18,10 +18,10 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProx
 
 import play.api.Logging
 import play.api.libs.json.{JsError, JsValue, Json}
-import play.api.mvc.{Action, ControllerComponents}
+import play.api.mvc.{Action, ControllerComponents, Result}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.*
-import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.EnrolmentsHelper
+import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.JsResultUtils.foldErrorsIntoBadRequest
 
@@ -30,13 +30,19 @@ import scala.concurrent.Future
 
 class GovTalkController @Inject() (
   authorise: AuthAction,
+  resourceHelper: ResourceHelper,
   enrolmentHelper: EnrolmentsHelper,
   cc: ControllerComponents
 )() extends BackendController(cc)
     with Logging {
 
+  private val govTalkReturnResponsePath         = "/resources/govTalk"
+  private val getGovTalkStatus_200_ResponsePath = s"$govTalkReturnResponsePath/getGovTalkStatus-200-response.json"
+
   def getGovTalkStatus: Action[JsValue] =
     authorise(parse.json) { implicit request =>
+      val stage = request.getQueryString("stage")
+
       request.body
         .validate[GetGovTalkStatusRequest]
         .fold(
@@ -47,17 +53,23 @@ class GovTalkController @Inject() (
                 (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {
                   case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
                   case ("502", _) => BadGateway(Json.obj("message" -> "formp failed"))
-                  case ("404", _) => NotFound
-                  case _          => NotFound
+                  case _          => govTalkStatusResult(stage)
                 }
               case None                     =>
                 enrolmentHelper.agentEnrolmentsOpt(request) match {
                   case Some("AGT404") => NotFound
-                  case Some(_)        => NotFound
+                  case Some(_)        => govTalkStatusResult(stage)
                   case None           => InternalServerError
                 }
             }
         )
+    }
+
+  private def govTalkStatusResult(stage: Option[String]): Result =
+    stage match {
+      case Some("initial") => NotFound
+      case Some("polling") => Ok(resourceHelper.resourceAsString(getGovTalkStatus_200_ResponsePath))
+      case _               => NotFound
     }
 
   def updateGovTalkStatusCorrelationId: Action[JsValue] =

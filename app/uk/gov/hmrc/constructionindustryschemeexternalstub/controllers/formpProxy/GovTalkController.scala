@@ -36,7 +36,7 @@ class GovTalkController @Inject() (
 )() extends BackendController(cc)
     with Logging {
 
-  private val govTalkReturnResponsePath = "/resources/govTalk"
+  private val govTalkReturnResponsePath         = "/resources/govTalk"
   private val getGovTalkStatus_200_ResponsePath = s"$govTalkReturnResponsePath/getGovTalkStatus-200-response.json"
 
   def getGovTalkStatus: Action[JsValue] =

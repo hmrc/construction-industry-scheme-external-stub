@@ -105,6 +105,34 @@ class SubcontractorControllerSpec extends SpecBase {
       contentAsString(res) mustBe ""
     }
 
+    "returns 204 NoContent with valid Trust payload" in new Setup {
+      val json: JsValue = Json.toJson(
+        CreateAndUpdateSubcontractorRequest.TrustRequest(
+          cisId = cisId,
+          utr = Some("1234567890"),
+          trustTradingName = Some("The Big Trust"),
+          addressLine1 = Some("1 Trust Street"),
+          city = Some("London"),
+          county = Some("Greater London"),
+          country = Some("United Kingdom"),
+          postcode = Some("SW1A 1AA"),
+          emailAddress = Some("trust@example.com"),
+          phoneNumber = Some("02000000000"),
+          mobilePhoneNumber = Some("07111111111"),
+          worksReferenceNumber = Some("WRN-TRUST-1")
+        )
+      )
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("200", "")))
+
+      val req: FakeRequest[JsValue] = makeJsonRequest(json, updateSubcontractorUrl)
+      val res: Future[Result]       = controller.createAndUpdateSubcontractor()(req)
+
+      status(res) mustBe NO_CONTENT
+      contentAsString(res) mustBe ""
+    }
+
     "returns 400 BadRequest with validation errors when payload is invalid" in new Setup {
       val invalidJson: JsValue = Json.obj(
         "cisId"       -> cisId,

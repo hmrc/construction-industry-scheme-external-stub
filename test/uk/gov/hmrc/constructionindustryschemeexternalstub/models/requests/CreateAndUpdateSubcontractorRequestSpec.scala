@@ -20,7 +20,7 @@ import org.scalatest.EitherValues
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.*
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{Company, Partnership, SoleTrader}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{Company, Partnership, SoleTrader, Trust}
 
 class CreateAndUpdateSubcontractorRequestSpec extends AnyWordSpec with Matchers with EitherValues {
 
@@ -119,6 +119,56 @@ class CreateAndUpdateSubcontractorRequestSpec extends AnyWordSpec with Matchers 
       (json \ "partnershipTradingName").as[String] mustBe "My Partnership"
       (json \ "partnerCrn").as[String] mustBe "CRN123"
       (json \ "partnerNino").as[String] mustBe "AA123456A"
+    }
+
+    "round-trip (write then read) for TrustRequest with fields populated" in {
+      val model: CreateAndUpdateSubcontractorRequest =
+        CreateAndUpdateSubcontractorRequest.TrustRequest(
+          cisId = "CIS-999",
+          utr = Some("1234567890"),
+          trustTradingName = Some("The Big Trust"),
+          addressLine1 = Some("1 Trust Street"),
+          addressLine2 = Some("Suite 9"),
+          city = Some("London"),
+          county = Some("Greater London"),
+          country = Some("United Kingdom"),
+          postcode = Some("SW1A 1AA"),
+          emailAddress = Some("trust@example.com"),
+          phoneNumber = Some("02000000000"),
+          mobilePhoneNumber = Some("07111111111"),
+          worksReferenceNumber = Some("WRN-TRUST-1")
+        )
+
+      val json = Json.toJson(model)
+      val back = json.as[CreateAndUpdateSubcontractorRequest]
+
+      back mustEqual model
+
+      (json \ "cisId").as[String] mustBe "CIS-999"
+      (json \ "subcontractorType").as[String] mustBe Trust.toString
+      (json \ "utr").as[String] mustBe "1234567890"
+      (json \ "trustTradingName").as[String] mustBe "The Big Trust"
+      (json \ "postcode").as[String] mustBe "SW1A 1AA"
+      (json \ "country").as[String] mustBe "United Kingdom"
+    }
+
+    "read minimal valid JSON (only required fields) for TrustRequest" in {
+      val json = Json.parse(
+        s"""
+           |{
+           |  "cisId": "CIS-1000",
+           |  "subcontractorType": "${Trust.toString}"
+           |}
+           |""".stripMargin
+      )
+
+      val result = json.validate[CreateAndUpdateSubcontractorRequest]
+      result.isSuccess mustBe true
+
+      result.get mustBe CreateAndUpdateSubcontractorRequest.TrustRequest(
+        cisId = "CIS-1000",
+        subcontractorType = Trust
+      )
     }
 
     "read minimal valid JSON (only required fields) for SoleTraderRequest" in {

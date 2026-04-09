@@ -187,4 +187,13 @@ class MonthlyReturnController @Inject() (
           Future.successful(NoContent)
         }
     }
+
+  def deleteUnsubmittedMonthlyReturn: Action[JsValue] =
+    authorise.async(parse.json) { implicit request =>
+      request.body
+        .validate[DeleteUnsubmittedMonthlyReturnRequest]
+        .foldErrorsIntoBadRequest { _ =>
+          Future.successful(NoContent)
+        }
+    }
 }

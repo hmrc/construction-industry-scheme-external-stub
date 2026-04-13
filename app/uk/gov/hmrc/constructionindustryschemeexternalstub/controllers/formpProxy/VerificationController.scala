@@ -26,14 +26,14 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import javax.inject.Inject
 
 class VerificationController @Inject() (
-                                         authorise: AuthAction,
-                                         resourceHelper: ResourceHelper,
-                                         enrolmentHelper: EnrolmentsHelper,
-                                         cc: ControllerComponents
-                                       )() extends BackendController(cc)
-  with Logging {
+  authorise: AuthAction,
+  resourceHelper: ResourceHelper,
+  enrolmentHelper: EnrolmentsHelper,
+  cc: ControllerComponents
+)() extends BackendController(cc)
+    with Logging {
 
-  private val verificationResponsePath = "/resources/verification"
+  private val verificationResponsePath                    = "/resources/verification"
   private val getNewestVerificationBatch_200_ResponsePath =
     s"$verificationResponsePath/getNewestVerificationBatch-200-response.json"
 
@@ -44,10 +44,10 @@ class VerificationController @Inject() (
           (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {
             case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
             case ("502", _) => BadGateway(Json.obj("message" -> "formp failed"))
-            case _ =>
+            case _          =>
               Ok(Json.parse(resourceHelper.resourceAsString(getNewestVerificationBatch_200_ResponsePath)))
           }
-        case None =>
+        case None                     =>
           InternalServerError
       }
     }

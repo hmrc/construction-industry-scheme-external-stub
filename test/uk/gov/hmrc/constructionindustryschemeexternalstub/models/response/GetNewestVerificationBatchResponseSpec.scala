@@ -382,4 +382,3 @@ final class GetNewestVerificationBatchResponseSpec extends AnyWordSpec with Matc
     }
   }
 }
-

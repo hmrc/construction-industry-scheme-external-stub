@@ -52,3 +52,5 @@ POST       /submission/ChRIS/poll/:service/:count/:error            uk.gov.hmrc.
 
 # stubbed email routes
 POST       /hmrc/email                                              uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.email.EmailController.sendEmail
+
+GET  /cis/verification-batch/newest/:instanceId                     uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.VerificationController.getNewestVerificationBatch(instanceId: String)

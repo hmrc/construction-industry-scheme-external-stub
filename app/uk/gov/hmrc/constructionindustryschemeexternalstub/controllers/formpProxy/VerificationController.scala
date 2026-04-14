@@ -48,7 +48,10 @@ class VerificationController @Inject() (
               Ok(Json.parse(resourceHelper.resourceAsString(getNewestVerificationBatch_200_ResponsePath)))
           }
         case None                     =>
-          InternalServerError
+          enrolmentHelper.agentEnrolmentsOpt(request) match {
+            case Some(_) => Ok(Json.parse(resourceHelper.resourceAsString(getNewestVerificationBatch_200_ResponsePath)))
+            case None    => InternalServerError
+          }
       }
     }
 }

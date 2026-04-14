@@ -24,6 +24,7 @@ import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{Creat
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
+import java.time.{LocalDateTime, ZoneId}
 import javax.inject.Inject
 
 class SubmissionController @Inject() (
@@ -74,8 +75,15 @@ class SubmissionController @Inject() (
                 (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {
 //                  case ("400", _) => BadRequest(Json.obj("message" -> "Missing CIS enrolment identifiers"))
 //                  case ("404", _) => NotFound(Json.obj("message" -> "CIS taxpayer not found"))
-                  case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
-                  case _          => NoContent
+                  case ("500", _)                                => InternalServerError(Json.obj("message" -> "Unexpected error"))
+                  case ("321", _) if body.hmrcMarkGgis.isDefined =>
+                    InternalServerError(Json.obj("message" -> "Unexpected error"))
+                  case ("322", _)
+                      if body.acceptedTime.exists(acceptedTime =>
+                        LocalDateTime.now(ZoneId.of("UTC")).isAfter(LocalDateTime.parse(acceptedTime).plusSeconds(5))
+                      ) =>
+                    InternalServerError(Json.obj("message" -> "Unexpected error"))
+                  case _                                         => NoContent
                 }
               case (_, Some(_))                  => NoContent
               case (None, None)                  => InternalServerError

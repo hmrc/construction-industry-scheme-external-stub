@@ -35,19 +35,19 @@ final class GetSubcontractorListResponseSpec extends AnyWordSpec with Matchers {
           |    {
           |      "subcontractorId": 10101,
           |      "subbieResourceRef": 1,
-          |      "type": "soletrader",
+          |      "subcontractorType": "soletrader",
           |      "utr": "1111111111"
           |    },
           |    {
           |      "subcontractorId": 20202,
           |      "subbieResourceRef": 2,
-          |      "type": "soletrader",
+          |      "subcontractorType": "soletrader",
           |      "utr": "2222222222"
           |    },
           |    {
           |      "subcontractorId": 30303,
           |      "subbieResourceRef": 3,
-          |      "type": "soletrader"
+          |      "subcontractorType": "soletrader"
           |    }
           |  ]
           |}
@@ -61,8 +61,8 @@ final class GetSubcontractorListResponseSpec extends AnyWordSpec with Matchers {
       out.subcontractors must have size 3
 
       out.subcontractors.head.subcontractorId mustBe 10101L
-      out.subcontractors.head.subbieResourceRef mustBe 1
-      out.subcontractors.head.`type` mustBe "soletrader"
+      out.subcontractors.head.subbieResourceRef mustBe Some(1L)
+      out.subcontractors.head.subcontractorType mustBe Some("soletrader")
       out.subcontractors.head.utr mustBe Some("1111111111")
 
       out.subcontractors(2).subcontractorId mustBe 30303L
@@ -74,8 +74,8 @@ final class GetSubcontractorListResponseSpec extends AnyWordSpec with Matchers {
         subcontractors = List(
           Subcontractor(
             subcontractorId = 1L,
-            subbieResourceRef = 10,
-            `type` = "soletrader",
+            subbieResourceRef = Some(10L),
+            subcontractorType = Some("soletrader"),
             utr = Some("1234567890"),
             pageVisited = Some(1),
             partnerUtr = None,
@@ -118,8 +118,8 @@ final class GetSubcontractorListResponseSpec extends AnyWordSpec with Matchers {
 
       (json \ "subcontractors").as[List[play.api.libs.json.JsValue]] must have size 1
       ((json \ "subcontractors")(0) \ "subcontractorId").as[Long] mustBe 1L
-      ((json \ "subcontractors")(0) \ "subbieResourceRef").as[Int] mustBe 10
-      ((json \ "subcontractors")(0) \ "type").as[String] mustBe "soletrader"
+      ((json \ "subcontractors")(0) \ "subbieResourceRef").as[Long] mustBe 10L
+      ((json \ "subcontractors")(0) \ "subcontractorType").as[String] mustBe "soletrader"
       ((json \ "subcontractors")(0) \ "utr").as[Option[String]] mustBe Some("1234567890")
       ((json \ "subcontractors")(0) \ "pageVisited").as[Int] mustBe 1
       ((json \ "subcontractors")(0) \ "version").as[Int] mustBe 2
@@ -130,8 +130,8 @@ final class GetSubcontractorListResponseSpec extends AnyWordSpec with Matchers {
         subcontractors = List(
           Subcontractor(
             subcontractorId = 999L,
-            subbieResourceRef = 123,
-            `type` = "company",
+            subbieResourceRef = Some(1L),
+            subcontractorType = Some("company"),
             utr = None,
             pageVisited = None,
             partnerUtr = Some("9999999999"),

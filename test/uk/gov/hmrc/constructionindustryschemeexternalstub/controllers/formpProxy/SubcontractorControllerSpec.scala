@@ -175,8 +175,8 @@ class SubcontractorControllerSpec extends SpecBase {
         subcontractors = List(
           Subcontractor(
             subcontractorId = 1L,
-            subbieResourceRef = 10,
-            `type` = "soletrader",
+            subbieResourceRef = Some(10L),
+            subcontractorType = Some("soletrader"),
             utr = Some("1234567890"),
             pageVisited = Some(2),
             partnerUtr = None,

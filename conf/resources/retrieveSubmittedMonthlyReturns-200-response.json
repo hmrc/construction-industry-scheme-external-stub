@@ -16,7 +16,7 @@
     "lastUpdate": "2018-02-23T16:26:23Z",
     "version": 69
   },
-"monthlyReturn": [
+  "monthlyReturns": [
     {
       "monthlyReturnId": 10000,
       "taxYear": 2022,

@@ -484,6 +484,46 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
     }
   }
 
+  "MonthlyReturnController deleteUnsubmittedMonthlyReturn" - {
+
+    "returns 204 when JSON body is valid" in new Setup {
+
+      val body = Json.obj(
+        "instanceId" -> "abc-123",
+        "taxYear"    -> 2025,
+        "taxMonth"   -> 1,
+        "amendment"  -> "N"
+      )
+
+      val req: FakeRequest[JsValue] =
+        FakeRequest(POST, "/cis/monthly-returns/unsubmitted/delete")
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(body)
+
+      val res: Future[Result] = controller.deleteUnsubmittedMonthlyReturn(req)
+
+      status(res) mustBe NO_CONTENT
+      contentAsString(res) mustBe ""
+    }
+
+    "returns 400 when JSON body is invalid" in new Setup {
+
+      val body = Json.obj(
+        "instanceId" -> "abc-123"
+      )
+
+      val req: FakeRequest[JsValue] =
+        FakeRequest(POST, "/cis/monthly-returns/unsubmitted/delete")
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(body)
+
+      val res: Future[Result] = controller.deleteUnsubmittedMonthlyReturn(req)
+
+      status(res) mustBe BAD_REQUEST
+      (contentAsJson(res) \ "message").as[String] mustBe "Invalid JSON body"
+    }
+  }
+
   ".retrieveSubmittedMonthlyReturns" - {
 
     "returns 200 when JSON body is valid" in new Setup {

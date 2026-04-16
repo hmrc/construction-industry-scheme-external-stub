@@ -22,8 +22,7 @@ import java.time.LocalDateTime
 
 case class Subcontractor(
   subcontractorId: Long,
-  subbieResourceRef: Int,
-  `type`: String,
+  subbieResourceRef: Option[Long],
   utr: Option[String],
   pageVisited: Option[Int],
   partnerUtr: Option[String],
@@ -34,6 +33,7 @@ case class Subcontractor(
   surname: Option[String],
   partnershipTradingName: Option[String],
   tradingName: Option[String],
+  subcontractorType: Option[String],
   addressLine1: Option[String],
   addressLine2: Option[String],
   addressLine3: Option[String],

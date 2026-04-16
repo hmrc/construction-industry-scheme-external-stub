@@ -876,7 +876,39 @@ To trigger the happy path, ensure you provide a valid request body:
 ```
 - Response status: `204`
 - Response body: empty body
+
+
+**Endpoint**: `POST /cis/monthly-returns/unsubmitted/delete`
+
+**Description**: Delete unsubmitted monthly return.
+
+#### Happy Path
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: any valid Tax Office no.
+- Identifier Name: TaxOfficeReference
+- Identifier Value: any valid Tax Office ref.
+
+- or
+
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: Any valid value
+
+To trigger the happy path, ensure you provide a valid request body:
+```json
+{
+  "instanceId":  "1",
+  "taxYear": 2025,
+  "taxMonth": 11,
+  "amendment": "N"
+}
 ```
+- Response status: `204`
+- Response body: _empty_
 
 **Endpoint**: `POST /scheme/email`
 
@@ -1926,6 +1958,47 @@ To trigger the happy path, ensure you provide a valid request body:
 ```
 - Response status: `200`
 - Response body: N/A
+
+
+
+### Get newest verification batch
+
+**Endpoint**: `GET /cis/verification-batch/newest/:instanceId`
+
+**Description**: Returns the newest verification batch for the given CIS instance id. The response includes:
+- scheme (contractor registered under CIS),
+- subcontractors,
+- newest verification batch and its verifications,
+- related submissions,
+- related monthly return and monthly return submission.
+
+#### Happy Path (Organisation)
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 200
+- Identifier Name: TaxOfficeReference
+- Identifier Value: Any
+
+- Response status: `200`
+- Response body: `resources/verification/getNewestVerificationBatch-200-response.json`
+
+#### Happy Path (Agent)
+
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: Any
+
+- Response status: `200`
+- Response body: `resources/verification/getNewestVerificationBatch-200-response.json`
+
+#### Unhappy Paths (Organisation)
+
+- TaxOfficeNumber = `500` → Response status: `500`
+```json
+{ "message": "Unexpected error" }
 
 
 ### ChRIS

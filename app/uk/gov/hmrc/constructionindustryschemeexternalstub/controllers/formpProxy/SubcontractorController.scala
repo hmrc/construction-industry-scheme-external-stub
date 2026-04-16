@@ -20,6 +20,7 @@ import play.api.Logging
 import play.api.libs.json.{JsError, JsValue, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.EmployerReference
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.CreateAndUpdateSubcontractorRequest
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -50,16 +51,26 @@ class SubcontractorController @Inject() (
 
   def getSubcontractorList(cisId: String): Action[AnyContent] =
     authorise { implicit request =>
-      val enrolments = enrolmentHelper.contractorEnrolmentsOpt(request)
-      enrolments match {
-        case Some(enrolmentReference) =>
-          (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {
+      val contractorRefOpt: Option[EmployerReference] = enrolmentHelper.contractorEnrolmentsOpt(request)
+      val agentRefOpt: Option[String]                 = enrolmentHelper.agentEnrolmentsOpt(request)
+
+      (contractorRefOpt, agentRefOpt) match {
+
+        case (Some(employerRef), _) =>
+          (employerRef.taxOfficeNumber, employerRef.taxOfficeReference) match {
             case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
             case ("502", _) => BadGateway(Json.obj("message" -> "formp failed"))
             case _          => Ok(resourceHelper.resourceAsString(getSubcontractorList_200_ResponsePath))
           }
-        case None                     => InternalServerError
+
+        case (None, Some(agentRef)) =>
+          Ok(resourceHelper.resourceAsString(getSubcontractorList_200_ResponsePath))
+
+        case (None, None) =>
+          logger.warn("[SubcontractorController][getSubcontractorList] Missing contractor and agent enrolments")
+          InternalServerError(Json.obj("message" -> "Missing enrolments"))
       }
+
     }
 
 }

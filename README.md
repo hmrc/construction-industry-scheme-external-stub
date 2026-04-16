@@ -1960,6 +1960,47 @@ To trigger the happy path, ensure you provide a valid request body:
 - Response body: N/A
 
 
+
+### Get newest verification batch
+
+**Endpoint**: `GET /cis/verification-batch/newest/:instanceId`
+
+**Description**: Returns the newest verification batch for the given CIS instance id. The response includes:
+- scheme (contractor registered under CIS),
+- subcontractors,
+- newest verification batch and its verifications,
+- related submissions,
+- related monthly return and monthly return submission.
+
+#### Happy Path (Organisation)
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 200
+- Identifier Name: TaxOfficeReference
+- Identifier Value: Any
+
+- Response status: `200`
+- Response body: `resources/verification/getNewestVerificationBatch-200-response.json`
+
+#### Happy Path (Agent)
+
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: Any
+
+- Response status: `200`
+- Response body: `resources/verification/getNewestVerificationBatch-200-response.json`
+
+#### Unhappy Paths (Organisation)
+
+- TaxOfficeNumber = `500` → Response status: `500`
+```json
+{ "message": "Unexpected error" }
+
+
 ### ChRIS
 
 **Endpoint**: `POST /submission/ChRIS/CISR/Filing/sync/CIS300MR`

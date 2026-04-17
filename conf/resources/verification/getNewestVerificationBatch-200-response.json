@@ -129,7 +129,7 @@
       "supersededBy": null
     }
   ],
-  "monthlyReturnSubmission": [
+  "mrSubmission": [
     {
       "submissionId": 556,
       "submissionType": "MONTHLY_RETURN",

@@ -1,0 +1,54 @@
+{
+  "scheme": [
+    {
+      "schemeId": 13343,
+      "instanceId": "900001",
+      "accountsOfficeReference": "125PA12345000",
+      "taxOfficeNumber": "101",
+      "taxOfficeReference": "AB0001",
+      "utr": "1234657890",
+      "name": "Test Contractor Ltd",
+      "emailAddress": "contractor@example.com",
+      "displayWelcomePage": "N",
+      "prePopCount": 3,
+      "prePopSuccessful": "Y",
+      "subcontractorCounter": 0,
+      "verificationBatchCounter": 0,
+      "lastUpdate": "2026-01-05T10:23:56Z",
+      "version": 5
+    }
+  ],
+  "monthlyReturn": [
+    {
+      "monthlyReturnId": 50002,
+      "taxYear": 2025,
+      "taxMonth": 2,
+      "nilReturnIndicator": "Y",
+      "decEmpStatusConsidered": "Y",
+      "decAllSubsVerified": "Y",
+      "decInformationCorrect": "Y",
+      "decNoMoreSubPayments": "N",
+      "decNilReturnNoPayments": "Y",
+      "status": "SUBMITTED",
+      "lastUpdate": "2026-04-16T10:15:00",
+      "amendment": "N"
+    }
+  ],
+  "subcontractors": [],
+  "monthlyReturnItems": [],
+  "submission": [
+    {
+      "submissionId": 70002,
+      "submissionType": "Nil return",
+      "activeObjectId": 50002,
+      "status": "SUBMITTED",
+      "hmrcMarkGenerated": "bmlscmV0dXJudGVzdGlybWFya2Jhc2U2NA==",
+      "hmrcMarkGgis": "bmlscmV0dXJudGVzdGlybWFya2Jhc2U2NA==",
+      "emailRecipient": "contractor@example.com",
+      "acceptedTime": "2026-04-16T10:17:00",
+      "createDate": "2026-04-16T10:15:00",
+      "lastUpdate": "2026-04-16T10:17:00",
+      "schemeId": 13343
+    }
+  ]
+}

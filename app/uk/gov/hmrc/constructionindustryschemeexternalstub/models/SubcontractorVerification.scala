@@ -16,23 +16,22 @@
 
 package uk.gov.hmrc.constructionindustryschemeexternalstub.models
 
-
 import play.api.libs.json.{JsObject, Json, OFormat, Reads, Writes}
 
 import java.time.LocalDateTime
 
 case class SubcontractorVerification(
-                                      subcontractorId: Long,
-                                      firstName: Option[String],
-                                      secondName: Option[String],
-                                      surname: Option[String],
-                                      tradingName: Option[String],
-                                      verified: Option[String],
-                                      verificationNumber: Option[String],
-                                      taxTreatment: Option[String],
-                                      verificationDate: Option[LocalDateTime],
-                                      lastMonthlyReturnDate: Option[LocalDateTime]
-                                    )
+  subcontractorId: Long,
+  firstName: Option[String],
+  secondName: Option[String],
+  surname: Option[String],
+  tradingName: Option[String],
+  verified: Option[String],
+  verificationNumber: Option[String],
+  taxTreatment: Option[String],
+  verificationDate: Option[LocalDateTime],
+  lastMonthlyReturnDate: Option[LocalDateTime]
+)
 
 object SubcontractorVerification {
   given format: OFormat[SubcontractorVerification] = Json.format[SubcontractorVerification]

@@ -16,16 +16,15 @@
 
 package uk.gov.hmrc.constructionindustryschemeexternalstub.models
 
-
 import play.api.libs.json.{Json, OFormat}
 import java.time.LocalDateTime
 
 case class SubmissionVerification(
-                                   submissionId: Long,
-                                   activeObjectId: Option[Long],
-                                   submissionRequestDate: Option[LocalDateTime],
-                                   status: Option[String]
-                                 )
+  submissionId: Long,
+  activeObjectId: Option[Long],
+  submissionRequestDate: Option[LocalDateTime],
+  status: Option[String]
+)
 
 object SubmissionVerification {
   given format: OFormat[SubmissionVerification] = Json.format[SubmissionVerification]

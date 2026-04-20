@@ -19,9 +19,9 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub.models
 import play.api.libs.json.{Json, OFormat}
 
 case class MonthlyReturnVerification(
-                                      monthlyReturnId: Long,
-                                      decNoMoreSubPayments: Option[String] = None
-                                    )
+  monthlyReturnId: Long,
+  decNoMoreSubPayments: Option[String] = None
+)
 
 object MonthlyReturnVerification {
   implicit val format: OFormat[MonthlyReturnVerification] = Json.format[MonthlyReturnVerification]

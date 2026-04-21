@@ -34,7 +34,7 @@ class SubcontractorCurrVerificationSpec extends SpecBase {
         crn = Some("AC012345"),
         partnerUtr = Some("5860920998")
       )
-      val json = Json.toJson(subcontractors)
+      val json           = Json.toJson(subcontractors)
 
       (json \ "subcontractorId").as[Long] mustBe 1L
       (json \ "subbieResourceRef").as[Long] mustBe 10L
@@ -48,7 +48,7 @@ class SubcontractorCurrVerificationSpec extends SpecBase {
       (json \ "partnerUtr").as[String] mustBe "5860920998"
     }
     "deserialize from JSON correctly" in {
-      val json = Json.parse(
+      val json   = Json.parse(
         """
           |{
           |  "subcontractorId": 1,
@@ -89,8 +89,8 @@ class SubcontractorCurrVerificationSpec extends SpecBase {
         crn = Some("AC012345"),
         partnerUtr = Some("5860920998")
       )
-      val json = Json.toJson(subcontractors)
-      val result = json.as[SubcontractorCurrVerification]
+      val json           = Json.toJson(subcontractors)
+      val result         = json.as[SubcontractorCurrVerification]
       result mustBe subcontractors
     }
   }

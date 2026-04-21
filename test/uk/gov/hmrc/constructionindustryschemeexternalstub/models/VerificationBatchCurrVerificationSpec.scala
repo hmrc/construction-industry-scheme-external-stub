@@ -19,21 +19,20 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub.models
 import uk.gov.hmrc.constructionindustryschemeexternalstub.base.SpecBase
 import play.api.libs.json.Json
 
-
 class VerificationBatchCurrVerificationSpec extends SpecBase {
   "VerificationBatchCurrVerification" - {
     "serialize to JSON correctly" in {
       val verificationBatch = VerificationBatchCurrVerification(
-        verificationBatchId= 1L,
-        verifBatchResourceRef= Some(10L)
+        verificationBatchId = 1L,
+        verifBatchResourceRef = Some(10L)
       )
-      val json = Json.toJson(verificationBatch)
+      val json              = Json.toJson(verificationBatch)
 
       (json \ "verificationBatchId").as[Long] mustBe 1L
       (json \ "verifBatchResourceRef").as[Long] mustBe 10L
     }
     "deserialize from JSON correctly" in {
-      val json = Json.parse(
+      val json   = Json.parse(
         """
           |{
           |  "verificationBatchId": 1,
@@ -47,11 +46,11 @@ class VerificationBatchCurrVerificationSpec extends SpecBase {
     }
     "round-trip serialize and deserialize correctly" in {
       val verificationBatch = VerificationBatchCurrVerification(
-        verificationBatchId= 1L,
-        verifBatchResourceRef= Some(10L)
+        verificationBatchId = 1L,
+        verifBatchResourceRef = Some(10L)
       )
-      val json = Json.toJson(verificationBatch)
-      val result = json.as[VerificationBatchCurrVerification]
+      val json              = Json.toJson(verificationBatch)
+      val result            = json.as[VerificationBatchCurrVerification]
       result mustBe verificationBatch
     }
   }

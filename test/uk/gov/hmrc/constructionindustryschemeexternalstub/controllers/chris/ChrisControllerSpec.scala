@@ -27,7 +27,7 @@ import play.api.mvc.*
 import play.api.test.Helpers.*
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.config.AppConfig
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.FATAL_ERROR
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{ACKNOWLEDGE, FATAL_ERROR}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.services.ChrisService
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.ResourceHelper
 
@@ -220,7 +220,7 @@ class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
         </GovTalkMessage>
 
       when(mockResourceHelper.resourceAsString(any()))
-        .thenReturn("[correlationId]-[pollUrl]")
+        .thenReturn("[correlationId]-[pollUrl]-[digestValue]")
 
       val request  = postRequest.withXmlBody(pollRequestXml)
       val response = testInstance.getCISResponse(pollCount).apply(request)
@@ -231,7 +231,7 @@ class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
         s"${appConfig.pollUrl("IR-CIS-CIS300MR")}/${pollCount + 1}"
 
       contentAsString(response) mustBe
-        s"$correlationId-$expectedNextPollUrl"
+        s"$correlationId-$expectedNextPollUrl-NO_IRMARK_FOUND"
     }
 
     "return correct polling response template for all terminal statuses" in {
@@ -263,7 +263,7 @@ class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
         reset(service, mockResourceHelper)
 
         when(mockResourceHelper.resourceAsString(any()))
-          .thenReturn("[correlationId]-[pollUrl]-" + statusValue)
+          .thenReturn("[correlationId]-[pollUrl]-[digestValue]-" + statusValue)
 
         val request = FakeRequest(
           "POST",
@@ -275,8 +275,70 @@ class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
         status(response) mustBe OK
 
         contentAsString(response) mustBe
-          s"$correlationId--$statusValue"
+          s"$correlationId--NO_IRMARK_FOUND-$statusValue"
       }
+    }
+
+    "store IRmark from submitCISMessage and use it as digestValue in getCISResponse" in {
+      val correlationId = "CORR-IRMARK"
+      val irMarkValue   = "TBPJFWEAYSD4GFVRMHY7KLWEBHB5BLA5"
+
+      val submitMessage =
+        <GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
+          <Header>
+            <MessageDetails>
+              <Class>IR-CIS-CIS300MR</Class>
+              <CorrelationID>{correlationId}</CorrelationID>
+            </MessageDetails>
+          </Header>
+          <GovTalkDetails>
+            <Keys>
+              <Key Type="TaxOfficeNumber">123</Key>
+              <Key Type="TaxOfficeReference">AB00001</Key>
+            </Keys>
+          </GovTalkDetails>
+          <Body>
+            <IRenvelope>
+              <IRheader>
+                <IRmark>{irMarkValue}</IRmark>
+              </IRheader>
+            </IRenvelope>
+          </Body>
+        </GovTalkMessage>
+
+      reset(service, mockResourceHelper)
+      when(service.initialCisStatus(eqTo("123"), eqTo("AB00001")))
+        .thenReturn(ACKNOWLEDGE)
+      when(service.isForeverPending(eqTo("123")))
+        .thenReturn(false)
+      when(service.terminalStatusFor(eqTo("123")))
+        .thenReturn("SUBMITTED")
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn("[correlationId]-[pollUrl]-[gatewayTimestamp]")
+
+      val submitRequest  = postRequest.withXmlBody(submitMessage)
+      val submitResponse = testInstance.submitCISMessage().apply(submitRequest)
+      status(submitResponse) mustBe OK
+
+      reset(mockResourceHelper)
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn("[correlationId]-[digestValue]")
+
+      val pollMessage =
+        <GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
+          <Header>
+            <MessageDetails>
+              <CorrelationID>{correlationId}</CorrelationID>
+            </MessageDetails>
+          </Header>
+          <Body/>
+        </GovTalkMessage>
+
+      val pollRequest  = postRequest.withXmlBody(pollMessage)
+      val pollResponse = testInstance.getCISResponse(0).apply(pollRequest)
+
+      status(pollResponse) mustBe OK
+      contentAsString(pollResponse) mustBe s"$correlationId-$irMarkValue"
     }
 
     "return delete response when function is delete" in {

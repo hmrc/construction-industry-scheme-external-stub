@@ -490,6 +490,83 @@ To trigger the happy path, ensure you provide a valid request body:
 }
 ```
 
+**Endpoint**: `POST /cis/retrieve-submitted-monthly-returns`
+
+**Description**: Returns the full list of Submitted Monthly Returns for the given scheme.
+
+#### Happy Path
+
+- Affinity Group: Organisation / Agent
+- Enrolment Key: HMRC-CIS-ORG (for Organisation) or IR-PAYE-AGENT (for Agent)
+- Identifier Name: TaxOfficeNumber (for Organisation) or IRAgentReference (for Agent)
+- Identifier Value: any valid Tax Office no. or any valid IRAgentReference
+- Identifier Name: TaxOfficeReference (for Organisation) or none (for Agent)
+- Identifier Value: any valid Tax Office ref. (for Organisation)
+
+To trigger the happy path, ensure you provide a valid request body:
+```json
+{
+  "instanceId": "any valid instanceId"
+}
+```
+- Response status: `200`
+- Response body:
+```json
+{
+  "scheme": {
+    "schemeId": 10877,
+    "instanceId": "1",
+    "accountsOfficeReference": "123PA12345678",
+    "taxOfficeNumber": "123",
+    "taxOfficeReference": "AB456",
+    "utr": "1123456789",
+    "name": "PAL-355 Scheme",
+    "emailAddress": "test@test.com",
+    "displayWelcomePage": "N",
+    "prePopCount": 2,
+    "prePopSuccessful": "N",
+    "subcontractorCounter": 12,
+    "verificationBatchCounter": 4,
+    "lastUpdate": "2018-02-23T16:26:23Z",
+    "version": 69
+  },
+  "monthlyReturns": [
+    {
+      "monthlyReturnId": 10000,
+      "taxYear": 2022,
+      "taxMonth": 1,
+      "nilReturnIndicator": "N",
+      "decEmpStatusConsidered": "Y",
+      "decAllSubsVerified": "Y",
+      "decInformationCorrect": "Y",
+      "status": "SUBMITTED",
+      "supersededBy": 20000,
+      "amendmentStatus": "STARTED",
+      "lastUpdate": "2018-02-23T16:25:47",
+      "amendment": "N",
+      "monthlyReturnItems": "N"
+    }
+  ],
+  "submissions": [
+    {
+      "submissionId": 10900,
+      "submissionType": "MONTHLY_RETURN",
+      "activeObjectId": 10000,
+      "status": "SUBMITTED",
+      "hmrcMarkGenerated": "w5hsnI+Ziyr8rWZyJGWE+Nh/gRo=",
+      "hmrcMarkGgis": null,
+      "emailRecipient": "test@test.com",
+      "acceptedTime": null,
+      "createDate": "2018-02-23T16:22:45",
+      "lastUpdate": "2018-02-23T16:22:52",
+      "schemeId": 10877,
+      "agentId": "-",
+      "submissionRequestDate": "2018-02-23T16:22:49"
+    }
+  ]
+}
+```
+
 **Endpoint**: `POST /cis/monthly-return/nil/create`
 
 **Description**: Creates a monthly return record in the monthly return table.
@@ -876,7 +953,39 @@ To trigger the happy path, ensure you provide a valid request body:
 ```
 - Response status: `204`
 - Response body: empty body
+
+
+**Endpoint**: `POST /cis/monthly-returns/unsubmitted/delete`
+
+**Description**: Delete unsubmitted monthly return.
+
+#### Happy Path
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: any valid Tax Office no.
+- Identifier Name: TaxOfficeReference
+- Identifier Value: any valid Tax Office ref.
+
+- or
+
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: Any valid value
+
+To trigger the happy path, ensure you provide a valid request body:
+```json
+{
+  "instanceId":  "1",
+  "taxYear": 2025,
+  "taxMonth": 11,
+  "amendment": "N"
+}
 ```
+- Response status: `204`
+- Response body: _empty_
 
 **Endpoint**: `POST /scheme/email`
 

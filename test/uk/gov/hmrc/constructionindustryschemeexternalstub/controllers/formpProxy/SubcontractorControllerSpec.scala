@@ -18,7 +18,6 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProx
 
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
-import org.scalatest.freespec.AnyFreeSpec
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest
@@ -34,8 +33,52 @@ import scala.concurrent.Future
 
 class SubcontractorControllerSpec extends SpecBase {
 
-  private val cisId                  = "1"
-  private val updateSubcontractorUrl = "/cis/subcontractor/create-and-update"
+  private val cisId                                                         = "1"
+  private val updateSubcontractorUrl                                        = "/cis/subcontractor/create-and-update"
+  private val getListCisId: String                                          = "cis-123"
+  private val getSubcontractorListUrl: String                               = s"/cis/subcontractors/$getListCisId"
+  private val sampleSubcontractorListResponse: GetSubcontractorListResponse =
+    GetSubcontractorListResponse(
+      subcontractors = List(
+        Subcontractor(
+          subcontractorId = 1L,
+          subbieResourceRef = Some(10L),
+          subcontractorType = Some("soletrader"),
+          utr = Some("1234567890"),
+          pageVisited = Some(2),
+          partnerUtr = None,
+          crn = None,
+          firstName = Some("John"),
+          nino = Some("AA123456A"),
+          secondName = None,
+          surname = Some("Smith"),
+          partnershipTradingName = None,
+          tradingName = Some("ACME"),
+          addressLine1 = Some("1 Main Street"),
+          addressLine2 = None,
+          addressLine3 = None,
+          addressLine4 = None,
+          country = Some("GB"),
+          postcode = Some("AA1 1AA"),
+          emailAddress = None,
+          phoneNumber = None,
+          mobilePhoneNumber = None,
+          worksReferenceNumber = None,
+          version = Some(1),
+          taxTreatment = None,
+          updatedTaxTreatment = None,
+          verificationNumber = None,
+          createDate = None,
+          lastUpdate = None,
+          matched = None,
+          verified = None,
+          autoVerified = None,
+          verificationDate = None,
+          lastMonthlyReturnDate = None,
+          pendingVerifications = Some(0)
+        )
+      )
+    )
 
   ".createAndUpdateSubcontractor" - {
 
@@ -148,95 +191,51 @@ class SubcontractorControllerSpec extends SpecBase {
     }
   }
 
-  "returns 400 BadRequest with validation errors when payload is invalid" in new Setup {
-    val invalidJson: JsValue = Json.obj(
-      "cisId"       -> cisId,
-      "tradingName" -> "name-only"
-    )
-
-    val req: FakeRequest[JsValue] = makeJsonRequest(invalidJson, updateSubcontractorUrl)
-    val res: Future[Result]       = controller.createAndUpdateSubcontractor()(req)
-
-    status(res) mustBe BAD_REQUEST
-    (contentAsJson(res) \ "message").as[String] mustBe "Invalid payload"
-    (contentAsJson(res) \ "errors").isDefined mustBe true
-  }
-
   ".getSubcontractorList" - {
 
-    val cisId                   = "cis-123"
-    val getSubcontractorListUrl = s"/cis/subcontractors/$cisId"
-
     "returns 200 get with subcontractor list on success" in new Setup {
-
-      val subcontractorUTR: Seq[String] = Seq("1111111111", "2222222222")
-
-      val response = GetSubcontractorListResponse(
-        subcontractors = List(
-          Subcontractor(
-            subcontractorId = 1L,
-            subbieResourceRef = Some(10L),
-            subcontractorType = Some("soletrader"),
-            utr = Some("1234567890"),
-            pageVisited = Some(2),
-            partnerUtr = None,
-            crn = None,
-            firstName = Some("John"),
-            nino = Some("AA123456A"),
-            secondName = None,
-            surname = Some("Smith"),
-            partnershipTradingName = None,
-            tradingName = Some("ACME"),
-            addressLine1 = Some("1 Main Street"),
-            addressLine2 = None,
-            addressLine3 = None,
-            addressLine4 = None,
-            country = Some("GB"),
-            postcode = Some("AA1 1AA"),
-            emailAddress = None,
-            phoneNumber = None,
-            mobilePhoneNumber = None,
-            worksReferenceNumber = None,
-            version = Some(1),
-            taxTreatment = None,
-            updatedTaxTreatment = None,
-            verificationNumber = None,
-            createDate = None,
-            lastUpdate = None,
-            matched = None,
-            verified = None,
-            autoVerified = None,
-            verificationDate = None,
-            lastMonthlyReturnDate = None,
-            pendingVerifications = Some(0)
-          )
-        )
-      )
 
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
         .thenReturn(Some(EmployerReference("200", "")))
 
       when(mockResourceHelper.resourceAsString(any()))
-        .thenReturn(Json.toJson(response).toString)
+        .thenReturn(Json.toJson(sampleSubcontractorListResponse).toString)
 
       val req: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, getSubcontractorListUrl)
-      val res: Future[Result]                      = controller.getSubcontractorList(cisId)(req)
+      val res: Future[Result]                      = controller.getSubcontractorList(getListCisId)(req)
 
       status(res) mustBe OK
-      contentAsJson(res) mustBe Json.toJson(response)
+      contentAsJson(res) mustBe Json.toJson(sampleSubcontractorListResponse)
     }
 
-    "propagates UpstreamErrorResponse for taxOfficeNumber = 502" in new Setup {
+    "returns 200 with subcontractor list when contractor enrolment is missing but agent enrolment is present" in new Setup {
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(Some("agent-123"))
+
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn(Json.toJson(sampleSubcontractorListResponse).toString)
+
+      val req: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, getSubcontractorListUrl)
+      val res: Future[Result]                      = controller.getSubcontractorList(getListCisId)(req)
+
+      status(res) mustBe OK
+      contentAsJson(res) mustBe Json.toJson(sampleSubcontractorListResponse)
+    }
+
+    "returns 502 BadGateway for taxOfficeNumber = 502" in new Setup {
 
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
         .thenReturn(Some(EmployerReference("502", "")))
 
       val req: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, getSubcontractorListUrl)
-      val res: Future[Result]                      = controller.getSubcontractorList(cisId)(req)
+      val res: Future[Result]                      = controller.getSubcontractorList(getListCisId)(req)
 
       status(res) mustBe BAD_GATEWAY
       (contentAsJson(res) \ "message").as[String] must include("formp failed")
-
     }
 
     "returns 500 with generic message for taxOfficeNumber = 500" in new Setup {
@@ -245,23 +244,26 @@ class SubcontractorControllerSpec extends SpecBase {
         .thenReturn(Some(EmployerReference("500", "")))
 
       val req: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, getSubcontractorListUrl)
-      val res: Future[Result]                      = controller.getSubcontractorList(cisId)(req)
+      val res: Future[Result]                      = controller.getSubcontractorList(getListCisId)(req)
 
       status(res) mustBe INTERNAL_SERVER_ERROR
       (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
     }
 
-    "returns 500 with error message when no contractor enrolment found" in new Setup {
+    "returns 500 when no contractor enrolment and no agent enrolment found" in new Setup {
 
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
         .thenReturn(None)
 
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
+
       val req: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, getSubcontractorListUrl)
-      val res: Future[Result]                      = controller.getSubcontractorList(cisId)(req)
+      val res: Future[Result]                      = controller.getSubcontractorList(getListCisId)(req)
 
       status(res) mustBe INTERNAL_SERVER_ERROR
+      (contentAsJson(res) \ "message").as[String] mustBe "Missing enrolments"
     }
-
   }
 
   private trait Setup {

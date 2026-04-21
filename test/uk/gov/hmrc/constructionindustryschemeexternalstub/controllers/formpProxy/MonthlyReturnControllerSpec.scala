@@ -316,6 +316,37 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
     }
   }
 
+  ".retrieveSubmittedMonthlyReturns" - {
+
+    "returns 200 when JSON body is valid" in new Setup {
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn(
+          """{"scheme":{"schemeId":1,"instanceId":"123","accountsOfficeReference":"a","taxOfficeNumber":"1","taxOfficeReference":"b"},"monthlyReturn":[]}"""
+        )
+
+      val req: FakeRequest[JsValue] =
+        FakeRequest(POST, "/cis/retrieve-submitted-monthly-returns")
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(Json.obj("instanceId" -> "abc-123"))
+
+      val res = controller.retrieveSubmittedMonthlyReturns(req)
+
+      status(res) mustBe OK
+    }
+
+    "returns 400 when JSON body is invalid" in new Setup {
+      val req: FakeRequest[JsValue] =
+        FakeRequest(POST, "/cis/retrieve-submitted-monthly-returns")
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(Json.obj("somethingElse" -> "oops"))
+
+      val res = controller.retrieveSubmittedMonthlyReturns(req)
+
+      status(res) mustBe BAD_REQUEST
+      (contentAsJson(res) \ "message").as[String] mustBe "Invalid JSON body"
+    }
+  }
+
   ".updateMonthlyReturnItem" - {
 
     "returns 204 NO_CONTENT when payload is valid" in new Setup {
@@ -478,6 +509,46 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
           .withBody(body)
 
       val res: Future[Result] = controller.deleteMonthlyReturnItem(req)
+
+      status(res) mustBe BAD_REQUEST
+      (contentAsJson(res) \ "message").as[String] mustBe "Invalid JSON body"
+    }
+  }
+
+  "MonthlyReturnController deleteUnsubmittedMonthlyReturn" - {
+
+    "returns 204 when JSON body is valid" in new Setup {
+
+      val body = Json.obj(
+        "instanceId" -> "abc-123",
+        "taxYear"    -> 2025,
+        "taxMonth"   -> 1,
+        "amendment"  -> "N"
+      )
+
+      val req: FakeRequest[JsValue] =
+        FakeRequest(POST, "/cis/monthly-returns/unsubmitted/delete")
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(body)
+
+      val res: Future[Result] = controller.deleteUnsubmittedMonthlyReturn(req)
+
+      status(res) mustBe NO_CONTENT
+      contentAsString(res) mustBe ""
+    }
+
+    "returns 400 when JSON body is invalid" in new Setup {
+
+      val body = Json.obj(
+        "instanceId" -> "abc-123"
+      )
+
+      val req: FakeRequest[JsValue] =
+        FakeRequest(POST, "/cis/monthly-returns/unsubmitted/delete")
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(body)
+
+      val res: Future[Result] = controller.deleteUnsubmittedMonthlyReturn(req)
 
       status(res) mustBe BAD_REQUEST
       (contentAsJson(res) \ "message").as[String] mustBe "Invalid JSON body"

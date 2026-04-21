@@ -1968,7 +1968,46 @@ To trigger the happy path, ensure you provide a valid request body:
 ```json
 { "message": "Unexpected error" }
 
+### Get current verification batch
 
+**Endpoint**: `GET /cis/verification-batch/current/:instanceId`
+
+**Description**: Returns the current verification batch for the given CIS instance id. The response includes:
+- subcontractors,
+- current verification batch and its verifications,
+
+
+#### Happy Path (Organisation)
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 200
+- Identifier Name: TaxOfficeReference
+- Identifier Value: Any
+
+- Response status: `200`
+- Response body (instance id not 1): `resources/verification/getCurrentVerificationBatch-200-verificationBatchStatus-started-response.json`
+- Response body (instance id equal 1): `resources/verification/getCurrentVerificationBatch-200-verificationBatchStatus-none-response.json`
+
+#### Happy Path (Agent)
+
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: Any
+
+- Response status: `200`
+- Response body (instance id not 1): `resources/verification/getCurrentVerificationBatch-200-verificationBatchStatus-started-response.json`
+- Response body (instance id equal 1): `resources/verification/getCurrentVerificationBatch-200-verificationBatchStatus-none-response.json`
+
+#### Unhappy Paths (Organisation)
+
+- TaxOfficeNumber = `500` → Response status: `500`
+```json
+{ "message": "Unexpected error" }
+
+        
 ### ChRIS
 
 **Endpoint**: `POST /submission/ChRIS/CISR/Filing/sync/CIS300MR`

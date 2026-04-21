@@ -210,10 +210,10 @@ class MonthlyReturnController @Inject() (
         }
     }
 
-  def retrieveSubmittedMonthlyReturns: Action[JsValue] =
+  def retrieveSubmittedMonthlyReturnsData: Action[JsValue] =
     authorise.async(parse.json) { implicit request =>
       request.body
-        .validate[GetSubmittedMonthlyReturnsRequest]
+        .validate[GetSubmittedMonthlyReturnsDataRequest]
         .foldErrorsIntoBadRequest { _ =>
           Future.successful(Ok(resourceHelper.resourceAsString(getSubmittedMonthlyReturns_200_ResponsePath)))
         }

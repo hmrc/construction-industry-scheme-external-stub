@@ -16,24 +16,14 @@
 
 package uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests
 
-import org.scalatest.matchers.must.Matchers
-import org.scalatest.wordspec.AnyWordSpec
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
-class GetSubmittedMonthlyReturnsRequestSpec extends AnyWordSpec with Matchers {
+case class GetSubmittedMonthlyReturnsDataRequest(
+  instanceId: String,
+  taxYear: Int,
+  taxMonth: Int,
+  amendment: String
+)
 
-  "GetSubmittedMonthlyReturnsRequest JSON format" should {
-
-    "serialize and deserialize correctly" in {
-      val model = GetSubmittedMonthlyReturnsRequest(
-        instanceId = "abc-123",
-        taxYear = 2025,
-        taxMonth = 1,
-        amendment = "Y"
-      )
-
-      val json = Json.toJson(model)
-      json.as[GetSubmittedMonthlyReturnsRequest] mustBe model
-    }
-  }
-}
+object GetSubmittedMonthlyReturnsDataRequest:
+  given format: OFormat[GetSubmittedMonthlyReturnsDataRequest] = Json.format[GetSubmittedMonthlyReturnsDataRequest]

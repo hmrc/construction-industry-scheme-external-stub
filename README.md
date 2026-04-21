@@ -1042,9 +1042,9 @@ To trigger the happy path, ensure you provide a valid request body, below is an 
 - Response status: `204`
 - Response body: empty body
 
-**Endpoint**: `POST /cis/retrieve-submitted-monthly-returns `
+**Endpoint**: `POST /cis/submitted-monthly-returns-data `
 
-**Description**: Returns the Submitted Monthly Returns
+**Description**: Returns the Submitted Monthly Returns Data
 
 #### Happy Path
 

@@ -555,7 +555,7 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
     }
   }
 
-  ".retrieveSubmittedMonthlyReturns" - {
+  ".retrieveSubmittedMonthlyReturnsData" - {
 
     "returns 200 when JSON body is valid" in new Setup {
       val body = Json.obj(
@@ -575,7 +575,7 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
           .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
           .withBody(body)
 
-      val res = controller.retrieveSubmittedMonthlyReturns(req)
+      val res = controller.retrieveSubmittedMonthlyReturnsData(req)
 
       status(res) mustBe OK
     }
@@ -591,7 +591,7 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
           .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
           .withBody(body)
 
-      val res: Future[Result] = controller.retrieveSubmittedMonthlyReturns(req)
+      val res: Future[Result] = controller.retrieveSubmittedMonthlyReturnsData(req)
 
       status(res) mustBe BAD_REQUEST
       (contentAsJson(res) \ "message").as[String] mustBe "Invalid JSON body"

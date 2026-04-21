@@ -109,7 +109,7 @@ class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
                       <dsig:Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/>
                     </dsig:Transforms>
                     <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
-                    <dsig:DigestValue>6kUvmjT9exR0Xfy9Y5MWeSt85Hw=</dsig:DigestValue>
+                    <dsig:DigestValue>[digestValue]</dsig:DigestValue>
                   </dsig:Reference>
                 </dsig:SignedInfo>
                 <dsig:SignatureValue>xjd0lzhAQrnHZsE5inNCOVsmwcQ9HTu+CFUoyqEcOhVvxj2jvYGcjkhu7sZkZJ9RBjBcEP/eQTbesMTrnUgofuMqaROt8ZyD/RJKFIwh5TtNzYzDM55Pa3GDd2ZXcmfR38mS9KPwqc5Ty+Eqv69FxqivCQk46H20F8fnWnx85H4=</dsig:SignatureValue> <dsig:KeyInfo>

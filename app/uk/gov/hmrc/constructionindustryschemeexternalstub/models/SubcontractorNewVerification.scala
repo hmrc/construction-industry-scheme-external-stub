@@ -20,19 +20,21 @@ import play.api.libs.json.{JsObject, Json, OFormat, Reads, Writes}
 
 import java.time.LocalDateTime
 
-case class SubcontractorVerification(
+case class SubcontractorNewVerification(
   subcontractorId: Long,
   firstName: Option[String],
   secondName: Option[String],
   surname: Option[String],
   tradingName: Option[String],
+  partnershipTradingName: Option[String],
   verified: Option[String],
   verificationNumber: Option[String],
   taxTreatment: Option[String],
   verificationDate: Option[LocalDateTime],
-  lastMonthlyReturnDate: Option[LocalDateTime]
+  lastMonthlyReturnDate: Option[LocalDateTime],
+  createDate: Option[LocalDateTime]
 )
 
-object SubcontractorVerification {
-  given format: OFormat[SubcontractorVerification] = Json.format[SubcontractorVerification]
+object SubcontractorNewVerification {
+  given format: OFormat[SubcontractorNewVerification] = Json.format[SubcontractorNewVerification]
 }

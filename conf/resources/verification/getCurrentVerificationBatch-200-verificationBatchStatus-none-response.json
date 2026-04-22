@@ -10,7 +10,8 @@
       "utr": "1111111111",
       "nino": "AA123456A",
       "crn": null,
-      "partnerUtr": null
+      "partnerUtr": null,
+      "partnershipTradingName": null
     },
     {
       "subcontractorId": 20,
@@ -22,7 +23,8 @@
       "utr": null,
       "nino": null,
       "crn": "AC012345",
-      "partnerUtr": "2222222222"
+      "partnerUtr": "2222222222",
+      "partnershipTradingName": "Partnership"
     },
     {
       "subcontractorId": 30,
@@ -34,7 +36,8 @@
       "utr": null,
       "nino": null,
       "crn": null,
-      "partnerUtr": null
+      "partnerUtr": null,
+      "partnershipTradingName": null
     }
   ],
   "verificationBatch": [],

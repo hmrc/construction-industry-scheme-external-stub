@@ -46,11 +46,8 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
       val responseJson: JsValue = Json.parse(
         s"""
            |{
-           |  "scheme": [
-           |    { "schemeId": 123, "instanceId": "$instanceId" }
-           |  ],
            |  "subcontractors": [
-           |    { "subcontractorId": 1, "utr": "1111111111" }
+           |    { "subcontractorId": 1 }
            |  ],
            |  "verificationBatch": [
            |    { "verificationBatchId": 99 }
@@ -63,9 +60,6 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
            |  ],
            |  "monthlyReturn": [
            |    { "monthlyReturnId": 777 }
-           |  ],
-           |  "monthlyReturnSubmission": [
-           |    { "submissionId": 556 }
            |  ]
            |}
            |""".stripMargin
@@ -84,18 +78,13 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
 
       body mustBe responseJson
 
-      (body \ "scheme")(0).\("schemeId").as[Int] mustBe 123
-      (body \ "scheme")(0).\("instanceId").as[String] mustBe instanceId
-
       (body \ "subcontractors")(0).\("subcontractorId").as[Long] mustBe 1L
-      (body \ "subcontractors")(0).\("utr").as[String] mustBe "1111111111"
 
       (body \ "verificationBatch")(0).\("verificationBatchId").as[Long] mustBe 99L
       (body \ "verifications")(0).\("verificationId").as[Long] mustBe 1001L
 
       (body \ "submission")(0).\("submissionId").as[Long] mustBe 555L
       (body \ "monthlyReturn")(0).\("monthlyReturnId").as[Long] mustBe 777L
-      (body \ "monthlyReturnSubmission")(0).\("submissionId").as[Long] mustBe 556L
     }
 
     "returns 200 OK with JSON body on success (agent enrolment)" in new Setup {
@@ -107,15 +96,21 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
       val responseJson: JsValue = Json.parse(
         s"""
            |{
-           |  "scheme": [
-           |    { "schemeId": 123, "instanceId": "$instanceId" }
+           |  "subcontractors": [
+           |    { "subcontractorId": 1 }
            |  ],
-           |  "subcontractors": [],
-           |  "verificationBatch": [],
-           |  "verifications": [],
-           |  "submission": [],
-           |  "monthlyReturn": [],
-           |  "monthlyReturnSubmission": []
+           |  "verificationBatch": [
+           |    { "verificationBatchId": 99 }
+           |  ],
+           |  "verifications": [
+           |    { "verificationId": 1001 }
+           |  ],
+           |  "submission": [
+           |    { "submissionId": 555 }
+           |  ],
+           |  "monthlyReturn": [
+           |    { "monthlyReturnId": 777 }
+           |  ]
            |}
            |""".stripMargin
       )

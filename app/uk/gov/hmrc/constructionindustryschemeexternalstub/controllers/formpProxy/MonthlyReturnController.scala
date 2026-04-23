@@ -48,6 +48,8 @@ class MonthlyReturnController @Inject() (
     s"$monthlyNilReturnResponsePath/getSchemeEmail-null-200-response.json"
   private val retrieveUnsubmittedMonthlyReturns_200_ResponsePath =
     "/resources/retrieveUnsubmittedMonthlyReturns-200-response.json"
+  private val retrieveSubmittedMonthlyReturns_200_ResponsePath   =
+    "/resources/retrieveSubmittedMonthlyReturns-200-response.json"
   private val getMonthlyReturnForEdit_200_ResponsePath           =
     "/resources/getMonthlyReturnForEdit-200-response.json"
 
@@ -158,6 +160,15 @@ class MonthlyReturnController @Inject() (
         .validate[InstanceIdRequest]
         .foldErrorsIntoBadRequest { _ =>
           Future.successful(Ok(resourceHelper.resourceAsString(retrieveUnsubmittedMonthlyReturns_200_ResponsePath)))
+        }
+    }
+
+  def retrieveSubmittedMonthlyReturns: Action[JsValue] =
+    authorise.async(parse.json) { implicit request =>
+      request.body
+        .validate[InstanceIdRequest]
+        .foldErrorsIntoBadRequest { _ =>
+          Future.successful(Ok(resourceHelper.resourceAsString(retrieveSubmittedMonthlyReturns_200_ResponsePath)))
         }
     }
 

@@ -1042,7 +1042,7 @@ To trigger the happy path, ensure you provide a valid request body, below is an 
 - Response status: `204`
 - Response body: empty body
 
-**Endpoint**: `POST /cis/submitted-monthly-returns-data `
+**Endpoint**: `POST /cis/retrieve-submitted-monthly-returns-data`
 
 **Description**: Returns the Submitted Monthly Returns Data
 
@@ -1068,24 +1068,24 @@ To trigger the happy path, ensure you provide a valid request body similar to ex
 - Response body:
 ```json
 {
-  "scheme": 
-    {
-      "schemeId": 13343,
-      "instanceId": "900001",
-      "accountsOfficeReference": "125PA12345000",
-      "taxOfficeNumber": "101",
-      "taxOfficeReference": "AB0001",
-      "utr": "1234657890",
-      "name": "company",
-      "emailAddress": "test@test",
-      "displayWelcomePage": "N",
-      "prePopCount": 3,
-      "prePopSuccessful": "Y",
-      "subcontractorCounter": 1,
-      "verificationBatchCounter": 0,
-      "lastUpdate": "2026-01-05T10:23:56Z",
-      "version": 3
-    },
+  "scheme":
+  {
+    "schemeId": 13343,
+    "instanceId": "900001",
+    "accountsOfficeReference": "125PA12345000",
+    "taxOfficeNumber": "101",
+    "taxOfficeReference": "AB0001",
+    "utr": "1234657890",
+    "name": "company",
+    "emailAddress": "test@test",
+    "displayWelcomePage": "N",
+    "prePopCount": 3,
+    "prePopSuccessful": "Y",
+    "subcontractorCounter": 1,
+    "verificationBatchCounter": 0,
+    "lastUpdate": "2026-01-05T10:23:56Z",
+    "version": 3
+  },
   "monthlyReturn": [
     {
       "monthlyReturnId": 30001,
@@ -1106,36 +1106,36 @@ To trigger the happy path, ensure you provide a valid request body similar to ex
     {
       "monthlyReturnId": 30001,
       "monthlyReturnItemId": 1,
-      "totalPayments": "1,000.00",
+      "totalPayments": "1000.00",
       "costOfMaterials": "100.00",
       "totalDeducted": "100.00",
       "unmatchedTaxRateIndicator": "Y",
       "subcontractorId": 10903,
-      "subcontractorName": "Alice, A",
+      "subcontractorName": "BuildRight Construction",
       "verificationNumber": "V1000000001",
       "itemResourceReference": 1
     },
     {
       "monthlyReturnId": 30001,
       "monthlyReturnItemId": 2,
-      "totalPayments": "2,000.00",
+      "totalPayments": "2000.00",
       "costOfMaterials": "200.00",
       "totalDeducted": "200.00",
       "unmatchedTaxRateIndicator": "Y",
       "subcontractorId": 10903,
-      "subcontractorName": "Alice, A",
+      "subcontractorName": "Northern Trades Ltd",
       "verificationNumber": "V1000000001",
       "itemResourceReference": 2
     },
     {
       "monthlyReturnId": 30001,
       "monthlyReturnItemId": 3,
-      "totalPayments": "3,000.00",
+      "totalPayments": "3000.00",
       "costOfMaterials": "300.00",
       "totalDeducted": "300.00",
       "unmatchedTaxRateIndicator": "Y",
       "subcontractorId": 10903,
-      "subcontractorName": "Alice, A",
+      "subcontractorName": "TyneWear Ltd",
       "verificationNumber": "V1000000001",
       "itemResourceReference": 3
     }
@@ -1149,7 +1149,7 @@ To trigger the happy path, ensure you provide a valid request body similar to ex
       "hmrcMarkGenerated": "9AjFBxlBohmcRZ8s/2IV0QaYzz0=",
       "hmrcMarkGgis": "9AjFBxlBohmcRZ8s/2IV0QaYzz0=",
       "emailRecipient": "test@test.com",
-      "acceptedTime": "2018-04-06T08:46:08.081",
+      "acceptedTime": "2026-04-06T09:50:08.081",
       "createDate": "2018-02-23T16:26:25",
       "lastUpdate": "2018-02-23T16:26:30",
       "schemeId": 13343,

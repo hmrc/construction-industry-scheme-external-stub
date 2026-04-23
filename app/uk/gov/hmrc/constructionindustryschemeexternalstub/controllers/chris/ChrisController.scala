@@ -26,6 +26,7 @@ import uk.gov.hmrc.constructionindustryschemeexternalstub.models.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.ResourceHelper
 
 import java.time.LocalDateTime
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.{Inject, Singleton}
 import scala.xml.{Node, NodeSeq}
 
@@ -36,7 +37,8 @@ class ChrisController @Inject() (
   resourceHelper: ResourceHelper,
   cc: ControllerComponents
 ) extends BackendController(cc) {
-  private val logger = Logger(classOf[ChrisController])
+  private val logger      = Logger(classOf[ChrisController])
+  private val irMarkStore = new ConcurrentHashMap[String, String]()
 
   private val monthlyNilReturnResponsePath                        = "/resources/monthlyNilReturns"
   private val submitCISMessage_acknowledgement_ResponsePath       =
@@ -70,6 +72,12 @@ class ChrisController @Inject() (
       case _                     => "123"
     }
     val taxOfficeReference                = (keys filter typeIs("TaxOfficeReference")).text
+
+    val irMark = (message \\ "IRmark").text.trim
+    if (irMark.nonEmpty) {
+      irMarkStore.put(correlationId, irMark)
+      logger.info(s"[ChrisStub] Stored IRmark for correlationId=$correlationId")
+    }
 
     service.initialCisStatus(taxOfficeNumber, taxOfficeReference) match {
       case FATAL_ERROR =>
@@ -201,10 +209,13 @@ class ChrisController @Inject() (
           s"$basePollUrl/$nextCount$suffix"
         }
 
+      val storedIrMark = Option(irMarkStore.get(correlationId)).getOrElse("NO_IRMARK_FOUND")
+
       val xml =
         replaceCorrelationId(rawXml, correlationId, pollingUrlHost)
           .replace("[pollUrl]", nextPollUrl)
           .replace("[gatewayTimestamp]", gatewayTimestamp)
+          .replace("[digestValue]", storedIrMark)
 
       Ok(xml)
     }

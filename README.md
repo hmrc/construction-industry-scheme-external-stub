@@ -921,6 +921,34 @@ To trigger the happy path, ensure you provide a valid request body (same shape a
 - Response status: `204`
 - Response body: _empty_
 
+**Endpoint**: `POST /cis/monthly-return-complete`
+
+**Description**: Returns the complete monthly return data for a submitted return, including scheme, monthly return, subcontractors, monthly return items, and submission details.
+
+#### Happy Path
+
+- Affinity Group: Organisation / Agent
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber (for Organisation) or IRAgentReference (for Agent)
+- Identifier Value: any valid Tax Office no. or any valid IRAgentReference
+- Identifier Name: TaxOfficeReference (for Organisation) or none (for Agent)
+- Identifier Value: any valid Tax Office ref. (for Organisation)
+
+To trigger the happy path, ensure you provide a valid request body:
+```json
+{
+  "instanceId": "900001",
+  "taxYear": 2025,
+  "taxMonth": 1,
+  "amendment": "N"
+}
+```
+- For `taxMonth` = `2` or `9`, the stub returns a nil return response (`getMonthlyReturnComplete-nil-200-response.json`).
+- For all other `taxMonth` values, the stub returns a standard return response (`getMonthlyReturnComplete-200-response.json`).
+
+- Response status: `200`
+- Response body: `resources/getMonthlyReturnComplete-200-response.json`
+
 **Endpoint**: `POST /cis/monthly-return-item/delete`
 
 **Description**: Delete a record in the monthly return item table.

@@ -21,6 +21,34 @@
       "verificationDate": "2026-04-01T10:00:00",
       "lastMonthlyReturnDate": null,
       "createDate": "2026-04-01T10:00:00"
+    },
+    {
+      "subcontractorId": 2,
+      "firstName": "Alice",
+      "secondName": null,
+      "surname": "Brown",
+      "tradingName": "BROWN LIMITED",
+      "partnershipTradingName": null,
+      "verified": "N",
+      "verificationNumber": null,
+      "taxTreatment": null,
+      "verificationDate": null,
+      "lastMonthlyReturnDate": null,
+      "createDate": "2026-04-05T09:30:00"
+    },
+    {
+      "subcontractorId": 3,
+      "firstName": "Charlie",
+      "secondName": "D",
+      "surname": "Green",
+      "tradingName": null,
+      "partnershipTradingName": null,
+      "verified": null,
+      "verificationNumber": null,
+      "taxTreatment": null,
+      "verificationDate": null,
+      "lastMonthlyReturnDate": null,
+      "createDate": "2026-04-10T14:15:00"
     }
   ],
   "verificationBatch": [
@@ -38,6 +66,22 @@
       "taxTreatment": "0",
       "verificationBatchId": 99,
       "subcontractorId": 1
+    },
+    {
+      "verificationId": 1002,
+      "matched": "N",
+      "verificationNumber": null,
+      "taxTreatment": null,
+      "verificationBatchId": 99,
+      "subcontractorId": 2
+    },
+    {
+      "verificationId": 1003,
+      "matched": "N",
+      "verificationNumber": null,
+      "taxTreatment": null,
+      "verificationBatchId": 99,
+      "subcontractorId": 3
     }
   ],
   "submission": [

@@ -66,22 +66,6 @@
       "taxTreatment": "0",
       "verificationBatchId": 99,
       "subcontractorId": 1
-    },
-    {
-      "verificationId": 1002,
-      "matched": "N",
-      "verificationNumber": null,
-      "taxTreatment": null,
-      "verificationBatchId": 99,
-      "subcontractorId": 2
-    },
-    {
-      "verificationId": 1003,
-      "matched": "N",
-      "verificationNumber": null,
-      "taxTreatment": null,
-      "verificationBatchId": 99,
-      "subcontractorId": 3
     }
   ],
   "submission": [

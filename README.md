@@ -2076,6 +2076,24 @@ To trigger the happy path, ensure you provide a valid request body:
 - TaxOfficeNumber = `500` → Response status: `500`
 ```json
 { "message": "Unexpected error" }
+```
+
+### Create verification batch and verifications
+
+**Endpoint**: `POST /cis/verification-batch/create`
+
+**Description**: Creates a new verification batch and verification records for the provided subcontractor resource references (stubbed response).
+
+#### Request body
+
+```json
+  {
+  "instanceId": "123",
+  "verificationResourceReferences": [1, 2, 3],
+  "actionIndicator": "A"
+  }
+```
+
 
 ### Get current verification batch
 

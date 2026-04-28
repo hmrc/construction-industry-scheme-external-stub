@@ -29,8 +29,9 @@ POST       /cis/govtalkstatus/create                                uk.gov.hmrc.
 POST       /cis/subcontractor/create-and-update                     uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubcontractorController.createAndUpdateSubcontractor()
 GET        /cis/subcontractors/:cisId                               uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubcontractorController.getSubcontractorList(cisId: String)
 
-POST       /cis/monthly-return-item/update                              uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.updateMonthlyReturnItem()
-GET        /verification-batch/newest/:instanceId                     uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.VerificationController.getNewestVerificationBatch(instanceId: String)
+POST       /cis/monthly-return-item/update                          uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.updateMonthlyReturnItem()
+GET        /cis/verification-batch/newest/:instanceId               uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.VerificationController.getNewestVerificationBatch(instanceId: String)
+POST       /cis/verification-batch/create                           uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.VerificationController.createVerificationBatchAndVerifications()
 
 
 

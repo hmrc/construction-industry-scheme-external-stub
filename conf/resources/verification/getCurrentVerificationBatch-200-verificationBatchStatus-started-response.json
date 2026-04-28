@@ -1,0 +1,57 @@
+{
+  "subcontractors": [
+    {
+      "subcontractorId": 10,
+      "subbieResourceRef": 1,
+      "firstName": "John",
+      "secondName": null,
+      "surname": "Smith",
+      "tradingName": null,
+      "utr": "1111111111",
+      "nino": "AA123456A",
+      "crn": null,
+      "partnerUtr": null,
+      "partnershipTradingName": null
+    },
+    {
+      "subcontractorId": 20,
+      "subbieResourceRef": 2,
+      "firstName": null,
+      "secondName": null,
+      "surname": null,
+      "tradingName": "Partner",
+      "utr": null,
+      "nino": null,
+      "crn": "AC012345",
+      "partnerUtr": "2222222222",
+      "partnershipTradingName": "Partnership"
+    },
+    {
+      "subcontractorId": 30,
+      "subbieResourceRef": 3,
+      "firstName": null,
+      "secondName": null,
+      "surname": null,
+      "tradingName": "ABC Ltd",
+      "utr": null,
+      "nino": null,
+      "crn": null,
+      "partnerUtr": null,
+      "partnershipTradingName": null
+    }
+  ],
+  "verificationBatch": [
+    {
+      "verificationBatchId": 99,
+      "verifBatchResourceRef": 10
+    }
+  ],
+  "verifications": [
+    {
+      "verificationId": 1001,
+      "verificationBatchId": 99,
+      "subcontractorId": 10,
+      "verificationResourceRef": 1
+    }
+  ]
+}

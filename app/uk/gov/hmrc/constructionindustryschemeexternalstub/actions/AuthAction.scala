@@ -40,8 +40,8 @@ class DefaultAuthAction @Inject() (
 
   override def invokeBlock[A](request: Request[A], block: AuthenticatedRequest[A] => Future[Result]): Future[Result] = {
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequest(request)
-
-    val sessionId = summon[HeaderCarrier].sessionId
+    logger.info(s"Request received: \n${request.method} ${request.uri}\n${request.body}")
+    val sessionId                  = summon[HeaderCarrier].sessionId
       .getOrElse(throw new UnauthorizedException("Unable to retrieve session ID from headers"))
 
     authorised()

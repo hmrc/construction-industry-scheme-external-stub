@@ -153,6 +153,20 @@
       "monthlyReturnItems": "N"
     },
     {
+      "monthlyReturnId": 10013,
+      "taxYear": 2024,
+      "taxMonth": 9,
+      "nilReturnIndicator": "Y",
+      "decEmpStatusConsidered": "Y",
+      "decAllSubsVerified": "Y",
+      "decInformationCorrect": "Y",
+      "status": "SUBMITTED",
+      "amendmentStatus": "SUBMITTED",
+      "lastUpdate": "2018-03-15T10:30:00",
+      "amendment": "N",
+      "monthlyReturnItems": "N"
+    },
+    {
       "monthlyReturnId": 10009,
       "taxYear": 2025,
       "taxMonth": 1,
@@ -406,6 +420,21 @@
       "schemeId": 10877,
       "agentId": "-",
       "submissionRequestDate": "2018-02-23T16:26:27"
+    },
+    {
+      "submissionId": 10913,
+      "submissionType": "Nil return",
+      "activeObjectId": 10013,
+      "status": "SUBMITTED",
+      "hmrcMarkGenerated": "xN7pQ2rKl8mT5vBw3jH9cYzA1Fo=",
+      "hmrcMarkGgis": "xN7pQ2rKl8mT5vBw3jH9cYzA1Fo=",
+      "emailRecipient": "test@test.com",
+      "acceptedTime": "2018-03-15T10:30:00",
+      "createDate": "2018-03-15T10:28:00",
+      "lastUpdate": "2018-03-15T10:30:00",
+      "schemeId": 10877,
+      "agentId": "-",
+      "submissionRequestDate": "2018-03-15T10:29:00"
     }
   ]
 }

@@ -1,12 +1,10 @@
 {
-  "scheme": [
-    {
+  "scheme": {
       "accountsOfficeReference": "123PA00123456",
       "name": "John",
       "utr": "1111111111",
       "emailAddress": "ops@example.com"
-    }
-  ],
+    },
   "subcontractors": [
     {
       "subcontractorId": 1,
@@ -20,7 +18,13 @@
       "taxTreatment": "0",
       "verificationDate": "2026-04-01T10:00:00",
       "lastMonthlyReturnDate": null,
-      "createDate": "2026-04-01T10:00:00"
+      "createDate": "2026-04-01T10:00:00",
+      "subcontractorType": "soletrader",
+      "subbieResourceRef":  10,
+      "utr": "1111111111",
+      "partnerUtr": "6666",
+      "crn":  "99999",
+      "nino": "AA123456A"
     },
     {
       "subcontractorId": 2,
@@ -34,7 +38,13 @@
       "taxTreatment": null,
       "verificationDate": null,
       "lastMonthlyReturnDate": null,
-      "createDate": "2026-04-05T09:30:00"
+      "createDate": "2026-04-05T09:30:00",
+      "subcontractorType": "company",
+      "subbieResourceRef":  10,
+      "utr": "1111111111",
+      "partnerUtr": "6666",
+      "crn":  "99999",
+      "nino": "AA123456A"
     },
     {
       "subcontractorId": 3,
@@ -48,16 +58,20 @@
       "taxTreatment": null,
       "verificationDate": null,
       "lastMonthlyReturnDate": null,
-      "createDate": "2026-04-10T14:15:00"
+      "createDate": "2026-04-10T14:15:00",
+      "subcontractorType": "soletrader",
+      "subbieResourceRef":  10,
+      "utr": "1111111111",
+      "partnerUtr": "6666",
+      "crn":  "99999",
+      "nino": "AA123456A"
     }
   ],
-  "verificationBatch": [
-    {
+  "verificationBatch": {
       "verificationBatchId": 99,
       "status": "STARTED",
       "verificationNumber": "VB00000001"
-    }
-  ],
+    },
   "verifications": [
     {
       "verificationId": 1001,
@@ -68,18 +82,14 @@
       "subcontractorId": 1
     }
   ],
-  "submission": [
-    {
+  "submission": {
       "submissionId": 555,
       "activeObjectId": 99,
       "status": "ACCEPTED",
       "submissionRequestDate": "2026-04-01T10:00:00"
-    }
-  ],
-  "monthlyReturn": [
-    {
+    },
+  "monthlyReturn": {
       "monthlyReturnId": 777,
       "decNoMoreSubPayments": null
     }
-  ]
 }

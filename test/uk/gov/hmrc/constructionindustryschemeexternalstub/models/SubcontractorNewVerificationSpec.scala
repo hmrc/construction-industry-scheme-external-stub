@@ -129,5 +129,3 @@ final class SubcontractorNewVerificationSpec extends AnyWordSpec with Matchers {
     }
   }
 }
-
-

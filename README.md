@@ -1015,6 +1015,38 @@ To trigger the happy path, ensure you provide a valid request body:
 - Response status: `204`
 - Response body: _empty_
 
+**Endpoint**: `POST /cis/amend-monthly-return/create`
+
+**Description**: Create an amended record in the monthly return table.
+
+#### Happy Path
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: any valid Tax Office no.
+- Identifier Name: TaxOfficeReference
+- Identifier Value: any valid Tax Office ref.
+
+- or
+
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: Any valid value
+
+To trigger the happy path, ensure you provide a valid request body:
+```json
+{
+  "instanceId":  "1",
+  "taxYear": 2025,
+  "taxMonth": 11,
+  "version": 0
+}
+```
+- Response status: `201`
+- Response body: empty body
+
 **Endpoint**: `POST /scheme/email`
 
 **Description**: Return a scheme email from the scheme table.

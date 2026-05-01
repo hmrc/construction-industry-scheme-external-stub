@@ -12,6 +12,7 @@ POST       /cis/monthly-return-complete                              uk.gov.hmrc
 POST       /cis/monthly-return/standard/create                      uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.createMonthlyReturn
 POST       /cis/monthly-return-item/sync                            uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.syncMonthlyReturnItems
 POST       /cis/monthly-return-item/delete                          uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.deleteMonthlyReturnItem
+POST       /cis/amend-monthly-return/create                         uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.AmendMonthlyReturnController.createAmendedMonthlyReturn
 POST       /scheme/email                                            uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.getSchemeEmail
 POST       /submissions/create                                      uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubmissionController.createSubmission()
 POST       /submissions/update                                      uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubmissionController.updateSubmission()

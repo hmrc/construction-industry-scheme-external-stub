@@ -40,12 +40,10 @@
       "partnershipTradingName": null
     }
   ],
-  "verificationBatch": [
-    {
+  "verificationBatch": {
       "verificationBatchId": 99,
       "verifBatchResourceRef": 10
-    }
-  ],
+    },
   "verifications": [
     {
       "verificationId": 1001,

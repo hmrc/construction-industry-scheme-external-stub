@@ -60,18 +60,12 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
            |  "subcontractors": [
            |    { "subcontractorId": 1 }
            |  ],
-           |  "verificationBatch": [
-           |    { "verificationBatchId": 99 }
-           |  ],
+           |  "verificationBatch": { "verificationBatchId": 99 },
            |  "verifications": [
            |    { "verificationId": 1001 }
            |  ],
-           |  "submission": [
-           |    { "submissionId": 555 }
-           |  ],
-           |  "monthlyReturn": [
-           |    { "monthlyReturnId": 777 }
-           |  ]
+           |  "submission": { "submissionId": 555 },
+           |  "monthlyReturn": { "monthlyReturnId": 777 }
            |}
            |""".stripMargin
       )
@@ -91,11 +85,11 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
 
       (body \ "subcontractors")(0).\("subcontractorId").as[Long] mustBe 1L
 
-      (body \ "verificationBatch")(0).\("verificationBatchId").as[Long] mustBe 99L
+      (body \ "verificationBatch").\("verificationBatchId").as[Long] mustBe 99L
       (body \ "verifications")(0).\("verificationId").as[Long] mustBe 1001L
 
-      (body \ "submission")(0).\("submissionId").as[Long] mustBe 555L
-      (body \ "monthlyReturn")(0).\("monthlyReturnId").as[Long] mustBe 777L
+      (body \ "submission").\("submissionId").as[Long] mustBe 555L
+      (body \ "monthlyReturn").\("monthlyReturnId").as[Long] mustBe 777L
     }
 
     "returns 200 OK with JSON body on success (agent enrolment)" in new Setup {
@@ -110,18 +104,12 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
            |  "subcontractors": [
            |    { "subcontractorId": 1 }
            |  ],
-           |  "verificationBatch": [
-           |    { "verificationBatchId": 99 }
-           |  ],
+           |  "verificationBatch": { "verificationBatchId": 99 },
            |  "verifications": [
            |    { "verificationId": 1001 }
            |  ],
-           |  "submission": [
-           |    { "submissionId": 555 }
-           |  ],
-           |  "monthlyReturn": [
-           |    { "monthlyReturnId": 777 }
-           |  ]
+           |  "submission": { "submissionId": 555 },
+           |  "monthlyReturn": { "monthlyReturnId": 777 }
            |}
            |""".stripMargin
       )
@@ -192,9 +180,7 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
              |  "subcontractors": [
              |    { "subcontractorId": 1 }
              |  ],
-             |  "verificationBatch": [
-             |    { "verificationBatchId": 99 }
-             |  ],
+             |  "verificationBatch": { "verificationBatchId": 99 },
              |  "verifications": [
              |    { "verificationId": 1001 }
              |  ]
@@ -217,7 +203,7 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
 
         (body \ "subcontractors")(0).\("subcontractorId").as[Long] mustBe 1L
 
-        (body \ "verificationBatch")(0).\("verificationBatchId").as[Long] mustBe 99L
+        (body \ "verificationBatch").\("verificationBatchId").as[Long] mustBe 99L
         (body \ "verifications")(0).\("verificationId").as[Long] mustBe 1001L
 
       }
@@ -236,9 +222,7 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
              |  "subcontractors": [
              |    { "subcontractorId": 1 }
              |  ],
-             |  "verificationBatch": [
-             |    { "verificationBatchId": 99 }
-             |  ],
+             |  "verificationBatch": { "verificationBatchId": 99 },
              |  "verifications": [
              |    { "verificationId": 1001 }
              |  ]
@@ -261,7 +245,7 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
 
         (body \ "subcontractors")(0).\("subcontractorId").as[Long] mustBe 1L
 
-        (body \ "verificationBatch")(0).\("verificationBatchId").as[Long] mustBe 99L
+        (body \ "verificationBatch").\("verificationBatchId").as[Long] mustBe 99L
         (body \ "verifications")(0).\("verificationId").as[Long] mustBe 1001L
 
       }
@@ -278,9 +262,7 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
              |  "subcontractors": [
              |    { "subcontractorId": 1 }
              |  ],
-             |  "verificationBatch": [
-             |    { "verificationBatchId": 99 }
-             |  ],
+             |  "verificationBatch": { "verificationBatchId": 99 },
              |  "verifications": [
              |    { "verificationId": 1001 }
              |  ]
@@ -313,9 +295,7 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
              |  "subcontractors": [
              |    { "subcontractorId": 1 }
              |  ],
-             |  "verificationBatch": [
-             |    { "verificationBatchId": 99 }
-             |  ],
+             |  "verificationBatch": { "verificationBatchId": 99 },
              |  "verifications": [
              |    { "verificationId": 1001 }
              |  ]

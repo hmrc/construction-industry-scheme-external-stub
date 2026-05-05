@@ -52,6 +52,10 @@ class MonthlyReturnController @Inject() (
     "/resources/retrieveSubmittedMonthlyReturns-200-response.json"
   private val getMonthlyReturnForEdit_200_ResponsePath           =
     "/resources/getMonthlyReturnForEdit-200-response.json"
+  private val getMonthlyReturnComplete_200_ResponsePath          =
+    "/resources/getMonthlyReturnComplete-200-response.json"
+  private val getMonthlyReturnComplete_nil_200_ResponsePath      =
+    "/resources/getMonthlyReturnComplete-nil-200-response.json"
   private val getSubmittedMonthlyReturnsData_200_ResponsePath    =
     s"$monthlyNilReturnResponsePath/retrieveSubmittedMonthlyReturnsData-200-response.json"
 
@@ -207,6 +211,18 @@ class MonthlyReturnController @Inject() (
         .validate[DeleteUnsubmittedMonthlyReturnRequest]
         .foldErrorsIntoBadRequest { _ =>
           Future.successful(NoContent)
+        }
+    }
+
+  def getMonthlyReturnComplete: Action[JsValue] =
+    authorise.async(parse.json) { implicit request =>
+      request.body
+        .validate[GetMonthlyReturnCompleteRequest]
+        .foldErrorsIntoBadRequest { req =>
+          val responsePath =
+            if (req.taxMonth == 2 || req.taxMonth == 9) getMonthlyReturnComplete_nil_200_ResponsePath
+            else getMonthlyReturnComplete_200_ResponsePath
+          Future.successful(Ok(resourceHelper.resourceAsString(responsePath)))
         }
     }
 

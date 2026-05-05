@@ -22,7 +22,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.json.{JsArray, JsObject, JsValue, Json}
 import play.api.mvc.{ControllerComponents, PlayBodyParsers, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -426,6 +426,48 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
           )
 
       val res: Future[Result] = controller.getMonthlyReturnForEdit(req)
+
+      status(res) mustBe BAD_REQUEST
+      (contentAsJson(res) \ "message").as[String] mustBe "Invalid JSON body"
+    }
+  }
+
+  "MonthlyReturnController getMonthlyReturnComplete" - {
+
+    "returns 200 when JSON body is valid" in new Setup {
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn(
+          """{"scheme":[{"schemeId":1}],"monthlyReturn":[],"subcontractors":[],"monthlyReturnItems":[],"submission":[]}"""
+        )
+
+      val req: FakeRequest[JsValue] =
+        FakeRequest(POST, "/formp-proxy/cis/monthly-return-complete")
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(
+            Json.obj(
+              "instanceId" -> "abc-123",
+              "taxYear"    -> 2024,
+              "taxMonth"   -> 6,
+              "amendment"  -> "N"
+            )
+          )
+
+      val res: Future[Result] = controller.getMonthlyReturnComplete(req)
+      (contentAsJson(res) \ "scheme").as[JsArray].value must not be empty
+      status(res) mustBe OK
+    }
+
+    "returns 400 when JSON body is invalid" in new Setup {
+      val req: FakeRequest[JsValue] =
+        FakeRequest(POST, "/formp-proxy/cis/monthly-return-complete")
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(
+            Json.obj(
+              "instanceId" -> "abc-123"
+            )
+          )
+
+      val res: Future[Result] = controller.getMonthlyReturnComplete(req)
 
       status(res) mustBe BAD_REQUEST
       (contentAsJson(res) \ "message").as[String] mustBe "Invalid JSON body"

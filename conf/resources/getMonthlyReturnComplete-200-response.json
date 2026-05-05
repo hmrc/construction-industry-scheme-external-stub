@@ -1,0 +1,106 @@
+{
+  "scheme": [
+    {
+      "schemeId": 13343,
+      "instanceId": "900001",
+      "accountsOfficeReference": "125PA12345000",
+      "taxOfficeNumber": "101",
+      "taxOfficeReference": "AB0001",
+      "utr": "1234657890",
+      "name": "Test Contractor Ltd",
+      "emailAddress": "contractor@example.com",
+      "displayWelcomePage": "N",
+      "prePopCount": 3,
+      "prePopSuccessful": "Y",
+      "subcontractorCounter": 2,
+      "verificationBatchCounter": 1,
+      "lastUpdate": "2026-01-05T10:23:56Z",
+      "version": 5
+    }
+  ],
+  "monthlyReturn": [
+    {
+      "monthlyReturnId": 50001,
+      "taxYear": 2025,
+      "taxMonth": 1,
+      "nilReturnIndicator": "N",
+      "decEmpStatusConsidered": "Y",
+      "decAllSubsVerified": "Y",
+      "decInformationCorrect": "Y",
+      "decNoMoreSubPayments": "Y",
+      "decNilReturnNoPayments": "N",
+      "status": "SUBMITTED",
+      "lastUpdate": "2026-04-15T14:30:00",
+      "amendment": "N"
+    }
+  ],
+  "subcontractors": [
+    {
+      "subcontractorId": 31001,
+      "utr": "1935658406",
+      "pageVisited": 0,
+      "firstName": "John",
+      "nino": "AB623456C",
+      "surname": "Smith",
+      "subcontractorType": "soletrader",
+      "matched": "Y",
+      "verified": "Y",
+      "verificationNumber": "V1234567890",
+      "taxTreatment": "net",
+      "version": 1
+    },
+    {
+      "subcontractorId": 31002,
+      "utr": "2046759517",
+      "pageVisited": 0,
+      "firstName": "Jane",
+      "nino": "CD789012E",
+      "surname": "Doe",
+      "subcontractorType": "soletrader",
+      "matched": "Y",
+      "verified": "Y",
+      "verificationNumber": "V9876543210",
+      "taxTreatment": "gross",
+      "version": 1
+    }
+  ],
+  "monthlyReturnItems": [
+    {
+      "monthlyReturnId": 50001,
+      "monthlyReturnItemId": 60001,
+      "totalPayments": "5000.00",
+      "costOfMaterials": "200.00",
+      "totalDeducted": "960.00",
+      "unmatchedTaxRateIndicator": "N",
+      "subcontractorId": 31001,
+      "subcontractorName": "John Smith",
+      "verificationNumber": "V1234567890"
+    },
+    {
+      "monthlyReturnId": 50001,
+      "monthlyReturnItemId": 60002,
+      "totalPayments": "3000.00",
+      "costOfMaterials": "100.00",
+      "totalDeducted": "0.00",
+      "unmatchedTaxRateIndicator": "N",
+      "subcontractorId": 31002,
+      "subcontractorName": "Jane Doe",
+      "verificationNumber": "V9876543210"
+    }
+  ],
+  "submission": [
+    {
+      "submissionId": 70001,
+      "submissionType": "Monthly return",
+      "activeObjectId": 50001,
+      "status": "SUBMITTED",
+      "hmrcMarkGenerated": "dGVzdGlybWFya2Jhc2U2NGVuY29kZWQ=",
+      "hmrcMarkGgis": "dGVzdGlybWFya2Jhc2U2NGVuY29kZWQ=",
+      "emailRecipient": "contractor@example.com",
+      "acceptedTime": "2026-04-15T14:32:00",
+      "createDate": "2026-04-15T14:30:00",
+      "lastUpdate": "2026-04-15T14:32:00",
+      "schemeId": 13343
+    }
+  ]
+}

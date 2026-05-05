@@ -34,10 +34,14 @@ class VerificationController @Inject() (
 )() extends BackendController(cc)
     with Logging {
 
-  private val verificationResponsePath                                 = "/resources/verification"
-  private val getNewestVerificationBatch_200_ResponsePath              =
+  private val verificationResponsePath                                                     = "/resources/verification"
+  private val getNewestVerificationBatch_200_ResponsePath                                  =
     s"$verificationResponsePath/getNewestVerificationBatch-200-response.json"
-  private val createVerificationBatchAndVerifications_201_ResponsePath =
+  private val getCurrentVerificationBatch_200_verificationBatchStatus_none_ResponsePath    =
+    s"$verificationResponsePath/getCurrentVerificationBatch-200-verificationBatchStatus-none-response.json"
+  private val getCurrentVerificationBatch_200_verificationBatchStatus_started_ResponsePath =
+    s"$verificationResponsePath/getCurrentVerificationBatch-200-verificationBatchStatus-started-response.json"
+  private val createVerificationBatchAndVerifications_201_ResponsePath                     =
     s"$verificationResponsePath/createVerificationBatchAndVerifications-201-response.json"
 
   def getNewestVerificationBatch(instanceId: String): Action[AnyContent] =
@@ -53,6 +57,57 @@ class VerificationController @Inject() (
         case None                     =>
           enrolmentHelper.agentEnrolmentsOpt(request) match {
             case Some(_) => Ok(Json.parse(resourceHelper.resourceAsString(getNewestVerificationBatch_200_ResponsePath)))
+            case None    => InternalServerError
+          }
+      }
+    }
+
+  def getCurrentVerificationBatch(instanceId: String): Action[AnyContent] =
+    authorise { implicit request =>
+      enrolmentHelper.contractorEnrolmentsOpt(request) match {
+        case Some(enrolmentReference) =>
+          (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {
+            case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
+            case ("502", _) => BadGateway(Json.obj("message" -> "formp failed"))
+            case _          =>
+              if (instanceId == "1") {
+                Ok(
+                  Json.parse(
+                    resourceHelper.resourceAsString(
+                      getCurrentVerificationBatch_200_verificationBatchStatus_none_ResponsePath
+                    )
+                  )
+                )
+              } else {
+                Ok(
+                  Json.parse(
+                    resourceHelper.resourceAsString(
+                      getCurrentVerificationBatch_200_verificationBatchStatus_started_ResponsePath
+                    )
+                  )
+                )
+              }
+          }
+        case None                     =>
+          enrolmentHelper.agentEnrolmentsOpt(request) match {
+            case Some(_) =>
+              if (instanceId == "1") {
+                Ok(
+                  Json.parse(
+                    resourceHelper.resourceAsString(
+                      getCurrentVerificationBatch_200_verificationBatchStatus_none_ResponsePath
+                    )
+                  )
+                )
+              } else {
+                Ok(
+                  Json.parse(
+                    resourceHelper.resourceAsString(
+                      getCurrentVerificationBatch_200_verificationBatchStatus_started_ResponsePath
+                    )
+                  )
+                )
+              }
             case None    => InternalServerError
           }
       }

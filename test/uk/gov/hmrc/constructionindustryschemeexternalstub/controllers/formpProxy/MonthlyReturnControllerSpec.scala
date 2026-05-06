@@ -597,6 +597,49 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
     }
   }
 
+  ".retrieveSubmittedMonthlyReturnsData" - {
+
+    "returns 200 when JSON body is valid" in new Setup {
+      val body = Json.obj(
+        "instanceId" -> "abc-123",
+        "taxYear"    -> 2025,
+        "taxMonth"   -> 1,
+        "amendment"  -> "N"
+      )
+
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn(
+          """{"scheme":{"schemeId":1,"instanceId":"123","accountsOfficeReference":"a","taxOfficeNumber":"1","taxOfficeReference":"b"},"monthlyReturn":[]}"""
+        )
+
+      val req: FakeRequest[JsValue] =
+        FakeRequest(POST, "/monthly-return")
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(body)
+
+      val res = controller.retrieveSubmittedMonthlyReturnsData(req)
+
+      status(res) mustBe OK
+    }
+
+    "returns 400 when JSON body is invalid" in new Setup {
+
+      val body = Json.obj(
+        "instanceId" -> "abc-123"
+      )
+
+      val req: FakeRequest[JsValue] =
+        FakeRequest(POST, "/cis/monthly-return-item/delete")
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(body)
+
+      val res: Future[Result] = controller.retrieveSubmittedMonthlyReturnsData(req)
+
+      status(res) mustBe BAD_REQUEST
+      (contentAsJson(res) \ "message").as[String] mustBe "Invalid JSON body"
+    }
+  }
+
   private trait Setup {
     implicit val ec: ExecutionContext    = scala.concurrent.ExecutionContext.global
     private val cc: ControllerComponents = stubControllerComponents()

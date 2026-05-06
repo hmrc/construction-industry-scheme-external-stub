@@ -1070,6 +1070,127 @@ To trigger the happy path, ensure you provide a valid request body, below is an 
 - Response status: `204`
 - Response body: empty body
 
+**Endpoint**: `POST /cis/retrieve-submitted-monthly-returns-data`
+
+**Description**: Returns the Submitted Monthly Returns Data
+
+#### Happy Path
+
+- Affinity Group: Organisation / Agent
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber (for Organisation) or IRAgentReference (for Agent)
+- Identifier Value: any valid Tax Office no. or any valid IRAgentReference
+- Identifier Name: TaxOfficeReference (for Organisation) or none (for Agent)
+- Identifier Value: any valid Tax Office ref. (for Organisation)
+
+To trigger the happy path, ensure you provide a valid request body similar to example below:
+```json
+{
+  "instanceId": "900001",
+  "taxYear": 2025,
+  "taxMonth": 1,
+  "amendment": "Y"
+}
+```
+- Response status: `200`
+- Response body:
+```json
+{
+  "scheme":
+  {
+    "schemeId": 13343,
+    "instanceId": "900001",
+    "accountsOfficeReference": "125PA12345000",
+    "taxOfficeNumber": "101",
+    "taxOfficeReference": "AB0001",
+    "utr": "1234657890",
+    "name": "company",
+    "emailAddress": "test@test",
+    "displayWelcomePage": "N",
+    "prePopCount": 3,
+    "prePopSuccessful": "Y",
+    "subcontractorCounter": 1,
+    "verificationBatchCounter": 0,
+    "lastUpdate": "2026-01-05T10:23:56Z",
+    "version": 3
+  },
+  "monthlyReturn": [
+    {
+      "monthlyReturnId": 30001,
+      "taxYear": 2025,
+      "taxMonth": 1,
+      "nilReturnIndicator": "N",
+      "decEmpStatusConsidered": "Y",
+      "decAllSubsVerified": "Y",
+      "decInformationCorrect": "Y",
+      "decNoMoreSubPayments": "Y",
+      "decNilReturnNoPayments": "N",
+      "status": "STARTED",
+      "lastUpdate": "2026-01-01T23:24:56",
+      "amendment": "N"
+    }
+  ],
+  "monthlyReturnItems": [
+    {
+      "monthlyReturnId": 30001,
+      "monthlyReturnItemId": 1,
+      "totalPayments": "10,000.00",
+      "costOfMaterials": "100.00",
+      "totalDeducted": "100.00",
+      "unmatchedTaxRateIndicator": "Y",
+      "subcontractorId": 10903,
+      "subcontractorName": "BuildRight Construction",
+      "verificationNumber": "V1000000001",
+      "itemResourceReference": 1
+    },
+    {
+      "monthlyReturnId": 30001,
+      "monthlyReturnItemId": 2,
+      "totalPayments": "2000.00",
+      "costOfMaterials": "20,000.00",
+      "totalDeducted": "200.00",
+      "unmatchedTaxRateIndicator": "Y",
+      "subcontractorId": 10903,
+      "subcontractorName": "Northern Trades Ltd",
+      "verificationNumber": "V1000000001",
+      "itemResourceReference": 2
+    },
+    {
+      "monthlyReturnId": 30001,
+      "monthlyReturnItemId": 3,
+      "totalPayments": "3000.00",
+      "costOfMaterials": "300.00",
+      "totalDeducted": "30,000.00",
+      "unmatchedTaxRateIndicator": "Y",
+      "subcontractorId": 10903,
+      "subcontractorName": "TyneWear Ltd",
+      "verificationNumber": "V1000000001",
+      "itemResourceReference": 3
+    }
+  ],
+  "submission": [
+    {
+      "submissionId": 1,
+      "submissionType": "MONTHLY_RETURN",
+      "activeObjectId": 30001,
+      "status": "SUBMITTED",
+      "hmrcMarkGenerated": "9AjFBxlBohmcRZ8s/2IV0QaYzz0=",
+      "hmrcMarkGgis": "9AjFBxlBohmcRZ8s/2IV0QaYzz0=",
+      "emailRecipient": "test@test.com",
+      "acceptedTime": "2026-04-06T09:50:08.081",
+      "createDate": "2018-02-23T16:26:25",
+      "lastUpdate": "2018-02-23T16:26:30",
+      "schemeId": 13343,
+      "agentId": "-",
+      "l_Migrated": 1,
+      "submissionRequestDate": "2018-02-23T16:26:27"
+    }
+  ]
+}
+```
+
+
+
 **Endpoint**: `POST /submissions/create`
 
 **Description**: Creates a new submission record in the submission table.

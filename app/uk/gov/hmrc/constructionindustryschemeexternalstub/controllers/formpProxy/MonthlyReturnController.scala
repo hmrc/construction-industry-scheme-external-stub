@@ -56,6 +56,8 @@ class MonthlyReturnController @Inject() (
     "/resources/getMonthlyReturnComplete-200-response.json"
   private val getMonthlyReturnComplete_nil_200_ResponsePath      =
     "/resources/getMonthlyReturnComplete-nil-200-response.json"
+  private val getSubmittedMonthlyReturnsData_200_ResponsePath    =
+    s"$monthlyNilReturnResponsePath/retrieveSubmittedMonthlyReturnsData-200-response.json"
 
   def retrieveMonthlyReturns: Action[JsValue] =
     authorise.async(parse.json) { implicit request =>
@@ -221,6 +223,15 @@ class MonthlyReturnController @Inject() (
             if (req.taxMonth == 2 || req.taxMonth == 9) getMonthlyReturnComplete_nil_200_ResponsePath
             else getMonthlyReturnComplete_200_ResponsePath
           Future.successful(Ok(resourceHelper.resourceAsString(responsePath)))
+        }
+    }
+
+  def retrieveSubmittedMonthlyReturnsData: Action[JsValue] =
+    authorise.async(parse.json) { implicit request =>
+      request.body
+        .validate[GetSubmittedMonthlyReturnsDataRequest]
+        .foldErrorsIntoBadRequest { _ =>
+          Future.successful(Ok(resourceHelper.resourceAsString(getSubmittedMonthlyReturnsData_200_ResponsePath)))
         }
     }
 }

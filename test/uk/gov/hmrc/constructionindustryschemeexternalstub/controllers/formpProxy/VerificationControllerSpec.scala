@@ -17,17 +17,17 @@
 package uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy
 
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito._
+import org.mockito.Mockito.*
 import org.scalatest.freespec.AnyFreeSpec
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.FakeAuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.base.SpecBase
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.EmployerReference
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{CreateVerifications, DeleteVerifications, EmployerReference}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.CreateVerificationBatchAndVerificationsRequest
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateVerificationBatchAndVerificationsRequest, ModifyVerificationsRequest}
 
 import scala.concurrent.Future
 
@@ -460,6 +460,495 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
       val res: Future[Result] = controller.createVerificationBatchAndVerifications()(req)
 
       status(res) mustBe INTERNAL_SERVER_ERROR
+    }
+  }
+
+  ".modifyVerifications" - {
+
+    val postUrl = "/cis/verification-batch/modify"
+
+    val validJson: JsValue =
+      Json.toJson(
+        ModifyVerificationsRequest(
+          instanceId = "abc-123",
+          deleteVerifications = Some(
+            DeleteVerifications(
+              verificationResourceReferences = Seq(111L, 222L)
+            )
+          ),
+          createVerifications = Some(
+            CreateVerifications(
+              verificationBatchResourceRef = 10L,
+              verificationResourceReferences = Seq(333L, 444L),
+              actionIndicator = Some("A")
+            )
+          )
+        )
+      )
+
+    "returns 204 NO_CONTENT on success delete and create verifications (contractor enrolment)" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("200", "")))
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      val req = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(validJson)
+
+      val res: Future[Result] = controller.modifyVerifications()(req)
+
+      status(res) mustBe NO_CONTENT
+      contentAsString(res) mustBe ""
+    }
+
+    "returns 204 NO_CONTENT on success delete and create verifications (agent enrolment)" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(None)
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(Some("IRAgentReference-123"))
+
+      val req = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(validJson)
+
+      val res: Future[Result] = controller.modifyVerifications()(req)
+
+      status(res) mustBe NO_CONTENT
+      contentAsString(res) mustBe ""
+    }
+
+    "returns 204 NO_CONTENT on success delete verifications (contractor enrolment)" in new Setup {
+      val deleteVerificationsJson: JsValue =
+        Json.toJson(
+          ModifyVerificationsRequest(
+            instanceId = "abc-123",
+            deleteVerifications = Some(
+              DeleteVerifications(
+                verificationResourceReferences = Seq(111L, 222L)
+              )
+            ),
+            createVerifications = None
+          )
+        )
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("200", "")))
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      val req = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(deleteVerificationsJson)
+
+      val res: Future[Result] = controller.modifyVerifications()(req)
+
+      status(res) mustBe NO_CONTENT
+      contentAsString(res) mustBe ""
+    }
+
+    "returns 204 NO_CONTENT on success delete verifications (agent enrolment)" in new Setup {
+      val deleteVerificationsJson: JsValue =
+        Json.toJson(
+          ModifyVerificationsRequest(
+            instanceId = "abc-123",
+            deleteVerifications = Some(
+              DeleteVerifications(
+                verificationResourceReferences = Seq(111L, 222L)
+              )
+            ),
+            createVerifications = None
+          )
+        )
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(None)
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(Some("IRAgentReference-123"))
+
+      val req = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(deleteVerificationsJson)
+
+      val res: Future[Result] = controller.modifyVerifications()(req)
+
+      status(res) mustBe NO_CONTENT
+      contentAsString(res) mustBe ""
+    }
+
+    "returns 204 NO_CONTENT on success create verifications with actionIndicator (contractor enrolment)" in new Setup {
+      val createVerificationsJson: JsValue =
+        Json.toJson(
+          ModifyVerificationsRequest(
+            instanceId = "abc-123",
+            deleteVerifications = None,
+            createVerifications = Some(
+              CreateVerifications(
+                verificationBatchResourceRef = 10L,
+                verificationResourceReferences = Seq(333L, 444L),
+                actionIndicator = Some("A")
+              )
+            )
+          )
+        )
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("200", "")))
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      val req = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(createVerificationsJson)
+
+      val res: Future[Result] = controller.modifyVerifications()(req)
+
+      status(res) mustBe NO_CONTENT
+      contentAsString(res) mustBe ""
+    }
+
+    "returns 204 NO_CONTENT on success create verifications with actionIndicator (agent enrolment)" in new Setup {
+      val createVerificationsJson: JsValue =
+        Json.toJson(
+          ModifyVerificationsRequest(
+            instanceId = "abc-123",
+            deleteVerifications = None,
+            createVerifications = Some(
+              CreateVerifications(
+                verificationBatchResourceRef = 10L,
+                verificationResourceReferences = Seq(333L, 444L),
+                actionIndicator = Some("A")
+              )
+            )
+          )
+        )
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(None)
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(Some("IRAgentReference-123"))
+
+      val req = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(createVerificationsJson)
+
+      val res: Future[Result] = controller.modifyVerifications()(req)
+
+      status(res) mustBe NO_CONTENT
+      contentAsString(res) mustBe ""
+    }
+
+    "returns 204 NO_CONTENT on success create verifications without actionIndicator (contractor enrolment)" in new Setup {
+      val createVerificationsJson: JsValue =
+        Json.toJson(
+          ModifyVerificationsRequest(
+            instanceId = "abc-123",
+            deleteVerifications = None,
+            createVerifications = Some(
+              CreateVerifications(
+                verificationBatchResourceRef = 10L,
+                verificationResourceReferences = Seq(333L, 444L),
+                actionIndicator = None
+              )
+            )
+          )
+        )
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("200", "")))
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      val req = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(createVerificationsJson)
+
+      val res: Future[Result] = controller.modifyVerifications()(req)
+
+      status(res) mustBe NO_CONTENT
+      contentAsString(res) mustBe ""
+    }
+
+    "returns 204 NO_CONTENT on success create verifications without actionIndicator (agent enrolment)" in new Setup {
+      val createVerificationsJson: JsValue =
+        Json.toJson(
+          ModifyVerificationsRequest(
+            instanceId = "abc-123",
+            deleteVerifications = None,
+            createVerifications = Some(
+              CreateVerifications(
+                verificationBatchResourceRef = 10L,
+                verificationResourceReferences = Seq(333L, 444L),
+                actionIndicator = None
+              )
+            )
+          )
+        )
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(None)
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(Some("IRAgentReference-123"))
+
+      val req = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(createVerificationsJson)
+
+      val res: Future[Result] = controller.modifyVerifications()(req)
+
+      status(res) mustBe NO_CONTENT
+      contentAsString(res) mustBe ""
+    }
+
+    "returns 400 BadRequest when JSON is invalid" in new Setup {
+      val invalidJson = Json.obj() // missing required fields
+
+      val req = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(invalidJson)
+
+      val res: Future[Result] = controller.modifyVerifications()(req)
+
+      status(res) mustBe BAD_REQUEST
+      (contentAsJson(res) \ "message").as[String] mustBe "Invalid payload"
+      (contentAsJson(res) \ "errors").isDefined mustBe true
+    }
+
+    "returns 502 BadGateway for taxOfficeNumber = 502 (contractor enrolment)" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("502", "")))
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      val req = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(validJson)
+
+      val res: Future[Result] = controller.modifyVerifications()(req)
+
+      status(res) mustBe BAD_GATEWAY
+      (contentAsJson(res) \ "message").as[String] must include("formp failed")
+    }
+
+    "returns 500 InternalServerError for taxOfficeNumber = 500 (contractor enrolment)" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("500", "")))
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      val req = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(validJson)
+
+      val res: Future[Result] = controller.modifyVerifications()(req)
+
+      status(res) mustBe INTERNAL_SERVER_ERROR
+      (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
+    }
+
+    "returns 500 InternalServerError when no contractor enrolment and no agent enrolment found" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(None)
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      val req = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(validJson)
+
+      val res: Future[Result] = controller.modifyVerifications()(req)
+
+      status(res) mustBe INTERNAL_SERVER_ERROR
+    }
+
+    "returns 500 InternalServerError when only instanceId is present (contractor enrolment)" in new Setup {
+      val missingRequiredFieldsJson: JsValue =
+        Json.toJson(
+          ModifyVerificationsRequest(
+            instanceId = "abc-123",
+            deleteVerifications = None,
+            createVerifications = None
+          )
+        )
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("200", "")))
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      val req = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(missingRequiredFieldsJson)
+
+      val res: Future[Result] = controller.modifyVerifications()(req)
+
+      status(res) mustBe INTERNAL_SERVER_ERROR
+      (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
+    }
+
+    "returns 500 InternalServerError when only instanceId is present (agent enrolment)" in new Setup {
+      val missingRequiredFieldsJson: JsValue =
+        Json.toJson(
+          ModifyVerificationsRequest(
+            instanceId = "abc-123",
+            deleteVerifications = None,
+            createVerifications = None
+          )
+        )
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(None)
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(Some("IRAgentReference-123"))
+
+      val req = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(missingRequiredFieldsJson)
+
+      val res: Future[Result] = controller.modifyVerifications()(req)
+
+      status(res) mustBe INTERNAL_SERVER_ERROR
+      (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
+    }
+
+    "returns 500 InternalServerError when deleteVerifications is provided but verificationResourceReferences is empty (contractor enrolment)" in new Setup {
+      val invalidDeleteVerificationsJson: JsValue =
+        Json.toJson(
+          ModifyVerificationsRequest(
+            instanceId = "abc-123",
+            deleteVerifications = Some(
+              DeleteVerifications(
+                verificationResourceReferences = Seq.empty
+              )
+            ),
+            createVerifications = Some(
+              CreateVerifications(
+                verificationBatchResourceRef = 10L,
+                verificationResourceReferences = Seq(333L, 444L),
+                actionIndicator = Some("A")
+              )
+            )
+          )
+        )
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("200", "")))
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      val req = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(invalidDeleteVerificationsJson)
+
+      val res: Future[Result] = controller.modifyVerifications()(req)
+
+      status(res) mustBe INTERNAL_SERVER_ERROR
+      (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
+    }
+
+    "returns 500 InternalServerError when deleteVerifications is provided but verificationResourceReferences is empty (agent enrolment)" in new Setup {
+      val invalidDeleteVerificationsJson: JsValue =
+        Json.toJson(
+          ModifyVerificationsRequest(
+            instanceId = "abc-123",
+            deleteVerifications = Some(
+              DeleteVerifications(
+                verificationResourceReferences = Seq.empty
+              )
+            ),
+            createVerifications = Some(
+              CreateVerifications(
+                verificationBatchResourceRef = 10L,
+                verificationResourceReferences = Seq(333L, 444L),
+                actionIndicator = Some("A")
+              )
+            )
+          )
+        )
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(None)
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(Some("IRAgentReference-123"))
+
+      val req = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(invalidDeleteVerificationsJson)
+
+      val res: Future[Result] = controller.modifyVerifications()(req)
+
+      status(res) mustBe INTERNAL_SERVER_ERROR
+      (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
+    }
+
+    "returns 500 InternalServerError when createVerifications is provided but verificationResourceReferences is empty (contractor enrolment)" in new Setup {
+      val invalidCreateVerificationsJson: JsValue =
+        Json.toJson(
+          ModifyVerificationsRequest(
+            instanceId = "abc-123",
+            deleteVerifications = Some(
+              DeleteVerifications(
+                verificationResourceReferences = Seq(111L, 222L)
+              )
+            ),
+            createVerifications = Some(
+              CreateVerifications(
+                verificationBatchResourceRef = 10L,
+                verificationResourceReferences = Seq.empty,
+                actionIndicator = Some("A")
+              )
+            )
+          )
+        )
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("200", "")))
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      val req = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(invalidCreateVerificationsJson)
+
+      val res: Future[Result] = controller.modifyVerifications()(req)
+
+      status(res) mustBe INTERNAL_SERVER_ERROR
+      (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
+    }
+
+    "returns 500 InternalServerError when when createVerifications is provided but verificationResourceReferences is empty (agent enrolment)" in new Setup {
+      val invalidCreateVerificationsJson: JsValue =
+        Json.toJson(
+          ModifyVerificationsRequest(
+            instanceId = "abc-123",
+            deleteVerifications = Some(
+              DeleteVerifications(
+                verificationResourceReferences = Seq(111L, 222L)
+              )
+            ),
+            createVerifications = Some(
+              CreateVerifications(
+                verificationBatchResourceRef = 10L,
+                verificationResourceReferences = Seq.empty,
+                actionIndicator = Some("A")
+              )
+            )
+          )
+        )
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(None)
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(Some("IRAgentReference-123"))
+
+      val req = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(invalidCreateVerificationsJson)
+
+      val res: Future[Result] = controller.modifyVerifications()(req)
+
+      status(res) mustBe INTERNAL_SERVER_ERROR
+      (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
     }
   }
 

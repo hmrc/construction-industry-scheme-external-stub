@@ -18,25 +18,22 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProx
 
 import play.api.Logging
 import play.api.libs.json.{JsError, JsValue, Json}
-import play.api.mvc.{Action, ControllerComponents}
+import play.api.mvc.{Action, ControllerComponents, Result}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateSubmissionRequest, UpdateSubmissionRequest}
-import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.EnrolmentsHelper
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import java.time.{LocalDateTime, ZoneId}
+import java.util.concurrent.atomic.AtomicLong
 import javax.inject.Inject
 
 class SubmissionController @Inject() (
   authorise: AuthAction,
-  resourceHelper: ResourceHelper,
   enrolmentHelper: EnrolmentsHelper,
   cc: ControllerComponents
 )() extends BackendController(cc)
     with Logging {
-
-  private val monthlyNilReturnResponsePath      = "/resources/monthlyNilReturns"
-  private val createSubmission_200_ResponsePath = s"$monthlyNilReturnResponsePath/createSubmission-200-response.json"
 
   def createSubmission(): Action[JsValue] =
     authorise(parse.json) { implicit request =>
@@ -53,9 +50,9 @@ class SubmissionController @Inject() (
 //                    case ("400", _) => BadRequest(Json.obj("message" -> "Missing CIS enrolment identifiers"))
 //                    case ("404", _) => NotFound(Json.obj("message" -> "CIS taxpayer not found"))
                   case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
-                  case _          => Created(resourceHelper.resourceAsString(createSubmission_200_ResponsePath))
+                  case _          => createSubmissionSuccessResponse
                 }
-              case (_, Some(_))                  => Created(resourceHelper.resourceAsString(createSubmission_200_ResponsePath))
+              case (_, Some(_))                  => createSubmissionSuccessResponse
               case (None, None)                  => InternalServerError
             }
         )
@@ -90,4 +87,13 @@ class SubmissionController @Inject() (
             }
         )
     }
+
+  private val submissionIdCounter = new AtomicLong(90000L)
+
+  private def createSubmissionSuccessResponse: Result = {
+    val submissionId = submissionIdCounter.incrementAndGet().toString
+    logger.info(s"[SubmissionController] createSubmission returning submissionId=$submissionId")
+
+    Created(Json.obj("submissionId" -> submissionId))
+  }
 }

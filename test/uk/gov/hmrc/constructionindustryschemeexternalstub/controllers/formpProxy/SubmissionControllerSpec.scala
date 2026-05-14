@@ -43,8 +43,6 @@ class SubmissionControllerSpec extends SpecBase {
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
         .thenReturn(Some(EmployerReference("200", "")))
 
-      val response: JsObject = Json.obj("submissionId" -> "sub-123")
-
       val json: JsValue = Json.toJson(
         CreateSubmissionRequest(
           instanceId = "123",
@@ -55,14 +53,15 @@ class SubmissionControllerSpec extends SpecBase {
         )
       )
 
-      when(mockResourceHelper.resourceAsString(any()))
-        .thenReturn(response.toString)
-
       val req: FakeRequest[JsValue] = makeJsonRequest(json, createSubmissionUrl)
       val res: Future[Result]       = controller.createSubmission()(req)
 
       status(res) mustBe CREATED
-      contentAsJson(res) mustBe Json.obj("submissionId" -> "sub-123")
+
+      val responseJson = contentAsJson(res)
+      val submissionId = (responseJson \ "submissionId").as[String]
+
+      submissionId.toLong must be >= 90001L
     }
 
     "returns 400 BadRequest for invalid JSON" in new Setup {
@@ -152,7 +151,7 @@ class SubmissionControllerSpec extends SpecBase {
     val mockEnrolmentsHelper: EnrolmentsHelper = mock[EnrolmentsHelper]
 
     val auth: FakeAuthAction = new FakeAuthAction(cc.parsers)
-    lazy val controller      = new SubmissionController(auth, mockResourceHelper, mockEnrolmentsHelper, cc)
+    lazy val controller      = new SubmissionController(auth, mockEnrolmentsHelper, cc)
 
     def makeJsonRequest(body: JsValue, url: String): FakeRequest[JsValue] =
       FakeRequest(POST, "/submissions")

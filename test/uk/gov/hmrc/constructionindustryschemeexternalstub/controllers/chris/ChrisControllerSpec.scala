@@ -205,7 +205,7 @@ class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
       contentAsString(response) mustBe "FATAL-" + correlationId
     }
 
-    "return ACKNOWLEDGE polling response on first poll" in {
+    "return SUBMITTED polling response on first poll" in {
       val correlationId = "CORR-ACK-1"
       val pollCount     = 0
 
@@ -227,11 +227,8 @@ class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
 
       status(response) mustBe OK
 
-      val expectedNextPollUrl =
-        s"${appConfig.pollUrl("IR-CIS-CIS300MR")}/${pollCount + 1}"
-
       contentAsString(response) mustBe
-        s"$correlationId-$expectedNextPollUrl-NO_IRMARK_FOUND"
+        s"$correlationId--NO_IRMARK_FOUND"
     }
 
     "return correct polling response template for all terminal statuses" in {

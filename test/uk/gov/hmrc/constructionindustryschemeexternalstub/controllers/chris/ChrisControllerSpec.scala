@@ -173,6 +173,62 @@ class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
       contentAsString(response) mustBe expected.toString()
     }
 
+    "return a 5xx response from submitCISMessage when taxOfficeNumber is a 500..505 server-error trigger" in {
+      val correlationId = "CORR-5XX"
+
+      (500 to 505).foreach { code =>
+        val cisMessage =
+          <GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
+            <Header>
+              <MessageDetails>
+                <Class>IR-CIS-CIS300MR</Class>
+                <CorrelationID>{correlationId}</CorrelationID>
+              </MessageDetails>
+            </Header>
+            <GovTalkDetails>
+              <Keys>
+                <Key Type="TaxOfficeNumber">{code.toString}</Key>
+                <Key Type="TaxOfficeReference">EZ00125</Key>
+              </Keys>
+            </GovTalkDetails>
+            <Body/>
+          </GovTalkMessage>
+
+        val request  = postRequest.withXmlBody(cisMessage)
+        val response = testInstance.submitCISMessage().apply(request)
+
+        status(response) mustBe code
+        contentType(response).get mustBe "application/xml"
+      }
+    }
+
+    "return a 5xx response from getCISResponse when final=SERVER_ERROR_5xx and pollCount has reached the terminal" in {
+      val correlationId = "CORR-POLL-5XX"
+      val pollCount     = 2
+
+      val pollRequestXml =
+        <GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
+          <Header>
+            <MessageDetails>
+              <CorrelationID>{correlationId}</CorrelationID>
+            </MessageDetails>
+          </Header>
+          <Body/>
+        </GovTalkMessage>
+
+      (500 to 505).foreach { code =>
+        val request = FakeRequest(
+          "POST",
+          s"/dummy-path?final=SERVER_ERROR_$code"
+        ).withXmlBody(pollRequestXml)
+
+        val response = testInstance.getCISResponse(pollCount).apply(request)
+
+        status(response) mustBe code
+        contentType(response).get mustBe "application/xml"
+      }
+    }
+
     "return fatal error response for submitCISMessage when initial status is FATAL_ERROR" in {
       val correlationId = "CORR-123"
       val cisMessage    =

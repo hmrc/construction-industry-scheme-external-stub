@@ -176,17 +176,10 @@ class ChrisController @Inject() (
       val xml    = replaceCorrelationId(rawXml, correlationId, pollingUrlHost)
       Ok(xml)
     } else {
-      val finalStatusOpt = request.getQueryString("final")
-      val isFinalPoll    = finalStatusOpt.isDefined && count >= 2
-
       val finalStatusParam: String =
         request.getQueryString("final").getOrElse("SUBMITTED")
 
-      val status =
-        if (!isFinalPoll) "ACKNOWLEDGE"
-        else finalStatusParam
-
-      val resourcePath = status match {
+      val resourcePath = finalStatusParam match {
         case "ACKNOWLEDGE"            => submitCISMessage_acknowledgement_ResponsePath
         case "SUBMITTED_NO_RECEIPT"   => submitCISMessage_irMarkMismatchError_ResponsePath
         case "FATAL_ERROR"            => submitCISMessage_fatalError_ResponsePath
@@ -197,18 +190,8 @@ class ChrisController @Inject() (
         case _                        => submitCISMessage_success_ResponsePath
       }
 
-      val rawXml      = resourceHelper.resourceAsString(resourcePath)
-      val basePollUrl = config.pollUrl("IR-CIS-CIS300MR")
-
-      val nextPollUrl =
-        if (isFinalPoll) {
-          ""
-        } else {
-          val nextCount = count + 1
-          val suffix    = finalStatusOpt.map(fs => s"?final=$fs").getOrElse("")
-          s"$basePollUrl/$nextCount$suffix"
-        }
-
+      val rawXml       = resourceHelper.resourceAsString(resourcePath)
+      val nextPollUrl  = ""
       val storedIrMark = Option(irMarkStore.get(correlationId)).getOrElse("NO_IRMARK_FOUND")
 
       val xml =

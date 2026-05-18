@@ -18,11 +18,12 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProx
 
 import play.api.Logging
 import play.api.libs.json.{JsError, JsValue, Json}
-import play.api.mvc.{Action, AnyContent, ControllerComponents}
+import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.CreateVerificationBatchAndVerificationsRequest
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateVerificationBatchAndVerificationsRequest, ModifyVerificationsRequest}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{CreateVerifications, DeleteVerifications}
 
 import javax.inject.Inject
 
@@ -146,4 +147,60 @@ class VerificationController @Inject() (
             }
         )
     }
+
+  def modifyVerifications(): Action[JsValue] =
+    authorise(parse.json) { implicit request =>
+      request.body
+        .validate[ModifyVerificationsRequest]
+        .fold(
+          errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
+          req =>
+            enrolmentHelper.contractorEnrolmentsOpt(request) match {
+              case Some(enrolmentReference) =>
+                (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {
+                  case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
+                  case ("502", _) => BadGateway(Json.obj("message" -> "formp failed"))
+                  case _          => modifyVerificationsResult(req)
+                }
+              case None                     =>
+                enrolmentHelper.agentEnrolmentsOpt(request) match {
+                  case Some(_) => modifyVerificationsResult(req)
+                  case None    =>
+                    InternalServerError
+                }
+            }
+        )
+    }
+
+  private def modifyVerificationsResult(request: ModifyVerificationsRequest): Result =
+    validateModifyVerificationsRequest(request) match {
+      case Left(errorMessage) => InternalServerError(Json.obj("message" -> "Unexpected error"))
+
+      case Right(validRequest) =>
+        if (hasNoSubcontractorToModify(validRequest)) {
+          InternalServerError(Json.obj("message" -> "Unexpected error"))
+        } else {
+          NoContent
+        }
+    }
+
+  private def validateModifyVerificationsRequest(
+    request: ModifyVerificationsRequest
+  ): Either[String, ModifyVerificationsRequest] =
+    request match {
+      case ModifyVerificationsRequest(_, Some(DeleteVerifications(verificationResourceReferences)), _)
+          if verificationResourceReferences.isEmpty =>
+        Left("verificationResourceReferences must not be empty when deleteVerifications is provided")
+
+      case ModifyVerificationsRequest(_, _, Some(CreateVerifications(_, verificationResourceReferences, _)))
+          if verificationResourceReferences.isEmpty =>
+        Left("verificationResourceReferences must not be empty when createVerifications is provided")
+
+      case _ =>
+        Right(request)
+    }
+
+  private def hasNoSubcontractorToModify(request: ModifyVerificationsRequest): Boolean =
+    request.deleteVerifications.isEmpty && request.createVerifications.isEmpty
+
 }

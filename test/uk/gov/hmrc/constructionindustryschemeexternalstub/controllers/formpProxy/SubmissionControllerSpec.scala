@@ -48,6 +48,7 @@ class SubmissionControllerSpec extends SpecBase {
           instanceId = "123",
           taxYear = 2024,
           taxMonth = 4,
+          amendment = "N",
           hmrcMarkGenerated = Some("Dj5TVJDyRYCn9zta5EdySeY4fyA="),
           emailRecipient = Some("test@test.com")
         )
@@ -79,7 +80,7 @@ class SubmissionControllerSpec extends SpecBase {
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
         .thenReturn(Some(EmployerReference("500", "")))
 
-      val json: JsValue             = Json.toJson(CreateSubmissionRequest("123", 2024, 4))
+      val json: JsValue             = Json.toJson(CreateSubmissionRequest("123", 2024, 4, "N"))
       val req: FakeRequest[JsValue] = makeJsonRequest(json, createSubmissionUrl)
       val res: Future[Result]       = controller.createSubmission()(req)
 
@@ -102,6 +103,7 @@ class SubmissionControllerSpec extends SpecBase {
           instanceId = "123",
           taxYear = 2024,
           taxMonth = 4,
+          amendment = "N",
           hmrcMarkGenerated = "Dj5TVJDyRYCn9zta5EdySeY4fyA=",
           submittableStatus = "ACCEPTED"
         )
@@ -134,6 +136,7 @@ class SubmissionControllerSpec extends SpecBase {
           instanceId = "123",
           taxYear = 2024,
           taxMonth = 4,
+          amendment = "N",
           hmrcMarkGenerated = "Dj5TVJDyRYCn9zta5EdySeY4fyA=",
           submittableStatus = "ACCEPTED"
         )

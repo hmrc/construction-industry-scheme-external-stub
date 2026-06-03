@@ -2388,6 +2388,47 @@ To trigger the happy path, ensure you provide a valid request body:
 - Response status: `204`
 - Response body: _empty_
 
+
+### Create submission for verification
+
+**Endpoint**: `POST /cis/verification-batch/submission/create`
+
+**Description**: Creates a **VERIFICATIONS** submission in FormP for the provided verification batch, then updates:
+- the verification batch status/confirm flags, and
+- each verification record in the payload (action indicator + proceed + subcontractor name).
+
+This is executed in a single transaction in FormP Proxy.
+
+#### Request body
+
+```json
+{
+  "instanceId": "abc-123",
+  "verificationBatchId": 99,
+  "verificationBatchResourceRef": 7,
+  "emailRecipient": "ops@example.com",
+  "irMarkGenerated": "IR_MARK",
+  "verifications": [
+    {
+      "subcontractorName": "ACME LTD",
+      "verificationResourceRef": 111,
+      "proceedVerification": "Y"
+    },
+    {
+      "subcontractorName": "BOB BUILDER",
+      "verificationResourceRef": 222,
+      "proceedVerification": "N"
+    }
+  ],
+  "agentId": null
+}
+```
+#### Response body
+```json
+{
+  "submissionId": 555
+}
+```
         
 ### ChRIS
 

@@ -22,7 +22,7 @@ import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateSubmissionForVerificationRequest, CreateVerificationBatchAndVerificationsRequest, ModifyVerificationsRequest}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateSubmissionAndUpdateVerificationsRequest, CreateVerificationBatchAndVerificationsRequest, ModifyVerificationsRequest}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{CreateVerifications, DeleteVerifications}
 
 import javax.inject.Inject
@@ -205,10 +205,10 @@ class VerificationController @Inject() (
   private def hasNoSubcontractorToModify(request: ModifyVerificationsRequest): Boolean =
     request.deleteVerifications.isEmpty && request.createVerifications.isEmpty
 
-  def createSubmissionForVerification(): Action[JsValue] =
+  def createSubmissionAndUpdateVerifications(): Action[JsValue] =
     authorise(parse.json) { implicit request =>
       request.body
-        .validate[CreateSubmissionForVerificationRequest]
+        .validate[CreateSubmissionAndUpdateVerificationsRequest]
         .fold(
           errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
           _ =>

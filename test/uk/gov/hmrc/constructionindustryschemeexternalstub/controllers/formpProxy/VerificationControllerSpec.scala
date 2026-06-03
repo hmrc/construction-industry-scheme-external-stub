@@ -28,7 +28,7 @@ import uk.gov.hmrc.constructionindustryschemeexternalstub.base.SpecBase
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{CreateVerifications, DeleteVerifications, EmployerReference}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateVerificationBatchAndVerificationsRequest, ModifyVerificationsRequest}
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.CreateSubmissionForVerificationRequest
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.CreateSubmissionAndUpdateVerificationsRequest
 
 import scala.concurrent.Future
 
@@ -959,7 +959,7 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
 
     val validSubmissionJson: JsValue =
       Json.toJson(
-        CreateSubmissionForVerificationRequest(
+        CreateSubmissionAndUpdateVerificationsRequest(
           instanceId = instanceId,
           verificationBatchId = 99L,
           verificationBatchResourceRef = 10L,
@@ -996,7 +996,7 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
         .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
         .withBody(validSubmissionJson)
 
-      val res: Future[Result] = controller.createSubmissionForVerification()(req)
+      val res: Future[Result] = controller.createSubmissionAndUpdateVerifications()(req)
 
       status(res) mustBe CREATED
       contentType(res) mustBe Some(JSON)
@@ -1018,7 +1018,7 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
         .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
         .withBody(validSubmissionJson)
 
-      val res: Future[Result] = controller.createSubmissionForVerification()(req)
+      val res: Future[Result] = controller.createSubmissionAndUpdateVerifications()(req)
 
       status(res) mustBe CREATED
       contentType(res) mustBe Some(JSON)
@@ -1034,7 +1034,7 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
         .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
         .withBody(invalidJson)
 
-      val res: Future[Result] = controller.createSubmissionForVerification()(req)
+      val res: Future[Result] = controller.createSubmissionAndUpdateVerifications()(req)
 
       status(res) mustBe BAD_REQUEST
       contentType(res) mustBe Some(JSON)
@@ -1054,7 +1054,7 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
         .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
         .withBody(validSubmissionJson)
 
-      val res: Future[Result] = controller.createSubmissionForVerification()(req)
+      val res: Future[Result] = controller.createSubmissionAndUpdateVerifications()(req)
 
       status(res) mustBe BAD_GATEWAY
       (contentAsJson(res) \ "message").as[String] must include("formp failed")
@@ -1070,7 +1070,7 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
         .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
         .withBody(validSubmissionJson)
 
-      val res: Future[Result] = controller.createSubmissionForVerification()(req)
+      val res: Future[Result] = controller.createSubmissionAndUpdateVerifications()(req)
 
       status(res) mustBe INTERNAL_SERVER_ERROR
       (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
@@ -1086,7 +1086,7 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
         .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
         .withBody(validSubmissionJson)
 
-      val res: Future[Result] = controller.createSubmissionForVerification()(req)
+      val res: Future[Result] = controller.createSubmissionAndUpdateVerifications()(req)
 
       status(res) mustBe INTERNAL_SERVER_ERROR
     }

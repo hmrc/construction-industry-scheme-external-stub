@@ -18,7 +18,7 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.chris
 
 import play.api.Logger
 import play.api.mvc.Results.Ok
-import play.api.mvc.{Action, AnyContent, ControllerComponents, Request}
+import play.api.mvc.{Action, AnyContent, ControllerComponents, Request, Result}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.constructionindustryschemeexternalstub.config.AppConfig
 import uk.gov.hmrc.constructionindustryschemeexternalstub.services.ChrisService
@@ -60,67 +60,36 @@ class ChrisController @Inject() (
   private val submitCISMessage_recoverableError_1000_ResponsePath =
     s"$monthlyNilReturnResponsePath/submitCISMessage-recoverableError-1000-response.xml"
 
-  def submitCISMessage(): Action[AnyContent] = Action { (request: Request[AnyContent]) =>
-    val message                           = request.body.asXml.get
-    val correlationId                     = (message \ "Header" \ "MessageDetails" \ "CorrelationID").text
-    val pollingUrlHost                    = config.callback
-    val gatewayTimestamp                  = LocalDateTime.now().toString
-    val keys                              = message \ "GovTalkDetails" \ "Keys" \ "Key"
-    def typeIs(value: String)(node: Node) = node \@ "Type" == value
-    val taxOfficeNumber                   = (keys filter typeIs("TaxOfficeNumber")).text match {
-      case text if text.nonEmpty => text
-      case _                     => "123"
-    }
-    val taxOfficeReference                = (keys filter typeIs("TaxOfficeReference")).text
+  private val verificationResponsePath                                = "/resources/verification"
+  private val submitCISVerifyMessage_acknowledgement_ResponsePath     =
+    s"$verificationResponsePath/submitCISVerifyMessage-acknowledgement-response.xml"
+  private val submitCISVerifyMessage_fatalError_ResponsePath          =
+    s"$verificationResponsePath/submitCISVerifyMessage-fatalError-response.xml"
+  private val submitCISVerifyMessage_irMarkMismatchError_ResponsePath =
+    s"$verificationResponsePath/submitCISVerifyMessage-irMarkMismatchError-response.xml"
+  private val submitCISVerifyMessage_businessError_ResponsePath       =
+    s"$verificationResponsePath/submitCISVerifyMessage-businessError-response.xml"
+  private val submitCISVerifyMessage_success_ResponsePath             =
+    s"$verificationResponsePath/submitCISVerifyMessage-success-response.xml"
+  private val submitCISVerifyMessage_delete_ResponsePath              =
+    s"$verificationResponsePath/submitCISVerifyMessage-delete-response.xml"
 
-    val irMark = (message \\ "IRmark").text.trim
-    if (irMark.nonEmpty) {
-      irMarkStore.put(correlationId, irMark)
-      logger.info(s"[ChrisStub] Stored IRmark for correlationId=$correlationId")
-    }
-
-    service.initialCisStatus(taxOfficeNumber, taxOfficeReference) match {
-      case FATAL_ERROR =>
-        Ok(
-          replaceCorrelationId(
-            resourceHelper.resourceAsString(submitCISMessage_fatalError_ResponsePath),
-            correlationId,
-            pollingUrlHost
-          )
-        )
-
-      case _ =>
-        val basePollUrl = config.pollUrl("IR-CIS-CIS300MR")
-
-        val pollUrlWith0 =
-          if (service.isForeverPending(taxOfficeNumber)) {
-            s"$basePollUrl/0"
-          } else {
-            val finalStatus = service.terminalStatusFor(taxOfficeNumber)
-            s"$basePollUrl/0?final=$finalStatus"
-          }
-
-        val xml =
-          replaceCorrelationId(
-            resourceHelper.resourceAsString(submitCISMessage_acknowledgement_ResponsePath),
-            correlationId,
-            pollingUrlHost
-          )
-            .replace("[pollUrl]", pollUrlWith0)
-            .replace("[gatewayTimestamp]", gatewayTimestamp)
-
-        Ok(xml)
-    }
-
+  def submitCISMessage(): Action[AnyContent] = Action { request =>
+    submitCIS(
+      request = request,
+      regime = "IR-CIS-CIS300MR",
+      acknowledgementResponsePath = submitCISMessage_acknowledgement_ResponsePath,
+      fatalErrorResponsePath = submitCISMessage_fatalError_ResponsePath
+    )
   }
 
-  def submitCISVerifyMessage(): Action[AnyContent] = Action { (request: Request[AnyContent]) =>
-    val rootTextOpt = service.responseCISVerifyMessage(request.body.asXml.get)
-    if (rootTextOpt.isDefined) {
-      Ok(rootTextOpt.get)
-    } else {
-      NotFound
-    }
+  def submitCISVerifyMessage(): Action[AnyContent] = Action { request =>
+    submitCIS(
+      request = request,
+      regime = "IR-CIS-VERIFY",
+      acknowledgementResponsePath = submitCISVerifyMessage_acknowledgement_ResponsePath,
+      fatalErrorResponsePath = submitCISVerifyMessage_fatalError_ResponsePath
+    )
   }
 
   def actionCISMessage(): Action[AnyContent] = Action { (request: Request[AnyContent]) =>
@@ -164,31 +133,126 @@ class ChrisController @Inject() (
   }
 
   def getCISResponse(count: Int): Action[AnyContent] = Action { request =>
+    getCisPollResponse(
+      count = count,
+      request = request,
+      deleteResponsePath = submitCISMessage_delete_ResponsePath,
+      finalStatusResponsePaths = Map(
+        "ACKNOWLEDGE"            -> submitCISMessage_acknowledgement_ResponsePath,
+        "SUBMITTED_NO_RECEIPT"   -> submitCISMessage_irMarkMismatchError_ResponsePath,
+        "FATAL_ERROR"            -> submitCISMessage_fatalError_ResponsePath,
+        "DEPARTMENTAL_ERROR"     -> submitCISMessage_businessError_ResponsePath,
+        "RECOVERABLE_ERROR_3000" -> submitCISMessage_recoverableError_3000_ResponsePath,
+        "RECOVERABLE_ERROR_2005" -> submitCISMessage_recoverableError_2005_ResponsePath,
+        "RECOVERABLE_ERROR_1000" -> submitCISMessage_recoverableError_1000_ResponsePath
+      ),
+      defaultResponsePath = submitCISMessage_success_ResponsePath
+    )
+  }
+
+  def getCISVerifyResponse(count: Int): Action[AnyContent] = Action { request =>
+    getCisPollResponse(
+      count = count,
+      request = request,
+      deleteResponsePath = submitCISVerifyMessage_delete_ResponsePath,
+      finalStatusResponsePaths = Map(
+        "ACKNOWLEDGE"          -> submitCISVerifyMessage_acknowledgement_ResponsePath,
+        "SUBMITTED_NO_RECEIPT" -> submitCISVerifyMessage_irMarkMismatchError_ResponsePath,
+        "FATAL_ERROR"          -> submitCISVerifyMessage_fatalError_ResponsePath,
+        "DEPARTMENTAL_ERROR"   -> submitCISVerifyMessage_businessError_ResponsePath
+      ),
+      defaultResponsePath = submitCISVerifyMessage_success_ResponsePath
+    )
+  }
+
+  private def replaceCorrelationId(response: String, correlationId: String, pollingUrlHost: String): String =
+    response.replace("[correlationId]", correlationId).replace("[pollingUrlHost]", pollingUrlHost)
+
+  private def submitCIS(
+    request: Request[AnyContent],
+    regime: String,
+    acknowledgementResponsePath: String,
+    fatalErrorResponsePath: String
+  ): Result = {
+    val message          = request.body.asXml.get
+    val correlationId    = (message \ "Header" \ "MessageDetails" \ "CorrelationID").text
+    val pollingUrlHost   = config.callback
+    val gatewayTimestamp = LocalDateTime.now().toString
+    val keys             = message \ "GovTalkDetails" \ "Keys" \ "Key"
+
+    def typeIs(value: String)(node: Node) = node \@ "Type" == value
+
+    val taxOfficeNumber    = (keys filter typeIs("TaxOfficeNumber")).text match {
+      case text if text.nonEmpty => text
+      case _                     => "123"
+    }
+    val taxOfficeReference = (keys filter typeIs("TaxOfficeReference")).text
+
+    val irMark = (message \\ "IRmark").text.trim
+    if (irMark.nonEmpty) {
+      irMarkStore.put(correlationId, irMark)
+      logger.info(s"[ChrisStub] Stored IRmark for correlationId=$correlationId")
+    }
+
+    service.initialCisStatus(taxOfficeNumber, taxOfficeReference) match {
+      case FATAL_ERROR =>
+        Ok(
+          replaceCorrelationId(
+            resourceHelper.resourceAsString(fatalErrorResponsePath),
+            correlationId,
+            pollingUrlHost
+          )
+        )
+
+      case _ =>
+        val basePollUrl = config.pollUrl(regime)
+
+        val pollUrlWith0 =
+          if (service.isForeverPending(taxOfficeNumber)) {
+            s"$basePollUrl/0"
+          } else {
+            val finalStatus = service.terminalStatusFor(taxOfficeNumber)
+            s"$basePollUrl/0?final=$finalStatus"
+          }
+
+        val xml =
+          replaceCorrelationId(
+            resourceHelper.resourceAsString(acknowledgementResponsePath),
+            correlationId,
+            pollingUrlHost
+          )
+            .replace("[pollUrl]", pollUrlWith0)
+            .replace("[gatewayTimestamp]", gatewayTimestamp)
+
+        Ok(xml)
+    }
+  }
+
+  private def getCisPollResponse(
+    count: Int,
+    request: Request[AnyContent],
+    deleteResponsePath: String,
+    finalStatusResponsePaths: Map[String, String],
+    defaultResponsePath: String
+  ): Result = {
     val message          = request.body.asXml.get
     val correlationId    = (message \ "Header" \ "MessageDetails" \ "CorrelationID").text
     val pollingUrlHost   = config.callback
     val gatewayTimestamp = LocalDateTime.now().toString
     val function         = (message \ "Header" \ "MessageDetails" \ "Function").text
-    logger.info(s"[ChrisStub] getCISResponse function=$function, correlationId=$correlationId, count=$count")
+
+    logger.info(s"[ChrisStub] function=$function, correlationId=$correlationId, count=$count")
 
     if (function == "delete") {
-      val rawXml = resourceHelper.resourceAsString(submitCISMessage_delete_ResponsePath)
+      val rawXml = resourceHelper.resourceAsString(deleteResponsePath)
       val xml    = replaceCorrelationId(rawXml, correlationId, pollingUrlHost)
       Ok(xml)
     } else {
-      val finalStatusParam: String =
+      val finalStatusParam =
         request.getQueryString("final").getOrElse("SUBMITTED")
 
-      val resourcePath = finalStatusParam match {
-        case "ACKNOWLEDGE"            => submitCISMessage_acknowledgement_ResponsePath
-        case "SUBMITTED_NO_RECEIPT"   => submitCISMessage_irMarkMismatchError_ResponsePath
-        case "FATAL_ERROR"            => submitCISMessage_fatalError_ResponsePath
-        case "DEPARTMENTAL_ERROR"     => submitCISMessage_businessError_ResponsePath
-        case "RECOVERABLE_ERROR_3000" => submitCISMessage_recoverableError_3000_ResponsePath
-        case "RECOVERABLE_ERROR_2005" => submitCISMessage_recoverableError_2005_ResponsePath
-        case "RECOVERABLE_ERROR_1000" => submitCISMessage_recoverableError_1000_ResponsePath
-        case _                        => submitCISMessage_success_ResponsePath
-      }
+      val resourcePath =
+        finalStatusResponsePaths.getOrElse(finalStatusParam, defaultResponsePath)
 
       val rawXml       = resourceHelper.resourceAsString(resourcePath)
       val nextPollUrl  = ""
@@ -203,8 +267,5 @@ class ChrisController @Inject() (
       Ok(xml)
     }
   }
-
-  private def replaceCorrelationId(response: String, correlationId: String, pollingUrlHost: String): String =
-    response.replace("[correlationId]", correlationId).replace("[pollingUrlHost]", pollingUrlHost)
 
 }

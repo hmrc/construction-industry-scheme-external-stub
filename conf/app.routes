@@ -56,6 +56,7 @@ GET        /:serviceId/:credentialId/:agentId/clientlist            uk.gov.hmrc.
 POST       /submission/ChRIS/CISR/Filing/sync/CIS300MR              uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.chris.ChrisController.submitCISMessage()
 POST       /submission/ChRIS/CISR/Filing/sync/CISVERIFY             uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.chris.ChrisController.submitCISVerifyMessage()
 POST       /submission/ChRIS/poll/IR-CIS-CIS300MR/:count            uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.chris.ChrisController.getCISResponse(count: Int)
+POST       /submission/ChRIS/poll/IR-CIS-VERIFY/:count              uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.chris.ChrisController.getCISVerifyResponse(count: Int)
 POST       /submission/ChRIS/poll/:service/:count/:error            uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.chris.ChrisController.pollMessage(service: String, count: Int, error: Boolean)
 
 # stubbed email routes

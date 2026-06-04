@@ -1,0 +1,15 @@
+<GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
+    <EnvelopeVersion>2.0</EnvelopeVersion>
+    <Header>
+        <MessageDetails>
+            <Class>IR-CIS-VERIFY</Class>
+            <Qualifier>acknowledgement</Qualifier>
+            <Function>submit</Function>
+            <CorrelationID>[correlationId]</CorrelationID>
+            <ResponseEndPoint PollInterval="5">[pollUrl]</ResponseEndPoint>
+            <GatewayTimestamp>[gatewayTimestamp]</GatewayTimestamp>
+            <Transformation>XML</Transformation>
+        </MessageDetails>
+    </Header>
+    <Body/>
+</GovTalkMessage>

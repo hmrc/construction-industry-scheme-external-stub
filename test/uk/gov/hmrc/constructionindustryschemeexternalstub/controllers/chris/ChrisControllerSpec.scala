@@ -155,22 +155,40 @@ class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
     }
 
     "handle submitCISVERIFYMessage with a response" in {
-      val cisMessage = <ChRISEnvelope xmns="http://www.hmrc.gov.uk/ChRIS/Envelope/2">
-        <Header>
-          <MessageDetails>
-            <MessageClass>IR-CIS-VERIFY</MessageClass>
-          </MessageDetails>
-        </Header>
-      </ChRISEnvelope>
+      val correlationId = "CORR-VERIFY-123"
 
-      val expected: NodeSeq = <poll></poll>
-      val request           = postRequest.withXmlBody(cisMessage)
-      when(service.responseCISVerifyMessage(request.body.xml)).thenReturn(Some(expected))
+      val cisMessage =
+        <GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
+          <Header>
+            <MessageDetails>
+              <Class>IR-CIS-VERIFY</Class>
+              <CorrelationID>{correlationId}</CorrelationID>
+            </MessageDetails>
+          </Header>
+          <GovTalkDetails>
+            <Keys>
+              <Key Type="TaxOfficeNumber">123</Key>
+              <Key Type="TaxOfficeReference">AB00001</Key>
+            </Keys>
+          </GovTalkDetails>
+          <Body/>
+        </GovTalkMessage>
 
+      when(service.initialCisStatus(eqTo("123"), eqTo("AB00001")))
+        .thenReturn(ACKNOWLEDGE)
+      when(service.isForeverPending(eqTo("123")))
+        .thenReturn(false)
+      when(service.terminalStatusFor(eqTo("123")))
+        .thenReturn("SUBMITTED")
+
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn("[correlationId]-[pollUrl]-[gatewayTimestamp]")
+
+      val request  = postRequest.withXmlBody(cisMessage)
       val response = testInstance.submitCISVerifyMessage().apply(request)
+
       status(response) mustBe OK
-      contentType(response).get mustBe "application/xml"
-      contentAsString(response) mustBe expected.toString()
+      contentAsString(response) must include(correlationId)
     }
 
     "return fatal error response for submitCISMessage when initial status is FATAL_ERROR" in {
@@ -359,6 +377,162 @@ class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
 
       status(response) mustBe OK
       contentAsString(response) mustBe s"DELETE-$correlationId"
+    }
+
+    "return verification SUBMITTED polling response on first poll" in {
+      val correlationId = "CORR-VERIFY-ACK-1"
+      val pollCount     = 0
+
+      val pollRequestXml =
+        <GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
+          <Header>
+            <MessageDetails>
+              <CorrelationID>{correlationId}</CorrelationID>
+            </MessageDetails>
+          </Header>
+          <Body/>
+        </GovTalkMessage>
+
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn("[correlationId]-[pollUrl]-[digestValue]")
+
+      val request  = postRequest.withXmlBody(pollRequestXml)
+      val response = testInstance.getCISVerifyResponse(pollCount).apply(request)
+
+      status(response) mustBe OK
+
+      contentAsString(response) mustBe
+        s"$correlationId--NO_IRMARK_FOUND"
+    }
+
+    "return correct verification polling response template for all terminal statuses" in {
+      val correlationId = "CORR-VERIFY-LOOP"
+      val pollCount     = 2
+
+      val pollRequestXml =
+        <GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
+          <Header>
+            <MessageDetails>
+              <CorrelationID>{correlationId}</CorrelationID>
+            </MessageDetails>
+          </Header>
+          <Body/>
+        </GovTalkMessage>
+
+      val statuses = Seq(
+        "ACKNOWLEDGE",
+        "SUBMITTED_NO_RECEIPT",
+        "FATAL_ERROR",
+        "DEPARTMENTAL_ERROR",
+        "SUBMITTED"
+      )
+
+      statuses.foreach { statusValue =>
+        reset(service, mockResourceHelper)
+
+        when(mockResourceHelper.resourceAsString(any()))
+          .thenReturn("[correlationId]-[pollUrl]-[digestValue]-" + statusValue)
+
+        val request = FakeRequest(
+          "POST",
+          s"/dummy-path?final=$statusValue"
+        ).withXmlBody(pollRequestXml)
+
+        val response = testInstance.getCISVerifyResponse(pollCount).apply(request)
+
+        status(response) mustBe OK
+
+        contentAsString(response) mustBe
+          s"$correlationId--NO_IRMARK_FOUND-$statusValue"
+      }
+    }
+
+    "store IRmark from submitCISVerifyMessage and use it as digestValue in getCISVerifyResponse" in {
+      val correlationId = "CORR-VERIFY-IRMARK"
+      val irMarkValue   = "VERIFYIRMARK123456789"
+
+      val submitMessage =
+        <GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
+          <Header>
+            <MessageDetails>
+              <Class>IR-CIS-VERIFY</Class>
+              <CorrelationID>{correlationId}</CorrelationID>
+            </MessageDetails>
+          </Header>
+          <GovTalkDetails>
+            <Keys>
+              <Key Type="TaxOfficeNumber">123</Key>
+              <Key Type="TaxOfficeReference">AB00001</Key>
+            </Keys>
+          </GovTalkDetails>
+          <Body>
+            <IRenvelope>
+              <IRheader>
+                <IRmark>{irMarkValue}</IRmark>
+              </IRheader>
+            </IRenvelope>
+          </Body>
+        </GovTalkMessage>
+
+      reset(service, mockResourceHelper)
+
+      when(service.initialCisStatus(eqTo("123"), eqTo("AB00001")))
+        .thenReturn(ACKNOWLEDGE)
+      when(service.isForeverPending(eqTo("123")))
+        .thenReturn(false)
+      when(service.terminalStatusFor(eqTo("123")))
+        .thenReturn("SUBMITTED")
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn("[correlationId]-[pollUrl]-[gatewayTimestamp]")
+
+      val submitRequest  = postRequest.withXmlBody(submitMessage)
+      val submitResponse = testInstance.submitCISVerifyMessage().apply(submitRequest)
+
+      status(submitResponse) mustBe OK
+
+      reset(mockResourceHelper)
+
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn("[correlationId]-[digestValue]")
+
+      val pollMessage =
+        <GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
+          <Header>
+            <MessageDetails>
+              <CorrelationID>{correlationId}</CorrelationID>
+            </MessageDetails>
+          </Header>
+          <Body/>
+        </GovTalkMessage>
+
+      val pollRequest  = postRequest.withXmlBody(pollMessage)
+      val pollResponse = testInstance.getCISVerifyResponse(0).apply(pollRequest)
+
+      status(pollResponse) mustBe OK
+      contentAsString(pollResponse) mustBe s"$correlationId-$irMarkValue"
+    }
+
+    "return verification delete response when function is delete" in {
+      val correlationId = "CORR-VERIFY-DELETE"
+
+      val deleteRequestXml =
+        <GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
+          <Header>
+            <MessageDetails>
+              <Function>delete</Function>
+              <CorrelationID>{correlationId}</CorrelationID>
+            </MessageDetails>
+          </Header>
+        </GovTalkMessage>
+
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn("VERIFY-DELETE-[correlationId]")
+
+      val request  = postRequest.withXmlBody(deleteRequestXml)
+      val response = testInstance.getCISVerifyResponse(0).apply(request)
+
+      status(response) mustBe OK
+      contentAsString(response) mustBe s"VERIFY-DELETE-$correlationId"
     }
   }
 }

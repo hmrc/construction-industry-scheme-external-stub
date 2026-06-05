@@ -65,7 +65,23 @@ class ChrisService @Inject() (config: AppConfig) {
   def responseCISVerifyMessage(message: NodeSeq): Option[NodeSeq] = {
     val messageClass = (message \ "Header" \ "MessageDetails" \ "Class").text
     if (messageClass == "IR-CIS-VERIFY") {
-      Some(sendCISVerifyMessage(message, SUCCESS))
+      val keys = message \ "GovTalkDetails" \ "Keys" \ "Key"
+
+      def typeIs(value: String)(node: Node) = node \@ "Type" == value
+
+      val taxOfficeNumber    = (keys filter typeIs("TaxOfficeNumber")).text match {
+        case text if text.nonEmpty => text
+        case _                     => "123"
+      }
+      val taxOfficeReference = (keys filter typeIs("TaxOfficeReference")).text
+
+      val acknowledge = config.verifyAcknowledgeFilter.contains(taxOfficeNumber + "/" + taxOfficeReference)
+      val fatalError  = config.verifyFatalErrorFilter.contains(taxOfficeNumber + "/" + taxOfficeReference)
+
+      val responseType: ChRISResponseType =
+        calculateResponseType(acknowledge = acknowledge, fatalError = fatalError)
+
+      Some(sendCISVerifyMessage(message, responseType))
     } else {
       None
     }

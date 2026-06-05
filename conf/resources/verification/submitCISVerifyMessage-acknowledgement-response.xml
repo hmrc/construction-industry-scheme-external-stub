@@ -11,5 +11,16 @@
             <Transformation>XML</Transformation>
         </MessageDetails>
     </Header>
+    <GovTalkDetails>
+        <Keys/>
+        <GovTalkErrors>
+            <Error>
+                <RaisedBy>ChRIS</RaisedBy>
+                <Number>5999</Number>
+                <Type>business</Type>
+                <Text>Unknown CorrelationId</Text>
+            </Error>
+        </GovTalkErrors>
+    </GovTalkDetails>
     <Body/>
 </GovTalkMessage>

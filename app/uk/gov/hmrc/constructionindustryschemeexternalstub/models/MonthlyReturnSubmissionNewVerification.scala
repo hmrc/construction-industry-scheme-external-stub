@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests
+package uk.gov.hmrc.constructionindustryschemeexternalstub.models
 
 import play.api.libs.json.{Json, OFormat}
 
-case class CreateSubmissionRequest(
-  instanceId: String,
-  taxYear: Int,
-  taxMonth: Int,
-  amendment: String,
-  hmrcMarkGenerated: Option[String] = None,
-  emailRecipient: Option[String] = None,
-  agentId: Option[String] = None,
-  subcontractorCount: Option[Int] = None,
-  totalPaymentsMade: Option[BigDecimal] = None,
-  totalTaxDeducted: Option[BigDecimal] = None
+import java.time.LocalDateTime
+
+case class MonthlyReturnSubmissionNewVerification(
+  submissionId: Long,
+  submissionRequestDate: Option[LocalDateTime]
 )
 
-object CreateSubmissionRequest {
-  implicit val format: OFormat[CreateSubmissionRequest] = Json.format[CreateSubmissionRequest]
+object MonthlyReturnSubmissionNewVerification {
+  given format: OFormat[MonthlyReturnSubmissionNewVerification] = Json.format[MonthlyReturnSubmissionNewVerification]
 }

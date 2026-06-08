@@ -77,7 +77,7 @@ class VerificationController @Inject() (
                 Ok(
                   Json.parse(
                     resourceHelper.resourceAsString(
-                      getCurrentVerificationBatch_200_verificationBatchStatus_none_ResponsePath
+                      getCurrentVerificationBatch_200_verificationBatchStatus_started_ResponsePath
                     )
                   )
                 )
@@ -85,7 +85,7 @@ class VerificationController @Inject() (
                 Ok(
                   Json.parse(
                     resourceHelper.resourceAsString(
-                      getCurrentVerificationBatch_200_verificationBatchStatus_started_ResponsePath
+                      getCurrentVerificationBatch_200_verificationBatchStatus_none_ResponsePath
                     )
                   )
                 )
@@ -98,7 +98,7 @@ class VerificationController @Inject() (
                 Ok(
                   Json.parse(
                     resourceHelper.resourceAsString(
-                      getCurrentVerificationBatch_200_verificationBatchStatus_none_ResponsePath
+                      getCurrentVerificationBatch_200_verificationBatchStatus_started_ResponsePath
                     )
                   )
                 )
@@ -106,7 +106,7 @@ class VerificationController @Inject() (
                 Ok(
                   Json.parse(
                     resourceHelper.resourceAsString(
-                      getCurrentVerificationBatch_200_verificationBatchStatus_started_ResponsePath
+                      getCurrentVerificationBatch_200_verificationBatchStatus_none_ResponsePath
                     )
                   )
                 )

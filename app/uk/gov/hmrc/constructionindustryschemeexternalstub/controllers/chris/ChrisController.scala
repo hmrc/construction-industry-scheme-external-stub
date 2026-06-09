@@ -60,6 +60,9 @@ class ChrisController @Inject() (
   private val submitCISMessage_recoverableError_1000_ResponsePath =
     s"$monthlyNilReturnResponsePath/submitCISMessage-recoverableError-1000-response.xml"
 
+  private val ServerErrorTriggerTaxOfficeNumbers: Set[String] = (500 to 505).map(_.toString).toSet
+  private val ServerErrorPollFinalStatuses: Set[String]       = (500 to 505).map(s => s"SERVER_ERROR_$s").toSet
+
   def submitCISMessage(): Action[AnyContent] = Action { (request: Request[AnyContent]) =>
     val message                           = request.body.asXml.get
     val correlationId                     = (message \ "Header" \ "MessageDetails" \ "CorrelationID").text
@@ -79,38 +82,43 @@ class ChrisController @Inject() (
       logger.info(s"[ChrisStub] Stored IRmark for correlationId=$correlationId")
     }
 
-    service.initialCisStatus(taxOfficeNumber, taxOfficeReference) match {
-      case FATAL_ERROR =>
-        Ok(
-          replaceCorrelationId(
-            resourceHelper.resourceAsString(submitCISMessage_fatalError_ResponsePath),
-            correlationId,
-            pollingUrlHost
+    if (ServerErrorTriggerTaxOfficeNumbers.contains(taxOfficeNumber)) {
+      val statusCode = taxOfficeNumber.toInt
+      logger.info(s"[ChrisStub] Simulating $statusCode for taxOfficeNumber=$taxOfficeNumber corrId=$correlationId")
+      Status(statusCode)("<error>Simulated ChRIS server error</error>").as("application/xml")
+    } else
+      service.initialCisStatus(taxOfficeNumber, taxOfficeReference) match {
+        case FATAL_ERROR =>
+          Ok(
+            replaceCorrelationId(
+              resourceHelper.resourceAsString(submitCISMessage_fatalError_ResponsePath),
+              correlationId,
+              pollingUrlHost
+            )
           )
-        )
 
-      case _ =>
-        val basePollUrl = config.pollUrl("IR-CIS-CIS300MR")
+        case _ =>
+          val basePollUrl = config.pollUrl("IR-CIS-CIS300MR")
 
-        val pollUrlWith0 =
-          if (service.isForeverPending(taxOfficeNumber)) {
-            s"$basePollUrl/0"
-          } else {
-            val finalStatus = service.terminalStatusFor(taxOfficeNumber)
-            s"$basePollUrl/0?final=$finalStatus"
-          }
+          val pollUrlWith0 =
+            if (service.isForeverPending(taxOfficeNumber)) {
+              s"$basePollUrl/0"
+            } else {
+              val finalStatus = service.terminalStatusFor(taxOfficeNumber)
+              s"$basePollUrl/0?final=$finalStatus"
+            }
 
-        val xml =
-          replaceCorrelationId(
-            resourceHelper.resourceAsString(submitCISMessage_acknowledgement_ResponsePath),
-            correlationId,
-            pollingUrlHost
-          )
-            .replace("[pollUrl]", pollUrlWith0)
-            .replace("[gatewayTimestamp]", gatewayTimestamp)
+          val xml =
+            replaceCorrelationId(
+              resourceHelper.resourceAsString(submitCISMessage_acknowledgement_ResponsePath),
+              correlationId,
+              pollingUrlHost
+            )
+              .replace("[pollUrl]", pollUrlWith0)
+              .replace("[gatewayTimestamp]", gatewayTimestamp)
 
-        Ok(xml)
-    }
+          Ok(xml)
+      }
 
   }
 
@@ -175,6 +183,11 @@ class ChrisController @Inject() (
       val rawXml = resourceHelper.resourceAsString(submitCISMessage_delete_ResponsePath)
       val xml    = replaceCorrelationId(rawXml, correlationId, pollingUrlHost)
       Ok(xml)
+    } else if (request.getQueryString("final").exists(ServerErrorPollFinalStatuses.contains) && count >= 2) {
+      val finalStatus = request.getQueryString("final").get
+      val statusCode  = finalStatus.stripPrefix("SERVER_ERROR_").toInt
+      logger.info(s"[ChrisStub] Simulating $statusCode on poll corrId=$correlationId count=$count")
+      Status(statusCode)("<error>Simulated ChRIS server error</error>").as("application/xml")
     } else {
       val finalStatusParam: String =
         request.getQueryString("final").getOrElse("SUBMITTED")

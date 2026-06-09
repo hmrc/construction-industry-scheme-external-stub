@@ -26,7 +26,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.FakeAuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.base.SpecBase
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.EmployerReference
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{EmployerReference, GovTalkErrorStatus}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateSubmissionRequest, UpdateSubmissionRequest}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 
@@ -124,6 +124,32 @@ class SubmissionControllerSpec extends SpecBase {
 
       status(res) mustBe BAD_REQUEST
       (contentAsJson(res) \ "message").as[String] mustBe "Invalid payload"
+    }
+
+    "accepts a payload carrying a typed govTalkResponse and returns 204" in new Setup {
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("200", "")))
+
+      val json: JsValue = Json.toJson(
+        UpdateSubmissionRequest(
+          instanceId = "123",
+          taxYear = 2024,
+          taxMonth = 4,
+          hmrcMarkGenerated = "Dj5TVJDyRYCn9zta5EdySeY4fyA=",
+          submittableStatus = "FATAL_ERROR",
+          amendment = "N",
+          govTalkResponse = Some(GovTalkErrorStatus.ServerError(503))
+        )
+      )
+
+      (json \ "govTalkResponse" \ "kind").as[String] mustBe "ServerError"
+      (json \ "govTalkResponse" \ "httpStatus").as[Int] mustBe 503
+
+      val req: FakeRequest[JsValue] = makeJsonRequest(json, updateSubmissionUrl)
+      val res: Future[Result]       = controller.updateSubmission()(req)
+
+      status(res) mustBe NO_CONTENT
     }
 
     "maps service failure to 500 (no body expected) for taxOfficeNumber = 500" in new Setup {

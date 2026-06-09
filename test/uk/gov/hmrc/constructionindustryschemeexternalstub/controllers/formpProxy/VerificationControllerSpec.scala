@@ -28,6 +28,7 @@ import uk.gov.hmrc.constructionindustryschemeexternalstub.base.SpecBase
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{CreateVerifications, DeleteVerifications, EmployerReference}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateVerificationBatchAndVerificationsRequest, ModifyVerificationsRequest}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.CreateSubmissionAndUpdateVerificationsRequest
 
 import scala.concurrent.Future
 
@@ -949,6 +950,145 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
 
       status(res) mustBe INTERNAL_SERVER_ERROR
       (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
+    }
+  }
+
+  ".createSubmissionForVerification" - {
+
+    val postUrl = "/cis/verification-batch/submission/create" // <-- update to match your routes
+
+    val validSubmissionJson: JsValue =
+      Json.toJson(
+        CreateSubmissionAndUpdateVerificationsRequest(
+          instanceId = instanceId,
+          verificationBatchId = 99L,
+          verificationBatchResourceRef = 10L,
+          emailRecipient = "ops@example.com",
+          irMarkGenerated = Some("IR_MARK"),
+          verifications = Seq(
+            uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.VerificationToUpdate(
+              subcontractorName = "ACME",
+              verificationResourceRef = 111L,
+              proceedVerification = "Y"
+            ),
+            uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.VerificationToUpdate(
+              subcontractorName = "BETA",
+              verificationResourceRef = 222L,
+              proceedVerification = "N"
+            )
+          ),
+          agentId = None
+        )
+      )
+
+    "returns 201 Created with JSON body on success (contractor enrolment)" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("200", "")))
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      val responseJson = Json.obj("submissionId" -> 555)
+
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn(responseJson.toString())
+
+      val req = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(validSubmissionJson)
+
+      val res: Future[Result] = controller.createSubmissionAndUpdateVerifications()(req)
+
+      status(res) mustBe CREATED
+      contentType(res) mustBe Some(JSON)
+      contentAsJson(res) mustBe responseJson
+    }
+
+    "returns 201 Created with JSON body on success (agent enrolment)" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(None)
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(Some("IRAgentReference-123"))
+
+      val responseJson = Json.obj("submissionId" -> 555)
+
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn(responseJson.toString())
+
+      val req = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(validSubmissionJson)
+
+      val res: Future[Result] = controller.createSubmissionAndUpdateVerifications()(req)
+
+      status(res) mustBe CREATED
+      contentType(res) mustBe Some(JSON)
+      contentAsJson(res) mustBe responseJson
+    }
+
+    "returns 400 BadRequest when JSON is invalid" in new Setup {
+      val invalidJson = Json.obj(
+        "instanceId" -> instanceId
+      )
+
+      val req = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(invalidJson)
+
+      val res: Future[Result] = controller.createSubmissionAndUpdateVerifications()(req)
+
+      status(res) mustBe BAD_REQUEST
+      contentType(res) mustBe Some(JSON)
+
+      val body = contentAsJson(res)
+      (body \ "message").as[String] mustBe "Invalid payload"
+      (body \ "errors").isDefined mustBe true
+    }
+
+    "returns 502 BadGateway for taxOfficeNumber = 502 (contractor enrolment)" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("502", "")))
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      val req = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(validSubmissionJson)
+
+      val res: Future[Result] = controller.createSubmissionAndUpdateVerifications()(req)
+
+      status(res) mustBe BAD_GATEWAY
+      (contentAsJson(res) \ "message").as[String] must include("formp failed")
+    }
+
+    "returns 500 InternalServerError for taxOfficeNumber = 500 (contractor enrolment)" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("500", "")))
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      val req = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(validSubmissionJson)
+
+      val res: Future[Result] = controller.createSubmissionAndUpdateVerifications()(req)
+
+      status(res) mustBe INTERNAL_SERVER_ERROR
+      (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
+    }
+
+    "returns 500 InternalServerError when no contractor enrolment and no agent enrolment found" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(None)
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      val req = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(validSubmissionJson)
+
+      val res: Future[Result] = controller.createSubmissionAndUpdateVerifications()(req)
+
+      status(res) mustBe INTERNAL_SERVER_ERROR
     }
   }
 

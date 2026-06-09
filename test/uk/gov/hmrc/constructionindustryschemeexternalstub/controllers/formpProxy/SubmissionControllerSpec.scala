@@ -138,6 +138,7 @@ class SubmissionControllerSpec extends SpecBase {
           taxMonth = 4,
           hmrcMarkGenerated = "Dj5TVJDyRYCn9zta5EdySeY4fyA=",
           submittableStatus = "FATAL_ERROR",
+          amendment = "N",
           govTalkResponse = Some(GovTalkErrorStatus.ServerError(503))
         )
       )

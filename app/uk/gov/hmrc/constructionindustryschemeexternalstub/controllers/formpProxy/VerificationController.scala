@@ -22,7 +22,7 @@ import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateVerificationBatchAndVerificationsRequest, ModifyVerificationsRequest}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateSubmissionAndUpdateVerificationsRequest, CreateVerificationBatchAndVerificationsRequest, ModifyVerificationsRequest}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{CreateVerifications, DeleteVerifications}
 
 import javax.inject.Inject
@@ -44,6 +44,8 @@ class VerificationController @Inject() (
     s"$verificationResponsePath/getCurrentVerificationBatch-200-verificationBatchStatus-started-response.json"
   private val createVerificationBatchAndVerifications_201_ResponsePath                     =
     s"$verificationResponsePath/createVerificationBatchAndVerifications-201-response.json"
+  private val createSubmissionForVerification_201_ResponsePath                             =
+    s"$verificationResponsePath/createSubmissionForVerification-201-response.json"
 
   def getNewestVerificationBatch(instanceId: String): Action[AnyContent] =
     authorise { implicit request =>
@@ -202,5 +204,35 @@ class VerificationController @Inject() (
 
   private def hasNoSubcontractorToModify(request: ModifyVerificationsRequest): Boolean =
     request.deleteVerifications.isEmpty && request.createVerifications.isEmpty
+
+  def createSubmissionAndUpdateVerifications(): Action[JsValue] =
+    authorise(parse.json) { implicit request =>
+      request.body
+        .validate[CreateSubmissionAndUpdateVerificationsRequest]
+        .fold(
+          errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
+          _ =>
+            enrolmentHelper.contractorEnrolmentsOpt(request) match {
+              case Some(enrolmentReference) =>
+                (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {
+                  case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
+                  case ("502", _) => BadGateway(Json.obj("message" -> "formp failed"))
+                  case _          =>
+                    Created(
+                      Json.parse(resourceHelper.resourceAsString(createSubmissionForVerification_201_ResponsePath))
+                    )
+                }
+              case None                     =>
+                enrolmentHelper.agentEnrolmentsOpt(request) match {
+                  case Some(_) =>
+                    Created(
+                      Json.parse(resourceHelper.resourceAsString(createSubmissionForVerification_201_ResponsePath))
+                    )
+                  case None    =>
+                    InternalServerError
+                }
+            }
+        )
+    }
 
 }

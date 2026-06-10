@@ -105,15 +105,41 @@ case class CISVerifyResponse(
   override def errorResponseXmlBusiness(): Elem =
     CommonChrisResponse(transactionId, correlationId, timestamp, service, body, url, "2").toErrorResponseXml(
       <Error>
-        <RaisedBy>ChRIS</RaisedBy>
-        <Number>5005</Number>
+        <RaisedBy>Department</RaisedBy>
+        <Number>3001</Number>
         <Type>business</Type>
-        <Text>Keys in the GovTalkDetails do not match those in the IRheader.</Text>
-        <Location>/hd:GovTalkMessage[1]/hd:Body[1]/r68:IRenvelope[1]/r68:IRheader[1]/r68:Keys[1]/r68:Key[1]</Location>
-        <ErrorData>AA00001</ErrorData>
+        <Text>The submission of this document has failed due to departmental specific business logic in the Body tag.</Text>
+        <Location></Location>
       </Error>
     )
 
-  override def errorResponseXmlFatal(): NodeSeq  = ???
-  override def acknowledgeResponseXml(): NodeSeq = ???
+  override def errorResponseXmlFatal(): Elem =
+    CommonChrisResponse(transactionId, correlationId, timestamp, service, body, url, "2").toErrorResponseXml(
+      <Error>
+        <RaisedBy>Gateway</RaisedBy>
+        <Number>1020</Number>
+        <Type>fatal</Type>
+        <Text>Forced fatal error (stub)</Text>
+        <Location></Location>
+      </Error>
+    )
+
+  override def acknowledgeResponseXml(): Elem = <GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
+    <EnvelopeVersion>2.0</EnvelopeVersion>
+    <Header>
+      <MessageDetails>
+        <Class>{service}</Class>
+        <Qualifier>acknowledgement</Qualifier>
+        <Function>submit</Function>
+        <CorrelationID>{correlationId}</CorrelationID>
+        <ResponseEndPoint PollInterval="5">{url}</ResponseEndPoint>
+        <GatewayTimestamp>{timestamp}</GatewayTimestamp>
+        <Transformation>XML</Transformation>
+      </MessageDetails>
+    </Header>
+    <GovTalkDetails>
+      <Keys/>
+    </GovTalkDetails>
+    <Body/>
+  </GovTalkMessage>
 }

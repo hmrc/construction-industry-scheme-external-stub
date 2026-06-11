@@ -38,10 +38,30 @@
                     </dsig:X509Data>
                 </dsig:KeyInfo>
                 </dsig:Signature>
-                <Message code="1">HMRC has received the IR-CIS-CIS300MR document ref: 123/GL01 at 08.46 on 06/04/2017. The associated IRmark was: TBPJFWEAYSD4GFVRMHY7KLWEBHB5BLA5. We advise you to keep this receipt in both electronic and hardcopy versions for your records. You may wish to use them to identify your submission in the future.</Message>
+                <Message code="1">HMRC has received the IR-CIS-VERIFY document ref: 123/GL01 at 08.46 on 06/04/2017. The associated IRmark was: IT53IRTZFGY7FJYJS2DG5GPY5FNBHPXT. We advise you to keep this receipt in both electronic and hardcopy versions for your records. You may wish to use them to identify your submission in the future.</Message>
             </IRmarkReceipt>
-            <Message code="9004">The Monthly Return has been processed and passed full validation</Message>
+            <Message code="9004">The Subcontractor Verification has been processed and passed full validation</Message>
             <AcceptedTime>2017-04-06T08:46:08.081</AcceptedTime>
+            <ResponseData>
+                <CISresponse xmlns="http://www.govtalk.gov.uk/taxation/CISresponse">
+                    <Contractor>
+                        <UTR>1234657890</UTR>
+                        <AOref>125PA12345000</AOref>
+                    </Contractor>
+                    <Subcontractor>
+                        <Name>
+                            <Fore>Noel</Fore>
+                            <Sur>Armstrong</Sur>
+                        </Name>
+                        <TradingName>DBB Construction</TradingName>
+                        <UTR>8786438047</UTR>
+                        <NINO>AB623456C</NINO>
+                        <Matched>Y</Matched>
+                        <TaxTreatment>net</TaxTreatment>
+                        <VerificationNumber>V1000000007</VerificationNumber>
+                    </Subcontractor>
+                </CISresponse>
+            </ResponseData>
         </SuccessResponse>
     </Body>
 </GovTalkMessage>

@@ -36,5 +36,10 @@ class AppConfig @Inject() (config: Configuration):
     config.get[Seq[String]]("stub.endpoint.submission.cis.filing.acknowledgeFilter")
   lazy val fatalErrorFilter: Seq[String]  =
     config.get[Seq[String]]("stub.endpoint.submission.cis.filing.fatalErrorFilter")
-  lazy val perfMode: Boolean              = config.get[Boolean]("perfMode")
-  lazy val pollInterval: String           = if (perfMode) "0" else "2"
+
+  lazy val verifyAcknowledgeFilter: Seq[String] =
+    config.get[Seq[String]]("stub.endpoint.submission.cis.verify.acknowledgeFilter")
+  lazy val verifyFatalErrorFilter: Seq[String]  =
+    config.get[Seq[String]]("stub.endpoint.submission.cis.verify.fatalErrorFilter")
+  lazy val perfMode: Boolean                    = config.get[Boolean]("perfMode")
+  lazy val pollInterval: String                 = if (perfMode) "0" else "2"

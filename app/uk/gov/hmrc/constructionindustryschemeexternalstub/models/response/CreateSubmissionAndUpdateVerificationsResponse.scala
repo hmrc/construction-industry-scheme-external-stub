@@ -17,18 +17,10 @@
 package uk.gov.hmrc.constructionindustryschemeexternalstub.models.response
 
 import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.*
 
-final case class GetNewestVerificationBatchResponse(
-  scheme: Option[ContractorSchemeNewVerification],
-  subcontractors: Seq[SubcontractorNewVerification],
-  verificationBatch: Option[VerificationBatch],
-  verifications: Seq[Verification],
-  submission: Option[SubmissionNewVerification],
-  monthlyReturn: Option[MonthlyReturnNewVerification],
-  monthlyReturnSubmission: Option[MonthlyReturnSubmissionNewVerification]
-)
+final case class CreateSubmissionAndUpdateVerificationsResponse(submissionId: Long)
 
-object GetNewestVerificationBatchResponse {
-  given format: OFormat[GetNewestVerificationBatchResponse] = Json.format[GetNewestVerificationBatchResponse]
+object CreateSubmissionAndUpdateVerificationsResponse {
+  given OFormat[CreateSubmissionAndUpdateVerificationsResponse] =
+    Json.format[CreateSubmissionAndUpdateVerificationsResponse]
 }

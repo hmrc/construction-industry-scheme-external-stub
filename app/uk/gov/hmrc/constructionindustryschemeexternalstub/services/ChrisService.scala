@@ -20,7 +20,7 @@ import java.util.{Date, TimeZone}
 import javax.inject.{Inject, Singleton}
 import play.api.Logger
 import uk.gov.hmrc.constructionindustryschemeexternalstub.config.AppConfig
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{ACKNOWLEDGE, BUSINESS_ERROR, CISMRFilingResponse, CISVerifyResponse, ChRISResponseType, ChrisResponse, CommonChrisResponse, FATAL_ERROR, SUCCESS}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{ACKNOWLEDGE, BUSINESS_ERROR, CISMRFilingResponse, ChRISResponseType, ChrisResponse, CommonChrisResponse, FATAL_ERROR, SUCCESS}
 
 import scala.xml.{Node, NodeSeq}
 
@@ -62,31 +62,6 @@ class ChrisService @Inject() (config: AppConfig) {
     }
   }
 
-  def responseCISVerifyMessage(message: NodeSeq): Option[NodeSeq] = {
-    val messageClass = (message \ "Header" \ "MessageDetails" \ "Class").text
-    if (messageClass == "IR-CIS-VERIFY") {
-      val keys = message \ "GovTalkDetails" \ "Keys" \ "Key"
-
-      def typeIs(value: String)(node: Node) = node \@ "Type" == value
-
-      val taxOfficeNumber    = (keys filter typeIs("TaxOfficeNumber")).text match {
-        case text if text.nonEmpty => text
-        case _                     => "123"
-      }
-      val taxOfficeReference = (keys filter typeIs("TaxOfficeReference")).text
-
-      val acknowledge = config.verifyAcknowledgeFilter.contains(taxOfficeNumber + "/" + taxOfficeReference)
-      val fatalError  = config.verifyFatalErrorFilter.contains(taxOfficeNumber + "/" + taxOfficeReference)
-
-      val responseType: ChRISResponseType =
-        calculateResponseType(acknowledge = acknowledge, fatalError = fatalError)
-
-      Some(sendCISVerifyMessage(message, responseType))
-    } else {
-      None
-    }
-  }
-
   def responseActionMonthlyReturnCISMessage(message: NodeSeq): Option[NodeSeq] = {
     val messageClass = (message \ "Header" \ "MessageDetails" \ "Class").text
     if (messageClass == "IR-CIS-CIS300MR") {
@@ -106,9 +81,6 @@ class ChrisService @Inject() (config: AppConfig) {
 
   private def sendCISActionMonthlyReturnMessage(message: NodeSeq, service: String): NodeSeq =
     responseMessageCISMRFiling(message, service)
-
-  private def sendCISVerifyMessage(message: NodeSeq, responseType: ChRISResponseType): NodeSeq =
-    responseMessageCISVerify(message, responseType)
 
   private def isError(rt: ChRISResponseType): Boolean =
     rt match {
@@ -165,49 +137,6 @@ class ChrisService @Inject() (config: AppConfig) {
     logger.info(s"Message received to send to Chris: \n${message.toString}")
     responseMessage(cisMRFilingResponse, responseType)
   }
-
-  private def responseMessageCISVerify(message: NodeSeq, responseType: ChRISResponseType): NodeSeq = {
-    val service        = "IR-CIS-VERIFY"
-    val body           = message \ "Body"
-    val messageDetails = message \ "Header" \ "MessageDetails"
-    val transactionId  = (messageDetails \ "TransactionID").text
-    val correlationId  = (messageDetails \ "CorrelationID").text
-    val timestamp      = makeSimpleDataFormatter().format(new Date())
-    val url            = "%s/%s".format(config.responseUrl(service), isError(responseType))
-    val irMarkValue    = Option((message \ "Body" \ "IRenvelope" \ "IRheader" \ "IRmark").text)
-
-    val utr                                         = Option(message \ "Body" \ "IRenvelope" \ "CISrequest" \ "Subcontractor" \ "UTR").map(_.text)
-    val tradingName                                 =
-      Option(message \ "Body" \ "IRenvelope" \ "CISrequest" \ "Subcontractor" \ "TradingName").map(_.text)
-    val worksRef                                    = Option(message \ "Body" \ "IRenvelope" \ "CISrequest" \ "Subcontractor" \ "WorksRef").map(_.text)
-    val (matched, taxTreatment, verificationNumber) = defineSubcontractorResponseDetails(worksRef.getOrElse(""))
-
-    val cisVerifyResponse = CISVerifyResponse(
-      transactionId,
-      correlationId,
-      timestamp,
-      service,
-      body,
-      utr,
-      matched,
-      taxTreatment,
-      verificationNumber,
-      tradingName,
-      url,
-      irMarkValue
-    )
-
-    logger.info(s"Message received to send to Chris: \n${message.toString}")
-    responseMessage(cisVerifyResponse, responseType)
-  }
-
-  private def defineSubcontractorResponseDetails(worksRef: String) =
-    if (worksRef.contains("unmatched"))
-      ("unmatched", "", "")
-    else if (worksRef.contains("net"))
-      ("matched", "net", "V1000000009")
-    else
-      ("matched", "gross", "V1000000009")
 
   private def responseMessage(response: ChrisResponse, responseType: ChRISResponseType): NodeSeq =
     responseType match {

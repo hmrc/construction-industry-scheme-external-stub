@@ -3325,7 +3325,7 @@ staging = https://construction-industry-scheme-external-stub.protected.mdtp:443/
             <Function>submit</Function>
             <TransactionID></TransactionID>
             <CorrelationID>[correlationId]</CorrelationID>
-            <ResponseEndPoint PollInterval="2">[pollingUrlHost]submission/ChRIS/IR-CIS-CIS300MR/Filing/data/true</ResponseEndPoint>
+            <ResponseEndPoint PollInterval="2">[pollingUrlHost]submission/ChRIS/IR-CIS-VERIFY/Filing/data/true</ResponseEndPoint>
             <Transformation>XML</Transformation>
             <GatewayTimestamp>2025-12-01T10:51:31.225</GatewayTimestamp>
         </MessageDetails>
@@ -3452,7 +3452,7 @@ staging = https://construction-industry-scheme-external-stub.protected.mdtp:443/
             <Function>submit</Function>
             <TransactionID></TransactionID>
             <CorrelationID>[correlationId]</CorrelationID>
-            <ResponseEndPoint PollInterval="2">[pollingUrlHost]submission/ChRIS/IR-CIS-CIS300MR/Filing/data/true</ResponseEndPoint>
+            <ResponseEndPoint PollInterval="2">[pollingUrlHost]submission/ChRIS/IR-CIS-VERIFY/Filing/data/true</ResponseEndPoint>
             <Transformation>XML</Transformation>
             <GatewayTimestamp>2025-12-01T10:41:42.885</GatewayTimestamp>
         </MessageDetails>

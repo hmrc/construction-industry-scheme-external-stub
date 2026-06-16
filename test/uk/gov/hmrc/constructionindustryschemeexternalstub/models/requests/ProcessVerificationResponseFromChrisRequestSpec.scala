@@ -191,4 +191,3 @@ class ProcessVerificationResponseFromChrisRequestSpec extends PlaySpec {
     }
   }
 }
-

@@ -27,10 +27,10 @@ import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.FakeAuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.base.SpecBase
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{CreateVerifications, DeleteVerifications, EmployerReference}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateVerificationBatchAndVerificationsRequest, ModifyVerificationsRequest}
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.CreateSubmissionAndUpdateVerificationsRequest
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateSubmissionAndUpdateVerificationsRequest, CreateVerificationBatchAndVerificationsRequest, ModifyVerificationsRequest, ProcessVerificationResponseFromChrisRequest}
 
 import scala.concurrent.Future
+import java.time.LocalDateTime
 
 class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
 
@@ -1087,6 +1087,137 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
         .withBody(validSubmissionJson)
 
       val res: Future[Result] = controller.createSubmissionAndUpdateVerifications()(req)
+
+      status(res) mustBe INTERNAL_SERVER_ERROR
+    }
+  }
+
+  ".processVerificationResponseFromChris" - {
+
+    val postUrl = "/cis/verification/response/process"
+
+    val validProcessResponseJson: JsValue =
+      Json.toJson(
+        ProcessVerificationResponseFromChrisRequest(
+          instanceId = instanceId,
+          submissionType = "VERIFICATIONS",
+          activeObjectId = 99L,
+          hmrcMarkGenerated = Some("IR_MARK_GENERATED"),
+          hmrcMarkGgis = Some("IR_MARK_GGIS"),
+          emailRecipient = Some("ops@example.com"),
+          submissionRequestDate = Some(LocalDateTime.of(2026, 6, 15, 10, 0, 0)),
+          acceptedTime = Some("2026-06-15T10:05:00Z"),
+          agentId = None,
+          submittableStatus = "ACCEPTED",
+          govTalkErrorCode = None,
+          govTalkErrorType = None,
+          govTalkErrorMessage = None,
+          verifBatchResourceRef = 10L,
+          verificationResourceRef = 111L,
+          subbieResourceRef = 222L,
+          matched = Some("Y"),
+          verificationNumber = Some("V123456"),
+          taxTreatment = Some("NET"),
+          actionIndicator = Some("VERIFY"),
+          proceed = Some("Y"),
+          subcontractorName = "ACME"
+        )
+      )
+
+    "returns 204 NO_CONTENT on success (contractor enrolment)" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("200", "")))
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      val req = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(validProcessResponseJson)
+
+      val res: Future[Result] = controller.processVerificationResponseFromChris()(req)
+
+      status(res) mustBe NO_CONTENT
+      contentAsString(res) mustBe ""
+    }
+
+    "returns 204 NO_CONTENT on success (agent enrolment)" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(None)
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(Some("IRAgentReference-123"))
+
+      val req = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(validProcessResponseJson)
+
+      val res: Future[Result] = controller.processVerificationResponseFromChris()(req)
+
+      status(res) mustBe NO_CONTENT
+      contentAsString(res) mustBe ""
+    }
+
+    "returns 400 BadRequest when JSON is invalid" in new Setup {
+      val invalidJson = Json.obj(
+        "instanceId" -> instanceId
+      )
+
+      val req = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(invalidJson)
+
+      val res: Future[Result] = controller.processVerificationResponseFromChris()(req)
+
+      status(res) mustBe BAD_REQUEST
+      contentType(res) mustBe Some(JSON)
+
+      val body = contentAsJson(res)
+      (body \ "message").as[String] mustBe "Invalid payload"
+      (body \ "errors").isDefined mustBe true
+    }
+
+    "returns 502 BadGateway for taxOfficeNumber = 502 (contractor enrolment)" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("502", "")))
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      val req = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(validProcessResponseJson)
+
+      val res: Future[Result] = controller.processVerificationResponseFromChris()(req)
+
+      status(res) mustBe BAD_GATEWAY
+      (contentAsJson(res) \ "message").as[String] must include("formp failed")
+    }
+
+    "returns 500 InternalServerError for taxOfficeNumber = 500 (contractor enrolment)" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("500", "")))
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      val req = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(validProcessResponseJson)
+
+      val res: Future[Result] = controller.processVerificationResponseFromChris()(req)
+
+      status(res) mustBe INTERNAL_SERVER_ERROR
+      (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
+    }
+
+    "returns 500 InternalServerError when no contractor enrolment and no agent enrolment found" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(None)
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      val req = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(validProcessResponseJson)
+
+      val res: Future[Result] = controller.processVerificationResponseFromChris()(req)
 
       status(res) mustBe INTERNAL_SERVER_ERROR
     }

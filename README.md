@@ -2429,6 +2429,50 @@ This is executed in a single transaction in FormP Proxy.
   "submissionId": 555
 }
 ```
+
+
+### Process verification response from ChRIS
+
+**Endpoint**: `POST /cis/verification/response/process`
+
+**Description**: Processes the ChRIS verification response in FormP. This updates:
+- the existing **VERIFICATIONS** submission with the response status and GovTalk error details,
+- the related verification batch status, and
+- the related subcontractor/verification details returned from ChRIS.
+
+This is executed in a single transaction in FormP Proxy.
+
+#### Request body
+
+```json
+{
+  "instanceId": "abc-123",
+  "submissionType": "VERIFICATIONS",
+  "activeObjectId": 99,
+  "hmrcMarkGenerated": "IR_MARK_GENERATED",
+  "hmrcMarkGgis": "IR_MARK_GGIS",
+  "emailRecipient": "ops@example.com",
+  "submissionRequestDate": "2026-06-15T10:00:00",
+  "acceptedTime": "2026-06-15T10:05:00Z",
+  "agentId": null,
+  "submittableStatus": "ACCEPTED",
+  "govTalkErrorCode": null,
+  "govTalkErrorType": null,
+  "govTalkErrorMessage": null,
+  "verifBatchResourceRef": 7,
+  "verificationResourceRef": 111,
+  "subbieResourceRef": 222,
+  "matched": "Y",
+  "verificationNumber": "V123456",
+  "taxTreatment": "NET",
+  "actionIndicator": "VERIFY",
+  "proceed": "Y",
+  "subcontractorName": "ACME LTD"
+}
+```
+
+#### Response
+- 204 No Content
         
 ### ChRIS
 

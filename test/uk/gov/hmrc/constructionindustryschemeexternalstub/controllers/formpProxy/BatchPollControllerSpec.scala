@@ -39,7 +39,7 @@ class BatchPollControllerSpec extends AnyFreeSpec with Matchers with MockitoSuga
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
         .thenReturn(Some(EmployerReference("200", "")))
 
-      when(mockResourceHelper.resourceAsString(any()))
+      when(mockResourceHelper.resourceAsString(nonEmptyPath))
         .thenReturn(nonEmptyResponse.toString)
 
       val req: FakeRequest[JsValue] = makeJsonRequest()
@@ -47,13 +47,14 @@ class BatchPollControllerSpec extends AnyFreeSpec with Matchers with MockitoSuga
 
       status(res) mustBe OK
       contentAsJson(res) mustBe nonEmptyResponse
+      verify(mockResourceHelper).resourceAsString(nonEmptyPath)
     }
 
     "returns 200 with empty batch poll submissions when contractor taxOfficeNumber is 000" in new Setup {
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
         .thenReturn(Some(EmployerReference("000", "")))
 
-      when(mockResourceHelper.resourceAsString(any()))
+      when(mockResourceHelper.resourceAsString(emptyPath))
         .thenReturn(emptyResponse.toString)
 
       val req: FakeRequest[JsValue] = makeJsonRequest()
@@ -61,6 +62,7 @@ class BatchPollControllerSpec extends AnyFreeSpec with Matchers with MockitoSuga
 
       status(res) mustBe OK
       contentAsJson(res) mustBe emptyResponse
+      verify(mockResourceHelper).resourceAsString(emptyPath)
     }
 
     "returns 502 when contractor taxOfficeNumber is 502" in new Setup {
@@ -92,7 +94,7 @@ class BatchPollControllerSpec extends AnyFreeSpec with Matchers with MockitoSuga
       when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
         .thenReturn(Some("AGT200"))
 
-      when(mockResourceHelper.resourceAsString(any()))
+      when(mockResourceHelper.resourceAsString(nonEmptyPath))
         .thenReturn(nonEmptyResponse.toString)
 
       val req: FakeRequest[JsValue] = makeJsonRequest()
@@ -100,6 +102,7 @@ class BatchPollControllerSpec extends AnyFreeSpec with Matchers with MockitoSuga
 
       status(res) mustBe OK
       contentAsJson(res) mustBe nonEmptyResponse
+      verify(mockResourceHelper).resourceAsString(nonEmptyPath)
     }
 
     "returns 200 with empty batch poll submissions when agent enrolment is AGT000" in new Setup {
@@ -109,7 +112,7 @@ class BatchPollControllerSpec extends AnyFreeSpec with Matchers with MockitoSuga
       when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
         .thenReturn(Some("AGT000"))
 
-      when(mockResourceHelper.resourceAsString(any()))
+      when(mockResourceHelper.resourceAsString(emptyPath))
         .thenReturn(emptyResponse.toString)
 
       val req: FakeRequest[JsValue] = makeJsonRequest()
@@ -117,6 +120,7 @@ class BatchPollControllerSpec extends AnyFreeSpec with Matchers with MockitoSuga
 
       status(res) mustBe OK
       contentAsJson(res) mustBe emptyResponse
+      verify(mockResourceHelper).resourceAsString(emptyPath)
     }
 
     "returns 502 when agent enrolment is AGT502" in new Setup {
@@ -170,6 +174,9 @@ class BatchPollControllerSpec extends AnyFreeSpec with Matchers with MockitoSuga
 
     val mockResourceHelper: ResourceHelper     = mock[ResourceHelper]
     val mockEnrolmentsHelper: EnrolmentsHelper = mock[EnrolmentsHelper]
+
+    val nonEmptyPath = "/resources/batchPoll/getBatchPollSubmissions-200-response.json"
+    val emptyPath    = "/resources/batchPoll/getBatchPollSubmissions-200-empty-response.json"
 
     val controller =
       new BatchPollController(fakeAuth, mockResourceHelper, mockEnrolmentsHelper, cc)

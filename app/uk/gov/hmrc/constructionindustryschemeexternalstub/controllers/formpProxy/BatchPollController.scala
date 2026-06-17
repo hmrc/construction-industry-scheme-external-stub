@@ -17,7 +17,7 @@
 package uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy
 
 import play.api.Logging
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
@@ -38,26 +38,26 @@ class BatchPollController @Inject() (
   private val getBatchPollSubmissions200ResponsePath =
     s"$batchPollResponsePath/getBatchPollSubmissions-200-response.json"
 
-  private val getBatchPollSubmissionsEmpty200ResponsePath =
-    s"$batchPollResponsePath/getBatchPollSubmissions-empty-200-response.json"
+  private val getBatchPollSubmissions200EmptyResponsePath =
+    s"$batchPollResponsePath/getBatchPollSubmissions-200-empty-response.json"
 
   def getBatchPollSubmissions: Action[JsValue] = authorise(parse.json) { implicit request =>
     enrolmentHelper.contractorEnrolmentsOpt(request) match {
       case Some(enrolmentReference) =>
         (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {
-          case ("500", _) => InternalServerError("""{"message":"Unexpected error"}""")
-          case ("502", _) => BadGateway("""{"message":"formp failed"}""")
-          case ("000", _) => Ok(resourceHelper.resourceAsString(getBatchPollSubmissionsEmpty200ResponsePath))
+          case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
+          case ("502", _) => BadGateway(Json.obj("message" -> "formp failed"))
+          case ("000", _) => Ok(resourceHelper.resourceAsString(getBatchPollSubmissions200EmptyResponsePath))
           case _          => Ok(resourceHelper.resourceAsString(getBatchPollSubmissions200ResponsePath))
         }
 
       case None =>
         enrolmentHelper.agentEnrolmentsOpt(request) match {
-          case Some("AGT500") => InternalServerError("""{"message":"Unexpected error"}""")
-          case Some("AGT502") => BadGateway("""{"message":"formp failed"}""")
-          case Some("AGT000") => Ok(resourceHelper.resourceAsString(getBatchPollSubmissionsEmpty200ResponsePath))
+          case Some("AGT500") => InternalServerError(Json.obj("message" -> "Unexpected error"))
+          case Some("AGT502") => BadGateway(Json.obj("message" -> "formp failed"))
+          case Some("AGT000") => Ok(resourceHelper.resourceAsString(getBatchPollSubmissions200EmptyResponsePath))
           case Some(_)        => Ok(resourceHelper.resourceAsString(getBatchPollSubmissions200ResponsePath))
-          case None           => InternalServerError("""{"message":"Missing enrolment"}""")
+          case None           => InternalServerError(Json.obj("message" -> "Missing enrolment"))
         }
     }
   }

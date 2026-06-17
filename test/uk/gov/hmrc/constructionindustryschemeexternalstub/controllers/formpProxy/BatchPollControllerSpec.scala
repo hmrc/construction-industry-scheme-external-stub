@@ -175,7 +175,7 @@ class BatchPollControllerSpec extends AnyFreeSpec with Matchers with MockitoSuga
       new BatchPollController(fakeAuth, mockResourceHelper, mockEnrolmentsHelper, cc)
 
     def makeJsonRequest(): FakeRequest[JsValue] =
-      FakeRequest(POST, "/cis/get-batchpoll-submissions")
+      FakeRequest(GET, "/cis/batchpoll-submissions")
         .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
         .withBody(Json.obj())
 
@@ -200,8 +200,8 @@ class BatchPollControllerSpec extends AnyFreeSpec with Matchers with MockitoSuga
             "status"             -> "SUBMITTED",
             "taxOfficeNumber"    -> "123",
             "taxOfficeReference" -> "456789",
-            "taxYear"            -> "2025-26",
-            "taxMonth"           -> "06",
+            "taxYear"            -> 2025,
+            "taxMonth"           -> 6,
             "instanceId"         -> "instance-monthly-return-001",
             "agentId"            -> "A123456"
           )

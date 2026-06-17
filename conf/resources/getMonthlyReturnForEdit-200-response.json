@@ -99,7 +99,7 @@
       "createDate": "2026-02-24T18:23:56",
       "lastUpdate": "2026-02-24T18:23:56",
       "schemeId": 10800,
-      "subbieResourceRef": 4,
+      "subbieResourceRef": 2,
       "matched": "Y",
       "autoVerified": "Y",
       "verified": "N",
@@ -175,7 +175,7 @@
       "createDate": "2026-02-24T18:23:56",
       "lastUpdate": "2026-02-24T18:23:56",
       "schemeId": 10100,
-      "subbieResourceRef": 2,
+      "subbieResourceRef": 3,
       "matched": "Y",
       "autoVerified": "Y",
       "verified": "Y",
@@ -456,18 +456,6 @@
   "monthlyReturnItems": [
     {
       "monthlyReturnId": 30001,
-      "monthlyReturnItemId": 1,
-      "totalPayments": "1,000.00",
-      "costOfMaterials": "100.00",
-      "totalDeducted": "100.00",
-      "unmatchedTaxRateIndicator": "Y",
-      "subcontractorId": 10903,
-      "subcontractorName": "Alice, A",
-      "verificationNumber": "V1000000001",
-      "itemResourceReference": 1
-    },
-    {
-      "monthlyReturnId": 30001,
       "monthlyReturnItemId": 2,
       "totalPayments": "2,000.00",
       "costOfMaterials": "200.00",
@@ -477,18 +465,6 @@
       "subcontractorName": "Alice, A",
       "verificationNumber": "V1000000001",
       "itemResourceReference": 2
-    },
-    {
-      "monthlyReturnId": 30001,
-      "monthlyReturnItemId": 3,
-      "totalPayments": "3,000.00",
-      "costOfMaterials": "300.00",
-      "totalDeducted": "300.00",
-      "unmatchedTaxRateIndicator": "Y",
-      "subcontractorId": 10903,
-      "subcontractorName": "Alice, A",
-      "verificationNumber": "V1000000001",
-      "itemResourceReference": 3
     }
   ],
   "submission": [

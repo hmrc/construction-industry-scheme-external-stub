@@ -17,8 +17,8 @@
 package uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy
 
 import play.api.Logging
-import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{Action, ControllerComponents}
+import play.api.libs.json.Json
+import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -30,7 +30,7 @@ class BatchPollController @Inject() (
   resourceHelper: ResourceHelper,
   enrolmentHelper: EnrolmentsHelper,
   cc: ControllerComponents
-)() extends BackendController(cc)
+) extends BackendController(cc)
     with Logging {
 
   private val batchPollResponsePath = "/resources/batchPoll"
@@ -41,7 +41,7 @@ class BatchPollController @Inject() (
   private val getBatchPollSubmissions200EmptyResponsePath =
     s"$batchPollResponsePath/getBatchPollSubmissions-200-empty-response.json"
 
-  def getBatchPollSubmissions: Action[JsValue] = authorise(parse.json) { implicit request =>
+  def getBatchPollSubmissions: Action[AnyContent] = authorise { implicit request =>
     enrolmentHelper.contractorEnrolmentsOpt(request) match {
       case Some(enrolmentReference) =>
         (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {

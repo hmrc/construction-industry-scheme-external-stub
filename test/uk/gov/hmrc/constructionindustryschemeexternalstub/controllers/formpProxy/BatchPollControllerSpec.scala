@@ -22,7 +22,7 @@ import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{ControllerComponents, PlayBodyParsers, Result}
+import play.api.mvc.{AnyContentAsEmpty, ControllerComponents, PlayBodyParsers, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.{AuthAction, FakeAuthAction}
@@ -42,8 +42,8 @@ class BatchPollControllerSpec extends AnyFreeSpec with Matchers with MockitoSuga
       when(mockResourceHelper.resourceAsString(nonEmptyPath))
         .thenReturn(nonEmptyResponse.toString)
 
-      val req: FakeRequest[JsValue] = makeJsonRequest()
-      val res: Future[Result]       = controller.getBatchPollSubmissions()(req)
+      val req: FakeRequest[AnyContentAsEmpty.type] = makeGetRequest()
+      val res: Future[Result]                      = controller.getBatchPollSubmissions()(req)
 
       status(res) mustBe OK
       contentAsJson(res) mustBe nonEmptyResponse
@@ -57,8 +57,8 @@ class BatchPollControllerSpec extends AnyFreeSpec with Matchers with MockitoSuga
       when(mockResourceHelper.resourceAsString(emptyPath))
         .thenReturn(emptyResponse.toString)
 
-      val req: FakeRequest[JsValue] = makeJsonRequest()
-      val res: Future[Result]       = controller.getBatchPollSubmissions()(req)
+      val req: FakeRequest[AnyContentAsEmpty.type] = makeGetRequest()
+      val res: Future[Result]                      = controller.getBatchPollSubmissions()(req)
 
       status(res) mustBe OK
       contentAsJson(res) mustBe emptyResponse
@@ -69,8 +69,8 @@ class BatchPollControllerSpec extends AnyFreeSpec with Matchers with MockitoSuga
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
         .thenReturn(Some(EmployerReference("502", "")))
 
-      val req: FakeRequest[JsValue] = makeJsonRequest()
-      val res: Future[Result]       = controller.getBatchPollSubmissions()(req)
+      val req: FakeRequest[AnyContentAsEmpty.type] = makeGetRequest()
+      val res: Future[Result]                      = controller.getBatchPollSubmissions()(req)
 
       status(res) mustBe BAD_GATEWAY
       (contentAsJson(res) \ "message").as[String] must include("formp failed")
@@ -80,8 +80,8 @@ class BatchPollControllerSpec extends AnyFreeSpec with Matchers with MockitoSuga
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
         .thenReturn(Some(EmployerReference("500", "")))
 
-      val req: FakeRequest[JsValue] = makeJsonRequest()
-      val res: Future[Result]       = controller.getBatchPollSubmissions()(req)
+      val req: FakeRequest[AnyContentAsEmpty.type] = makeGetRequest()
+      val res: Future[Result]                      = controller.getBatchPollSubmissions()(req)
 
       status(res) mustBe INTERNAL_SERVER_ERROR
       (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
@@ -97,8 +97,8 @@ class BatchPollControllerSpec extends AnyFreeSpec with Matchers with MockitoSuga
       when(mockResourceHelper.resourceAsString(nonEmptyPath))
         .thenReturn(nonEmptyResponse.toString)
 
-      val req: FakeRequest[JsValue] = makeJsonRequest()
-      val res: Future[Result]       = controller.getBatchPollSubmissions()(req)
+      val req: FakeRequest[AnyContentAsEmpty.type] = makeGetRequest()
+      val res: Future[Result]                      = controller.getBatchPollSubmissions()(req)
 
       status(res) mustBe OK
       contentAsJson(res) mustBe nonEmptyResponse
@@ -115,8 +115,8 @@ class BatchPollControllerSpec extends AnyFreeSpec with Matchers with MockitoSuga
       when(mockResourceHelper.resourceAsString(emptyPath))
         .thenReturn(emptyResponse.toString)
 
-      val req: FakeRequest[JsValue] = makeJsonRequest()
-      val res: Future[Result]       = controller.getBatchPollSubmissions()(req)
+      val req: FakeRequest[AnyContentAsEmpty.type] = makeGetRequest()
+      val res: Future[Result]                      = controller.getBatchPollSubmissions()(req)
 
       status(res) mustBe OK
       contentAsJson(res) mustBe emptyResponse
@@ -130,8 +130,8 @@ class BatchPollControllerSpec extends AnyFreeSpec with Matchers with MockitoSuga
       when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
         .thenReturn(Some("AGT502"))
 
-      val req: FakeRequest[JsValue] = makeJsonRequest()
-      val res: Future[Result]       = controller.getBatchPollSubmissions()(req)
+      val req: FakeRequest[AnyContentAsEmpty.type] = makeGetRequest()
+      val res: Future[Result]                      = controller.getBatchPollSubmissions()(req)
 
       status(res) mustBe BAD_GATEWAY
       (contentAsJson(res) \ "message").as[String] must include("formp failed")
@@ -144,8 +144,8 @@ class BatchPollControllerSpec extends AnyFreeSpec with Matchers with MockitoSuga
       when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
         .thenReturn(Some("AGT500"))
 
-      val req: FakeRequest[JsValue] = makeJsonRequest()
-      val res: Future[Result]       = controller.getBatchPollSubmissions()(req)
+      val req: FakeRequest[AnyContentAsEmpty.type] = makeGetRequest()
+      val res: Future[Result]                      = controller.getBatchPollSubmissions()(req)
 
       status(res) mustBe INTERNAL_SERVER_ERROR
       (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
@@ -158,8 +158,8 @@ class BatchPollControllerSpec extends AnyFreeSpec with Matchers with MockitoSuga
       when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
         .thenReturn(None)
 
-      val req: FakeRequest[JsValue] = makeJsonRequest()
-      val res: Future[Result]       = controller.getBatchPollSubmissions()(req)
+      val req: FakeRequest[AnyContentAsEmpty.type] = makeGetRequest()
+      val res: Future[Result]                      = controller.getBatchPollSubmissions()(req)
 
       status(res) mustBe INTERNAL_SERVER_ERROR
       (contentAsJson(res) \ "message").as[String] mustBe "Missing enrolment"
@@ -181,10 +181,9 @@ class BatchPollControllerSpec extends AnyFreeSpec with Matchers with MockitoSuga
     val controller =
       new BatchPollController(fakeAuth, mockResourceHelper, mockEnrolmentsHelper, cc)
 
-    def makeJsonRequest(): FakeRequest[JsValue] =
+    def makeGetRequest(): FakeRequest[AnyContentAsEmpty.type] =
       FakeRequest(GET, "/cis/batchpoll-submissions")
-        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
-        .withBody(Json.obj())
+        .withHeaders(ACCEPT -> JSON)
 
     val nonEmptyResponse: JsValue =
       Json.obj(

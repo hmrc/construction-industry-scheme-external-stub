@@ -27,7 +27,7 @@ import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.FakeAuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.base.SpecBase
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{CreateVerifications, DeleteVerifications, EmployerReference}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateSubmissionAndUpdateVerificationsRequest, CreateVerificationBatchAndVerificationsRequest, ModifyVerificationsRequest, ProcessVerificationResponseFromChrisRequest}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateSubmissionAndUpdateVerificationsRequest, CreateVerificationBatchAndVerificationsRequest, ModifyVerificationsRequest, ProcessVerificationResponseFromChrisRequest, VerificationResult}
 
 import scala.concurrent.Future
 import java.time.LocalDateTime
@@ -955,7 +955,7 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
 
   ".createSubmissionForVerification" - {
 
-    val postUrl = "/cis/verification-batch/submission/create" // <-- update to match your routes
+    val postUrl = "/cis/verification-batch/submission/create"
 
     val validSubmissionJson: JsValue =
       Json.toJson(
@@ -1100,27 +1100,28 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
       Json.toJson(
         ProcessVerificationResponseFromChrisRequest(
           instanceId = instanceId,
-          submissionType = "VERIFICATIONS",
-          activeObjectId = 99L,
-          hmrcMarkGenerated = Some("IR_MARK_GENERATED"),
-          hmrcMarkGgis = Some("IR_MARK_GGIS"),
-          emailRecipient = Some("ops@example.com"),
-          submissionRequestDate = Some(LocalDateTime.of(2026, 6, 15, 10, 0, 0)),
-          acceptedTime = Some("2026-06-15T10:05:00Z"),
-          agentId = None,
-          submittableStatus = "ACCEPTED",
-          govTalkErrorCode = None,
-          govTalkErrorType = None,
-          govTalkErrorMessage = None,
-          verifBatchResourceRef = 10L,
-          verificationResourceRef = 111L,
-          subbieResourceRef = 222L,
-          matched = Some("Y"),
-          verificationNumber = Some("V123456"),
-          taxTreatment = Some("NET"),
-          actionIndicator = Some("VERIFY"),
-          proceed = Some("Y"),
-          subcontractorName = "ACME"
+          verificationBatchResourceRef = 10L,
+          acceptedTime = "2026-06-15T10:05:00Z",
+          submissionStatus = "ACCEPTED",
+          irMarkReceived = "IR_MARK_GGIS",
+          verificationResults = Seq(
+            VerificationResult(
+              resourceRef = 111L,
+              matched = Some("Y"),
+              verified = Some("Y"),
+              verificationNumber = "V123456",
+              taxTreatment = "NET",
+              verifiedDate = LocalDateTime.of(2026, 6, 15, 10, 5, 0)
+            ),
+            VerificationResult(
+              resourceRef = 222L,
+              matched = Some("N"),
+              verified = Some("N"),
+              verificationNumber = "V654321",
+              taxTreatment = "GROSS",
+              verifiedDate = LocalDateTime.of(2026, 6, 15, 10, 6, 0)
+            )
+          )
         )
       )
 

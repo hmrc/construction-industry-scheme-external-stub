@@ -1103,13 +1103,13 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
           verificationBatchResourceRef = 10L,
           acceptedTime = "2026-06-15T10:05:00Z",
           submissionStatus = "ACCEPTED",
-          irMarkReceived = "IR_MARK_GGIS",
+          irMarkReceived = Some("IR_MARK_GGIS"),
           verificationResults = Seq(
             VerificationResult(
               resourceRef = 111L,
               matched = Some("Y"),
               verified = Some("Y"),
-              verificationNumber = "V123456",
+              verificationNumber = Some("V123456"),
               taxTreatment = "NET",
               verifiedDate = LocalDateTime.of(2026, 6, 15, 10, 5, 0)
             ),
@@ -1117,7 +1117,7 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
               resourceRef = 222L,
               matched = Some("N"),
               verified = Some("N"),
-              verificationNumber = "V654321",
+              verificationNumber = Some("V654321"),
               taxTreatment = "GROSS",
               verifiedDate = LocalDateTime.of(2026, 6, 15, 10, 6, 0)
             )

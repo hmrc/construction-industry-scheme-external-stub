@@ -314,6 +314,46 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
         contentAsJson(res) mustBe responseJson
       }
 
+      "returns 200 OK with ChRIS JSON body when instanceId is 800 on success (contractor enrolment)" in new Setup {
+        val instanceId = "800"
+        val url        = s"/cis/verification-batch/current/$instanceId"
+
+        when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+          .thenReturn(Some(EmployerReference("200", "")))
+        when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+          .thenReturn(None)
+
+        val responseJson: JsValue = Json.parse(
+          s"""
+             |{
+             |  "subcontractors": [
+             |    { "subcontractorId": 1 }
+             |  ],
+             |  "verificationBatch": {
+             |    "verificationBatchId": 800
+             |  },
+             |  "verifications": [
+             |    { "verificationId": 1001 }
+             |  ]
+             |}
+             |""".stripMargin
+        )
+
+        when(mockResourceHelper.resourceAsString(any()))
+          .thenReturn(responseJson.toString())
+
+        val req: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, url)
+        val res: Future[Result]                      = controller.getCurrentVerificationBatch(instanceId)(req)
+
+        status(res) mustBe OK
+        contentType(res) mustBe Some(JSON)
+
+        val body = contentAsJson(res)
+
+        body mustBe responseJson
+        (body \ "verificationBatch" \ "verificationBatchId").as[Long] mustBe 800L
+      }
+
       "returns 502 BadGateway for taxOfficeNumber = 502 (contractor enrolment)" in new Setup {
         when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
           .thenReturn(Some(EmployerReference("502", "")))
@@ -1230,8 +1270,9 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
     val validUpdateJson: JsValue = Json.toJson(
       UpdateVerificationSubmissionRequest(
         instanceId = instanceId,
-        verificationBatchId = 99L,
         verificationBatchResourceRef = 77L,
+        submissionRequestDate = Some(LocalDateTime.now()),
+        hmrcMarkGenerated = Some("JagmnWbpl2ZNdnuG9GN33Oot32k="),
         submittableStatus = "FATAL_ERROR",
         govtalkErrorCode = Some("500"),
         govtalkErrorType = Some("timeOut"),

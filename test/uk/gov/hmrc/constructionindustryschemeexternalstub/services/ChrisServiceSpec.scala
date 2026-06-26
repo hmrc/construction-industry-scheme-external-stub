@@ -234,9 +234,12 @@ class ChrisServiceSpec extends AnyWordSpec with Matchers with OneInstancePerTest
       pollingUrl mustBe ""
     }
 
-    "responseCISMessage should return an empty response for request with unknown message class" in {
-      val response = testInstance.responseCISMessage(submitUnknownCISMessage)
-      response mustBe empty
+    "responseCISMessage should throw for request with unknown message class" in {
+      val exception = intercept[RuntimeException] {
+        testInstance.responseCISMessage(submitUnknownCISMessage)
+      }
+
+      exception.getMessage mustBe "Unknown regime: UNKNOWN Message"
     }
 
     "ChrisService.initialCisStatus" should {
@@ -245,7 +248,7 @@ class ChrisServiceSpec extends AnyWordSpec with Matchers with OneInstancePerTest
         val fatalKey                             = appConfig.fatalErrorFilter.headOption.getOrElse("754/EZ00125")
         val Array(taxOfficeNumber, taxOfficeRef) = fatalKey.split("/")
 
-        val result = testInstance.initialCisStatus(taxOfficeNumber, taxOfficeRef)
+        val result = testInstance.initialCisStatus("IR-CIS-CIS300MR", taxOfficeNumber, taxOfficeRef)
 
         result mustBe FATAL_ERROR
       }
@@ -254,7 +257,7 @@ class ChrisServiceSpec extends AnyWordSpec with Matchers with OneInstancePerTest
         val ackKey                               = appConfig.acknowledgeFilter.headOption.getOrElse("754/EZ00100")
         val Array(taxOfficeNumber, taxOfficeRef) = ackKey.split("/")
 
-        val result = testInstance.initialCisStatus(taxOfficeNumber, taxOfficeRef)
+        val result = testInstance.initialCisStatus("IR-CIS-CIS300MR", taxOfficeNumber, taxOfficeRef)
 
         result mustBe ACKNOWLEDGE
       }
@@ -264,16 +267,16 @@ class ChrisServiceSpec extends AnyWordSpec with Matchers with OneInstancePerTest
 
       "return configured terminal status for a known tax office number" in {
         val taxOfficeNumber = "754"
-        val expected        = appConfig.pollingStatus(taxOfficeNumber)
+        val expected        = appConfig.pollingStatus("IR-CIS-CIS300MR", taxOfficeNumber)
 
-        testInstance.terminalStatusFor(taxOfficeNumber) mustBe expected
+        testInstance.terminalStatusFor("IR-CIS-CIS300MR", taxOfficeNumber) mustBe expected
       }
 
       "return SUBMITTED when tax office number is not configured" in {
         val unknownTaxOfficeNumber = "99999"
 
-        appConfig.pollingStatus(unknownTaxOfficeNumber) mustBe "SUBMITTED"
-        testInstance.terminalStatusFor(unknownTaxOfficeNumber) mustBe "SUBMITTED"
+        appConfig.pollingStatus("IR-CIS-CIS300MR", unknownTaxOfficeNumber) mustBe "SUBMITTED"
+        testInstance.terminalStatusFor("IR-CIS-CIS300MR", unknownTaxOfficeNumber) mustBe "SUBMITTED"
       }
     }
 
@@ -281,13 +284,13 @@ class ChrisServiceSpec extends AnyWordSpec with Matchers with OneInstancePerTest
 
       "return true when polling status is ACKNOWLEDGE" in {
         val taxOfficeNumber = "758"
-        testInstance.terminalStatusFor(taxOfficeNumber) mustBe "ACKNOWLEDGE"
-        testInstance.isForeverPending(taxOfficeNumber) mustBe true
+        testInstance.terminalStatusFor("IR-CIS-CIS300MR", taxOfficeNumber) mustBe "ACKNOWLEDGE"
+        testInstance.isForeverPending("IR-CIS-CIS300MR", taxOfficeNumber) mustBe true
       }
 
       "return false when polling status is not ACKNOWLEDGE" in {
         val taxOfficeNumber = "754"
-        testInstance.isForeverPending(taxOfficeNumber) mustBe false
+        testInstance.isForeverPending("IR-CIS-CIS300MR", taxOfficeNumber) mustBe false
       }
     }
   }

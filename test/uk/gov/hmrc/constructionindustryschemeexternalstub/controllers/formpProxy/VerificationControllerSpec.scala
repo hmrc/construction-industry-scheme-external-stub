@@ -29,6 +29,7 @@ import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{CreateVerifica
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.*
 import scala.concurrent.Future
+import java.time.LocalDateTime
 
 class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
 
@@ -953,7 +954,7 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
 
   ".createSubmissionForVerification" - {
 
-    val postUrl = "/cis/verification-batch/submission/create" // <-- update to match your routes
+    val postUrl = "/cis/verification-batch/submission/create"
 
     val validSubmissionJson: JsValue =
       Json.toJson(
@@ -1085,6 +1086,138 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
         .withBody(validSubmissionJson)
 
       val res: Future[Result] = controller.createSubmissionAndUpdateVerifications()(req)
+
+      status(res) mustBe INTERNAL_SERVER_ERROR
+    }
+  }
+
+  ".processVerificationResponseFromChris" - {
+
+    val postUrl = "/cis/verification/response/process"
+
+    val validProcessResponseJson: JsValue =
+      Json.toJson(
+        ProcessVerificationResponseFromChrisRequest(
+          instanceId = instanceId,
+          verificationBatchResourceRef = 10L,
+          acceptedTime = "2026-06-15T10:05:00Z",
+          submissionStatus = "ACCEPTED",
+          irMarkReceived = Some("IR_MARK_GGIS"),
+          verificationResults = Seq(
+            VerificationResult(
+              resourceRef = 111L,
+              matched = Some("Y"),
+              verified = Some("Y"),
+              verificationNumber = Some("V123456"),
+              taxTreatment = "NET",
+              verifiedDate = LocalDateTime.of(2026, 6, 15, 10, 5, 0)
+            ),
+            VerificationResult(
+              resourceRef = 222L,
+              matched = Some("N"),
+              verified = Some("N"),
+              verificationNumber = Some("V654321"),
+              taxTreatment = "GROSS",
+              verifiedDate = LocalDateTime.of(2026, 6, 15, 10, 6, 0)
+            )
+          )
+        )
+      )
+
+    "returns 204 NO_CONTENT on success (contractor enrolment)" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("200", "")))
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      val req = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(validProcessResponseJson)
+
+      val res: Future[Result] = controller.processVerificationResponseFromChris()(req)
+
+      status(res) mustBe NO_CONTENT
+      contentAsString(res) mustBe ""
+    }
+
+    "returns 204 NO_CONTENT on success (agent enrolment)" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(None)
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(Some("IRAgentReference-123"))
+
+      val req = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(validProcessResponseJson)
+
+      val res: Future[Result] = controller.processVerificationResponseFromChris()(req)
+
+      status(res) mustBe NO_CONTENT
+      contentAsString(res) mustBe ""
+    }
+
+    "returns 400 BadRequest when JSON is invalid" in new Setup {
+      val invalidJson = Json.obj(
+        "instanceId" -> instanceId
+      )
+
+      val req = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(invalidJson)
+
+      val res: Future[Result] = controller.processVerificationResponseFromChris()(req)
+
+      status(res) mustBe BAD_REQUEST
+      contentType(res) mustBe Some(JSON)
+
+      val body = contentAsJson(res)
+      (body \ "message").as[String] mustBe "Invalid payload"
+      (body \ "errors").isDefined mustBe true
+    }
+
+    "returns 502 BadGateway for taxOfficeNumber = 502 (contractor enrolment)" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("502", "")))
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      val req = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(validProcessResponseJson)
+
+      val res: Future[Result] = controller.processVerificationResponseFromChris()(req)
+
+      status(res) mustBe BAD_GATEWAY
+      (contentAsJson(res) \ "message").as[String] must include("formp failed")
+    }
+
+    "returns 500 InternalServerError for taxOfficeNumber = 500 (contractor enrolment)" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("500", "")))
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      val req = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(validProcessResponseJson)
+
+      val res: Future[Result] = controller.processVerificationResponseFromChris()(req)
+
+      status(res) mustBe INTERNAL_SERVER_ERROR
+      (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
+    }
+
+    "returns 500 InternalServerError when no contractor enrolment and no agent enrolment found" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(None)
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      val req = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(validProcessResponseJson)
+
+      val res: Future[Result] = controller.processVerificationResponseFromChris()(req)
 
       status(res) mustBe INTERNAL_SERVER_ERROR
     }

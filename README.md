@@ -2430,6 +2430,50 @@ This is executed in a single transaction in FormP Proxy.
 }
 ```
 
+
+### Process verification response from ChRIS
+
+**Endpoint**: `POST /cis/verification/response/process`
+
+**Description**: Processes the ChRIS verification response in FormP. This updates:
+- the existing **VERIFICATIONS** submission with the response status and GovTalk error details,
+- the related verification batch status, and
+- the related subcontractor/verification details returned from ChRIS.
+
+This is executed in a single transaction in FormP Proxy.
+
+#### Request body
+
+```json
+{
+  "instanceId": "abc-123",
+  "submissionType": "VERIFICATIONS",
+  "activeObjectId": 99,
+  "hmrcMarkGenerated": "IR_MARK_GENERATED",
+  "hmrcMarkGgis": "IR_MARK_GGIS",
+  "emailRecipient": "ops@example.com",
+  "submissionRequestDate": "2026-06-15T10:00:00",
+  "acceptedTime": "2026-06-15T10:05:00Z",
+  "agentId": null,
+  "submittableStatus": "ACCEPTED",
+  "govTalkErrorCode": null,
+  "govTalkErrorType": null,
+  "govTalkErrorMessage": null,
+  "verifBatchResourceRef": 7,
+  "verificationResourceRef": 111,
+  "subbieResourceRef": 222,
+  "matched": "Y",
+  "verificationNumber": "V123456",
+  "taxTreatment": "NET",
+  "actionIndicator": "VERIFY",
+  "proceed": "Y",
+  "subcontractorName": "ACME LTD"
+}
+```
+
+#### Response
+- 204 No Content
+        
 ### Update verification submission
 
 **Endpoint**: `POST /cis/verification/submission/update`
@@ -3044,6 +3088,551 @@ staging = https://construction-industry-scheme-external-stub.protected.mdtp:443/
     <Body/>
 </GovTalkMessage>
 ```
+**Endpoint**: `POST /submission/ChRIS/CISR/Filing/sync/CISVERIFY`
+
+**Description**: A soap message constructed for subcontractor verification and submitted to the ChRIS service.
+
+#### Happy Path
+###### HTTP 200 - acknowledgement (will trigger polling)
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 754
+- Identifier Name: TaxOfficeReference
+- Identifier Value: **EZ00100**
+
+To trigger the happy path, ensure you provide a valid request body:
+```xml
+<GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
+    <EnvelopeVersion>2.0</EnvelopeVersion>
+    <Header>
+        <MessageDetails>
+            <Class>IR-CIS-VERIFY</Class>
+            <Qualifier>request</Qualifier>
+            <Function>submit</Function>
+            <CorrelationID>FB2E47B242134FF289328EF8A39C3BDC</CorrelationID>
+            <Transformation>XML</Transformation>
+            <GatewayTimestamp>2025-11-25T11:41:09.413</GatewayTimestamp>
+        </MessageDetails>
+        <SenderDetails/>
+    </Header>
+    <GovTalkDetails>
+        <Keys>
+            <Key Type="TaxOfficeNumber">754</Key>
+            <Key Type="TaxOfficeReference">EZ00100</Key>
+        </Keys>
+        <TargetDetails>
+            <Organisation>IR</Organisation>
+        </TargetDetails>
+        <ChannelRouting>
+            <Channel>
+                <URI>0126</URI>
+                <Product>EzGov IR-CIS-CIS300MR</Product>
+                <Version>3.4</Version>
+            </Channel>
+        </ChannelRouting>
+    </GovTalkDetails>
+    <Body>
+        <IRenvelope xmlns="http://www.govtalk.gov.uk/taxation/CISreturn">
+            <IRheader>
+                <Keys>
+                    <Key Type="TaxOfficeNumber">754</Key>
+                    <Key Type="TaxOfficeReference">EZ00100</Key>
+                </Keys>
+                <PeriodEnd>2025-05-05</PeriodEnd>
+                <DefaultCurrency>GBP</DefaultCurrency>
+                <Manifest>
+                    <Contains>
+                        <Reference>
+                            <Namespace>http://www.govtalk.gov.uk/taxation/CISreturn</Namespace>
+                            <SchemaVersion>2005-v1.1</SchemaVersion>
+                            <TopElementName>CISreturn</TopElementName>
+                        </Reference>
+                    </Contains>
+                </Manifest>
+                <IRmark Type="generic">Fv1KhWmy3UvlCGU/skHcT01qiiI=</IRmark>
+                <Sender>Company</Sender>
+            </IRheader>
+            <CISrequest>
+                <Contractor>
+                    <UTR>1123456789</UTR>
+                    <AOref>123PA12345678</AOref>
+                </Contractor>
+                <Subcontractor>
+                    <Action>match</Action>
+                    <Type>soletrader</Type>
+                    <Name>
+                        <Fore>A</Fore>
+                        <Sur>Alice</Sur>
+                    </Name>
+                    <UTR>1111111111</UTR>
+                    <NINO>PX123456A</NINO>
+                </Subcontractor>
+                <Subcontractor>
+                    <Action>match</Action>
+                    <Type>soletrader</Type>
+                    <Name>
+                        <Fore>B</Fore>
+                        <Sur>Bob</Sur>
+                    </Name>
+                    <UTR>2222222222</UTR>
+                    <NINO>PX223456A</NINO>
+                </Subcontractor>
+                <Declaration>yes</Declaration>
+            </CISrequest>
+        </IRenvelope>
+    </Body>
+</GovTalkMessage>
+```
+- Response status: `200`
+- Response body:
+
+**{environmentUrl}**:
+
+local = http://localhost:6997/
+
+staging = https://construction-industry-scheme-external-stub.protected.mdtp:443/
+
+```xml
+<GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
+    <EnvelopeVersion>2.0</EnvelopeVersion>
+    <Header>
+      <MessageDetails>
+        <Class>IR-CIS-VERIFY</Class>
+        <Qualifier>acknowledgement</Qualifier>
+        <Function>submit</Function>
+        <CorrelationID>FB2E47B242134FF289328EF8A39C3BDC</CorrelationID>
+        <ResponseEndPoint PollInterval="5">{environmentUrl}submission/ChRIS/poll/IR-CIS-CIS300MR/0/false</ResponseEndPoint>
+        <GatewayTimestamp/>
+        <Transformation>XML</Transformation>
+      </MessageDetails>
+    </Header>
+    <GovTalkDetails>
+      <Keys/>
+      <GovTalkErrors>
+        <Error>
+          <RaisedBy>ChRIS</RaisedBy>
+          <Number>5999</Number>
+          <Type>business</Type>
+          <Text>Unknown CorrelationId</Text>
+        </Error>
+      </GovTalkErrors>
+    </GovTalkDetails>
+    <Body/>
+  </GovTalkMessage>
+```
+
+#### Unhappy Path
+
+To trigger the unhappy paths, ensure you provide the following auth login stub values:
+
+###### HTTP 200 - Fatal Error (will trigger polling)
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 755
+- Identifier Name: TaxOfficeReference
+- Identifier Value: **EZ00100**
+
+
+- Request body: **See valid request body above.**
+
+
+- Response status: `200`
+- Response body:
+
+**{environmentUrl}**:
+
+local = http://localhost:6997/
+
+staging = https://construction-industry-scheme-external-stub.protected.mdtp:443/
+
+```xml
+<GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
+    <EnvelopeVersion>2.0</EnvelopeVersion>
+    <Header>
+        <MessageDetails>
+            <Class>IR-CIS-VERIFY</Class>
+            <Qualifier>error</Qualifier>
+            <Function>submit</Function>
+            <TransactionID></TransactionID>
+            <CorrelationID>C0A341CF946B46A18BF01C270D15B1E6</CorrelationID>
+            <ResponseEndPoint PollInterval="2">{environmentUrl}submission/ChRIS/IR-CIS-CIS300MR/Filing/data/true</ResponseEndPoint>
+            <Transformation>XML</Transformation>
+            <GatewayTimestamp>2025-11-25T12:03:25.242</GatewayTimestamp>
+        </MessageDetails>
+    </Header>
+    <GovTalkDetails>
+        <Keys/>
+        <GovTalkErrors>
+            <Error>
+                <RaisedBy>Gateway</RaisedBy>
+                <Number>1001</Number>
+                <Type>fatal</Type>
+                <Text>Forced fatal error (stub)</Text>
+                <Location></Location>
+            </Error>
+        </GovTalkErrors>
+    </GovTalkDetails>
+    <Body/>
+</GovTalkMessage>
+```
+
+**Endpoint**: `POST /submission/ChRIS/poll/IR-CIS-VERIFY/:count`
+
+**Description**: A soap message constructed for subcontractor verification and submitted to the ChRIS service.
+
+Ensure you provide a valid request body:
+```xml
+<GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
+    <EnvelopeVersion>2.0</EnvelopeVersion>
+    <Header>
+      <MessageDetails>
+        <Class>IR-CIS-VERIFY</Class>
+        <Qualifier>poll</Qualifier>
+        <Function>submit</Function>
+        <CorrelationID>C0A341CF946B46A18BF01C270D15B1E6</CorrelationID>
+        <Transformation>XML</Transformation>
+      </MessageDetails>
+      <SenderDetails/>
+    </Header>
+    <GovTalkDetails>
+      <Keys/>
+    </GovTalkDetails>
+</GovTalkMessage>
+```
+
+#### Happy Path - SUBMITTED 
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 754
+- Identifier Name: TaxOfficeReference
+- Identifier Value: **EZ00100**
+
+
+- Request body: **See valid request body above.**
+
+- Response status: `200`
+- Response body:
+
+```xml
+<GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
+    <EnvelopeVersion>2.0</EnvelopeVersion>
+    <Header>
+        <MessageDetails>
+            <Class>IR-CIS-VERIFY</Class>
+            <Qualifier>response</Qualifier>
+            <Function>submit</Function>
+            <CorrelationID>[correlationId]</CorrelationID>
+            <ResponseEndPoint/>
+            <GatewayTimestamp>2025-12-01T11:41:05.431</GatewayTimestamp>
+            <Transformation>XML</Transformation>
+        </MessageDetails>
+    </Header>
+    <GovTalkDetails>
+        <Keys/>
+    </GovTalkDetails>
+    <Body>
+        <SuccessResponse xmlns="http://www.inlandrevenue.gov.uk/SuccessResponse">
+            <IRmarkReceipt>
+                <dsig:Signature xmlns:dsig="http://www.w3.org/2000/09/xmldsig#">
+                    <dsig:SignedInfo>
+                        <dsig:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+                        <dsig:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+                        <dsig:Reference>
+                            <dsig:Transforms>
+                                <dsig:Transform Algorithm="http://www.w3.org/TR/1999/REC-xpath-19991116">
+                                    <dsig:XPath>(count(ancestor-or-self::node()|/gti:GovTalkMessage/gti:Body)=count(ancestor-or-self::node())) and (count(ancestor-or-self::node()|/gti:GovTalkMessage/gti:Body/*[name()='IRenvelope']/*[name()='IRheader']/*[name()='IRmark'])!=count(ancestor-or-self::node()))</dsig:XPath>
+                                </dsig:Transform>
+                                <dsig:Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/>
+                            </dsig:Transforms>
+                            <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+                            <dsig:DigestValue>[digestValue]</dsig:DigestValue>
+                        </dsig:Reference>
+                    </dsig:SignedInfo>
+                    <dsig:SignatureValue>xjd0lzhAQrnHZsE5inNCOVsmwcQ9HTu+CFUoyqEcOhVvxj2jvYGcjkhu7sZkZJ9RBjBcEP/eQTbesMTrnUgofuMqaROt8ZyD/RJKFIwh5TtNzYzDM55Pa3GDd2ZXcmfR38mS9KPwqc5Ty+Eqv69FxqivCQk46H20F8fnWnx85H4=</dsig:SignatureValue> <dsig:KeyInfo>
+                    <dsig:X509Data>
+                        <dsig:X509Certificate>MIID0zCCAzygAwIBAgIBADANBgkqhkiG9w0BAQQFADCBqDELMAkGA1UEBhMCbmwxFjAUBgNVBAgTDU5vb3JkLUhvbGxhbmQxFzAVBgNVBAoTDk1vYmlsZWZpc2guY29tMRAwDgYDVQQHEwdaYWFuZGFtMRIwEAYDVQQLEwlNYXJrZXRpbmcxGzAZBgNVBAMTEnd3dy5tb2JpbGVmaXNoLmNvbTElMCMGCSqGSIb3DQEJARYWY29udGFjdEBtb2JpbGVmaXNoLmNvbTAeFw0xMTEwMTMxMDI2NTZaFw0xMjEwMTIxMDI2NTZaMIGoMQswCQYDVQQGEwJubDEWMBQGA1UECBMNTm9vcmQtSG9sbGFuZDEXMBUGA1UEChMOTW9iaWxlZmlzaC5jb20xEDAOBgNVBAcTB1phYW5kYW0xEjAQBgNVBAsTCU1hcmtldGluZzEbMBkGA1UEAxMSd3d3Lm1vYmlsZWZpc2guY29tMSUwIwYJKoZIhvcNAQkBFhZjb250YWN0QG1vYmlsZWZpc2guY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQD3o83CcmMMOC/fnjVv2puirJTs36+al6RDBe2tbFLKKODd29DZbmH9/6R77VPZACvXxBdRzMls//YRVHoJyJVudy+B4siUfHP80pssg2ZXCmCtUZGS71ohmlHcGQGTVLj8wmicf/DfmMAgq19OFZJP5LUn3md/MQBOUYrFXt21dQIDAQABo4IBCTCCAQUwHQYDVR0OBBYEFAIuWYA/BMx8Gn/YOILevnJthkIZMIHVBgNVHSMEgc0wgcqAFAIuWYA/BMx8Gn/YOILevnJthkIZoYGupIGrMIGoMQswCQYDVQQGEwJubDEWMBQGA1UECBMNTm9vcmQtSG9sbGFuZDEXMBUGA1UEChMOTW9iaWxlZmlzaC5jb20xEDAOBgNVBAcTB1phYW5kYW0xEjAQBgNVBAsTCU1hcmtldGluZzEbMBkGA1UEAxMSd3d3Lm1vYmlsZWZpc2guY29tMSUwIwYJKoZIhvcNAQkBFhZjb250YWN0QG1vYmlsZWZpc2guY29tggEAMAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEEBQADgYEABCb+f82DKWIWBczTeKGc6Ka5U7oys/itCY7XOYMIvXYPj+tb+5PBrmTO3jZNoZso9cYYFcDGXySbk6wSZiEPlbMqkoYE62E6dVXAmbza3ZNNIX/yEpkE3ZeBBtYzJMPQme9jrMgwgMIhgVzQNL2KPkbWOtQfoYgnThHQKLBry6Y=</dsig:X509Certificate>
+                    </dsig:X509Data>
+                </dsig:KeyInfo>
+                </dsig:Signature>
+                <Message code="1">HMRC has received the IR-CIS-VERIFY document ref: 123/GL01 at 08.46 on 06/04/2017. The associated IRmark was: IT53IRTZFGY7FJYJS2DG5GPY5FNBHPXT. We advise you to keep this receipt in both electronic and hardcopy versions for your records. You may wish to use them to identify your submission in the future.</Message>
+            </IRmarkReceipt>
+            <Message code="9004">The Subcontractor Verification has been processed and passed full validation</Message>
+            <AcceptedTime>2017-04-06T08:46:08.081</AcceptedTime>
+            <ResponseData>
+                <CISresponse xmlns="http://www.govtalk.gov.uk/taxation/CISresponse">
+                    <Contractor>
+                        <UTR>1234657890</UTR>
+                        <AOref>125PA12345000</AOref>
+                    </Contractor>
+                    <Subcontractor>
+                        <Name>
+                            <Fore>Noel</Fore>
+                            <Sur>Armstrong</Sur>
+                        </Name>
+                        <TradingName>DBB Construction</TradingName>
+                        <UTR>8786438047</UTR>
+                        <NINO>AB623456C</NINO>
+                        <Matched>Y</Matched>
+                        <TaxTreatment>net</TaxTreatment>
+                        <VerificationNumber>V1000000007</VerificationNumber>
+                    </Subcontractor>
+                </CISresponse>
+            </ResponseData>
+        </SuccessResponse>
+    </Body>
+</GovTalkMessage>
+```
+
+**{environmentUrl}**:
+
+local = http://localhost:6997/
+
+staging = https://construction-industry-scheme-external-stub.protected.mdtp:443/
+
+#### Happy Path - SUBMITTED_NO_RECEIPT
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 757
+- Identifier Name: TaxOfficeReference
+- Identifier Value: **EZ00100**
+
+
+- Request body: **See valid request body above.**
+
+- Response status: `200`
+- Response body:
+
+```xml
+<GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
+    <EnvelopeVersion>2.0</EnvelopeVersion>
+    <Header>
+        <MessageDetails>
+            <Class>IR-CIS-VERIFY</Class>
+            <Qualifier>error</Qualifier>
+            <Function>submit</Function>
+            <TransactionID></TransactionID>
+            <CorrelationID>[correlationId]</CorrelationID>
+            <ResponseEndPoint PollInterval="2">[pollingUrlHost]submission/ChRIS/IR-CIS-VERIFY/Filing/data/true</ResponseEndPoint>
+            <Transformation>XML</Transformation>
+            <GatewayTimestamp>2025-12-01T10:51:31.225</GatewayTimestamp>
+        </MessageDetails>
+    </Header>
+    <GovTalkDetails>
+        <Keys/>
+        <GovTalkErrors>
+            <Error>
+                <RaisedBy>ChRIS</RaisedBy>
+                <Number>3001</Number>
+                <Type>business</Type>
+                <Text>Your submission failed due to business validation errors. Please see below for details.</Text>
+                <Location></Location>
+            </Error>
+        </GovTalkErrors>
+    </GovTalkDetails>
+    <Body>
+        <ErrorResponse SchemaVersion="2.0">
+            <Application>
+                <MessageCount>1</MessageCount>
+            </Application>
+            <Error>
+                <RaisedBy>ChRIS</RaisedBy>
+                <Number>2021</Number>
+                <Type>business</Type>
+                <Text>The supplied IRmark is incorrect.</Text>
+                <Location>IRmark</Location>
+            </Error>
+        </ErrorResponse>
+    </Body>
+</GovTalkMessage>
+```
+
+**{environmentUrl}**:
+
+local = http://localhost:6997/
+
+staging = https://construction-industry-scheme-external-stub.protected.mdtp:443/
+
+#### Happy Path - DELETE
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 754
+- Identifier Name: TaxOfficeReference
+- Identifier Value: **EZ00100**
+
+- Request body:
+```xml
+<GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
+  <EnvelopeVersion>2.0</EnvelopeVersion>
+  <Header>
+    <MessageDetails>
+      <Class>IR-CIS-VERIFY</Class>
+      <Qualifier>request</Qualifier>
+      <Function>delete</Function>
+      <Transformation>XML</Transformation>
+    </MessageDetails>
+    <SenderDetails/>
+  </Header>
+  <GovTalkDetails>
+    <Keys/>
+  </GovTalkDetails>
+</GovTalkMessage>
+```
+
+- Response status: `200`
+- Response body:
+
+```xml
+<GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
+    <EnvelopeVersion>2.0</EnvelopeVersion>
+    <Header>
+        <MessageDetails>
+            <Class>IR-CIS-VERIFY</Class>
+            <Qualifier>response</Qualifier>
+            <Function>delete</Function>
+            <TransactionID/>
+            <CorrelationID>[correlationId]</CorrelationID>
+            <ResponseEndPoint PollInterval="10"></ResponseEndPoint>
+            <GatewayTimestamp>2001-02-25T16:32:18.795</GatewayTimestamp>
+        </MessageDetails>
+        <SenderDetails/>
+    </Header>
+    <GovTalkDetails>
+        <Keys/>
+    </GovTalkDetails>
+    <Body/>
+</GovTalkMessage>
+```
+
+
+
+**{environmentUrl}**:
+
+local = http://localhost:6997/
+
+staging = https://construction-industry-scheme-external-stub.protected.mdtp:443/
+
+
+#### Unhappy Path - FATAL_ERROR
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 756
+- Identifier Name: TaxOfficeReference
+- Identifier Value: **EZ00100**
+
+
+- Request body: **See valid request body above.**
+
+- Response status: `200`
+- Response body:
+
+```xml
+<GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
+    <EnvelopeVersion>2.0</EnvelopeVersion>
+    <Header>
+        <MessageDetails>
+            <Class>IR-CIS-VERIFY</Class>
+            <Qualifier>error</Qualifier>
+            <Function>submit</Function>
+            <TransactionID></TransactionID>
+            <CorrelationID>[correlationId]</CorrelationID>
+            <ResponseEndPoint PollInterval="2">[pollingUrlHost]submission/ChRIS/IR-CIS-VERIFY/Filing/data/true</ResponseEndPoint>
+            <Transformation>XML</Transformation>
+            <GatewayTimestamp>2025-12-01T10:41:42.885</GatewayTimestamp>
+        </MessageDetails>
+    </Header>
+    <GovTalkDetails>
+        <Keys/>
+        <GovTalkErrors>
+            <Error>
+                <RaisedBy>Department</RaisedBy>
+                <Number>3001</Number>
+                <Type>business</Type>
+                <Text>The submission of this document has failed due to departmental specific business logic in the Body tag.</Text>
+                <Location></Location>
+            </Error>
+        </GovTalkErrors>
+    </GovTalkDetails>
+    <Body>
+        <ErrorResponse SchemaVersion="2.0">
+            <Application>
+                <MessageCount>1</MessageCount>
+            </Application>
+            <Error>
+                <RaisedBy>System</RaisedBy>
+                <Number>5005</Number>
+                <Type>business</Type>
+                <Text>Keys in the GovTalkDetails do not match those in the IRheader.</Text>
+                <Location>/hd:GovTalkMessage[1]/hd:Body[1]/MTR:IRenvelope[1]/MTR:IRheader[1]/MTR:Keys[1]/MTR:Key[1]</Location>
+            </Error>
+        </ErrorResponse>
+    </Body>
+</GovTalkMessage>
+```
+
+#### Unhappy Path - DEPARTMENTAL_ERROR
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 755
+- Identifier Name: TaxOfficeReference
+- Identifier Value: **EZ00100**
+
+
+- Request body: **See valid request body above.**
+
+- Response status: `200`
+- Response body:
+
+```xml
+<GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
+    <EnvelopeVersion>2.0</EnvelopeVersion>
+    <Header>
+        <MessageDetails>
+            <Class>IR-CIS-VERIFY</Class>
+            <Qualifier>error</Qualifier>
+            <Function>submit</Function>
+            <TransactionID></TransactionID>
+            <CorrelationID>[correlationId]</CorrelationID>
+            <ResponseEndPoint PollInterval="2">[pollingUrlHost]submission/ChRIS/IR-CIS-VERIFY/Filing/data/true</ResponseEndPoint>
+            <Transformation>XML</Transformation>
+            <GatewayTimestamp>2025-12-01T10:45:18.799</GatewayTimestamp>
+        </MessageDetails>
+    </Header>
+    <GovTalkDetails>
+        <Keys/>
+        <GovTalkErrors>
+            <Error>
+                <RaisedBy>Gateway</RaisedBy>
+                <Number>1001</Number>
+                <Type>fatal</Type>
+                <Text>Forced fatal error (stub)</Text>
+                <Location></Location>
+            </Error>
+        </GovTalkErrors>
+    </GovTalkDetails>
+    <Body/>
+</GovTalkMessage>
+```
+
+**{environmentUrl}**:
+
+local = http://localhost:6997/
+
+staging = https://construction-industry-scheme-external-stub.protected.mdtp:443/
+
 
 **Endpoint**: `/hmrc/email`
 

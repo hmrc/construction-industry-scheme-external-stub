@@ -16,64 +16,57 @@
 
 package uk.gov.hmrc.constructionindustryschemeexternalstub.models.response
 
-
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models._
 import java.time.LocalDateTime
 
 final case class GetSubmittedVerificationsResponse(
-                                                    scheme: Seq[ContractorScheme],
-                                                    subcontractors: Seq[Subcontractor],
-                                                    verificationBatches: Seq[GetSubmittedVerificationBatch],
-                                                    verifications: Seq[GetSubmittedVerification],
-                                                    submissions: Seq[Submission]
-                                                  )
+  scheme: Seq[ContractorScheme],
+  subcontractors: Seq[Subcontractor],
+  verificationBatches: Seq[GetSubmittedVerificationBatch],
+  verifications: Seq[GetSubmittedVerification],
+  submissions: Seq[Submission]
+)
 
 object GetSubmittedVerificationsResponse {
   given format: OFormat[GetSubmittedVerificationsResponse] =
     Json.format[GetSubmittedVerificationsResponse]
 }
 
-
 final case class GetSubmittedVerificationBatch(
-                                    verificationBatchId: Long,
-                                    schemeId: Long,
-                                    verificationsCounter: Option[Long],
-                                    verifBatchResourceRef: Option[Long],
-                                    proceedSession: Option[String],
-                                    confirmArrangement: Option[String],
-                                    confirmCorrect: Option[String],
-                                    status: Option[String],
-                                    verificationNumber: Option[String],
-                                    createDate: Option[LocalDateTime],
-                                    lastUpdate: Option[LocalDateTime],
-                                    version: Option[Int]
-                                  )
+  verificationBatchId: Long,
+  schemeId: Long,
+  verificationsCounter: Option[Long],
+  verifBatchResourceRef: Option[Long],
+  proceedSession: Option[String],
+  confirmArrangement: Option[String],
+  confirmCorrect: Option[String],
+  status: Option[String],
+  verificationNumber: Option[String],
+  createDate: Option[LocalDateTime],
+  lastUpdate: Option[LocalDateTime],
+  version: Option[Int]
+)
 
 object GetSubmittedVerificationBatch:
   given format: OFormat[GetSubmittedVerificationBatch] = Json.format[GetSubmittedVerificationBatch]
 
-
 case class GetSubmittedVerification(
-                         verificationId: Long,
-                         matched: Option[String],
-                         verificationNumber: Option[String],
-                         taxTreatment: Option[String],
-                         actionIndicator: Option[String],
-                         verificationBatchId: Option[Long],
-                         schemeId: Option[Long],
-                         subcontractorId: Option[Long],
-                         subcontractorName: Option[String],
-                         verificationResourceRef: Option[Long],
-                         proceed: Option[String],
-                         createDate: Option[LocalDateTime],
-                         lastUpdate: Option[LocalDateTime],
-                         version: Option[Int]
-                       )
+  verificationId: Long,
+  matched: Option[String],
+  verificationNumber: Option[String],
+  taxTreatment: Option[String],
+  actionIndicator: Option[String],
+  verificationBatchId: Option[Long],
+  schemeId: Option[Long],
+  subcontractorId: Option[Long],
+  subcontractorName: Option[String],
+  verificationResourceRef: Option[Long],
+  proceed: Option[String],
+  createDate: Option[LocalDateTime],
+  lastUpdate: Option[LocalDateTime],
+  version: Option[Int]
+)
 
 object GetSubmittedVerification:
   given format: OFormat[GetSubmittedVerification] = Json.format[GetSubmittedVerification]
-
-
-
-

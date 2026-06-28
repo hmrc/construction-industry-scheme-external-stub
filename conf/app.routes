@@ -38,6 +38,7 @@ POST       /cis/verification-batch/create                           uk.gov.hmrc.
 POST       /cis/verification-batch/modify                           uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.VerificationController.modifyVerifications()
 POST       /cis/verification/submission/create                      uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.VerificationController.createSubmissionAndUpdateVerifications()
 POST       /cis/verification/response/process                       uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.VerificationController.processVerificationResponseFromChris()
+POST       /cis/verification/submitted-verifications                uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.VerificationController.getSubmittedVerifications()
 
 
 # stubbed rds-datacache-proxy routes

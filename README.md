@@ -2430,6 +2430,56 @@ This is executed in a single transaction in FormP Proxy.
 }
 ```
 
+### Update verification submission
+
+**Endpoint**: `POST /cis/verification/submission/update`
+
+**Description**: Updates a verification submission record with the submittable status and optional GovTalk error details.
+
+#### Happy Path (Organisation)
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 200
+- Identifier Name: TaxOfficeReference
+- Identifier Value: Any
+
+#### Happy Path (Agent)
+
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: Any
+
+#### Unhappy Paths (Organisation)
+
+- TaxOfficeNumber = `500` → Response status: `500`
+```json
+{ "message": "Unexpected error" }
+```
+
+- TaxOfficeNumber = `502` → Response status: `502`
+```json
+{ "message": "formp failed" }
+```
+
+#### Request body
+
+To trigger the happy path, ensure you provide a valid request body:
+```json
+{
+  "instanceId": "abc-123",
+  "verificationBatchId": 99,
+  "verificationBatchResourceRef": 7,
+  "submittableStatus": "ACCEPTED"
+}
+```
+
+Optional fields: `govtalkErrorCode`, `govtalkErrorType`, `govtalkErrorMessage`.
+
+- Response status: `204`
+- Response body: _empty_
 
 ### Process verification response from ChRIS
 
@@ -2473,7 +2523,7 @@ This is executed in a single transaction in FormP Proxy.
 
 #### Response
 - 204 No Content
-        
+
 ### ChRIS
 
 **Endpoint**: `POST /submission/ChRIS/CISR/Filing/sync/CIS300MR`

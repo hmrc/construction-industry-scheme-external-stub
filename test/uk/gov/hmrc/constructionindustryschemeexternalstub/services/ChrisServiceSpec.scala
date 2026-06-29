@@ -187,95 +187,6 @@ class ChrisServiceSpec extends AnyWordSpec with Matchers with OneInstancePerTest
       <GovTalkDetails/>
     </GovTalkMessage>
 
-  private val submitCISVerifyXML =
-    <GovTalkMessage xmlns='http://www.govtalk.gov.uk/CM/envelope'>
-      <EnvelopeVersion>2.0</EnvelopeVersion>
-      <Header>
-        <MessageDetails>
-          <Class>IR-CIS-VERIFY</Class>
-          <Qualifier>request</Qualifier>
-          <Function>submit</Function>
-          <CorrelationID>0000000007</CorrelationID>
-          <Transformation>XML</Transformation>
-          <GatewayTest>1</GatewayTest>
-          <GatewayTimestamp>2017-04-06T08:46:08.081</GatewayTimestamp>
-        </MessageDetails>
-        <SenderDetails>
-          <IDAuthentication>
-            <SenderID>ISV147</SenderID>
-            <Authentication>
-              <Method>clear</Method>
-              <Role>principal</Role>
-              <Value>xxxxx</Value>
-            </Authentication>
-          </IDAuthentication>
-        </SenderDetails>
-      </Header>
-      <GovTalkDetails>
-        <Keys>
-          <Key Type='TaxOfficeNumber'>123</Key>
-          <Key Type='TaxOfficeReference'>GL01</Key>
-        </Keys>
-        <TargetDetails>
-          <Organisation>IR</Organisation>
-        </TargetDetails>
-        <ChannelRouting>
-          <Channel>
-            <Name>0147</Name>
-            <Product>sdsteam</Product>
-            <Version>1</Version>
-          </Channel>
-        </ChannelRouting>
-      </GovTalkDetails>
-      <Body>
-        <IRenvelope xmlns="http://www.govtalk.gov.uk/taxation/CISrequest">
-          <IRheader>
-            <TestMessage>0</TestMessage>
-            <Keys>
-              <Key Type='TaxOfficeNumber'>123</Key>
-              <Key Type='TaxOfficeReference'>GL01</Key>
-            </Keys>
-            <PeriodEnd>2007-05-05</PeriodEnd>
-            <DefaultCurrency>GBP</DefaultCurrency>
-            <IRmark Type='generic'>RPu0RnkpsfKnCZaGbpn46VoTvvM=</IRmark>
-            <Sender>Individual</Sender>
-          </IRheader>
-          <CISrequest>
-            <Contractor>
-              <UTR>2325648152</UTR>
-              <AOref>123PP87654321</AOref>
-            </Contractor>
-            <Subcontractor>
-              <Action>match</Action>
-              <Type>soletrader</Type>
-              <Name>
-                <Fore>John</Fore>
-                <Sur>Smith</Sur>
-              </Name>
-              <UTR>2325648152</UTR>
-              <NINO>YW000003A</NINO>
-            </Subcontractor>
-            <Subcontractor>
-              <Action>verify</Action>
-              <Type>soletrader</Type>
-              <Name>
-                <Fore>Fred</Fore>
-                <Fore>George</Fore>
-                <Sur>Bingham</Sur>
-              </Name>
-              <UTR>2345678901</UTR>
-              <Address>
-                <Line>15 High Street</Line>
-                <PostCode>RH11 8BG</PostCode>
-                <Country>England</Country>
-              </Address>
-            </Subcontractor>
-            <Declaration>yes</Declaration>
-          </CISrequest>
-        </IRenvelope>
-      </Body>
-    </GovTalkMessage>
-
   private val configuration = new Configuration(ConfigFactory.load("test-application.conf"))
 
   private val appConfig                  = new AppConfig(configuration)
@@ -323,24 +234,8 @@ class ChrisServiceSpec extends AnyWordSpec with Matchers with OneInstancePerTest
       pollingUrl mustBe ""
     }
 
-    "responseCISVERIFYMessage should return successful business response for a valid CIS VERIFY submit request" in {
-      val response = testInstance.responseCISVerifyMessage(submitCISVerifyXML).get
-
-      val clazz           = (response \ "Header" \ "MessageDetails" \ "Class").text
-      val qualifier       = (response \ "Header" \ "MessageDetails" \ "Qualifier").text
-      val successResponse = (response \ "Body" \ "SuccessResponse" \ "Message").text
-      qualifier mustBe "response"
-      successResponse mustBe "The Subcontractor Verification has been processed and passed full validation"
-      clazz mustBe "IR-CIS-VERIFY"
-    }
-
     "responseCISMessage should return an empty response for request with unknown message class" in {
       val response = testInstance.responseCISMessage(submitUnknownCISMessage)
-      response mustBe empty
-    }
-
-    "responseCISVERIFYMessage should return an empty response for request with unknown message class" in {
-      val response = testInstance.responseCISVerifyMessage(submitUnknownCISMessage)
       response mustBe empty
     }
 

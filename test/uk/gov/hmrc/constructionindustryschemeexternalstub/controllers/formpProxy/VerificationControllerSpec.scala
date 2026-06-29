@@ -1176,6 +1176,20 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
 
       status(res) mustBe INTERNAL_SERVER_ERROR
     }
+
+    "returns 502 BadGateway for taxOfficeNumber = 502 (contractor enrolment)" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("502", "")))
+
+      val req = FakeRequest(POST, updateVerificationSubmissionUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(validUpdateJson)
+
+      val res: Future[Result] = controller.updateVerificationSubmission()(req)
+
+      status(res) mustBe BAD_GATEWAY
+      (contentAsJson(res) \ "message").as[String] must include("formp failed")
+    }
   }
 
   ".processVerificationResponseFromChris" - {

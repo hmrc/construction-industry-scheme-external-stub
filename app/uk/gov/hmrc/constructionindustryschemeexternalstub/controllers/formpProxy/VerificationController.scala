@@ -74,60 +74,15 @@ class VerificationController @Inject() (
 
   def getCurrentVerificationBatch(instanceId: String): Action[AnyContent] =
     authorise { implicit request =>
-      enrolmentHelper.contractorEnrolmentsOpt(request) match {
-        case Some(enrolmentReference) =>
-          (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {
-            case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
-            case ("502", _) => BadGateway(Json.obj("message" -> "formp failed"))
-            case _          =>
-              if (instanceId == "1") {
-                Ok(
-                  Json.parse(
-                    resourceHelper.resourceAsString(
-                      getCurrentVerificationBatch_200_verificationBatchStatus_started_ResponsePath
-                    )
-                  )
-                )
-              } else if (instanceId == "800") {
-                Ok(
-                  Json.parse(
-                    resourceHelper.resourceAsString(
-                      getCurrentVerificationBatch_200_verificationBatchStatus_chris_ResponsePath
-                    )
-                  )
-                )
-              } else {
-                Ok(
-                  Json.parse(
-                    resourceHelper.resourceAsString(
-                      getCurrentVerificationBatch_200_verificationBatchStatus_none_ResponsePath
-                    )
-                  )
-                )
-              }
+      withEnrolmentDispatch {
+        val responsePath =
+          instanceId match {
+            case "1"   => getCurrentVerificationBatch_200_verificationBatchStatus_started_ResponsePath
+            case "800" => getCurrentVerificationBatch_200_verificationBatchStatus_chris_ResponsePath
+            case _     => getCurrentVerificationBatch_200_verificationBatchStatus_none_ResponsePath
           }
-        case None                     =>
-          enrolmentHelper.agentEnrolmentsOpt(request) match {
-            case Some(_) =>
-              if (instanceId == "1") {
-                Ok(
-                  Json.parse(
-                    resourceHelper.resourceAsString(
-                      getCurrentVerificationBatch_200_verificationBatchStatus_started_ResponsePath
-                    )
-                  )
-                )
-              } else {
-                Ok(
-                  Json.parse(
-                    resourceHelper.resourceAsString(
-                      getCurrentVerificationBatch_200_verificationBatchStatus_none_ResponsePath
-                    )
-                  )
-                )
-              }
-            case None    => InternalServerError
-          }
+
+        Ok(Json.parse(resourceHelper.resourceAsString(responsePath)))
       }
     }
 

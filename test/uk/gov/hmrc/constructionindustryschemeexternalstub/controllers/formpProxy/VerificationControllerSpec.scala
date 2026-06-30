@@ -1138,8 +1138,9 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
     val validUpdateJson: JsValue = Json.toJson(
       UpdateVerificationSubmissionRequest(
         instanceId = instanceId,
-        verificationBatchId = 99L,
         verificationBatchResourceRef = 77L,
+        submissionRequestDate = Some(LocalDateTime.parse("2026-06-15T10:05:00")),
+        hmrcMarkGenerated = Some("IR_MARK"),
         submittableStatus = "FATAL_ERROR",
         govtalkErrorCode = Some("500"),
         govtalkErrorType = Some("timeOut"),
@@ -1359,94 +1360,6 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
         .withBody(validProcessResponseJson)
 
       val res: Future[Result] = controller.processVerificationResponseFromChris()(req)
-
-      status(res) mustBe INTERNAL_SERVER_ERROR
-    }
-  }
-
-  ".updateVerificationSubmission" - {
-
-    val updateVerificationSubmissionUrl = "/cis/verification/submission/update"
-
-    val validUpdateJson: JsValue = Json.toJson(
-      UpdateVerificationSubmissionRequest(
-        instanceId = instanceId,
-        verificationBatchResourceRef = 77L,
-        submissionRequestDate = Some(LocalDateTime.now()),
-        hmrcMarkGenerated = Some("JagmnWbpl2ZNdnuG9GN33Oot32k="),
-        submittableStatus = "FATAL_ERROR",
-        govtalkErrorCode = Some("500"),
-        govtalkErrorType = Some("timeOut"),
-        govtalkErrorMessage = Some("timeOut")
-      )
-    )
-
-    "returns 204 NoContent on valid payload (contractor enrolment)" in new Setup {
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(Some(EmployerReference("200", "")))
-
-      val req = FakeRequest(POST, updateVerificationSubmissionUrl)
-        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
-        .withBody(validUpdateJson)
-
-      val res: Future[Result] = controller.updateVerificationSubmission()(req)
-
-      status(res) mustBe NO_CONTENT
-    }
-
-    "returns 204 NoContent on valid payload (agent enrolment)" in new Setup {
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(None)
-      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
-        .thenReturn(Some("IRAgentReference-123"))
-
-      val req = FakeRequest(POST, updateVerificationSubmissionUrl)
-        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
-        .withBody(validUpdateJson)
-
-      val res: Future[Result] = controller.updateVerificationSubmission()(req)
-
-      status(res) mustBe NO_CONTENT
-    }
-
-    "returns 400 BadRequest when JSON is invalid" in new Setup {
-      val invalidJson = Json.obj("bad" -> "data")
-
-      val req = FakeRequest(POST, updateVerificationSubmissionUrl)
-        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
-        .withBody(invalidJson)
-
-      val res: Future[Result] = controller.updateVerificationSubmission()(req)
-
-      status(res) mustBe BAD_REQUEST
-      (contentAsJson(res) \ "message").as[String] mustBe "Invalid payload"
-    }
-
-    "returns 500 InternalServerError when taxOfficeNumber is 500" in new Setup {
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(Some(EmployerReference("500", "")))
-
-      val req = FakeRequest(POST, updateVerificationSubmissionUrl)
-        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
-        .withBody(validUpdateJson)
-
-      val res: Future[Result] = controller.updateVerificationSubmission()(req)
-
-      status(res) mustBe INTERNAL_SERVER_ERROR
-      (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
-    }
-
-    "returns 500 InternalServerError when no enrolments found" in new Setup {
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(None)
-      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
-        .thenReturn(None)
-
-      val req = FakeRequest(POST, updateVerificationSubmissionUrl)
-        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
-        .withBody(validUpdateJson)
-
-      val res: Future[Result] = controller.updateVerificationSubmission()(req)
 
       status(res) mustBe INTERNAL_SERVER_ERROR
     }

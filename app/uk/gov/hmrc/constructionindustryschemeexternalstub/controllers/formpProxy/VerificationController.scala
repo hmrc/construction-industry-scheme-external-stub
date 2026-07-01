@@ -19,10 +19,11 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProx
 import play.api.Logging
 import play.api.libs.json.{JsError, JsValue, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.AuthenticatedRequest
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateSubmissionAndUpdateVerificationsRequest, CreateVerificationBatchAndVerificationsRequest, ModifyVerificationsRequest}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateSubmissionAndUpdateVerificationsRequest, CreateVerificationBatchAndVerificationsRequest, ModifyVerificationsRequest, ProcessVerificationResponseFromChrisRequest, UpdateVerificationSubmissionRequest}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{CreateVerifications, DeleteVerifications}
 
 import javax.inject.Inject
@@ -47,73 +48,46 @@ class VerificationController @Inject() (
   private val createSubmissionForVerification_201_ResponsePath                             =
     s"$verificationResponsePath/createSubmissionForVerification-201-response.json"
 
+  private def withEnrolmentDispatch(onSuccess: => Result)(implicit request: AuthenticatedRequest[_]): Result =
+    enrolmentHelper.contractorEnrolmentsOpt(request) match {
+      case Some(enrolmentReference) =>
+        enrolmentReference.taxOfficeNumber match {
+          case "500" => InternalServerError(Json.obj("message" -> "Unexpected error"))
+          case "502" => BadGateway(Json.obj("message" -> "formp failed"))
+          case _     => onSuccess
+        }
+      case None                     =>
+        enrolmentHelper.agentEnrolmentsOpt(request) match {
+          case Some(_) => onSuccess
+          case None    => InternalServerError
+        }
+    }
+
   def getNewestVerificationBatch(instanceId: String): Action[AnyContent] =
     authorise { implicit request =>
-      enrolmentHelper.contractorEnrolmentsOpt(request) match {
-        case Some(enrolmentReference) =>
-          (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {
-            case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
-            case ("502", _) => BadGateway(Json.obj("message" -> "formp failed"))
-            case _          =>
-              Ok(Json.parse(resourceHelper.resourceAsString(getNewestVerificationBatch_200_ResponsePath)))
-          }
-        case None                     =>
-          enrolmentHelper.agentEnrolmentsOpt(request) match {
-            case Some(_) => Ok(Json.parse(resourceHelper.resourceAsString(getNewestVerificationBatch_200_ResponsePath)))
-            case None    => InternalServerError
-          }
-      }
+      withEnrolmentDispatch(
+        Ok(Json.parse(resourceHelper.resourceAsString(getNewestVerificationBatch_200_ResponsePath)))
+      )
     }
 
   def getCurrentVerificationBatch(instanceId: String): Action[AnyContent] =
     authorise { implicit request =>
-      enrolmentHelper.contractorEnrolmentsOpt(request) match {
-        case Some(enrolmentReference) =>
-          (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {
-            case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
-            case ("502", _) => BadGateway(Json.obj("message" -> "formp failed"))
-            case _          =>
-              if (instanceId == "1") {
-                Ok(
-                  Json.parse(
-                    resourceHelper.resourceAsString(
-                      getCurrentVerificationBatch_200_verificationBatchStatus_started_ResponsePath
-                    )
-                  )
-                )
-              } else {
-                Ok(
-                  Json.parse(
-                    resourceHelper.resourceAsString(
-                      getCurrentVerificationBatch_200_verificationBatchStatus_none_ResponsePath
-                    )
-                  )
-                )
-              }
-          }
-        case None                     =>
-          enrolmentHelper.agentEnrolmentsOpt(request) match {
-            case Some(_) =>
-              if (instanceId == "1") {
-                Ok(
-                  Json.parse(
-                    resourceHelper.resourceAsString(
-                      getCurrentVerificationBatch_200_verificationBatchStatus_started_ResponsePath
-                    )
-                  )
-                )
-              } else {
-                Ok(
-                  Json.parse(
-                    resourceHelper.resourceAsString(
-                      getCurrentVerificationBatch_200_verificationBatchStatus_none_ResponsePath
-                    )
-                  )
-                )
-              }
-            case None    => InternalServerError
-          }
-      }
+      withEnrolmentDispatch(
+        if (instanceId == "1")
+          Ok(
+            Json.parse(
+              resourceHelper.resourceAsString(
+                getCurrentVerificationBatch_200_verificationBatchStatus_started_ResponsePath
+              )
+            )
+          )
+        else
+          Ok(
+            Json.parse(
+              resourceHelper.resourceAsString(getCurrentVerificationBatch_200_verificationBatchStatus_none_ResponsePath)
+            )
+          )
+      )
     }
 
   def createVerificationBatchAndVerifications(): Action[JsValue] =
@@ -123,30 +97,11 @@ class VerificationController @Inject() (
         .fold(
           errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
           _ =>
-            enrolmentHelper.contractorEnrolmentsOpt(request) match {
-              case Some(enrolmentReference) =>
-                (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {
-                  case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
-                  case ("502", _) => BadGateway(Json.obj("message" -> "formp failed"))
-                  case _          =>
-                    Created(
-                      Json.parse(
-                        resourceHelper.resourceAsString(createVerificationBatchAndVerifications_201_ResponsePath)
-                      )
-                    )
-                }
-              case None                     =>
-                enrolmentHelper.agentEnrolmentsOpt(request) match {
-                  case Some(_) =>
-                    Created(
-                      Json.parse(
-                        resourceHelper.resourceAsString(createVerificationBatchAndVerifications_201_ResponsePath)
-                      )
-                    )
-                  case None    =>
-                    InternalServerError
-                }
-            }
+            withEnrolmentDispatch(
+              Created(
+                Json.parse(resourceHelper.resourceAsString(createVerificationBatchAndVerifications_201_ResponsePath))
+              )
+            )
         )
     }
 
@@ -156,21 +111,7 @@ class VerificationController @Inject() (
         .validate[ModifyVerificationsRequest]
         .fold(
           errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
-          req =>
-            enrolmentHelper.contractorEnrolmentsOpt(request) match {
-              case Some(enrolmentReference) =>
-                (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {
-                  case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
-                  case ("502", _) => BadGateway(Json.obj("message" -> "formp failed"))
-                  case _          => modifyVerificationsResult(req)
-                }
-              case None                     =>
-                enrolmentHelper.agentEnrolmentsOpt(request) match {
-                  case Some(_) => modifyVerificationsResult(req)
-                  case None    =>
-                    InternalServerError
-                }
-            }
+          req => withEnrolmentDispatch(modifyVerificationsResult(req))
         )
     }
 
@@ -212,26 +153,29 @@ class VerificationController @Inject() (
         .fold(
           errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
           _ =>
-            enrolmentHelper.contractorEnrolmentsOpt(request) match {
-              case Some(enrolmentReference) =>
-                (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {
-                  case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
-                  case ("502", _) => BadGateway(Json.obj("message" -> "formp failed"))
-                  case _          =>
-                    Created(
-                      Json.parse(resourceHelper.resourceAsString(createSubmissionForVerification_201_ResponsePath))
-                    )
-                }
-              case None                     =>
-                enrolmentHelper.agentEnrolmentsOpt(request) match {
-                  case Some(_) =>
-                    Created(
-                      Json.parse(resourceHelper.resourceAsString(createSubmissionForVerification_201_ResponsePath))
-                    )
-                  case None    =>
-                    InternalServerError
-                }
-            }
+            withEnrolmentDispatch(
+              Created(Json.parse(resourceHelper.resourceAsString(createSubmissionForVerification_201_ResponsePath)))
+            )
+        )
+    }
+
+  def updateVerificationSubmission(): Action[JsValue] =
+    authorise(parse.json) { implicit request =>
+      request.body
+        .validate[UpdateVerificationSubmissionRequest]
+        .fold(
+          errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
+          _ => withEnrolmentDispatch(NoContent)
+        )
+    }
+
+  def processVerificationResponseFromChris(): Action[JsValue] =
+    authorise(parse.json) { implicit request =>
+      request.body
+        .validate[ProcessVerificationResponseFromChrisRequest]
+        .fold(
+          errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
+          _ => withEnrolmentDispatch(NoContent)
         )
     }
 

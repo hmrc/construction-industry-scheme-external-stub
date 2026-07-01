@@ -19,16 +19,13 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProx
 import play.api.Logging
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
-import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.ResourceHelper
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.Inject
 
 class BatchPollController @Inject() (
-  authorise: AuthAction,
   resourceHelper: ResourceHelper,
-  enrolmentHelper: EnrolmentsHelper,
   cc: ControllerComponents
 ) extends BackendController(cc)
     with Logging {
@@ -41,42 +38,22 @@ class BatchPollController @Inject() (
   private val getBatchPollSubmissions200EmptyResponsePath =
     s"$batchPollResponsePath/getBatchPollSubmissions-200-empty-response.json"
 
-  def getBatchPollSubmissions: Action[AnyContent] = authorise { implicit request =>
-    enrolmentHelper.contractorEnrolmentsOpt(request) match {
-      case Some(enrolmentReference) =>
-        (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {
-          case ("500", _) =>
-            logger.warn("[BatchPollController][getBatchPollSubmissions] Contractor 500 - returning Unexpected error")
-            InternalServerError(Json.obj("message" -> "Unexpected error"))
-          case ("502", _) =>
-            logger.warn("[BatchPollController][getBatchPollSubmissions] Contractor 502 - returning formp failed")
-            BadGateway(Json.obj("message" -> "formp failed"))
-          case ("000", _) =>
-            logger.info("[BatchPollController][getBatchPollSubmissions] Contractor 000 - returning empty submissions")
-            Ok(resourceHelper.resourceAsString(getBatchPollSubmissions200EmptyResponsePath))
-          case _          =>
-            logger.info("[BatchPollController][getBatchPollSubmissions] Contractor - returning batch poll submissions")
-            Ok(resourceHelper.resourceAsString(getBatchPollSubmissions200ResponsePath))
-        }
+  def getBatchPollSubmissions: Action[AnyContent] =
+    Action { request =>
+      request.getQueryString("scenario") match {
+        case Some("500") =>
+          logger.warn("[BatchPollController][getBatchPollSubmissions] Scenario 500 - returning Unexpected error")
+          InternalServerError(Json.obj("message" -> "Unexpected error"))
+        case Some("502") =>
+          logger.warn("[BatchPollController][getBatchPollSubmissions] Scenario 502 - returning formp failed")
+          BadGateway(Json.obj("message" -> "formp failed"))
+        case Some("000") =>
+          logger.info("[BatchPollController][getBatchPollSubmissions] Scenario 000 - returning empty submissions")
+          Ok(resourceHelper.resourceAsString(getBatchPollSubmissions200EmptyResponsePath))
 
-      case None =>
-        enrolmentHelper.agentEnrolmentsOpt(request) match {
-          case Some("AGT500") =>
-            logger.warn("[BatchPollController][getBatchPollSubmissions] Agent AGT500 - returning Unexpected error")
-            InternalServerError(Json.obj("message" -> "Unexpected error"))
-          case Some("AGT502") =>
-            logger.warn("[BatchPollController][getBatchPollSubmissions] Agent AGT502 - returning formp failed")
-            BadGateway(Json.obj("message" -> "formp failed"))
-          case Some("AGT000") =>
-            logger.info("[BatchPollController][getBatchPollSubmissions] Agent AGT000 - returning empty submissions")
-            Ok(resourceHelper.resourceAsString(getBatchPollSubmissions200EmptyResponsePath))
-          case Some(_)        =>
-            logger.info("[BatchPollController][getBatchPollSubmissions] Agent - returning batch poll submissions")
-            Ok(resourceHelper.resourceAsString(getBatchPollSubmissions200ResponsePath))
-          case None           =>
-            logger.warn("[BatchPollController][getBatchPollSubmissions] No valid enrolment found")
-            InternalServerError(Json.obj("message" -> "Missing enrolment"))
-        }
+        case _ =>
+          logger.info("[BatchPollController][getBatchPollSubmissions] Returning batch poll submissions")
+          Ok(resourceHelper.resourceAsString(getBatchPollSubmissions200ResponsePath))
+      }
     }
-  }
 }

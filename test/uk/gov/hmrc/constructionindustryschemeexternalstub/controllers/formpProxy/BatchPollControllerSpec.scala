@@ -16,18 +16,15 @@
 
 package uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy
 
-import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{AnyContentAsEmpty, ControllerComponents, PlayBodyParsers, Result}
+import play.api.mvc.{AnyContentAsEmpty, ControllerComponents, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.{AuthAction, FakeAuthAction}
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.EmployerReference
-import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.ResourceHelper
 
 import scala.concurrent.Future
 
@@ -35,155 +32,113 @@ class BatchPollControllerSpec extends AnyFreeSpec with Matchers with MockitoSuga
 
   ".getBatchPollSubmissions" - {
 
-    "returns 200 with batch poll submissions for contractor enrolment" in new Setup {
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(Some(EmployerReference("200", "")))
-
+    "returns 200 with batch poll submissions by default" in new Setup {
       when(mockResourceHelper.resourceAsString(nonEmptyPath))
         .thenReturn(nonEmptyResponse.toString)
 
-      val req: FakeRequest[AnyContentAsEmpty.type] = makeGetRequest()
-      val res: Future[Result]                      = controller.getBatchPollSubmissions()(req)
+      val request: FakeRequest[AnyContentAsEmpty.type] =
+        makeGetRequest()
 
-      status(res) mustBe OK
-      contentAsJson(res) mustBe nonEmptyResponse
+      val result: Future[Result] =
+        controller.getBatchPollSubmissions()(request)
+
+      status(result) mustBe OK
+      contentAsJson(result) mustBe nonEmptyResponse
+
       verify(mockResourceHelper).resourceAsString(nonEmptyPath)
     }
 
-    "returns 200 with empty batch poll submissions when contractor taxOfficeNumber is 000" in new Setup {
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(Some(EmployerReference("000", "")))
-
-      when(mockResourceHelper.resourceAsString(emptyPath))
-        .thenReturn(emptyResponse.toString)
-
-      val req: FakeRequest[AnyContentAsEmpty.type] = makeGetRequest()
-      val res: Future[Result]                      = controller.getBatchPollSubmissions()(req)
-
-      status(res) mustBe OK
-      contentAsJson(res) mustBe emptyResponse
-      verify(mockResourceHelper).resourceAsString(emptyPath)
-    }
-
-    "returns 502 when contractor taxOfficeNumber is 502" in new Setup {
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(Some(EmployerReference("502", "")))
-
-      val req: FakeRequest[AnyContentAsEmpty.type] = makeGetRequest()
-      val res: Future[Result]                      = controller.getBatchPollSubmissions()(req)
-
-      status(res) mustBe BAD_GATEWAY
-      (contentAsJson(res) \ "message").as[String] must include("formp failed")
-    }
-
-    "returns 500 when contractor taxOfficeNumber is 500" in new Setup {
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(Some(EmployerReference("500", "")))
-
-      val req: FakeRequest[AnyContentAsEmpty.type] = makeGetRequest()
-      val res: Future[Result]                      = controller.getBatchPollSubmissions()(req)
-
-      status(res) mustBe INTERNAL_SERVER_ERROR
-      (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
-    }
-
-    "returns 200 with batch poll submissions for agent enrolment" in new Setup {
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(None)
-
-      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
-        .thenReturn(Some("AGT200"))
-
+    "returns 200 with batch poll submissions for scenario 200" in new Setup {
       when(mockResourceHelper.resourceAsString(nonEmptyPath))
         .thenReturn(nonEmptyResponse.toString)
 
-      val req: FakeRequest[AnyContentAsEmpty.type] = makeGetRequest()
-      val res: Future[Result]                      = controller.getBatchPollSubmissions()(req)
+      val request: FakeRequest[AnyContentAsEmpty.type] =
+        makeGetRequest(Some("200"))
 
-      status(res) mustBe OK
-      contentAsJson(res) mustBe nonEmptyResponse
+      val result: Future[Result] =
+        controller.getBatchPollSubmissions()(request)
+
+      status(result) mustBe OK
+      contentAsJson(result) mustBe nonEmptyResponse
+
       verify(mockResourceHelper).resourceAsString(nonEmptyPath)
     }
 
-    "returns 200 with empty batch poll submissions when agent enrolment is AGT000" in new Setup {
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(None)
-
-      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
-        .thenReturn(Some("AGT000"))
-
+    "returns 200 with empty submissions for scenario 000" in new Setup {
       when(mockResourceHelper.resourceAsString(emptyPath))
         .thenReturn(emptyResponse.toString)
 
-      val req: FakeRequest[AnyContentAsEmpty.type] = makeGetRequest()
-      val res: Future[Result]                      = controller.getBatchPollSubmissions()(req)
+      val request: FakeRequest[AnyContentAsEmpty.type] =
+        makeGetRequest(Some("000"))
 
-      status(res) mustBe OK
-      contentAsJson(res) mustBe emptyResponse
+      val result: Future[Result] =
+        controller.getBatchPollSubmissions()(request)
+
+      status(result) mustBe OK
+      contentAsJson(result) mustBe emptyResponse
+
       verify(mockResourceHelper).resourceAsString(emptyPath)
     }
 
-    "returns 502 when agent enrolment is AGT502" in new Setup {
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(None)
+    "returns 502 for scenario 502" in new Setup {
+      val request: FakeRequest[AnyContentAsEmpty.type] =
+        makeGetRequest(Some("502"))
 
-      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
-        .thenReturn(Some("AGT502"))
+      val result: Future[Result] =
+        controller.getBatchPollSubmissions()(request)
 
-      val req: FakeRequest[AnyContentAsEmpty.type] = makeGetRequest()
-      val res: Future[Result]                      = controller.getBatchPollSubmissions()(req)
+      status(result) mustBe BAD_GATEWAY
+      (contentAsJson(result) \ "message").as[String] must include("formp failed")
 
-      status(res) mustBe BAD_GATEWAY
-      (contentAsJson(res) \ "message").as[String] must include("formp failed")
+      verifyNoInteractions(mockResourceHelper)
     }
 
-    "returns 500 when agent enrolment is AGT500" in new Setup {
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(None)
+    "returns 500 for scenario 500" in new Setup {
+      val request: FakeRequest[AnyContentAsEmpty.type] =
+        makeGetRequest(Some("500"))
 
-      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
-        .thenReturn(Some("AGT500"))
+      val result: Future[Result] =
+        controller.getBatchPollSubmissions()(request)
 
-      val req: FakeRequest[AnyContentAsEmpty.type] = makeGetRequest()
-      val res: Future[Result]                      = controller.getBatchPollSubmissions()(req)
+      status(result) mustBe INTERNAL_SERVER_ERROR
+      (contentAsJson(result) \ "message").as[String] mustBe "Unexpected error"
 
-      status(res) mustBe INTERNAL_SERVER_ERROR
-      (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
-    }
-
-    "returns 500 when no valid enrolment is found" in new Setup {
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(None)
-
-      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
-        .thenReturn(None)
-
-      val req: FakeRequest[AnyContentAsEmpty.type] = makeGetRequest()
-      val res: Future[Result]                      = controller.getBatchPollSubmissions()(req)
-
-      status(res) mustBe INTERNAL_SERVER_ERROR
-      (contentAsJson(res) \ "message").as[String] mustBe "Missing enrolment"
+      verifyNoInteractions(mockResourceHelper)
     }
   }
 
   private trait Setup {
-    private val cc: ControllerComponents = stubControllerComponents()
-    private val parsers: PlayBodyParsers = cc.parsers
 
-    private def fakeAuth: AuthAction = new FakeAuthAction(parsers)
+    private val cc: ControllerComponents =
+      stubControllerComponents()
 
-    val mockResourceHelper: ResourceHelper     = mock[ResourceHelper]
-    val mockEnrolmentsHelper: EnrolmentsHelper = mock[EnrolmentsHelper]
+    val mockResourceHelper: ResourceHelper =
+      mock[ResourceHelper]
 
-    val nonEmptyPath = "/resources/batchPoll/getBatchPollSubmissions-200-response.json"
-    val emptyPath    = "/resources/batchPoll/getBatchPollSubmissions-200-empty-response.json"
+    val nonEmptyPath: String =
+      "/resources/batchPoll/getBatchPollSubmissions-200-response.json"
+
+    val emptyPath: String =
+      "/resources/batchPoll/getBatchPollSubmissions-200-empty-response.json"
 
     val controller =
-      new BatchPollController(fakeAuth, mockResourceHelper, mockEnrolmentsHelper, cc)
+      new BatchPollController(
+        resourceHelper = mockResourceHelper,
+        cc = cc
+      )
 
-    def makeGetRequest(): FakeRequest[AnyContentAsEmpty.type] =
-      FakeRequest(GET, "/cis/batchpoll-submissions")
+    def makeGetRequest(
+      scenario: Option[String] = None
+    ): FakeRequest[AnyContentAsEmpty.type] = {
+
+      val requestUrl: String =
+        scenario.fold("/cis/batchpoll-submissions") { value =>
+          s"/cis/batchpoll-submissions?scenario=$value"
+        }
+
+      FakeRequest(GET, requestUrl)
         .withHeaders(ACCEPT -> JSON)
+    }
 
     val nonEmptyResponse: JsValue =
       Json.obj(

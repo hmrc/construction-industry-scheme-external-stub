@@ -1002,7 +1002,7 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
           instanceId = instanceId,
           verificationBatchId = 99L,
           verificationBatchResourceRef = 10L,
-          emailRecipient = "ops@example.com",
+          emailRecipient = Some("ops@example.com"),
           irMarkGenerated = Some("IR_MARK"),
           verifications = Seq(
             uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.VerificationToUpdate(

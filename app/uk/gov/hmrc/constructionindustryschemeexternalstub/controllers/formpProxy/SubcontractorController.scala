@@ -22,6 +22,7 @@ import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.EmployerReference
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.CreateAndUpdateSubcontractorRequest
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.response.GetSubcontractorForDeleteResponse
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -71,6 +72,23 @@ class SubcontractorController @Inject() (
           InternalServerError(Json.obj("message" -> "Missing enrolments"))
       }
 
+    }
+
+  def getSubcontractorForDelete(
+    cisId: String,
+    subbieResourceRef: Long
+  ): Action[AnyContent] =
+    authorise { implicit request =>
+
+      val canDelete = subbieResourceRef != 999L
+
+      Ok(
+        Json.toJson(
+          GetSubcontractorForDeleteResponse(
+            subcontractorCanBeDeleted = canDelete
+          )
+        )
+      )
     }
 
 }

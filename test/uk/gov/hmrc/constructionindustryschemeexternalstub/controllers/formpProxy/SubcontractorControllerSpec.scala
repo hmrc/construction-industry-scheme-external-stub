@@ -266,6 +266,47 @@ class SubcontractorControllerSpec extends SpecBase {
     }
   }
 
+  ".getSubcontractorForDelete" - {
+
+    val deleteStatusCisId = "cis-123"
+
+    "returns canBeDeleted = true for normal subcontractor references" in new Setup {
+
+      val req =
+        FakeRequest(
+          GET,
+          s"/cis/subcontractor/$deleteStatusCisId/10/delete-status"
+        )
+
+      val res =
+        controller.getSubcontractorForDelete(deleteStatusCisId, 10L)(req)
+
+      status(res) mustBe OK
+
+      contentAsJson(res) mustBe Json.obj(
+        "subcontractorCanBeDeleted" -> true
+      )
+    }
+
+    "returns canBeDeleted = false for resource ref 999" in new Setup {
+
+      val req =
+        FakeRequest(
+          GET,
+          s"/cis/subcontractor/$deleteStatusCisId/999/delete-status"
+        )
+
+      val res =
+        controller.getSubcontractorForDelete(deleteStatusCisId, 999L)(req)
+
+      status(res) mustBe OK
+
+      contentAsJson(res) mustBe Json.obj(
+        "subcontractorCanBeDeleted" -> false
+      )
+    }
+  }
+
   private trait Setup {
     val mockResourceHelper: ResourceHelper     = mock[ResourceHelper]
     val mockEnrolmentsHelper: EnrolmentsHelper = mock[EnrolmentsHelper]

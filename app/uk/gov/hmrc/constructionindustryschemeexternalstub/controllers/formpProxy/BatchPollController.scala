@@ -49,11 +49,11 @@ class BatchPollController @Inject() (
           BadGateway(Json.obj("message" -> "formp failed"))
         case Some("000") =>
           logger.info("[BatchPollController][getBatchPollSubmissions] Scenario 000 - returning empty submissions")
-          Ok(resourceHelper.resourceAsString(getBatchPollSubmissions200EmptyResponsePath))
+          Ok(Json.parse(resourceHelper.resourceAsString(getBatchPollSubmissions200EmptyResponsePath)))
 
         case _ =>
           logger.info("[BatchPollController][getBatchPollSubmissions] Returning batch poll submissions")
-          Ok(resourceHelper.resourceAsString(getBatchPollSubmissions200ResponsePath))
+          Ok(Json.parse(resourceHelper.resourceAsString(getBatchPollSubmissions200ResponsePath)))
       }
     }
 }

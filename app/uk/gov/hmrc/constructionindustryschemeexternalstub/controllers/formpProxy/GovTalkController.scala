@@ -61,7 +61,7 @@ class GovTalkController @Inject() (
     stage match {
       case Some("initial") => NotFound
       case Some("polling") =>
-        Ok(resourceHelper.resourceAsString(getGovTalkStatus200ResponsePath))
+        Ok(Json.parse(resourceHelper.resourceAsString(getGovTalkStatus200ResponsePath)))
       case _               => NotFound
     }
 

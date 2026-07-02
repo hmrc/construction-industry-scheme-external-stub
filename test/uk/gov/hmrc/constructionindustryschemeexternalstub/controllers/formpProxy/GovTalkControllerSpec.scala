@@ -16,18 +16,14 @@
 
 package uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy
 
-import org.mockito.ArgumentMatchers.*
 import org.mockito.Mockito.*
-import org.scalatest.freespec.AnyFreeSpec
 import play.api.libs.json.{JsNull, JsObject, JsValue, Json}
 import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
-import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.FakeAuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.base.SpecBase
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.EmployerReference
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.*
-import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.ResourceHelper
 
 import java.time.LocalDateTime
 import scala.concurrent.Future
@@ -37,6 +33,7 @@ class GovTalkControllerSpec extends SpecBase {
   ".getGovTalkStatus" - {
 
     val getGovTalkStatusUrl = "/cis/govtalkstatus/get"
+    val responsePath        = "/resources/govTalk/getGovTalkStatus-200-response.json"
 
     def validRequestBody: JsValue =
       Json.toJson(
@@ -65,164 +62,92 @@ class GovTalkControllerSpec extends SpecBase {
         )
       )
 
-    "returns 200 with valid data for contractor enrolment when stage=polling" in new Setup {
-
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(Some(EmployerReference("200", "")))
-      when(mockResourceHelper.resourceAsString(any()))
+    "returns 200 with valid data when stage=polling" in new Setup {
+      when(mockResourceHelper.resourceAsString(responsePath))
         .thenReturn(okResponse.toString)
 
-      val req: FakeRequest[JsValue] =
+      val request: FakeRequest[JsValue] =
         makeJsonRequest(validRequestBody, s"$getGovTalkStatusUrl?stage=polling")
 
-      val res: Future[Result] = controller.getGovTalkStatus()(req)
+      val result: Future[Result] = controller.getGovTalkStatus()(request)
 
-      status(res) mustBe OK
-      contentAsJson(res) mustBe okResponse
+      status(result) mustBe OK
+      contentAsJson(result) mustBe okResponse
+      verify(mockResourceHelper).resourceAsString(responsePath)
     }
 
-    "returns 200 with valid data for agent enrolment when stage=polling" in new Setup {
-
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(None)
-      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
-        .thenReturn(Some("agentRef"))
-      when(mockResourceHelper.resourceAsString(any()))
-        .thenReturn(okResponse.toString)
-
-      val req: FakeRequest[JsValue] =
-        makeJsonRequest(validRequestBody, s"$getGovTalkStatusUrl?stage=polling")
-
-      val res: Future[Result] = controller.getGovTalkStatus()(req)
-
-      status(res) mustBe OK
-      contentAsJson(res) mustBe okResponse
-    }
-
-    "returns 404 for contractor enrolment when stage=initial" in new Setup {
-
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(Some(EmployerReference("200", "")))
-
-      val req: FakeRequest[JsValue] =
+    "returns 404 when stage=initial" in new Setup {
+      val request: FakeRequest[JsValue] =
         makeJsonRequest(validRequestBody, s"$getGovTalkStatusUrl?stage=initial")
 
-      val res: Future[Result] = controller.getGovTalkStatus()(req)
+      val result: Future[Result] = controller.getGovTalkStatus()(request)
 
-      status(res) mustBe NOT_FOUND
+      status(result) mustBe NOT_FOUND
+      verifyNoInteractions(mockResourceHelper)
     }
 
-    "returns 404 for agent enrolment when stage=initial" in new Setup {
-
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(None)
-      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
-        .thenReturn(Some("agentRef"))
-
-      val req: FakeRequest[JsValue] =
-        makeJsonRequest(validRequestBody, s"$getGovTalkStatusUrl?stage=initial")
-
-      val res: Future[Result] = controller.getGovTalkStatus()(req)
-
-      status(res) mustBe NOT_FOUND
-    }
-
-    "returns 404 when stage is missing for contractor enrolment" in new Setup {
-
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(Some(EmployerReference("200", "")))
-
-      val req: FakeRequest[JsValue] =
+    "returns 404 when stage is missing" in new Setup {
+      val request: FakeRequest[JsValue] =
         makeJsonRequest(validRequestBody, getGovTalkStatusUrl)
 
-      val res: Future[Result] = controller.getGovTalkStatus()(req)
+      val result: Future[Result] = controller.getGovTalkStatus()(request)
 
-      status(res) mustBe NOT_FOUND
+      status(result) mustBe NOT_FOUND
+      verifyNoInteractions(mockResourceHelper)
     }
 
-    "returns 404 when stage is missing for agent enrolment" in new Setup {
+    "returns 404 for scenario 404" in new Setup {
+      val request: FakeRequest[JsValue] =
+        makeJsonRequest(
+          validRequestBody,
+          s"$getGovTalkStatusUrl?stage=polling&scenario=404"
+        )
 
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(None)
-      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
-        .thenReturn(Some("agentRef"))
+      val result: Future[Result] = controller.getGovTalkStatus()(request)
 
-      val req: FakeRequest[JsValue] =
-        makeJsonRequest(validRequestBody, getGovTalkStatusUrl)
-
-      val res: Future[Result] = controller.getGovTalkStatus()(req)
-
-      status(res) mustBe NOT_FOUND
-    }
-
-    "returns 404 on valid payload for agentReference = AGT404" in new Setup {
-
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(None)
-      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
-        .thenReturn(Some("AGT404"))
-
-      val req: FakeRequest[JsValue] =
-        makeJsonRequest(validRequestBody, s"$getGovTalkStatusUrl?stage=polling")
-
-      val res: Future[Result] = controller.getGovTalkStatus()(req)
-
-      status(res) mustBe NOT_FOUND
+      status(result) mustBe NOT_FOUND
+      verifyNoInteractions(mockResourceHelper)
     }
 
     "returns 400 BadRequest for invalid JSON" in new Setup {
+      val invalidBody: JsObject = Json.obj("nope" -> "nope")
 
-      val bad: JsObject             = Json.obj("nope" -> "nope")
-      val req: FakeRequest[JsValue] =
-        makeJsonRequest(bad, s"$getGovTalkStatusUrl?stage=polling")
+      val request: FakeRequest[JsValue] =
+        makeJsonRequest(invalidBody, s"$getGovTalkStatusUrl?stage=polling")
 
-      val res: Future[Result] = controller.getGovTalkStatus()(req)
+      val result: Future[Result] = controller.getGovTalkStatus()(request)
 
-      status(res) mustBe BAD_REQUEST
-      (contentAsJson(res) \ "message").as[String] mustBe "Invalid payload"
+      status(result) mustBe BAD_REQUEST
+      (contentAsJson(result) \ "message").as[String] mustBe "Invalid payload"
+      verifyNoInteractions(mockResourceHelper)
     }
 
-    "returns 502 for taxOfficeNumber = 502" in new Setup {
+    "returns 502 for scenario 502" in new Setup {
+      val request: FakeRequest[JsValue] =
+        makeJsonRequest(
+          validRequestBody,
+          s"$getGovTalkStatusUrl?stage=polling&scenario=502"
+        )
 
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(Some(EmployerReference("502", "")))
+      val result: Future[Result] = controller.getGovTalkStatus()(request)
 
-      val req: FakeRequest[JsValue] =
-        makeJsonRequest(validRequestBody, s"$getGovTalkStatusUrl?stage=polling")
-
-      val res: Future[Result] = controller.getGovTalkStatus()(req)
-
-      status(res) mustBe BAD_GATEWAY
-      (contentAsJson(res) \ "message").as[String] must include("formp failed")
+      status(result) mustBe BAD_GATEWAY
+      (contentAsJson(result) \ "message").as[String] must include("formp failed")
+      verifyNoInteractions(mockResourceHelper)
     }
 
-    "returns 500 with generic message for taxOfficeNumber = 500" in new Setup {
+    "returns 500 for scenario 500" in new Setup {
+      val request: FakeRequest[JsValue] =
+        makeJsonRequest(
+          validRequestBody,
+          s"$getGovTalkStatusUrl?stage=polling&scenario=500"
+        )
 
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(Some(EmployerReference("500", "")))
+      val result: Future[Result] = controller.getGovTalkStatus()(request)
 
-      val req: FakeRequest[JsValue] =
-        makeJsonRequest(validRequestBody, s"$getGovTalkStatusUrl?stage=polling")
-
-      val res: Future[Result] = controller.getGovTalkStatus()(req)
-
-      status(res) mustBe INTERNAL_SERVER_ERROR
-      (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
-    }
-
-    "returns 500 for missing contractor and agent enrolment" in new Setup {
-
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(None)
-      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
-        .thenReturn(None)
-
-      val req: FakeRequest[JsValue] =
-        makeJsonRequest(validRequestBody, s"$getGovTalkStatusUrl?stage=polling")
-
-      val res: Future[Result] = controller.getGovTalkStatus()(req)
-
-      status(res) mustBe INTERNAL_SERVER_ERROR
+      status(result) mustBe INTERNAL_SERVER_ERROR
+      (contentAsJson(result) \ "message").as[String] mustBe "Unexpected error"
+      verifyNoInteractions(mockResourceHelper)
     }
   }
 
@@ -239,19 +164,19 @@ class GovTalkControllerSpec extends SpecBase {
         "gatewayURL"     -> "http://example.com"
       )
 
-      val req: FakeRequest[JsValue] = makeJsonRequest(json, updateUrl)
-      val res: Future[Result]       = controller.updateGovTalkStatusCorrelationId(req)
+      val request: FakeRequest[JsValue] = makeJsonRequest(json, updateUrl)
+      val result: Future[Result]        = controller.updateGovTalkStatusCorrelationId(request)
 
-      status(res) mustBe NO_CONTENT
+      status(result) mustBe NO_CONTENT
     }
 
     "returns 400 BadRequest for invalid JSON payload" in new Setup {
-      val bad: JsValue = Json.obj("nope" -> "nope")
+      val invalidBody: JsValue = Json.obj("nope" -> "nope")
 
-      val req: FakeRequest[JsValue] = makeJsonRequest(bad, updateUrl)
-      val res: Future[Result]       = controller.updateGovTalkStatusCorrelationId(req)
+      val request: FakeRequest[JsValue] = makeJsonRequest(invalidBody, updateUrl)
+      val result: Future[Result]        = controller.updateGovTalkStatusCorrelationId(request)
 
-      status(res) mustBe BAD_REQUEST
+      status(result) mustBe BAD_REQUEST
     }
   }
 
@@ -259,84 +184,55 @@ class GovTalkControllerSpec extends SpecBase {
 
     val resetGovTalkStatusUrl = "/cis/govtalkstatus/reset"
 
-    def validResetBody: JsValue = Json.toJson(
-      ResetGovTalkStatusRequest(
-        userIdentifier = "1",
-        formResultID = "12890",
-        oldProtocolStatus = "dataRequest",
-        gatewayURL = "http://localhost:9712/submission/ChRIS/CISR/Filing/sync/CIS300MR"
+    def validResetBody: JsValue =
+      Json.toJson(
+        ResetGovTalkStatusRequest(
+          userIdentifier = "1",
+          formResultID = "12890",
+          oldProtocolStatus = "dataRequest",
+          gatewayURL = "http://localhost:9712/submission/ChRIS/CISR/Filing/sync/CIS300MR"
+        )
       )
-    )
 
-    "returns 204 for contractor enrolment with valid payload" in new Setup {
+    "returns 204 with a valid payload" in new Setup {
+      val request: FakeRequest[JsValue] =
+        makeJsonRequest(validResetBody, resetGovTalkStatusUrl)
 
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(Some(EmployerReference("200", "")))
+      val result: Future[Result] = controller.resetGovTalkStatus()(request)
 
-      val req: FakeRequest[JsValue] = makeJsonRequest(validResetBody, resetGovTalkStatusUrl)
-      val res: Future[Result]       = controller.resetGovTalkStatus()(req)
-
-      status(res) mustBe NO_CONTENT
+      status(result) mustBe NO_CONTENT
     }
 
-    "returns 204 for agent enrolment with valid payload" in new Setup {
+    "returns 500 for scenario 500" in new Setup {
+      val request: FakeRequest[JsValue] =
+        makeJsonRequest(validResetBody, s"$resetGovTalkStatusUrl?scenario=500")
 
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(None)
-      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
-        .thenReturn(Some("agentRef"))
+      val result: Future[Result] = controller.resetGovTalkStatus()(request)
 
-      val req: FakeRequest[JsValue] = makeJsonRequest(validResetBody, resetGovTalkStatusUrl)
-      val res: Future[Result]       = controller.resetGovTalkStatus()(req)
-
-      status(res) mustBe NO_CONTENT
+      status(result) mustBe INTERNAL_SERVER_ERROR
+      (contentAsJson(result) \ "message").as[String] mustBe "Unexpected error"
     }
 
-    "returns 500 for taxOfficeNumber = 500" in new Setup {
+    "returns 502 for scenario 502" in new Setup {
+      val request: FakeRequest[JsValue] =
+        makeJsonRequest(validResetBody, s"$resetGovTalkStatusUrl?scenario=502")
 
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(Some(EmployerReference("500", "")))
+      val result: Future[Result] = controller.resetGovTalkStatus()(request)
 
-      val req: FakeRequest[JsValue] = makeJsonRequest(validResetBody, resetGovTalkStatusUrl)
-      val res: Future[Result]       = controller.resetGovTalkStatus()(req)
-
-      status(res) mustBe INTERNAL_SERVER_ERROR
-      (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
-    }
-
-    "returns 502 for taxOfficeNumber = 502" in new Setup {
-
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(Some(EmployerReference("502", "")))
-
-      val req: FakeRequest[JsValue] = makeJsonRequest(validResetBody, resetGovTalkStatusUrl)
-      val res: Future[Result]       = controller.resetGovTalkStatus()(req)
-
-      status(res) mustBe BAD_GATEWAY
-      (contentAsJson(res) \ "message").as[String] must include("formp failed")
-    }
-
-    "returns 500 for missing contractor and agent enrolment" in new Setup {
-
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(None)
-      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
-        .thenReturn(None)
-
-      val req: FakeRequest[JsValue] = makeJsonRequest(validResetBody, resetGovTalkStatusUrl)
-      val res: Future[Result]       = controller.resetGovTalkStatus()(req)
-
-      status(res) mustBe INTERNAL_SERVER_ERROR
+      status(result) mustBe BAD_GATEWAY
+      (contentAsJson(result) \ "message").as[String] must include("formp failed")
     }
 
     "returns 400 BadRequest for invalid JSON" in new Setup {
+      val invalidBody: JsObject = Json.obj("nope" -> "nope")
 
-      val bad: JsObject             = Json.obj("nope" -> "nope")
-      val req: FakeRequest[JsValue] = makeJsonRequest(bad, resetGovTalkStatusUrl)
-      val res: Future[Result]       = controller.resetGovTalkStatus()(req)
+      val request: FakeRequest[JsValue] =
+        makeJsonRequest(invalidBody, resetGovTalkStatusUrl)
 
-      status(res) mustBe BAD_REQUEST
-      (contentAsJson(res) \ "message").as[String] mustBe "Invalid payload"
+      val result: Future[Result] = controller.resetGovTalkStatus()(request)
+
+      status(result) mustBe BAD_REQUEST
+      (contentAsJson(result) \ "message").as[String] mustBe "Invalid payload"
     }
   }
 
@@ -344,43 +240,35 @@ class GovTalkControllerSpec extends SpecBase {
 
     val updateGovTalkStatusUrl = "/cis/govtalkstatus/update-status"
 
-    "returns 204 on valid payload for an unknown taxOfficeNumber / taxOfficeReference / agent enrollments" in new Setup {
-
-      val response: JsObject =
-        Json.obj(
-          "govtalk_status" -> Json.arr(
-            Json.obj(
-              "userIdentifier" -> "1",
-              "formResultID"   -> "12890",
-              "endStateDate"   -> "2026-02-03T00:00:00",
-              "protocolStatus" -> "dataRequest"
-            )
+    "returns 204 for a valid payload" in new Setup {
+      val json: JsValue =
+        Json.toJson(
+          UpdateGovTalkStatusRequest(
+            userIdentifier = "123",
+            formResultID = "YE2025",
+            endStateDate = Some(LocalDateTime.parse("2026-02-03T00:00:00")),
+            protocolStatus = "dataRequest"
           )
         )
 
-      val json: JsValue = Json.toJson(
-        UpdateGovTalkStatusRequest(
-          userIdentifier = "123",
-          formResultID = "YE2025",
-          endStateDate = Some(LocalDateTime.parse("2026-02-03T00:00:00")),
-          protocolStatus = "dataRequest"
-        )
-      )
+      val request: FakeRequest[JsValue] =
+        makeJsonRequest(json, updateGovTalkStatusUrl)
 
-      val req: FakeRequest[JsValue] = makeJsonRequest(json, updateGovTalkStatusUrl)
-      val res: Future[Result]       = controller.updateGovTalkStatus()(req)
+      val result: Future[Result] = controller.updateGovTalkStatus()(request)
 
-      status(res) mustBe NO_CONTENT
+      status(result) mustBe NO_CONTENT
     }
 
     "returns 400 BadRequest for invalid JSON" in new Setup {
+      val invalidBody: JsObject = Json.obj("nope" -> "nope")
 
-      val bad: JsObject             = Json.obj("nope" -> "nope")
-      val req: FakeRequest[JsValue] = makeJsonRequest(bad, updateGovTalkStatusUrl)
-      val res: Future[Result]       = controller.updateGovTalkStatus()(req)
+      val request: FakeRequest[JsValue] =
+        makeJsonRequest(invalidBody, updateGovTalkStatusUrl)
 
-      status(res) mustBe BAD_REQUEST
-      (contentAsJson(res) \ "message").as[String] mustBe "Invalid payload"
+      val result: Future[Result] = controller.updateGovTalkStatus()(request)
+
+      status(result) mustBe BAD_REQUEST
+      (contentAsJson(result) \ "message").as[String] mustBe "Invalid payload"
     }
   }
 
@@ -388,123 +276,144 @@ class GovTalkControllerSpec extends SpecBase {
 
     val updateGovTalkStatusStatisticsUrl = "/cis/govtalkstatus/update-statistics"
 
-    "returns 204 NoContent on valid payload for an unknown taxOfficeNumber / taxOfficeReference" in new Setup {
-
-      val json: JsValue = Json.toJson(
-        UpdateGovTalkStatusStatisticsRequest(
-          userIdentifier = "123456789",
-          formResultID = "SUB123456",
-          lastMessageDate = java.time.LocalDateTime.parse("2026-02-16T10:30:00"),
-          numPolls = 3,
-          pollInterval = 300,
-          gatewayURL = "http://localhost:9712/submission/ChRIS/CISR/Filing/sync/CIS300MR"
+    "returns 204 NoContent on valid payload" in new Setup {
+      val json: JsValue =
+        Json.toJson(
+          UpdateGovTalkStatusStatisticsRequest(
+            userIdentifier = "123456789",
+            formResultID = "SUB123456",
+            lastMessageDate = LocalDateTime.parse("2026-02-16T10:30:00"),
+            numPolls = 3,
+            pollInterval = 300,
+            gatewayURL = "http://localhost:9712/submission/ChRIS/CISR/Filing/sync/CIS300MR"
+          )
         )
-      )
 
-      val req: FakeRequest[JsValue] = makeJsonRequest(json, updateGovTalkStatusStatisticsUrl)
-      val res: Future[Result]       = controller.updateGovTalkStatusStatistics()(req)
+      val request: FakeRequest[JsValue] =
+        makeJsonRequest(json, updateGovTalkStatusStatisticsUrl)
 
-      status(res) mustBe NO_CONTENT
+      val result: Future[Result] =
+        controller.updateGovTalkStatusStatistics()(request)
+
+      status(result) mustBe NO_CONTENT
     }
 
     "returns 204 NoContent with zero polls" in new Setup {
-
-      val json: JsValue = Json.toJson(
-        UpdateGovTalkStatusStatisticsRequest(
-          userIdentifier = "123456789",
-          formResultID = "SUB123456",
-          lastMessageDate = java.time.LocalDateTime.parse("2026-02-16T10:30:00"),
-          numPolls = 0,
-          pollInterval = 0,
-          gatewayURL = "http://localhost:9712/submission/ChRIS/CISR/Filing/sync/CIS300MR"
+      val json: JsValue =
+        Json.toJson(
+          UpdateGovTalkStatusStatisticsRequest(
+            userIdentifier = "123456789",
+            formResultID = "SUB123456",
+            lastMessageDate = LocalDateTime.parse("2026-02-16T10:30:00"),
+            numPolls = 0,
+            pollInterval = 0,
+            gatewayURL = "http://localhost:9712/submission/ChRIS/CISR/Filing/sync/CIS300MR"
+          )
         )
-      )
 
-      val req: FakeRequest[JsValue] = makeJsonRequest(json, updateGovTalkStatusStatisticsUrl)
-      val res: Future[Result]       = controller.updateGovTalkStatusStatistics()(req)
+      val request: FakeRequest[JsValue] =
+        makeJsonRequest(json, updateGovTalkStatusStatisticsUrl)
 
-      status(res) mustBe NO_CONTENT
+      val result: Future[Result] =
+        controller.updateGovTalkStatusStatistics()(request)
+
+      status(result) mustBe NO_CONTENT
     }
 
     "returns 204 NoContent with high poll numbers" in new Setup {
-
-      val json: JsValue = Json.toJson(
-        UpdateGovTalkStatusStatisticsRequest(
-          userIdentifier = "123456789",
-          formResultID = "SUB123456",
-          lastMessageDate = java.time.LocalDateTime.parse("2026-02-16T10:30:00"),
-          numPolls = 100,
-          pollInterval = 3600,
-          gatewayURL = "http://localhost:9712/submission/ChRIS/CISR/Filing/sync/CIS300MR"
+      val json: JsValue =
+        Json.toJson(
+          UpdateGovTalkStatusStatisticsRequest(
+            userIdentifier = "123456789",
+            formResultID = "SUB123456",
+            lastMessageDate = LocalDateTime.parse("2026-02-16T10:30:00"),
+            numPolls = 100,
+            pollInterval = 3600,
+            gatewayURL = "http://localhost:9712/submission/ChRIS/CISR/Filing/sync/CIS300MR"
+          )
         )
-      )
 
-      val req: FakeRequest[JsValue] = makeJsonRequest(json, updateGovTalkStatusStatisticsUrl)
-      val res: Future[Result]       = controller.updateGovTalkStatusStatistics()(req)
+      val request: FakeRequest[JsValue] =
+        makeJsonRequest(json, updateGovTalkStatusStatisticsUrl)
 
-      status(res) mustBe NO_CONTENT
+      val result: Future[Result] =
+        controller.updateGovTalkStatusStatistics()(request)
+
+      status(result) mustBe NO_CONTENT
     }
 
     "returns 400 BadRequest for invalid JSON" in new Setup {
+      val invalidBody: JsObject = Json.obj("nope" -> "nope")
 
-      val bad: JsObject             = Json.obj("nope" -> "nope")
-      val req: FakeRequest[JsValue] = makeJsonRequest(bad, updateGovTalkStatusStatisticsUrl)
-      val res: Future[Result]       = controller.updateGovTalkStatusStatistics()(req)
+      val request: FakeRequest[JsValue] =
+        makeJsonRequest(invalidBody, updateGovTalkStatusStatisticsUrl)
 
-      status(res) mustBe BAD_REQUEST
-      (contentAsJson(res) \ "message").as[String] mustBe "Invalid payload"
+      val result: Future[Result] =
+        controller.updateGovTalkStatusStatistics()(request)
+
+      status(result) mustBe BAD_REQUEST
+      (contentAsJson(result) \ "message").as[String] mustBe "Invalid payload"
     }
 
     "returns 400 BadRequest for missing userIdentifier" in new Setup {
+      val json: JsObject =
+        Json.obj(
+          "formResultID"    -> "SUB123456",
+          "lastMessageDate" -> "2026-02-16T10:30:00",
+          "numPolls"        -> 3,
+          "pollInterval"    -> 300,
+          "gatewayURL"      -> "http://localhost:9712/submission/ChRIS/CISR/Filing/sync/CIS300MR"
+        )
 
-      val json: JsObject = Json.obj(
-        "formResultID"    -> "SUB123456",
-        "lastMessageDate" -> "2026-02-16T10:30:00",
-        "numPolls"        -> 3,
-        "pollInterval"    -> 300,
-        "gatewayURL"      -> "http://localhost:9712/submission/ChRIS/CISR/Filing/sync/CIS300MR"
-      )
+      val request: FakeRequest[JsValue] =
+        makeJsonRequest(json, updateGovTalkStatusStatisticsUrl)
 
-      val req: FakeRequest[JsValue] = makeJsonRequest(json, updateGovTalkStatusStatisticsUrl)
-      val res: Future[Result]       = controller.updateGovTalkStatusStatistics()(req)
+      val result: Future[Result] =
+        controller.updateGovTalkStatusStatistics()(request)
 
-      status(res) mustBe BAD_REQUEST
-      (contentAsJson(res) \ "message").as[String] mustBe "Invalid payload"
+      status(result) mustBe BAD_REQUEST
+      (contentAsJson(result) \ "message").as[String] mustBe "Invalid payload"
     }
 
     "returns 400 BadRequest for missing formResultID" in new Setup {
+      val json: JsObject =
+        Json.obj(
+          "userIdentifier"  -> "123456789",
+          "lastMessageDate" -> "2026-02-16T10:30:00",
+          "numPolls"        -> 3,
+          "pollInterval"    -> 300,
+          "gatewayURL"      -> "http://localhost:9712/submission/ChRIS/CISR/Filing/sync/CIS300MR"
+        )
 
-      val json: JsObject = Json.obj(
-        "userIdentifier"  -> "123456789",
-        "lastMessageDate" -> "2026-02-16T10:30:00",
-        "numPolls"        -> 3,
-        "pollInterval"    -> 300,
-        "gatewayURL"      -> "http://localhost:9712/submission/ChRIS/CISR/Filing/sync/CIS300MR"
-      )
+      val request: FakeRequest[JsValue] =
+        makeJsonRequest(json, updateGovTalkStatusStatisticsUrl)
 
-      val req: FakeRequest[JsValue] = makeJsonRequest(json, updateGovTalkStatusStatisticsUrl)
-      val res: Future[Result]       = controller.updateGovTalkStatusStatistics()(req)
+      val result: Future[Result] =
+        controller.updateGovTalkStatusStatistics()(request)
 
-      status(res) mustBe BAD_REQUEST
-      (contentAsJson(res) \ "message").as[String] mustBe "Invalid payload"
+      status(result) mustBe BAD_REQUEST
+      (contentAsJson(result) \ "message").as[String] mustBe "Invalid payload"
     }
 
     "returns 400 BadRequest for invalid date format" in new Setup {
+      val json: JsObject =
+        Json.obj(
+          "userIdentifier"  -> "123456789",
+          "formResultID"    -> "SUB123456",
+          "lastMessageDate" -> "invalid-date",
+          "numPolls"        -> 3,
+          "pollInterval"    -> 300,
+          "gatewayURL"      -> "http://localhost:9712/submission/ChRIS/CISR/Filing/sync/CIS300MR"
+        )
 
-      val json: JsObject = Json.obj(
-        "userIdentifier"  -> "123456789",
-        "formResultID"    -> "SUB123456",
-        "lastMessageDate" -> "invalid-date",
-        "numPolls"        -> 3,
-        "pollInterval"    -> 300,
-        "gatewayURL"      -> "http://localhost:9712/submission/ChRIS/CISR/Filing/sync/CIS300MR"
-      )
+      val request: FakeRequest[JsValue] =
+        makeJsonRequest(json, updateGovTalkStatusStatisticsUrl)
 
-      val req: FakeRequest[JsValue] = makeJsonRequest(json, updateGovTalkStatusStatisticsUrl)
-      val res: Future[Result]       = controller.updateGovTalkStatusStatistics()(req)
+      val result: Future[Result] =
+        controller.updateGovTalkStatusStatistics()(request)
 
-      status(res) mustBe BAD_REQUEST
-      (contentAsJson(res) \ "message").as[String] mustBe "Invalid payload"
+      status(result) mustBe BAD_REQUEST
+      (contentAsJson(result) \ "message").as[String] mustBe "Invalid payload"
     }
   }
 
@@ -512,42 +421,53 @@ class GovTalkControllerSpec extends SpecBase {
 
     val createGovTalkStatusUrl = "/cis/govtalkstatus/create"
 
-    "returns 201 on valid payload for an unknown taxOfficeNumber / taxOfficeReference / agent" in new Setup {
-
-      val json: JsValue = Json.toJson(
-        CreateGovTalkStatusRecordRequest(
-          userIdentifier = "1",
-          formResultID = "12890",
-          correlationID = "C742D5DEE7EB4D15B4F7EFD50B890525",
-          gatewayURL = "http://localhost:9712/submission/ChRIS/CISR/Filing/sync/CIS300MR"
+    "returns 201 for a valid payload" in new Setup {
+      val json: JsValue =
+        Json.toJson(
+          CreateGovTalkStatusRecordRequest(
+            userIdentifier = "1",
+            formResultID = "12890",
+            correlationID = "C742D5DEE7EB4D15B4F7EFD50B890525",
+            gatewayURL = "http://localhost:9712/submission/ChRIS/CISR/Filing/sync/CIS300MR"
+          )
         )
-      )
 
-      val req: FakeRequest[JsValue] = makeJsonRequest(json, createGovTalkStatusUrl)
-      val res: Future[Result]       = controller.createGovTalkStatusRecord()(req)
+      val request: FakeRequest[JsValue] =
+        makeJsonRequest(json, createGovTalkStatusUrl)
 
-      status(res) mustBe CREATED
+      val result: Future[Result] =
+        controller.createGovTalkStatusRecord()(request)
+
+      status(result) mustBe CREATED
     }
 
     "returns 400 BadRequest for invalid JSON" in new Setup {
+      val invalidBody: JsObject = Json.obj("nope" -> "nope")
 
-      val bad: JsObject             = Json.obj("nope" -> "nope")
-      val req: FakeRequest[JsValue] = makeJsonRequest(bad, createGovTalkStatusUrl)
-      val res: Future[Result]       = controller.createGovTalkStatusRecord()(req)
+      val request: FakeRequest[JsValue] =
+        makeJsonRequest(invalidBody, createGovTalkStatusUrl)
 
-      status(res) mustBe BAD_REQUEST
-      (contentAsJson(res) \ "message").as[String] mustBe "Invalid payload"
+      val result: Future[Result] =
+        controller.createGovTalkStatusRecord()(request)
+
+      status(result) mustBe BAD_REQUEST
+      (contentAsJson(result) \ "message").as[String] mustBe "Invalid payload"
     }
   }
 
   private trait Setup {
-    val mockResourceHelper: ResourceHelper     = mock[ResourceHelper]
-    val mockEnrolmentsHelper: EnrolmentsHelper = mock[EnrolmentsHelper]
+    val mockResourceHelper: ResourceHelper = mock[ResourceHelper]
 
-    private val auth: FakeAuthAction = new FakeAuthAction(cc.parsers)
-    lazy val controller              = new GovTalkController(auth, mockResourceHelper, mockEnrolmentsHelper, cc)
+    lazy val controller =
+      new GovTalkController(
+        resourceHelper = mockResourceHelper,
+        cc = cc
+      )
 
-    def makeJsonRequest(body: JsValue, url: String): FakeRequest[JsValue] =
+    def makeJsonRequest(
+      body: JsValue,
+      url: String
+    ): FakeRequest[JsValue] =
       FakeRequest(POST, url)
         .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
         .withBody(body)

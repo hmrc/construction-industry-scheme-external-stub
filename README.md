@@ -867,6 +867,13 @@ To trigger the happy path, ensure you provide a valid request body similar to ex
 }
 ```
 
+#### Stub Response Variance
+
+The stub varies the response based on `taxMonth` to support different amendment journey scenarios:
+
+- For `taxMonth` = `3`, the stub returns a response with an empty `submission` array (`getMonthlyReturnForEdit-nosubmission-200-response.json`), simulating a new amendment with no prior submission (no resubmission ID).
+- For all other `taxMonth` values, the stub returns the standard response (`getMonthlyReturnForEdit-200-response.json`) which includes a prior `submissionId`, simulating a resubmission scenario.
+
 **Endpoint**: `POST /cis/monthly-return/standard/create`
 
 **Description**: Creates a standard monthly return record in the monthly return table.

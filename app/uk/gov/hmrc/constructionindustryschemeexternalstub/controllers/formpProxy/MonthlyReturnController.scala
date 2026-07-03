@@ -54,6 +54,8 @@ class MonthlyReturnController @Inject() (
     "/resources/getMonthlyReturnForEdit-200-response.json"
   private val getMonthlyReturnForEdit_nosubmission_200_ResponsePath =
     "/resources/getMonthlyReturnForEdit-nosubmission-200-response.json"
+  private val getMonthlyReturnForEdit_nil_200_ResponsePath          =
+    "/resources/getMonthlyReturnForEdit-nil-200-response.json"
   private val getMonthlyReturnComplete_200_ResponsePath             =
     "/resources/getMonthlyReturnComplete-200-response.json"
   private val getMonthlyReturnComplete_nil_200_ResponsePath         =
@@ -187,6 +189,7 @@ class MonthlyReturnController @Inject() (
         .foldErrorsIntoBadRequest { req =>
           val fixturePath =
             if (req.taxMonth == 3) getMonthlyReturnForEdit_nosubmission_200_ResponsePath
+            else if (req.taxMonth == 4) getMonthlyReturnForEdit_nil_200_ResponsePath
             else getMonthlyReturnForEdit_200_ResponsePath
           Future.successful(Ok(resourceHelper.resourceAsString(fixturePath)))
         }

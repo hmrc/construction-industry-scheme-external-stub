@@ -288,16 +288,16 @@ class SubcontractorControllerSpec extends SpecBase {
       )
     }
 
-    "returns canBeDeleted = false for resource ref 999" in new Setup {
+    "returns canBeDeleted = false for resource ref 27L" in new Setup {
 
       val req =
         FakeRequest(
           GET,
-          s"/cis/subcontractor/$deleteStatusCisId/999/delete-status"
+          s"/cis/subcontractor/$deleteStatusCisId/27L/delete-status"
         )
 
       val res =
-        controller.getSubcontractorForDelete(deleteStatusCisId, 999L)(req)
+        controller.getSubcontractorForDelete(deleteStatusCisId, 27L)(req)
 
       status(res) mustBe OK
 

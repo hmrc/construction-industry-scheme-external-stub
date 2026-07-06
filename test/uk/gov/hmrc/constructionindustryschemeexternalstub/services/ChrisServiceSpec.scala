@@ -234,12 +234,9 @@ class ChrisServiceSpec extends AnyWordSpec with Matchers with OneInstancePerTest
       pollingUrl mustBe ""
     }
 
-    "responseCISMessage should throw for request with unknown message class" in {
-      val exception = intercept[RuntimeException] {
-        testInstance.responseCISMessage(submitUnknownCISMessage)
-      }
-
-      exception.getMessage mustBe "Unknown regime: UNKNOWN Message"
+    "responseCISMessage should return an empty response for request with unknown message class" in {
+      val response = testInstance.responseCISMessage(submitUnknownCISMessage)
+      response mustBe empty
     }
 
     "ChrisService.initialCisStatus" should {
@@ -258,6 +255,32 @@ class ChrisServiceSpec extends AnyWordSpec with Matchers with OneInstancePerTest
         val Array(taxOfficeNumber, taxOfficeRef) = ackKey.split("/")
 
         val result = testInstance.initialCisStatus("IR-CIS-CIS300MR", taxOfficeNumber, taxOfficeRef)
+
+        result mustBe ACKNOWLEDGE
+      }
+
+      "return FATAL_ERROR for IR-CIS-VERIFY when tax office / reference is in verifyFatalErrorFilter" in {
+        val fatalKey =
+          appConfig.verifyFatalErrorFilter.headOption.getOrElse(
+            fail("Expected verifyFatalErrorFilter to contain at least one configured test key")
+          )
+
+        val Array(taxOfficeNumber, taxOfficeReference) = fatalKey.split("/", 2)
+
+        val result = testInstance.initialCisStatus("IR-CIS-VERIFY", taxOfficeNumber, taxOfficeReference)
+
+        result mustBe FATAL_ERROR
+      }
+
+      "return ACKNOWLEDGE for IR-CIS-VERIFY when tax office / reference is not in verifyFatalErrorFilter" in {
+        val nonFatalKey =
+          Iterator("999/NOTINVERIFY", "000/NOTINVERIFY")
+            .find(key => !appConfig.verifyFatalErrorFilter.contains(key))
+            .getOrElse(fail("Could not find a key outside verifyFatalErrorFilter"))
+
+        val Array(taxOfficeNumber, taxOfficeReference) = nonFatalKey.split("/", 2)
+
+        val result = testInstance.initialCisStatus("IR-CIS-VERIFY", taxOfficeNumber, taxOfficeReference)
 
         result mustBe ACKNOWLEDGE
       }

@@ -50,12 +50,11 @@ class ChrisService @Inject() (config: AppConfig) {
     val acknowledge = config.acknowledgeFilter.contains(taxOfficeNumber + "/" + taxOfficeReference)
     val fatalError  = config.fatalErrorFilter.contains(taxOfficeNumber + "/" + taxOfficeReference)
 
-    val pollTerminalStatus = config.pollingStatus(messageClass, taxOfficeNumber)
-
     val responseType: ChRISResponseType =
       calculateResponseType(acknowledge = acknowledge, fatalError = fatalError)
 
     if (messageClass == "IR-CIS-CIS300MR") {
+      val pollTerminalStatus = config.pollingStatus(messageClass, taxOfficeNumber)
       Some(sendCISMonthlyReturnMessage(message, messageClass, responseType, pollTerminalStatus))
     } else {
       None

@@ -80,7 +80,7 @@ class SubcontractorController @Inject() (
   ): Action[AnyContent] =
     authorise { implicit request =>
 
-      val canDelete = subbieResourceRef != 999L
+      val canDelete = subbieResourceRef != 27L
 
       Ok(
         Json.toJson(

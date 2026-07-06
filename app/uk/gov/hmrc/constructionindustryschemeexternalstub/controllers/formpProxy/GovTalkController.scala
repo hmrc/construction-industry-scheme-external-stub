@@ -19,61 +19,69 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProx
 import play.api.Logging
 import play.api.libs.json.{JsError, JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents, Result}
-import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.*
-import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
-import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.JsResultUtils.foldErrorsIntoBadRequest
+import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.ResourceHelper
+import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.Inject
 import scala.concurrent.Future
 
 class GovTalkController @Inject() (
-  authorise: AuthAction,
   resourceHelper: ResourceHelper,
-  enrolmentHelper: EnrolmentsHelper,
   cc: ControllerComponents
-)() extends BackendController(cc)
+) extends BackendController(cc)
     with Logging {
 
-  private val govTalkReturnResponsePath         = "/resources/govTalk"
-  private val getGovTalkStatus_200_ResponsePath = s"$govTalkReturnResponsePath/getGovTalkStatus-200-response.json"
+  private val govTalkReturnResponsePath = "/resources/govTalk"
+
+  private val getGovTalkStatus200ResponsePath =
+    s"$govTalkReturnResponsePath/getGovTalkStatus-200-response.json"
 
   def getGovTalkStatus: Action[JsValue] =
-    authorise(parse.json) { implicit request =>
-      val stage = request.getQueryString("stage")
+    Action(parse.json) { request =>
+      val stage    = request.getQueryString("stage")
+      val scenario = request.getQueryString("scenario")
 
       request.body
         .validate[GetGovTalkStatusRequest]
         .fold(
-          errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
-          body =>
-            enrolmentHelper.contractorEnrolmentsOpt(request) match {
-              case Some(enrolmentReference) =>
-                (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {
-                  case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
-                  case ("502", _) => BadGateway(Json.obj("message" -> "formp failed"))
-                  case _          => govTalkStatusResult(stage)
-                }
-              case None                     =>
-                enrolmentHelper.agentEnrolmentsOpt(request) match {
-                  case Some("AGT404") => NotFound
-                  case Some(_)        => govTalkStatusResult(stage)
-                  case None           => InternalServerError
-                }
-            }
+          errors =>
+            BadRequest(
+              Json.obj(
+                "message" -> "Invalid payload",
+                "errors"  -> JsError.toJson(errors)
+              )
+            ),
+          _ => scenarioResult(scenario, govTalkStatusResult(stage))
         )
     }
 
   private def govTalkStatusResult(stage: Option[String]): Result =
     stage match {
       case Some("initial") => NotFound
-      case Some("polling") => Ok(resourceHelper.resourceAsString(getGovTalkStatus_200_ResponsePath))
+      case Some("polling") =>
+        Ok(Json.parse(resourceHelper.resourceAsString(getGovTalkStatus200ResponsePath)))
       case _               => NotFound
     }
 
+  private def scenarioResult(
+    scenario: Option[String],
+    defaultResult: => Result
+  ): Result =
+    scenario match {
+      case Some("500") =>
+        InternalServerError(Json.obj("message" -> "Unexpected error"))
+      case Some("502") =>
+        BadGateway(Json.obj("message" -> "formp failed"))
+      case Some("404") =>
+        NotFound
+      case _           =>
+        defaultResult
+    }
+
   def updateGovTalkStatusCorrelationId: Action[JsValue] =
-    authorise(parse.json).async { implicit request =>
+    Action.async(parse.json) { request =>
       request.body
         .validate[UpdateGovTalkStatusCorrelationIdRequest]
         .foldErrorsIntoBadRequest { _ =>
@@ -82,55 +90,68 @@ class GovTalkController @Inject() (
     }
 
   def resetGovTalkStatus: Action[JsValue] =
-    authorise(parse.json) { implicit request =>
+    Action(parse.json) { request =>
+      val scenario = request.getQueryString("scenario")
+
       request.body
         .validate[ResetGovTalkStatusRequest]
         .fold(
-          errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
-          _ =>
-            enrolmentHelper.contractorEnrolmentsOpt(request) match {
-              case Some(enrolmentReference) =>
-                (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {
-                  case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
-                  case ("502", _) => BadGateway(Json.obj("message" -> "formp failed"))
-                  case _          => NoContent
-                }
-              case None                     =>
-                enrolmentHelper.agentEnrolmentsOpt(request) match {
-                  case Some(_) => NoContent
-                  case None    => InternalServerError
-                }
-            }
+          errors =>
+            BadRequest(
+              Json.obj(
+                "message" -> "Invalid payload",
+                "errors"  -> JsError.toJson(errors)
+              )
+            ),
+          _ => scenarioResult(scenario, NoContent)
         )
     }
 
   def updateGovTalkStatus: Action[JsValue] =
-    authorise(parse.json) { implicit request =>
+    Action(parse.json) { request =>
       request.body
         .validate[UpdateGovTalkStatusRequest]
         .fold(
-          errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
-          body => NoContent
+          errors =>
+            BadRequest(
+              Json.obj(
+                "message" -> "Invalid payload",
+                "errors"  -> JsError.toJson(errors)
+              )
+            ),
+          _ => NoContent
         )
     }
 
   def updateGovTalkStatusStatistics(): Action[JsValue] =
-    authorise(parse.json) { implicit request =>
+    Action(parse.json) { request =>
       request.body
         .validate[UpdateGovTalkStatusStatisticsRequest]
         .fold(
-          errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
-          body => NoContent
+          errors =>
+            BadRequest(
+              Json.obj(
+                "message" -> "Invalid payload",
+                "errors"  -> JsError.toJson(errors)
+              )
+            ),
+          _ => NoContent
         )
     }
 
   def createGovTalkStatusRecord: Action[JsValue] =
-    authorise(parse.json) { implicit request =>
+    Action(parse.json) { request =>
       request.body
         .validate[CreateGovTalkStatusRecordRequest]
         .fold(
-          errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
-          body => Created
+          errors =>
+            BadRequest(
+              Json.obj(
+                "message" -> "Invalid payload",
+                "errors"  -> JsError.toJson(errors)
+              )
+            ),
+          _ => Created
         )
     }
 }

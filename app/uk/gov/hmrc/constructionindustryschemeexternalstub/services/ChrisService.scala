@@ -50,12 +50,11 @@ class ChrisService @Inject() (config: AppConfig) {
     val acknowledge = config.acknowledgeFilter.contains(taxOfficeNumber + "/" + taxOfficeReference)
     val fatalError  = config.fatalErrorFilter.contains(taxOfficeNumber + "/" + taxOfficeReference)
 
-    val pollTerminalStatus = config.pollingStatus(taxOfficeNumber)
-
     val responseType: ChRISResponseType =
       calculateResponseType(acknowledge = acknowledge, fatalError = fatalError)
 
     if (messageClass == "IR-CIS-CIS300MR") {
+      val pollTerminalStatus = config.pollingStatus(messageClass, taxOfficeNumber)
       Some(sendCISMonthlyReturnMessage(message, messageClass, responseType, pollTerminalStatus))
     } else {
       None
@@ -164,18 +163,24 @@ class ChrisService @Inject() (config: AppConfig) {
     else if (businessError) BUSINESS_ERROR
     else SUCCESS
 
-  def initialCisStatus(taxOfficeNumber: String, taxOfficeReference: String): ChRISResponseType = {
+  def initialCisStatus(regime: String, taxOfficeNumber: String, taxOfficeReference: String): ChRISResponseType = {
     val key = s"$taxOfficeNumber/$taxOfficeReference"
 
-    if (config.fatalErrorFilter.contains(key)) FATAL_ERROR
+    val fatalErrorFilter = regime match {
+      case "IR-CIS-VERIFY"   => config.verifyFatalErrorFilter
+      case "IR-CIS-CIS300MR" => config.fatalErrorFilter
+      case _                 => throw new RuntimeException(s"Unknown regime: $regime")
+    }
+
+    if (fatalErrorFilter.contains(key)) FATAL_ERROR
     else ACKNOWLEDGE
   }
 
-  def terminalStatusFor(taxOfficeNumber: String): String =
-    config.pollingStatus(taxOfficeNumber)
+  def terminalStatusFor(regime: String, taxOfficeNumber: String): String =
+    config.pollingStatus(regime, taxOfficeNumber)
 
-  def isForeverPending(taxOfficeNumber: String): Boolean =
-    terminalStatusFor(taxOfficeNumber) == "ACKNOWLEDGE"
+  def isForeverPending(regime: String, taxOfficeNumber: String): Boolean =
+    terminalStatusFor(regime, taxOfficeNumber) == "ACKNOWLEDGE"
 }
 
 object CorrelationIDGenerator {

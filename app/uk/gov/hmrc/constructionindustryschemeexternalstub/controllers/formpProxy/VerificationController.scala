@@ -23,7 +23,7 @@ import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.Authen
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateSubmissionAndUpdateVerificationsRequest, CreateVerificationBatchAndVerificationsRequest, ModifyVerificationsRequest, ProcessVerificationResponseFromChrisRequest, UpdateVerificationSubmissionRequest}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{CreateVerifications, DeleteVerifications}
 
 import javax.inject.Inject
@@ -43,6 +43,8 @@ class VerificationController @Inject() (
     s"$verificationResponsePath/getCurrentVerificationBatch-200-verificationBatchStatus-none-response.json"
   private val getCurrentVerificationBatch_200_verificationBatchStatus_started_ResponsePath =
     s"$verificationResponsePath/getCurrentVerificationBatch-200-verificationBatchStatus-started-response.json"
+  private val getCurrentVerificationBatch_200_verificationBatchStatus_chris_ResponsePath   =
+    s"$verificationResponsePath/getCurrentVerificationBatch-200-verificationBatchStatus-chris-response.json"
   private val createVerificationBatchAndVerifications_201_ResponsePath                     =
     s"$verificationResponsePath/createVerificationBatchAndVerifications-201-response.json"
   private val createSubmissionForVerification_201_ResponsePath                             =
@@ -72,22 +74,16 @@ class VerificationController @Inject() (
 
   def getCurrentVerificationBatch(instanceId: String): Action[AnyContent] =
     authorise { implicit request =>
-      withEnrolmentDispatch(
-        if (instanceId == "1")
-          Ok(
-            Json.parse(
-              resourceHelper.resourceAsString(
-                getCurrentVerificationBatch_200_verificationBatchStatus_started_ResponsePath
-              )
-            )
-          )
-        else
-          Ok(
-            Json.parse(
-              resourceHelper.resourceAsString(getCurrentVerificationBatch_200_verificationBatchStatus_none_ResponsePath)
-            )
-          )
-      )
+      withEnrolmentDispatch {
+        val responsePath =
+          instanceId match {
+            case "1"   => getCurrentVerificationBatch_200_verificationBatchStatus_started_ResponsePath
+            case "800" => getCurrentVerificationBatch_200_verificationBatchStatus_chris_ResponsePath
+            case _     => getCurrentVerificationBatch_200_verificationBatchStatus_none_ResponsePath
+          }
+
+        Ok(Json.parse(resourceHelper.resourceAsString(responsePath)))
+      }
     }
 
   def createVerificationBatchAndVerifications(): Action[JsValue] =

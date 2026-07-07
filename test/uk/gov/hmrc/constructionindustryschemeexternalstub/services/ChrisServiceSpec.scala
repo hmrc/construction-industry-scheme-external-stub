@@ -245,7 +245,7 @@ class ChrisServiceSpec extends AnyWordSpec with Matchers with OneInstancePerTest
         val fatalKey                             = appConfig.fatalErrorFilter.headOption.getOrElse("754/EZ00125")
         val Array(taxOfficeNumber, taxOfficeRef) = fatalKey.split("/")
 
-        val result = testInstance.initialCisStatus(taxOfficeNumber, taxOfficeRef)
+        val result = testInstance.initialCisStatus("IR-CIS-CIS300MR", taxOfficeNumber, taxOfficeRef)
 
         result mustBe FATAL_ERROR
       }
@@ -254,7 +254,33 @@ class ChrisServiceSpec extends AnyWordSpec with Matchers with OneInstancePerTest
         val ackKey                               = appConfig.acknowledgeFilter.headOption.getOrElse("754/EZ00100")
         val Array(taxOfficeNumber, taxOfficeRef) = ackKey.split("/")
 
-        val result = testInstance.initialCisStatus(taxOfficeNumber, taxOfficeRef)
+        val result = testInstance.initialCisStatus("IR-CIS-CIS300MR", taxOfficeNumber, taxOfficeRef)
+
+        result mustBe ACKNOWLEDGE
+      }
+
+      "return FATAL_ERROR for IR-CIS-VERIFY when tax office / reference is in verifyFatalErrorFilter" in {
+        val fatalKey =
+          appConfig.verifyFatalErrorFilter.headOption.getOrElse(
+            fail("Expected verifyFatalErrorFilter to contain at least one configured test key")
+          )
+
+        val Array(taxOfficeNumber, taxOfficeReference) = fatalKey.split("/", 2)
+
+        val result = testInstance.initialCisStatus("IR-CIS-VERIFY", taxOfficeNumber, taxOfficeReference)
+
+        result mustBe FATAL_ERROR
+      }
+
+      "return ACKNOWLEDGE for IR-CIS-VERIFY when tax office / reference is not in verifyFatalErrorFilter" in {
+        val nonFatalKey =
+          Iterator("999/NOTINVERIFY", "000/NOTINVERIFY")
+            .find(key => !appConfig.verifyFatalErrorFilter.contains(key))
+            .getOrElse(fail("Could not find a key outside verifyFatalErrorFilter"))
+
+        val Array(taxOfficeNumber, taxOfficeReference) = nonFatalKey.split("/", 2)
+
+        val result = testInstance.initialCisStatus("IR-CIS-VERIFY", taxOfficeNumber, taxOfficeReference)
 
         result mustBe ACKNOWLEDGE
       }
@@ -264,16 +290,16 @@ class ChrisServiceSpec extends AnyWordSpec with Matchers with OneInstancePerTest
 
       "return configured terminal status for a known tax office number" in {
         val taxOfficeNumber = "754"
-        val expected        = appConfig.pollingStatus(taxOfficeNumber)
+        val expected        = appConfig.pollingStatus("IR-CIS-CIS300MR", taxOfficeNumber)
 
-        testInstance.terminalStatusFor(taxOfficeNumber) mustBe expected
+        testInstance.terminalStatusFor("IR-CIS-CIS300MR", taxOfficeNumber) mustBe expected
       }
 
       "return SUBMITTED when tax office number is not configured" in {
         val unknownTaxOfficeNumber = "99999"
 
-        appConfig.pollingStatus(unknownTaxOfficeNumber) mustBe "SUBMITTED"
-        testInstance.terminalStatusFor(unknownTaxOfficeNumber) mustBe "SUBMITTED"
+        appConfig.pollingStatus("IR-CIS-CIS300MR", unknownTaxOfficeNumber) mustBe "SUBMITTED"
+        testInstance.terminalStatusFor("IR-CIS-CIS300MR", unknownTaxOfficeNumber) mustBe "SUBMITTED"
       }
     }
 
@@ -281,13 +307,13 @@ class ChrisServiceSpec extends AnyWordSpec with Matchers with OneInstancePerTest
 
       "return true when polling status is ACKNOWLEDGE" in {
         val taxOfficeNumber = "758"
-        testInstance.terminalStatusFor(taxOfficeNumber) mustBe "ACKNOWLEDGE"
-        testInstance.isForeverPending(taxOfficeNumber) mustBe true
+        testInstance.terminalStatusFor("IR-CIS-CIS300MR", taxOfficeNumber) mustBe "ACKNOWLEDGE"
+        testInstance.isForeverPending("IR-CIS-CIS300MR", taxOfficeNumber) mustBe true
       }
 
       "return false when polling status is not ACKNOWLEDGE" in {
         val taxOfficeNumber = "754"
-        testInstance.isForeverPending(taxOfficeNumber) mustBe false
+        testInstance.isForeverPending("IR-CIS-CIS300MR", taxOfficeNumber) mustBe false
       }
     }
   }

@@ -174,11 +174,11 @@ class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
           <Body/>
         </GovTalkMessage>
 
-      when(service.initialCisStatus(eqTo("123"), eqTo("AB00001")))
+      when(service.initialCisStatus(eqTo("IR-CIS-VERIFY"), eqTo("123"), eqTo("AB00001")))
         .thenReturn(ACKNOWLEDGE)
-      when(service.isForeverPending(eqTo("123")))
+      when(service.isForeverPending(eqTo("IR-CIS-VERIFY"), eqTo("123")))
         .thenReturn(false)
-      when(service.terminalStatusFor(eqTo("123")))
+      when(service.terminalStatusFor(eqTo("IR-CIS-VERIFY"), eqTo("123")))
         .thenReturn("SUBMITTED")
 
       when(mockResourceHelper.resourceAsString(any()))
@@ -266,7 +266,7 @@ class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
           <Body/>
         </GovTalkMessage>
 
-      when(service.initialCisStatus(eqTo("754"), eqTo("EZ00125")))
+      when(service.initialCisStatus(eqTo("IR-CIS-CIS300MR"), eqTo("754"), eqTo("EZ00125")))
         .thenReturn(FATAL_ERROR)
 
       when(mockResourceHelper.resourceAsString(any()))
@@ -378,11 +378,11 @@ class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
         </GovTalkMessage>
 
       reset(service, mockResourceHelper)
-      when(service.initialCisStatus(eqTo("123"), eqTo("AB00001")))
+      when(service.initialCisStatus(eqTo("IR-CIS-CIS300MR"), eqTo("123"), eqTo("AB00001")))
         .thenReturn(ACKNOWLEDGE)
-      when(service.isForeverPending(eqTo("123")))
+      when(service.isForeverPending(eqTo("IR-CIS-CIS300MR"), eqTo("123")))
         .thenReturn(false)
-      when(service.terminalStatusFor(eqTo("123")))
+      when(service.terminalStatusFor(eqTo("IR-CIS-CIS300MR"), eqTo("123")))
         .thenReturn("SUBMITTED")
       when(mockResourceHelper.resourceAsString(any()))
         .thenReturn("[correlationId]-[pollUrl]-[gatewayTimestamp]")
@@ -532,11 +532,11 @@ class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
 
       reset(service, mockResourceHelper)
 
-      when(service.initialCisStatus(eqTo("123"), eqTo("AB00001")))
+      when(service.initialCisStatus(eqTo("IR-CIS-VERIFY"), eqTo("123"), eqTo("AB00001")))
         .thenReturn(ACKNOWLEDGE)
-      when(service.isForeverPending(eqTo("123")))
+      when(service.isForeverPending(eqTo("IR-CIS-VERIFY"), eqTo("123")))
         .thenReturn(false)
-      when(service.terminalStatusFor(eqTo("123")))
+      when(service.terminalStatusFor(eqTo("IR-CIS-VERIFY"), eqTo("123")))
         .thenReturn("SUBMITTED")
       when(mockResourceHelper.resourceAsString(any()))
         .thenReturn("[correlationId]-[pollUrl]-[gatewayTimestamp]")

@@ -202,7 +202,7 @@ class ChrisController @Inject() (
       logger.info(s"[ChrisStub] Simulating $statusCode for taxOfficeNumber=$taxOfficeNumber corrId=$correlationId")
       Status(statusCode)("<error>Simulated ChRIS server error</error>").as("application/xml")
     } else {
-      service.initialCisStatus(taxOfficeNumber, taxOfficeReference) match {
+      service.initialCisStatus(regime, taxOfficeNumber, taxOfficeReference) match {
         case FATAL_ERROR =>
           Ok(
             replaceCorrelationId(
@@ -216,10 +216,10 @@ class ChrisController @Inject() (
           val basePollUrl = config.pollUrl(regime)
 
           val pollUrlWith0 =
-            if (service.isForeverPending(taxOfficeNumber)) {
+            if (service.isForeverPending(regime, taxOfficeNumber)) {
               s"$basePollUrl/0"
             } else {
-              val finalStatus = service.terminalStatusFor(taxOfficeNumber)
+              val finalStatus = service.terminalStatusFor(regime, taxOfficeNumber)
               s"$basePollUrl/0?final=$finalStatus"
             }
 

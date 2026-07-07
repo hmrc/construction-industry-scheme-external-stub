@@ -2470,7 +2470,6 @@ To trigger the happy path, ensure you provide a valid request body:
 ```json
 {
   "instanceId": "abc-123",
-  "verificationBatchId": 99,
   "verificationBatchResourceRef": 7,
   "submittableStatus": "ACCEPTED"
 }

@@ -21,7 +21,7 @@ import org.mockito.Mockito.*
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers.{should, shouldBe}
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -52,6 +52,42 @@ class CisTaxpayerControllerSpec extends SpecBase with MockitoSugar {
         status(res) mustBe OK
 //        contentType(res) mustBe Some(JSON)
         contentAsJson(res) mustBe Json.toJson(taxpayer)
+      }
+
+      "must return Ok response with uniqueId 800 when taxOfficeReference is EZ10800" in new Setup {
+
+        val baseTaxpayer: CisTaxpayer = mkTaxpayer(ton = "200", tor = "EZ10800")
+
+        when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+          .thenReturn(Some(EmployerReference("200", "EZ10800")))
+
+        when(mockResourceHelper.resourceAsString(any()))
+          .thenReturn(Json.toJson(baseTaxpayer).toString)
+
+        val req: FakeRequest[JsValue] =
+          requestWithEmployeeReferenceJsonPayload("200", "EZ10800")
+
+        val res: Future[Result] =
+          controller.getCisTaxpayerByTaxReference(req)
+
+        status(res) mustBe OK
+
+        val expectedJson: JsObject = Json
+          .toJson(baseTaxpayer)
+          .as[JsObject]
+          .deepMerge(
+            Json.obj(
+              "uniqueId"        -> "800",
+              "taxOfficeNumber" -> "200",
+              "taxOfficeRef"    -> "EZ10800"
+            )
+          )
+
+        contentAsJson(res) mustBe expectedJson
+
+        (contentAsJson(res) \ "uniqueId").as[String] mustBe "800"
+        (contentAsJson(res) \ "taxOfficeNumber").as[String] mustBe "200"
+        (contentAsJson(res) \ "taxOfficeRef").as[String] mustBe "EZ10800"
       }
 
       "return 404 with NOT FOUND message for taxOfficeNumber 404" in new Setup {

@@ -270,7 +270,7 @@ class SubcontractorControllerSpec extends SpecBase {
 
     val deleteStatusCisId = "cis-123"
 
-    "returns canBeDeleted = true for normal subcontractor references" in new Setup {
+    "returns subcontractor details with canBeDeleted = true for normal subcontractor references" in new Setup {
 
       val req =
         FakeRequest(
@@ -284,16 +284,17 @@ class SubcontractorControllerSpec extends SpecBase {
       status(res) mustBe OK
 
       contentAsJson(res) mustBe Json.obj(
+        "subcontractorName"         -> "Test Subcontractor",
         "subcontractorCanBeDeleted" -> true
       )
     }
 
-    "returns canBeDeleted = false for resource ref 27L" in new Setup {
+    "returns subcontractor details with canBeDeleted = false for resource ref 27" in new Setup {
 
       val req =
         FakeRequest(
           GET,
-          s"/cis/subcontractor/$deleteStatusCisId/27L/delete-status"
+          s"/cis/subcontractor/$deleteStatusCisId/27/delete-status"
         )
 
       val res =
@@ -302,6 +303,7 @@ class SubcontractorControllerSpec extends SpecBase {
       status(res) mustBe OK
 
       contentAsJson(res) mustBe Json.obj(
+        "subcontractorName"         -> "Gamma Builders",
         "subcontractorCanBeDeleted" -> false
       )
     }
@@ -312,7 +314,7 @@ class SubcontractorControllerSpec extends SpecBase {
     val mockEnrolmentsHelper: EnrolmentsHelper = mock[EnrolmentsHelper]
 
     val auth: FakeAuthAction = new FakeAuthAction(cc.parsers)
-    lazy val controller      = new SubcontractorController(auth, mockResourceHelper, mockEnrolmentsHelper, cc)
+    lazy val controller      = new SubcontractorController(auth, mockResourceHelper, mockEnrolmentsHelper, cc)()
 
     def makeJsonRequest(body: JsValue, url: String): FakeRequest[JsValue] =
       FakeRequest(POST, url)

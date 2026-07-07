@@ -80,11 +80,20 @@ class SubcontractorController @Inject() (
   ): Action[AnyContent] =
     authorise { implicit request =>
 
-      val canDelete = subbieResourceRef != 27L
+      val canDelete =
+        subbieResourceRef != 27L
+
+      val subcontractorName =
+        if (subbieResourceRef == 27L) {
+          "Gamma Builders"
+        } else {
+          "Test Subcontractor"
+        }
 
       Ok(
         Json.toJson(
           GetSubcontractorForDeleteResponse(
+            subcontractorName = subcontractorName,
             subcontractorCanBeDeleted = canDelete
           )
         )

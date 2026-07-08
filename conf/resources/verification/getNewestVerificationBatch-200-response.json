@@ -67,11 +67,11 @@
       "nino": "AA123456A"
     },
     {
-      "subcontractorId": 4,
-      "firstName": "Enid",
-      "secondName": "D",
-      "surname": "bridges",
-      "tradingName": null,
+      "subcontractorId": 10908,
+      "firstName": "Noel",
+      "secondName": null,
+      "surname": "Armstrong",
+      "tradingName": "DBB Construction",
       "partnershipTradingName": null,
       "verified": null,
       "verificationNumber": null,
@@ -81,10 +81,10 @@
       "createDate": "2026-04-10T14:15:00",
       "subcontractorType": "soletrader",
       "subbieResourceRef":  13,
-      "utr": "4444444444",
+      "utr": "8786438047",
       "partnerUtr": null,
       "crn":  null,
-      "nino": null
+      "nino": "AB623456C"
     },
     {
       "subcontractorId": 5,

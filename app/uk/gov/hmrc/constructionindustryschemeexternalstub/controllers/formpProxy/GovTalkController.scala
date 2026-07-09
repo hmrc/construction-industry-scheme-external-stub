@@ -59,10 +59,9 @@ class GovTalkController @Inject() (
 
   private def govTalkStatusResult(stage: Option[String]): Result =
     stage match {
-      case Some("initial") => NotFound
-      case Some("polling") =>
+      case Some("initial") | Some("polling") =>
         Ok(Json.parse(resourceHelper.resourceAsString(getGovTalkStatus200ResponsePath)))
-      case _               => NotFound
+      case _                                 => NotFound
     }
 
   private def scenarioResult(

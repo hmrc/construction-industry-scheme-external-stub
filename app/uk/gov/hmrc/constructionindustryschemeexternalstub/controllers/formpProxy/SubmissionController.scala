@@ -24,7 +24,6 @@ import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{Creat
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.EnrolmentsHelper
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
-import java.time.{LocalDateTime, ZoneId}
 import java.util.concurrent.atomic.AtomicLong
 import javax.inject.Inject
 
@@ -59,32 +58,12 @@ class SubmissionController @Inject() (
     }
 
   def updateSubmission(): Action[JsValue] =
-    authorise(parse.json) { implicit request =>
+    Action(parse.json) { implicit request =>
       request.body
         .validate[UpdateSubmissionRequest]
         .fold(
           errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
-          body =>
-            val orgEnrolments   = enrolmentHelper.contractorEnrolmentsOpt(request)
-            val agentEnrolments = enrolmentHelper.agentEnrolmentsOpt(request)
-            (orgEnrolments, agentEnrolments) match {
-              case (Some(enrolmentReference), _) =>
-                (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {
-//                  case ("400", _) => BadRequest(Json.obj("message" -> "Missing CIS enrolment identifiers"))
-//                  case ("404", _) => NotFound(Json.obj("message" -> "CIS taxpayer not found"))
-                  case ("500", _)                                => InternalServerError(Json.obj("message" -> "Unexpected error"))
-                  case ("321", _) if body.hmrcMarkGgis.isDefined =>
-                    InternalServerError(Json.obj("message" -> "Unexpected error"))
-                  case ("322", _)
-                      if body.acceptedTime.exists(acceptedTime =>
-                        LocalDateTime.now(ZoneId.of("UTC")).isAfter(LocalDateTime.parse(acceptedTime).plusSeconds(5))
-                      ) =>
-                    InternalServerError(Json.obj("message" -> "Unexpected error"))
-                  case _                                         => NoContent
-                }
-              case (_, Some(_))                  => NoContent
-              case (None, None)                  => InternalServerError
-            }
+          _ => NoContent
         )
     }
 

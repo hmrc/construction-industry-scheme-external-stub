@@ -1271,7 +1271,7 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
       val instanceId                   = "abc-123"
       val verificationBatchResourceRef = 77L
       val url                          =
-        s"/verification/submission-batch?instanceId=$instanceId&verificationBatchResourceRef=$verificationBatchResourceRef"
+        s"/cis/verification/submission-batch?instanceId=$instanceId&verificationBatchResourceRef=$verificationBatchResourceRef"
 
       "returns 200 OK with JSON body on success (contractor enrolment)" in new Setup {
 

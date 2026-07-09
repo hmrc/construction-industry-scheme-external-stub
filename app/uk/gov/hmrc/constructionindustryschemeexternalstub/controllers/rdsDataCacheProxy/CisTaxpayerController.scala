@@ -58,14 +58,27 @@ class CisTaxpayerController @Inject() (
             enrolments match {
               case Some(enrolmentReference) =>
                 (er.taxOfficeNumber, er.taxOfficeReference) match {
-                  case ("404", _) =>
+                  case ("404", _)     =>
                     NotFound(
                       Json.obj(
                         "message" -> s"CIS taxpayer not found for TON=${er.taxOfficeNumber}, TOR=${er.taxOfficeReference}"
                       )
                     )
-                  case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
-                  case (ton, tor) =>
+                  case ("500", _)     => InternalServerError(Json.obj("message" -> "Unexpected error"))
+                  case (_, "EZ10800") =>
+                    val json    =
+                      Json.parse(resourceHelper.resourceAsString(getCisTaxpayerByTaxReference_200_ResponsePath))
+                    val updated = json
+                      .as[JsObject]
+                      .deepMerge(
+                        Json.obj(
+                          "uniqueId"        -> "800",
+                          "taxOfficeNumber" -> er.taxOfficeNumber,
+                          "taxOfficeRef"    -> er.taxOfficeReference
+                        )
+                      )
+                    Ok(updated)
+                  case (ton, tor)     =>
                     val json    =
                       Json.parse(resourceHelper.resourceAsString(getCisTaxpayerByTaxReference_200_ResponsePath))
                     val updated = json

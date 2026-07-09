@@ -24,11 +24,21 @@ class AppConfig @Inject() (config: Configuration):
 
   lazy val callback: String = config.get[String]("stub.polling.callback")
 
-  def responseUrl(service: String): String     = callback + config.get[String](s"stub.$service.response")
-  def pollUrl(service: String): String         = callback + config.get[String](s"stub.$service.poll")
-  def pollingStatus(taxNumber: String): String = config
-    .getOptional[String](s"stub.endpoint.submission.cis.polling.statusMap.$taxNumber")
-    .getOrElse("SUBMITTED")
+  def responseUrl(service: String): String                     = callback + config.get[String](s"stub.$service.response")
+  def pollUrl(service: String): String                         = callback + config.get[String](s"stub.$service.poll")
+  def pollingStatus(regime: String, taxNumber: String): String = {
+    val path =
+      regime match {
+        case "IR-CIS-VERIFY"   =>
+          s"stub.endpoint.submission.cis.verify.polling.statusMap.$taxNumber"
+        case "IR-CIS-CIS300MR" =>
+          s"stub.endpoint.submission.cis.polling.statusMap.$taxNumber"
+        case _                 =>
+          throw new RuntimeException(s"Unknown regime: $regime")
+      }
+
+    config.getOptional[String](path).getOrElse("SUBMITTED")
+  }
 
   val appName: String = config.get[String]("appName")
 

@@ -7,7 +7,7 @@
             <Function>submit</Function>
             <CorrelationID>[correlationId]</CorrelationID>
             <ResponseEndPoint/>
-            <GatewayTimestamp>2025-12-01T11:41:05.431</GatewayTimestamp>
+            <GatewayTimestamp>[gatewayTimestamp]</GatewayTimestamp>
             <Transformation>XML</Transformation>
         </MessageDetails>
     </Header>
@@ -56,7 +56,7 @@
                         <TradingName>DBB Construction</TradingName>
                         <UTR>8786438047</UTR>
                         <NINO>AB623456C</NINO>
-                        <Matched>Y</Matched>
+                        <Matched>matched</Matched>
                         <TaxTreatment>net</TaxTreatment>
                         <VerificationNumber>V1000000007</VerificationNumber>
                     </Subcontractor>

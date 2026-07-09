@@ -1,0 +1,27 @@
+{
+  "subcontractors": [
+    {
+      "subcontractorId": 10908,
+      "firstName": "Noel",
+      "secondName": null,
+      "surname": "Armstrong",
+      "tradingName": "DBB Construction",
+      "subbieResourceRef":  13,
+      "utr": "8786438047",
+      "nino": "AB623456C",
+      "subcontractorType": "SoleTrader"
+    }
+  ],
+  "verificationBatch": {
+    "verificationBatchId": 10910,
+    "verifBatchResourceRef": 5
+  },
+  "verifications": [
+    {
+      "verificationId": 1001,
+      "verificationBatchId": 10910,
+      "subcontractorId": 10908,
+      "verificationResourceRef": 13
+    }
+  ]
+}

@@ -8,7 +8,7 @@ POST       /cis/monthly-returns/unsubmitted/delete                  uk.gov.hmrc.
 POST       /cis/monthly-return/nil/create                           uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.createNilMonthlyReturn
 POST       /cis/monthly-return/update                               uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.updateMonthlyReturn
 POST       /cis/monthly-return-edit                                 uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.getMonthlyReturnForEdit
-POST       /cis/monthly-return-complete                              uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.getMonthlyReturnComplete
+POST       /cis/monthly-return-complete                             uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.getMonthlyReturnComplete
 POST       /cis/monthly-return/standard/create                      uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.createMonthlyReturn
 POST       /cis/monthly-return-item/sync                            uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.syncMonthlyReturnItems
 POST       /cis/monthly-return-item/delete                          uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.deleteMonthlyReturnItem
@@ -30,6 +30,7 @@ POST       /cis/govtalkstatus/update-statistics                     uk.gov.hmrc.
 POST       /cis/govtalkstatus/create                                uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.GovTalkController.createGovTalkStatusRecord
 POST       /cis/subcontractor/create-and-update                     uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubcontractorController.createAndUpdateSubcontractor()
 GET        /cis/subcontractors/:cisId                               uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubcontractorController.getSubcontractorList(cisId: String)
+GET        /cis/subcontractor/:cisId/:subbieResourceRef/delete-status   uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubcontractorController.getSubcontractorForDelete(cisId: String, subbieResourceRef: Long)
 
 POST       /cis/monthly-return-item/update                          uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.updateMonthlyReturnItem()
 GET        /cis/verification-batch/newest/:instanceId               uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.VerificationController.getNewestVerificationBatch(instanceId: String)
@@ -37,9 +38,11 @@ GET        /cis/verification-batch/current/:instanceId              uk.gov.hmrc.
 POST       /cis/verification-batch/create                           uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.VerificationController.createVerificationBatchAndVerifications()
 POST       /cis/verification-batch/modify                           uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.VerificationController.modifyVerifications()
 POST       /cis/verification/submission/create                      uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.VerificationController.createSubmissionAndUpdateVerifications()
+POST       /cis/verification/submission/update                      uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.VerificationController.updateVerificationSubmission()
 POST       /cis/verification/response/process                       uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.VerificationController.processVerificationResponseFromChris()
 POST       /cis/verification/submitted-verifications                uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.VerificationController.getSubmittedVerifications()
 
+GET        /cis/batchpoll-submissions                               uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.BatchPollController.getBatchPollSubmissions()
 
 # stubbed rds-datacache-proxy routes
 POST       /cis-taxpayer                                            uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.rdsDataCacheProxy.CisTaxpayerController.getCisTaxpayerByTaxReference

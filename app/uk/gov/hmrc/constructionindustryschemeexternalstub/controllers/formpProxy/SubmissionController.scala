@@ -59,11 +59,16 @@ class SubmissionController @Inject() (
 
   def updateSubmission(): Action[JsValue] =
     Action(parse.json) { implicit request =>
+      val scenario = request.getQueryString("scenario")
       request.body
         .validate[UpdateSubmissionRequest]
         .fold(
           errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
-          _ => NoContent
+          _ =>
+            scenario match {
+              case Some("500") => InternalServerError(Json.obj("message" -> "Unexpected error"))
+              case _           => NoContent
+            }
         )
     }
 

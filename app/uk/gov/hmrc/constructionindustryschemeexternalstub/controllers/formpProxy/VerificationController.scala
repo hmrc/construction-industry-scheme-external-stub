@@ -185,40 +185,16 @@ class VerificationController @Inject() (
       logger.info(
         s"[VerificationController][getSubmissionWithVerificationBatch] Returning stubbed response for instanceId=$instanceId, verificationBatchResourceRef=$verificationBatchResourceRef"
       )
-      enrolmentHelper.contractorEnrolmentsOpt(request) match {
-        case Some(enrolmentReference) =>
-          (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {
-            case ("500", _) =>
-              InternalServerError(Json.obj("message" -> "Unexpected error"))
 
-            case ("502", _) =>
-              BadGateway(Json.obj("message" -> "formp failed"))
-
-            case _ =>
-              Ok(
-                Json.parse(
-                  resourceHelper.resourceAsString(
-                    getSubmissionWithVerificationBatch_200_ResponsePath
-                  )
-                )
-              )
-          }
-
-        case None =>
-          enrolmentHelper.agentEnrolmentsOpt(request) match {
-            case Some(_) =>
-              Ok(
-                Json.parse(
-                  resourceHelper.resourceAsString(
-                    getSubmissionWithVerificationBatch_200_ResponsePath
-                  )
-                )
-              )
-
-            case None =>
-              InternalServerError
-          }
-      }
+      withEnrolmentDispatch(
+        Ok(
+          Json.parse(
+            resourceHelper.resourceAsString(
+              getSubmissionWithVerificationBatch_200_ResponsePath
+            )
+          )
+        )
+      )
     }
 
 }

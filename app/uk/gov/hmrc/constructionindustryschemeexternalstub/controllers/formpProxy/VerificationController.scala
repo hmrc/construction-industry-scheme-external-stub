@@ -182,6 +182,7 @@ class VerificationController @Inject() (
     verificationBatchResourceRef: Long
   ): Action[AnyContent] =
     authorise { implicit request =>
+      logger.info(s"[VerificationController][getSubmissionWithVerificationBatch] Returning stubbed response for instanceId=$instanceId, verificationBatchResourceRef=$verificationBatchResourceRef")
       enrolmentHelper.contractorEnrolmentsOpt(request) match {
         case Some(enrolmentReference) =>
           (enrolmentReference.taxOfficeNumber, enrolmentReference.taxOfficeReference) match {

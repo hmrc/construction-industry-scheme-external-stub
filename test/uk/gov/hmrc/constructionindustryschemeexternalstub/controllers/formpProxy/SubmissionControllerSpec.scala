@@ -93,10 +93,7 @@ class SubmissionControllerSpec extends SpecBase {
 
     val updateSubmissionUrl = "/submissions/update"
 
-    "returns 204 NoContent on valid payload for an unknown taxOfficeNumber / taxOfficeReference" in new Setup {
-
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(Some(EmployerReference("200", "")))
+    "returns 204 NoContent on valid payload" in new Setup {
 
       val json: JsValue = Json.toJson(
         UpdateSubmissionRequest(
@@ -128,9 +125,6 @@ class SubmissionControllerSpec extends SpecBase {
 
     "accepts a payload carrying a typed govTalkResponse and returns 204" in new Setup {
 
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(Some(EmployerReference("200", "")))
-
       val json: JsValue = Json.toJson(
         UpdateSubmissionRequest(
           instanceId = "123",
@@ -152,10 +146,7 @@ class SubmissionControllerSpec extends SpecBase {
       status(res) mustBe NO_CONTENT
     }
 
-    "maps service failure to 500 (no body expected) for taxOfficeNumber = 500" in new Setup {
-
-      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-        .thenReturn(Some(EmployerReference("500", "")))
+    "returns 500 for scenario=500" in new Setup {
 
       val json: JsValue = Json.toJson(
         UpdateSubmissionRequest(
@@ -168,10 +159,11 @@ class SubmissionControllerSpec extends SpecBase {
         )
       )
 
-      val req: FakeRequest[JsValue] = makeJsonRequest(json, updateSubmissionUrl)
+      val req: FakeRequest[JsValue] = makeJsonRequest(json, s"$updateSubmissionUrl?scenario=500")
       val res: Future[Result]       = controller.updateSubmission()(req)
 
       status(res) mustBe INTERNAL_SERVER_ERROR
+      contentAsJson(res) mustBe Json.obj("message" -> "Unexpected error")
     }
   }
 

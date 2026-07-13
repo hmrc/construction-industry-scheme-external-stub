@@ -183,7 +183,7 @@ class SubmissionControllerSpec extends SpecBase {
     lazy val controller      = new SubmissionController(auth, mockEnrolmentsHelper, cc)
 
     def makeJsonRequest(body: JsValue, url: String): FakeRequest[JsValue] =
-      FakeRequest(POST, "/submissions")
+      FakeRequest(POST, url)
         .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
         .withBody(body)
   }

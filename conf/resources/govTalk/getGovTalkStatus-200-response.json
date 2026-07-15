@@ -11,7 +11,7 @@
       "numPolls": 0,
       "pollInterval": 0,
       "protocolStatus": "dataRequest",
-      "gatewayURL": "http://localhost:6997/submission/ChRIS/poll/IR-CIS-CIS300MR/0"
+      "gatewayURL": "http://localhost:6997/submission/ChRIS/poll/IR-CIS-CIS300MR/0?final=DEPARTMENTAL_ERROR"
     }
   ]
 }

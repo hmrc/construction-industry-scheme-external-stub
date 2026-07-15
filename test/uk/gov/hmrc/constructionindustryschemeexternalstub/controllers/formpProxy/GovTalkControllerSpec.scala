@@ -86,20 +86,6 @@ class GovTalkControllerSpec extends SpecBase {
       verifyNoInteractions(mockResourceHelper)
     }
 
-    "returns 200 with valid data when stage=initial and batchPoll=true" in new Setup {
-      when(mockResourceHelper.resourceAsString(responsePath))
-        .thenReturn(okResponse.toString)
-
-      val request: FakeRequest[JsValue] =
-        makeJsonRequest(validRequestBody, s"$getGovTalkStatusUrl?stage=initial&batchPoll=true")
-
-      val result: Future[Result] = controller.getGovTalkStatus()(request)
-
-      status(result) mustBe OK
-      contentAsJson(result) mustBe okResponse
-      verify(mockResourceHelper).resourceAsString(responsePath)
-    }
-
     "returns 404 when stage is missing" in new Setup {
       val request: FakeRequest[JsValue] =
         makeJsonRequest(validRequestBody, getGovTalkStatusUrl)

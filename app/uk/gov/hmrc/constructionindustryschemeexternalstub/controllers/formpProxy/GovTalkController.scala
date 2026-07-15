@@ -40,8 +40,9 @@ class GovTalkController @Inject() (
 
   def getGovTalkStatus: Action[JsValue] =
     Action(parse.json) { request =>
-      val stage    = request.getQueryString("stage")
-      val scenario = request.getQueryString("scenario")
+      val stage     = request.getQueryString("stage")
+      val batchPoll = request.getQueryString("batchPoll")
+      val scenario  = request.getQueryString("scenario")
 
       request.body
         .validate[GetGovTalkStatusRequest]
@@ -53,15 +54,20 @@ class GovTalkController @Inject() (
                 "errors"  -> JsError.toJson(errors)
               )
             ),
-          _ => scenarioResult(scenario, govTalkStatusResult(stage))
+          _ => scenarioResult(scenario, govTalkStatusResult(stage, batchPoll))
         )
     }
 
-  private def govTalkStatusResult(stage: Option[String]): Result =
+  private def govTalkStatusResult(stage: Option[String], batchPoll: Option[String]): Result =
     stage match {
-      case Some("initial") | Some("polling") =>
+      case Some("initial") if batchPoll.contains("true") =>
         Ok(Json.parse(resourceHelper.resourceAsString(getGovTalkStatus200ResponsePath)))
-      case _                                 => NotFound
+      case Some("initial")                               =>
+        NotFound
+      case Some("polling")                               =>
+        Ok(Json.parse(resourceHelper.resourceAsString(getGovTalkStatus200ResponsePath)))
+      case _                                             =>
+        NotFound
     }
 
   private def scenarioResult(

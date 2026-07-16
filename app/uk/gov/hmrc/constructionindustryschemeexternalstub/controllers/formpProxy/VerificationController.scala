@@ -198,8 +198,8 @@ class VerificationController @Inject() (
           )
         )
       )
-    }  
-      
+    }
+
   def getSubmittedVerifications: Action[JsValue] =
     authorise(parse.json) { implicit request =>
       request.body

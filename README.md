@@ -2523,6 +2523,52 @@ This is executed in a single transaction in FormP Proxy.
 #### Response
 - 204 No Content
 
+### Get submission with verification batch
+
+**Endpoint**: `GET /cis/verification/submission-batch/:instanceId/:verificationBatchResourceRef`
+
+**Description**: Returns the submission details with the related verification batch, verifications, subcontractors and scheme details for the given CIS instance id and verification batch resource reference.
+
+The response includes:
+
+* scheme,
+* subcontractors,
+* verifications,
+* verification batch,
+* submission.
+
+#### Happy Path (Organisation)
+
+* Affinity Group: Organisation
+* Enrolment Key: HMRC-CIS-ORG
+* Identifier Name: TaxOfficeNumber
+* Identifier Value: 200
+* Identifier Name: TaxOfficeReference
+* Identifier Value: Any
+* Request body: N/A
+* Response status: `200`
+* Response body: `resources/verification/getSubmissionWithVerificationBatch-200-response.json`
+
+#### Happy Path (Agent)
+
+* Affinity Group: Agent
+* Enrolment Key: IR-PAYE-AGENT
+* Identifier Name: IRAgentReference
+* Identifier Value: Any
+* Request body: N/A
+* Response status: `200`
+* Response body: `resources/verification/getSubmissionWithVerificationBatch-200-response.json`
+
+#### Unhappy Paths (Organisation)
+
+* TaxOfficeNumber = `500` → Response status: `500`
+
+```json
+{
+  "message": "Unexpected error"
+}
+```
+
 ### ChRIS
 
 **Endpoint**: `POST /submission/ChRIS/CISR/Filing/sync/CIS300MR`

@@ -10,17 +10,6 @@
       "utr": "8786438047",
       "nino": "AB623456C",
       "subcontractorType": "SoleTrader"
-    },
-    {
-      "subcontractorId": 1,
-      "firstName": "John",
-      "secondName": null,
-      "surname": "Smith",
-      "tradingName": "ACME",
-      "subbieResourceRef":  10,
-      "utr": "1111111111",
-      "nino": "AA123456A",
-      "subcontractorType": "SoleTrader"
     }
   ],
   "verificationBatch": {
@@ -33,12 +22,6 @@
       "verificationBatchId": 10910,
       "subcontractorId": 10908,
       "verificationResourceRef": 13
-    },
-    {
-      "verificationId": 1002,
-      "verificationBatchId": 10910,
-      "subcontractorId": 1,
-      "verificationResourceRef": 10
     }
   ]
 }

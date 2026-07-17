@@ -1,8 +1,8 @@
 {
   "govtalk_status": [
     {
-      "userIdentifier": "HMRC-VAT-DEC-999971516",
-      "formResultID": "14871366ACD9CA4975588D7151A11C31",
+      "userIdentifier": "instance-monthly-return-001",
+      "formResultID": "90002",
       "correlationID": "C742D5DEE7EB4D15B4F7EFD50B890525",
       "formLock": "N",
       "createDate": "2026-02-03T00:00:00",
@@ -11,7 +11,7 @@
       "numPolls": 0,
       "pollInterval": 0,
       "protocolStatus": "dataRequest",
-      "gatewayURL": "http://vat.chris.hmrc.gov.uk:9102/ChRIS/UKVAT/Filing/action/VATDEC"
+      "gatewayURL": "http://localhost:6997/submission/ChRIS/poll/IR-CIS-CIS300MR/0?final=DEPARTMENTAL_ERROR"
     }
   ]
 }

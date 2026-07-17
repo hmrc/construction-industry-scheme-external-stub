@@ -19,25 +19,23 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.email
 import play.api.Logging
 import play.api.libs.json.{JsError, JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents}
-import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.SendEmailRequest
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.Inject
 
 class EmailController @Inject() (
-  authorise: AuthAction,
   cc: ControllerComponents
 )() extends BackendController(cc)
     with Logging {
 
   def sendEmail: Action[JsValue] =
-    authorise(parse.json) { implicit request =>
+    Action(parse.json) { implicit request =>
       request.body
         .validate[SendEmailRequest]
         .fold(
           errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
-          body => Accepted
+          _ => Accepted
         )
     }
 }

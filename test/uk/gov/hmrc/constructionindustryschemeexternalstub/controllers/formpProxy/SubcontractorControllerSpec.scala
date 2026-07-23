@@ -26,7 +26,8 @@ import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.FakeAuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.base.SpecBase
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.EmployerReference
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.CreateAndUpdateSubcontractorRequest
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.response.{GetSubcontractorListResponse, Subcontractor}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.ContractorScheme
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.response.{GetSubcontractorListResponse, GetSubcontractorOtherInfo, GetSubcontractorResponse, Subcontractor}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 
 import scala.concurrent.Future
@@ -77,6 +78,76 @@ class SubcontractorControllerSpec extends SpecBase {
           lastMonthlyReturnDate = None,
           pendingVerifications = Some(0)
         )
+      )
+    )
+
+  private val getSubcontractorCisId             = "cis-123"
+  private val getSubcontractorSubbieResourceRef = 3L
+  private val getSubcontractorUrl: String       =
+    s"/cis/subcontractor/$getSubcontractorCisId/$getSubcontractorSubbieResourceRef"
+
+  private val sampleGetSubcontractorResponse: GetSubcontractorResponse =
+    GetSubcontractorResponse(
+      scheme = Some(
+        ContractorScheme(
+          schemeId = 123,
+          instanceId = "abc-123",
+          accountsOfficeReference = "123PA00123456",
+          taxOfficeNumber = "123",
+          taxOfficeReference = "AB456",
+          utr = Some("1234567890"),
+          name = Some("Test Contractor Ltd"),
+          emailAddress = Some("contractor@example.com"),
+          displayWelcomePage = Some("Y"),
+          prePopCount = Some(1),
+          prePopSuccessful = Some("Y"),
+          subcontractorCounter = Some(1),
+          verificationBatchCounter = Some(1),
+          version = Some(1)
+        )
+      ),
+      subcontractor = Some(
+        Subcontractor(
+          subcontractorId = 30303L,
+          subbieResourceRef = Some(3L),
+          subcontractorType = Some("soletrader"),
+          utr = Some("3333333333"),
+          pageVisited = Some(1),
+          partnerUtr = None,
+          crn = None,
+          firstName = Some("John"),
+          nino = Some("AA123456A"),
+          secondName = Some("Q"),
+          surname = Some("Smith"),
+          partnershipTradingName = None,
+          tradingName = Some("John Smith Trading"),
+          addressLine1 = Some("1 Main Street"),
+          addressLine2 = Some("Flat 2"),
+          addressLine3 = Some("London"),
+          addressLine4 = None,
+          country = Some("GB"),
+          postcode = Some("AA1 1AA"),
+          emailAddress = Some("subcontractor@example.com"),
+          phoneNumber = Some("01234567890"),
+          mobilePhoneNumber = Some("07123456789"),
+          worksReferenceNumber = Some("WR-123"),
+          version = Some(3),
+          taxTreatment = Some("NET"),
+          updatedTaxTreatment = Some("NET"),
+          verificationNumber = Some("V123456"),
+          createDate = None,
+          lastUpdate = None,
+          matched = Some("Y"),
+          verified = Some("Y"),
+          autoVerified = Some("N"),
+          verificationDate = None,
+          lastMonthlyReturnDate = None,
+          pendingVerifications = Some(0)
+        )
+      ),
+      otherInfo = Seq(
+        GetSubcontractorOtherInfo("1111111111"),
+        GetSubcontractorOtherInfo("2222222222")
       )
     )
 
@@ -306,6 +377,116 @@ class SubcontractorControllerSpec extends SpecBase {
         "subcontractorName"         -> "Gamma Builders",
         "subcontractorCanBeDeleted" -> false
       )
+    }
+  }
+
+  ".getSubcontractor" - {
+
+    "returns 200 with subcontractor response on success" in new Setup {
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("200", "")))
+
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn(Json.toJson(sampleGetSubcontractorResponse).toString)
+
+      val req: FakeRequest[AnyContentAsEmpty.type] =
+        FakeRequest(GET, getSubcontractorUrl)
+
+      val res: Future[Result] =
+        controller.getSubcontractor(
+          getSubcontractorCisId,
+          getSubcontractorSubbieResourceRef
+        )(req)
+
+      status(res) mustBe OK
+      contentAsJson(res) mustBe Json.toJson(sampleGetSubcontractorResponse)
+
+      (contentAsJson(res) \ "scheme" \ "schemeId").as[Int] mustBe 123
+      (contentAsJson(res) \ "subcontractor" \ "subcontractorId").as[Long] mustBe 30303L
+      (contentAsJson(res) \ "subcontractor" \ "utr").as[String] mustBe "3333333333"
+      (contentAsJson(res) \ "otherInfo" \ 0 \ "utr").as[String] mustBe "1111111111"
+    }
+
+    "returns 200 with subcontractor response when contractor enrolment is missing but agent enrolment is present" in new Setup {
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(Some("agent-123"))
+
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn(Json.toJson(sampleGetSubcontractorResponse).toString)
+
+      val req: FakeRequest[AnyContentAsEmpty.type] =
+        FakeRequest(GET, getSubcontractorUrl)
+
+      val res: Future[Result] =
+        controller.getSubcontractor(
+          getSubcontractorCisId,
+          getSubcontractorSubbieResourceRef
+        )(req)
+
+      status(res) mustBe OK
+      contentAsJson(res) mustBe Json.toJson(sampleGetSubcontractorResponse)
+    }
+
+    "returns 502 BadGateway for taxOfficeNumber = 502" in new Setup {
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("502", "")))
+
+      val req: FakeRequest[AnyContentAsEmpty.type] =
+        FakeRequest(GET, getSubcontractorUrl)
+
+      val res: Future[Result] =
+        controller.getSubcontractor(
+          getSubcontractorCisId,
+          getSubcontractorSubbieResourceRef
+        )(req)
+
+      status(res) mustBe BAD_GATEWAY
+      (contentAsJson(res) \ "message").as[String] mustBe "formp failed"
+    }
+
+    "returns 500 with generic message for taxOfficeNumber = 500" in new Setup {
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("500", "")))
+
+      val req: FakeRequest[AnyContentAsEmpty.type] =
+        FakeRequest(GET, getSubcontractorUrl)
+
+      val res: Future[Result] =
+        controller.getSubcontractor(
+          getSubcontractorCisId,
+          getSubcontractorSubbieResourceRef
+        )(req)
+
+      status(res) mustBe INTERNAL_SERVER_ERROR
+      (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
+    }
+
+    "returns 500 when no contractor enrolment and no agent enrolment found" in new Setup {
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      val req: FakeRequest[AnyContentAsEmpty.type] =
+        FakeRequest(GET, getSubcontractorUrl)
+
+      val res: Future[Result] =
+        controller.getSubcontractor(
+          getSubcontractorCisId,
+          getSubcontractorSubbieResourceRef
+        )(req)
+
+      status(res) mustBe INTERNAL_SERVER_ERROR
+      (contentAsJson(res) \ "message").as[String] mustBe "Missing enrolments"
     }
   }
 

@@ -19,12 +19,11 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub.models.response
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.ContractorScheme
 
-
 final case class GetSubcontractorResponse(
-                                           scheme: Option[ContractorScheme],
-                                           subcontractor: Option[Subcontractor],
-                                           otherInfo: Seq[GetSubcontractorOtherInfo]
-                                         )
+  scheme: Option[ContractorScheme],
+  subcontractor: Option[Subcontractor],
+  otherInfo: Seq[GetSubcontractorOtherInfo]
+)
 
 object GetSubcontractorResponse {
   given format: OFormat[GetSubcontractorResponse] =
@@ -32,8 +31,8 @@ object GetSubcontractorResponse {
 }
 
 final case class GetSubcontractorOtherInfo(
-                                            utr: String
-                                          )
+  utr: String
+)
 
 object GetSubcontractorOtherInfo {
   given format: OFormat[GetSubcontractorOtherInfo] =

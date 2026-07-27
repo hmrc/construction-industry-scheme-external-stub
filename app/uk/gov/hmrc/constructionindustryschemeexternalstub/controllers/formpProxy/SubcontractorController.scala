@@ -39,6 +39,8 @@ class SubcontractorController @Inject() (
   private val subcontractorResponsePath             = "/resources/subcontractor"
   private val getSubcontractorList_200_ResponsePath =
     s"$subcontractorResponsePath/getSubcontractorList-200-response.json"
+  private val getSubcontractor_200_ResponsePath     =
+    s"$subcontractorResponsePath/getSubcontractor-200-response.json"
 
   def createAndUpdateSubcontractor(): Action[JsValue] =
     authorise(parse.json) { implicit request =>
@@ -98,6 +100,48 @@ class SubcontractorController @Inject() (
           )
         )
       )
+    }
+
+  def getSubcontractor(
+    cisId: String,
+    subbieResourceRef: Long
+  ): Action[AnyContent] =
+    authorise { implicit request =>
+      val contractorRefOpt: Option[EmployerReference] =
+        enrolmentHelper.contractorEnrolmentsOpt(request)
+
+      val agentRefOpt: Option[String] =
+        enrolmentHelper.agentEnrolmentsOpt(request)
+
+      (contractorRefOpt, agentRefOpt) match {
+
+        case (Some(employerRef), _) =>
+          (employerRef.taxOfficeNumber, employerRef.taxOfficeReference) match {
+            case ("500", _) =>
+              InternalServerError(Json.obj("message" -> "Unexpected error"))
+
+            case ("502", _) =>
+              BadGateway(Json.obj("message" -> "formp failed"))
+
+            case _ =>
+              Ok(
+                Json.parse(
+                  resourceHelper.resourceAsString(getSubcontractor_200_ResponsePath)
+                )
+              )
+          }
+
+        case (None, Some(_)) =>
+          Ok(
+            Json.parse(
+              resourceHelper.resourceAsString(getSubcontractor_200_ResponsePath)
+            )
+          )
+
+        case (None, None) =>
+          logger.warn("[SubcontractorController][getSubcontractor] Missing contractor and agent enrolments")
+          InternalServerError(Json.obj("message" -> "Missing enrolments"))
+      }
     }
 
 }

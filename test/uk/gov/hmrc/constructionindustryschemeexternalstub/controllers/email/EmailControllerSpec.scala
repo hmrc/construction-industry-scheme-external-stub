@@ -21,7 +21,6 @@ import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{ACCEPT, CONTENT_TYPE, JSON, POST, contentAsJson, status}
-import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.FakeAuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.base.SpecBase
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.SendEmailRequest
 
@@ -62,8 +61,7 @@ class EmailControllerSpec extends SpecBase {
   }
 
   private trait Setup {
-    private val auth: FakeAuthAction = new FakeAuthAction(cc.parsers)
-    lazy val controller              = new EmailController(auth, cc)
+    lazy val controller = new EmailController(cc)
 
     def makeJsonRequest(body: JsValue, url: String): FakeRequest[JsValue] =
       FakeRequest(POST, url)

@@ -1,0 +1,64 @@
+{
+  "scheme": {
+    "schemeId": 123,
+    "instanceId": "partnership-123",
+    "accountsOfficeReference": "125PA12345000",
+    "taxOfficeNumber": "101",
+    "taxOfficeReference": "AB0001",
+    "utr": "1234657890",
+    "name": "company",
+    "emailAddress": "test@test",
+    "displayWelcomePage": "N",
+    "prePopCount": 3,
+    "prePopSuccessful": "Y",
+    "subcontractorCounter": 1,
+    "verificationBatchCounter": 0,
+    "lastUpdate": "2026-01-05T10:23:56Z",
+    "version": 3
+  },
+  "subcontractor": {
+    "subcontractorId": 14077,
+    "utr": "4649729124",
+    "pageVisited": 0,
+    "partnerUtr": "6316303501",
+    "crn": "10000001",
+    "firstName": null,
+    "nino": "AB623456C",
+    "secondName": null,
+    "surname": null,
+    "partnershipTradingName": null,
+    "tradingName": null,
+    "subcontractorType": "partnership",
+    "addressLine1": "one",
+    "addressLine2": "two ",
+    "addressLine3": "three",
+    "addressLine4": "four",
+    "country": "UK",
+    "postcode": "B1 2CD",
+    "emailAddress": "test@test.com",
+    "phoneNumber": "07123456789",
+    "mobilePhoneNumber": "7123456789",
+    "worksReferenceNumber": "123",
+    "createDate": "2026-01-05T10:23:56",
+    "lastUpdate": "2026-01-05T10:23:56",
+    "subbieResourceRef": 11,
+    "matched": "Y",
+    "autoVerified": "Y",
+    "verified": "Y",
+    "verificationNumber": "V1000000001",
+    "taxTreatment": "net",
+    "verificationDate": "2025-05-05T00:00:00",
+    "version": 0,
+    "updatedTaxTreatment": "TEST",
+    "lastMonthlyReturnDate": "2025-05-05T00:00:00",
+    "pendingVerifications": 0
+  },
+  "otherInfo": [
+    {
+      "utr": "4649729124"
+    },
+    {
+      "utr": "6316303501"
+    }
+  ]
+}

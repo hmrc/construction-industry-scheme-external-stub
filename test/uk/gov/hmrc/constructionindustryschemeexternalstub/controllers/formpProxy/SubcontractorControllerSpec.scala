@@ -81,7 +81,7 @@ class SubcontractorControllerSpec extends SpecBase {
       )
     )
 
-  private val getSubcontractorCisId             = "cis-123"
+  private val getSubcontractorCisId             = "individual-123"
   private val getSubcontractorSubbieResourceRef = 3L
   private val getSubcontractorUrl: String       =
     s"/cis/subcontractor/$getSubcontractorCisId/$getSubcontractorSubbieResourceRef"
@@ -382,7 +382,7 @@ class SubcontractorControllerSpec extends SpecBase {
 
   ".getSubcontractor" - {
 
-    "returns 200 with subcontractor response on success" in new Setup {
+    "returns verified individual response" in new Setup {
 
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
         .thenReturn(Some(EmployerReference("200", "")))
@@ -390,25 +390,152 @@ class SubcontractorControllerSpec extends SpecBase {
       when(mockResourceHelper.resourceAsString(any()))
         .thenReturn(Json.toJson(sampleGetSubcontractorResponse).toString)
 
-      val req: FakeRequest[AnyContentAsEmpty.type] =
-        FakeRequest(GET, getSubcontractorUrl)
-
-      val res: Future[Result] =
-        controller.getSubcontractor(
-          getSubcontractorCisId,
-          getSubcontractorSubbieResourceRef
-        )(req)
+      val res =
+        controller.getSubcontractor("individual-123", getSubcontractorSubbieResourceRef)(
+          FakeRequest(GET, getSubcontractorUrl)
+        )
 
       status(res) mustBe OK
       contentAsJson(res) mustBe Json.toJson(sampleGetSubcontractorResponse)
 
-      (contentAsJson(res) \ "scheme" \ "schemeId").as[Int] mustBe 123
-      (contentAsJson(res) \ "subcontractor" \ "subcontractorId").as[Long] mustBe 30303L
-      (contentAsJson(res) \ "subcontractor" \ "utr").as[String] mustBe "3333333333"
-      (contentAsJson(res) \ "otherInfo" \ 0 \ "utr").as[String] mustBe "1111111111"
+      verify(mockResourceHelper)
+        .resourceAsString("/resources/subcontractor/getSubcontractorIndividual-200-verifiedResponse.json")
     }
 
-    "returns 200 with subcontractor response when contractor enrolment is missing but agent enrolment is present" in new Setup {
+    "returns verified trust response" in new Setup {
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("200", "")))
+
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn(Json.toJson(sampleGetSubcontractorResponse).toString)
+
+      val res =
+        controller.getSubcontractor("trust-123", getSubcontractorSubbieResourceRef)(
+          FakeRequest(GET, getSubcontractorUrl)
+        )
+
+      status(res) mustBe OK
+
+      verify(mockResourceHelper)
+        .resourceAsString("/resources/subcontractor/getSubcontractorTrust-200-verifiedResponse.json")
+    }
+
+    "returns verified company response" in new Setup {
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("200", "")))
+
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn(Json.toJson(sampleGetSubcontractorResponse).toString)
+
+      val res =
+        controller.getSubcontractor("company-123", getSubcontractorSubbieResourceRef)(
+          FakeRequest(GET, getSubcontractorUrl)
+        )
+
+      status(res) mustBe OK
+
+      verify(mockResourceHelper)
+        .resourceAsString("/resources/subcontractor/getSubcontractorCompany-200-verifiedResponse.json")
+    }
+
+    "returns verified partnership response" in new Setup {
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("200", "")))
+
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn(Json.toJson(sampleGetSubcontractorResponse).toString)
+
+      val res =
+        controller.getSubcontractor("partnership-123", getSubcontractorSubbieResourceRef)(
+          FakeRequest(GET, getSubcontractorUrl)
+        )
+
+      status(res) mustBe OK
+
+      verify(mockResourceHelper)
+        .resourceAsString("/resources/subcontractor/getSubcontractorPartnership-200-verifiedResponse.json")
+    }
+
+    "returns unverified individual response" in new Setup {
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("200", "")))
+
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn(Json.toJson(sampleGetSubcontractorResponse).toString)
+
+      val res =
+        controller.getSubcontractor("individual-unverified-123", getSubcontractorSubbieResourceRef)(
+          FakeRequest(GET, getSubcontractorUrl)
+        )
+
+      status(res) mustBe OK
+
+      verify(mockResourceHelper)
+        .resourceAsString("/resources/subcontractor/getSubcontractorIndividual-200-unverifiedResponse.json")
+    }
+
+    "returns unverified trust response" in new Setup {
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("200", "")))
+
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn(Json.toJson(sampleGetSubcontractorResponse).toString)
+
+      val res =
+        controller.getSubcontractor("trust-unverified-123", getSubcontractorSubbieResourceRef)(
+          FakeRequest(GET, getSubcontractorUrl)
+        )
+
+      status(res) mustBe OK
+
+      verify(mockResourceHelper)
+        .resourceAsString("/resources/subcontractor/getSubcontractorTrust-200-unverifiedResponse.json")
+    }
+
+    "returns unverified company response" in new Setup {
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("200", "")))
+
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn(Json.toJson(sampleGetSubcontractorResponse).toString)
+
+      val res =
+        controller.getSubcontractor("company-unverified-123", getSubcontractorSubbieResourceRef)(
+          FakeRequest(GET, getSubcontractorUrl)
+        )
+
+      status(res) mustBe OK
+
+      verify(mockResourceHelper)
+        .resourceAsString("/resources/subcontractor/getSubcontractorCompany-200-unverifiedResponse.json")
+    }
+
+    "returns unverified partnership response" in new Setup {
+
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("200", "")))
+
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn(Json.toJson(sampleGetSubcontractorResponse).toString)
+
+      val res =
+        controller.getSubcontractor("partnership-unverified-123", getSubcontractorSubbieResourceRef)(
+          FakeRequest(GET, getSubcontractorUrl)
+        )
+
+      status(res) mustBe OK
+
+      verify(mockResourceHelper)
+        .resourceAsString("/resources/subcontractor/getSubcontractorPartnership-200-unverifiedResponse.json")
+    }
+
+    "returns response when contractor enrolment is missing but agent enrolment is present" in new Setup {
 
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
         .thenReturn(None)
@@ -419,17 +546,12 @@ class SubcontractorControllerSpec extends SpecBase {
       when(mockResourceHelper.resourceAsString(any()))
         .thenReturn(Json.toJson(sampleGetSubcontractorResponse).toString)
 
-      val req: FakeRequest[AnyContentAsEmpty.type] =
-        FakeRequest(GET, getSubcontractorUrl)
-
-      val res: Future[Result] =
-        controller.getSubcontractor(
-          getSubcontractorCisId,
-          getSubcontractorSubbieResourceRef
-        )(req)
+      val res =
+        controller.getSubcontractor("individual-123", getSubcontractorSubbieResourceRef)(
+          FakeRequest(GET, getSubcontractorUrl)
+        )
 
       status(res) mustBe OK
-      contentAsJson(res) mustBe Json.toJson(sampleGetSubcontractorResponse)
     }
 
     "returns 502 BadGateway for taxOfficeNumber = 502" in new Setup {
@@ -437,14 +559,10 @@ class SubcontractorControllerSpec extends SpecBase {
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
         .thenReturn(Some(EmployerReference("502", "")))
 
-      val req: FakeRequest[AnyContentAsEmpty.type] =
-        FakeRequest(GET, getSubcontractorUrl)
-
-      val res: Future[Result] =
-        controller.getSubcontractor(
-          getSubcontractorCisId,
-          getSubcontractorSubbieResourceRef
-        )(req)
+      val res =
+        controller.getSubcontractor("individual-123", getSubcontractorSubbieResourceRef)(
+          FakeRequest(GET, getSubcontractorUrl)
+        )
 
       status(res) mustBe BAD_GATEWAY
       (contentAsJson(res) \ "message").as[String] mustBe "formp failed"
@@ -455,14 +573,10 @@ class SubcontractorControllerSpec extends SpecBase {
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
         .thenReturn(Some(EmployerReference("500", "")))
 
-      val req: FakeRequest[AnyContentAsEmpty.type] =
-        FakeRequest(GET, getSubcontractorUrl)
-
-      val res: Future[Result] =
-        controller.getSubcontractor(
-          getSubcontractorCisId,
-          getSubcontractorSubbieResourceRef
-        )(req)
+      val res =
+        controller.getSubcontractor("individual-123", getSubcontractorSubbieResourceRef)(
+          FakeRequest(GET, getSubcontractorUrl)
+        )
 
       status(res) mustBe INTERNAL_SERVER_ERROR
       (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
@@ -476,14 +590,10 @@ class SubcontractorControllerSpec extends SpecBase {
       when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
         .thenReturn(None)
 
-      val req: FakeRequest[AnyContentAsEmpty.type] =
-        FakeRequest(GET, getSubcontractorUrl)
-
-      val res: Future[Result] =
-        controller.getSubcontractor(
-          getSubcontractorCisId,
-          getSubcontractorSubbieResourceRef
-        )(req)
+      val res =
+        controller.getSubcontractor("individual-123", getSubcontractorSubbieResourceRef)(
+          FakeRequest(GET, getSubcontractorUrl)
+        )
 
       status(res) mustBe INTERNAL_SERVER_ERROR
       (contentAsJson(res) \ "message").as[String] mustBe "Missing enrolments"

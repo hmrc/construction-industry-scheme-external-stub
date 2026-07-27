@@ -16,9 +16,12 @@
 
 package uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.chris
 
+import org.apache.pekko.stream.scaladsl.Source
+import org.apache.pekko.util.ByteString
 import play.api.Logger
+import play.api.http.HttpEntity
 import play.api.mvc.Results.Ok
-import play.api.mvc.{Action, AnyContent, ControllerComponents, Request, Result}
+import play.api.mvc.{Action, AnyContent, ControllerComponents, Request, ResponseHeader, Result}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.constructionindustryschemeexternalstub.config.AppConfig
 import uk.gov.hmrc.constructionindustryschemeexternalstub.services.ChrisService
@@ -78,6 +81,13 @@ class ChrisController @Inject() (
 
   private val ServerErrorTriggerTaxOfficeNumbers: Set[String] = (500 to 505).map(_.toString).toSet
   private val ServerErrorPollFinalStatuses: Set[String]       = (500 to 505).map(s => s"SERVER_ERROR_$s").toSet
+
+  // Transport-failure scenarios: instead of returning an HTTP response, abort the connection mid-stream so the caller
+  // sees a premature close / reset (a transport exception, not a 5xx). Drives the backend's connection-refused branch
+  // (GovTalkErrorMapper.fromConnectionRefused -> 500/timeOut/"timed out"). Submit is keyed by TaxOfficeNumber; the poll
+  // handler never sees the TON, so it is keyed by a ?final= token + count>=2, mirroring the SERVER_ERROR_* lever.
+  private val ConnectionAbortTaxOfficeNumbers: Set[String] = Set("781")
+  private val ConnectionAbortPollFinalStatus: String       = "CONNECTION_ABORT"
 
   def submitCISMessage(): Action[AnyContent] = Action { request =>
     submitCIS(
@@ -200,7 +210,9 @@ class ChrisController @Inject() (
       logger.info(s"[ChrisStub] Stored IRmark for correlationId=$correlationId")
     }
 
-    if (ServerErrorTriggerTaxOfficeNumbers.contains(taxOfficeNumber)) {
+    if (ConnectionAbortTaxOfficeNumbers.contains(taxOfficeNumber)) {
+      abortConnection(correlationId)
+    } else if (ServerErrorTriggerTaxOfficeNumbers.contains(taxOfficeNumber)) {
       val statusCode = taxOfficeNumber.toInt
       logger.info(s"[ChrisStub] Simulating $statusCode for taxOfficeNumber=$taxOfficeNumber corrId=$correlationId")
       Status(statusCode)("<error>Simulated ChRIS server error</error>").as("application/xml")
@@ -265,6 +277,8 @@ class ChrisController @Inject() (
 
       logger.info(s"[ChrisStub] Simulating $statusCode on poll corrId=$correlationId count=$count")
       Status(statusCode)("<error>Simulated ChRIS server error</error>").as("application/xml")
+    } else if (request.getQueryString("final").contains(ConnectionAbortPollFinalStatus) && count >= 2) {
+      abortConnection(correlationId)
     } else {
       val finalStatusParam =
         request.getQueryString("final").getOrElse("SUBMITTED")
@@ -284,6 +298,21 @@ class ChrisController @Inject() (
 
       Ok(xml)
     }
+  }
+
+  /** Simulates a transport-level failure (connection refused / reset). Emits a `200` chunked body that fails partway,
+    * so the calling HTTP client sees a premature close rather than a completed HTTP response — exercising the backend's
+    * `GovTalkErrorMapper.fromConnectionRefused` branch instead of the 5xx branch.
+    */
+  private def abortConnection(correlationId: String): Result = {
+    logger.info(s"[ChrisStub] Simulating connection abort corrId=$correlationId")
+    val body = Source
+      .single(ByteString("<partial"))
+      .concat(Source.failed[ByteString](new RuntimeException("simulated connection abort")))
+    Result(
+      header = ResponseHeader(OK),
+      body = HttpEntity.Streamed(body, None, Some("application/xml"))
+    )
   }
 
 }

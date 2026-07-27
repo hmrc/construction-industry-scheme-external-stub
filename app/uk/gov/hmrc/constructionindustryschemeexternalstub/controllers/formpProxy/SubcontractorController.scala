@@ -37,11 +37,13 @@ class SubcontractorController @Inject() (
 )() extends BackendController(cc)
     with Logging {
 
-  private val subcontractorResponsePath             = "/resources/subcontractor"
-  private val getSubcontractorList_200_ResponsePath =
+  private val subcontractorResponsePath                   = "/resources/subcontractor"
+  private val getSubcontractorList_200_ResponsePath       =
     s"$subcontractorResponsePath/getSubcontractorList-200-response.json"
-  private val getSubcontractor_200_ResponsePath     =
-    s"$subcontractorResponsePath/getSubcontractor-200-response.json"
+  private val getSubcontractorIndividual_200_ResponsePath =
+    s"$subcontractorResponsePath/getSubcontractorIndividual-200-response.json"
+  private val getSubcontractorTrust_200_ResponsePath      =
+    s"$subcontractorResponsePath/getSubcontractorTrust-200-response.json"
 
   def createAndUpdateSubcontractor(): Action[JsValue] =
     authorise(parse.json) { implicit request =>
@@ -125,17 +127,33 @@ class SubcontractorController @Inject() (
               BadGateway(Json.obj("message" -> "formp failed"))
 
             case _ =>
-              Ok(
-                Json.parse(
-                  resourceHelper.resourceAsString(getSubcontractor_200_ResponsePath)
-                )
-              )
-          }
+              cisId match {
+                case "abc-123" =>
+                  Ok(
+                    Json.parse(
+                      resourceHelper.resourceAsString(getSubcontractorIndividual_200_ResponsePath)
+                    )
+                  )
 
-        case (None, Some(_)) =>
+                case "900001" =>
+                  Ok(
+                    Json.parse(
+                      resourceHelper.resourceAsString(getSubcontractorTrust_200_ResponsePath)
+                    )
+                  )
+
+                case _ =>
+                  Ok(
+                    Json.parse(
+                      resourceHelper.resourceAsString(getSubcontractorIndividual_200_ResponsePath)
+                    )
+                  )
+              }
+          }
+        case (None, Some(_))        =>
           Ok(
             Json.parse(
-              resourceHelper.resourceAsString(getSubcontractor_200_ResponsePath)
+              resourceHelper.resourceAsString(getSubcontractorIndividual_200_ResponsePath)
             )
           )
 

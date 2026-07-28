@@ -27,7 +27,7 @@ import uk.gov.hmrc.constructionindustryschemeexternalstub.base.SpecBase
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.EmployerReference
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.CreateAndUpdateSubcontractorRequest
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.ContractorScheme
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.response.{GetSubcontractorListResponse, GetSubcontractorOtherInfo, GetSubcontractorResponse, Subcontractor}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.response.{GetSubcontractorListResponse, GetSubcontractorResponse, Subcontractor}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 
 import scala.concurrent.Future
@@ -144,10 +144,6 @@ class SubcontractorControllerSpec extends SpecBase {
           lastMonthlyReturnDate = None,
           pendingVerifications = Some(0)
         )
-      ),
-      otherInfo = Seq(
-        GetSubcontractorOtherInfo("1111111111"),
-        GetSubcontractorOtherInfo("2222222222")
       )
     )
 
@@ -405,7 +401,6 @@ class SubcontractorControllerSpec extends SpecBase {
       (contentAsJson(res) \ "scheme" \ "schemeId").as[Int] mustBe 123
       (contentAsJson(res) \ "subcontractor" \ "subcontractorId").as[Long] mustBe 30303L
       (contentAsJson(res) \ "subcontractor" \ "utr").as[String] mustBe "3333333333"
-      (contentAsJson(res) \ "otherInfo" \ 0 \ "utr").as[String] mustBe "1111111111"
     }
 
     "returns 200 with subcontractor response when contractor enrolment is missing but agent enrolment is present" in new Setup {

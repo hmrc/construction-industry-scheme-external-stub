@@ -1,0 +1,17 @@
+{
+  "govtalk_status": [
+    {
+      "userIdentifier": "10001",
+      "formResultID": "90002",
+      "correlationID": "C742D5DEE7EB4D15B4F7EFD50B890525",
+      "formLock": "N",
+      "createDate": "2026-02-03T00:00:00",
+      "endStateDate": null,
+      "lastMessageDate": "2026-02-03T00:00:00",
+      "numPolls": 0,
+      "pollInterval": 0,
+      "protocolStatus": "dataRequest",
+      "gatewayURL": "http://localhost:6997/submission/ChRIS/poll/IR-CIS-VERIFY/0?final=SUBMITTED"
+    }
+  ]
+}

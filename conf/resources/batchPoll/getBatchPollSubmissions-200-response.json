@@ -2,26 +2,24 @@
   "verificationSubmissions": [
     {
       "submissionId": 90001,
-      "submissionType": "CISVERIFY",
-      "agentId": "A123456",
+      "submissionType": "VERIFICATIONS",
       "taxOfficeNumber": "123",
-      "taxOfficeReference": "ABC123",
-      "instanceId": "instance-verification-001",
-      "status": "SUBMITTED",
-      "verificationBatchResourceRef": 70001
+      "taxOfficeReference": "AB456",
+      "instanceId": "10001",
+      "status": "ACCEPTED",
+      "verificationBatchResourceRef": 5
     }
   ],
   "monthlyReturnSubmissions": [
     {
       "submissionId": 90002,
-      "submissionType": "CIS300MR",
-      "status": "SUBMITTED",
+      "submissionType": "MONTHLY_RETURN",
+      "status": "ACCEPTED",
       "taxOfficeNumber": "123",
-      "taxOfficeReference": "456789",
+      "taxOfficeReference": "AB456",
       "taxYear": 2025,
       "taxMonth": 6,
-      "instanceId": "instance-monthly-return-001",
-      "agentId": "A123456"
+      "instanceId": "10001"
     }
   ]
 }

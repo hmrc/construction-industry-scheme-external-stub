@@ -82,12 +82,15 @@ class ChrisController @Inject() (
   private val ServerErrorTriggerTaxOfficeNumbers: Set[String] = (500 to 505).map(_.toString).toSet
   private val ServerErrorPollFinalStatuses: Set[String]       = (500 to 505).map(s => s"SERVER_ERROR_$s").toSet
 
-  // Transport-failure scenarios: instead of returning an HTTP response, abort the connection mid-stream so the caller
-  // sees a premature close / reset (a transport exception, not a 5xx). Drives the backend's connection-refused branch
-  // (GovTalkErrorMapper.fromConnectionRefused -> 500/timeOut/"timed out"). Submit is keyed by TaxOfficeNumber; the poll
-  // handler never sees the TON, so it is keyed by a ?final= token + count>=2, mirroring the SERVER_ERROR_* lever.
-  private val ConnectionAbortTaxOfficeNumbers: Set[String] = Set("781")
-  private val ConnectionAbortPollFinalStatus: String       = "CONNECTION_ABORT"
+  // Response-entity-failure scenarios: instead of returning a complete HTTP response, emit a 200 header followed by a
+  // partial chunked body that fails mid-stream, so the caller sees a premature entity close (an incomplete-read /
+  // stream-failure exception) rather than a completed 5xx response. This is not a TCP connection refused/reset - a
+  // genuine connection-refused requires an unreachable listener, which a controller returning a response cannot
+  // produce. The consuming service is expected to map this premature close onto its connection-failure branch
+  // (validated in that service's own tests). Submit is keyed by TaxOfficeNumber; the poll handler never sees the TON,
+  // so it is keyed by a ?final= token + count>=2, mirroring the SERVER_ERROR_* lever.
+  private val ResponseEntityFailureTaxOfficeNumbers: Set[String] = Set("781")
+  private val ResponseEntityFailurePollFinalStatus: String       = "CONNECTION_ABORT"
 
   def submitCISMessage(): Action[AnyContent] = Action { request =>
     submitCIS(
@@ -210,8 +213,8 @@ class ChrisController @Inject() (
       logger.info(s"[ChrisStub] Stored IRmark for correlationId=$correlationId")
     }
 
-    if (ConnectionAbortTaxOfficeNumbers.contains(taxOfficeNumber)) {
-      abortConnection(correlationId)
+    if (ResponseEntityFailureTaxOfficeNumbers.contains(taxOfficeNumber)) {
+      terminateResponseEarly(correlationId)
     } else if (ServerErrorTriggerTaxOfficeNumbers.contains(taxOfficeNumber)) {
       val statusCode = taxOfficeNumber.toInt
       logger.info(s"[ChrisStub] Simulating $statusCode for taxOfficeNumber=$taxOfficeNumber corrId=$correlationId")
@@ -277,8 +280,8 @@ class ChrisController @Inject() (
 
       logger.info(s"[ChrisStub] Simulating $statusCode on poll corrId=$correlationId count=$count")
       Status(statusCode)("<error>Simulated ChRIS server error</error>").as("application/xml")
-    } else if (request.getQueryString("final").contains(ConnectionAbortPollFinalStatus) && count >= 2) {
-      abortConnection(correlationId)
+    } else if (request.getQueryString("final").contains(ResponseEntityFailurePollFinalStatus) && count >= 2) {
+      terminateResponseEarly(correlationId)
     } else {
       val finalStatusParam =
         request.getQueryString("final").getOrElse("SUBMITTED")
@@ -300,15 +303,14 @@ class ChrisController @Inject() (
     }
   }
 
-  /** Simulates a transport-level failure (connection refused / reset). Emits a `200` chunked body that fails partway,
-    * so the calling HTTP client sees a premature close rather than a completed HTTP response — exercising the backend's
-    * `GovTalkErrorMapper.fromConnectionRefused` branch instead of the 5xx branch.
+  /** Emits a `200` header followed by a partial chunked body that fails mid-stream, so the calling HTTP client sees a
+    * premature entity close rather than a completed HTTP response.
     */
-  private def abortConnection(correlationId: String): Result = {
-    logger.info(s"[ChrisStub] Simulating connection abort corrId=$correlationId")
+  private def terminateResponseEarly(correlationId: String): Result = {
+    logger.info(s"[ChrisStub] Failing response entity mid-stream corrId=$correlationId")
     val body = Source
       .single(ByteString("<partial"))
-      .concat(Source.failed[ByteString](new RuntimeException("simulated connection abort")))
+      .concat(Source.failed[ByteString](new RuntimeException("simulated response entity failure")))
     Result(
       header = ResponseHeader(OK),
       body = HttpEntity.Streamed(body, None, Some("application/xml"))

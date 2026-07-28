@@ -6,6 +6,7 @@
       "subcontractorType": "soletrader",
       "utr": "1111111111",
       "tradingName": "AAA",
+      "createDate": "2026-01-01T00:00:00",
       "version": 1
     },
     {
@@ -14,6 +15,7 @@
       "subcontractorType": "soletrader",
       "utr": "2222222222",
       "tradingName": "BBB",
+      "createDate": "2026-01-15T00:00:00",
       "version": 2
     },
     {
@@ -22,6 +24,7 @@
       "subcontractorType": "soletrader",
       "firstName": "John",
       "surname": "Smith",
+      "createDate": "2026-02-20T00:00:00",
       "addressLine1": "1 Main Street",
       "country": "GB",
       "postcode": "AA1 1AA",
@@ -33,6 +36,7 @@
       "subcontractorType": "soletrader",
       "utr": "4444444444",
       "tradingName": "CCC",
+      "createDate": "2026-01-01T00:00:00",
       "version": 4
     },
     {
@@ -41,6 +45,7 @@
       "subcontractorType": "soletrader",
       "utr": "1211317359",
       "tradingName": "DDD",
+      "createDate": "2026-03-10T00:00:00",
       "version": 5
     },
     {
@@ -49,6 +54,7 @@
       "subcontractorType": "soletrader",
       "utr": "3536885673",
       "tradingName": "EEE",
+      "createDate": "2026-01-07T00:00:00",
       "version": 6
     }
   ]

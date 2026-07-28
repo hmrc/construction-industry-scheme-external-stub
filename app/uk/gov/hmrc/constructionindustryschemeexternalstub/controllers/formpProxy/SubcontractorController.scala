@@ -25,7 +25,6 @@ import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.Create
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.response.GetSubcontractorForDeleteResponse
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.response.GetSubcontractorResponse
 
 import javax.inject.Inject
 

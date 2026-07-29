@@ -25,7 +25,6 @@ import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.Create
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.response.GetSubcontractorForDeleteResponse
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.response.GetSubcontractorResponse
 
 import javax.inject.Inject
 
@@ -37,11 +36,25 @@ class SubcontractorController @Inject() (
 )() extends BackendController(cc)
     with Logging {
 
-  private val subcontractorResponsePath             = "/resources/subcontractor"
-  private val getSubcontractorList_200_ResponsePath =
+  private val subcontractorResponsePath                              = "/resources/subcontractor"
+  private val getSubcontractorList_200_ResponsePath                  =
     s"$subcontractorResponsePath/getSubcontractorList-200-response.json"
-  private val getSubcontractor_200_ResponsePath     =
-    s"$subcontractorResponsePath/getSubcontractor-200-response.json"
+  private val getSubcontractorIndividual_200_ResponsePath            =
+    s"$subcontractorResponsePath/getSubcontractorIndividual-200-verifiedResponse.json"
+  private val getSubcontractorTrust_200_ResponsePath                 =
+    s"$subcontractorResponsePath/getSubcontractorTrust-200-verifiedResponse.json"
+  private val getSubcontractorCompany_200_ResponsePath               =
+    s"$subcontractorResponsePath/getSubcontractorCompany-200-verifiedResponse.json"
+  private val getSubcontractorPartnership_200_ResponsePath           =
+    s"$subcontractorResponsePath/getSubcontractorPartnership-200-verifiedResponse.json"
+  private val getSubcontractorIndividual_200_UnverifiedResponsePath  =
+    s"$subcontractorResponsePath/getSubcontractorIndividual-200-unverifiedResponse.json"
+  private val getSubcontractorTrust_200_UnverifiedResponsePath       =
+    s"$subcontractorResponsePath/getSubcontractorTrust-200-unverifiedResponse.json"
+  private val getSubcontractorCompany_200_UnverifiedResponsePath     =
+    s"$subcontractorResponsePath/getSubcontractorCompany-200-unverifiedResponse.json"
+  private val getSubcontractorPartnership_200_UnverifiedResponsePath =
+    s"$subcontractorResponsePath/getSubcontractorPartnership-200-unverifiedResponse.json"
 
   def createAndUpdateSubcontractor(): Action[JsValue] =
     authorise(parse.json) { implicit request =>
@@ -108,38 +121,39 @@ class SubcontractorController @Inject() (
     subbieResourceRef: Long
   ): Action[AnyContent] =
     authorise { implicit request =>
-      val contractorRefOpt: Option[EmployerReference] =
-        enrolmentHelper.contractorEnrolmentsOpt(request)
 
-      val agentRefOpt: Option[String] =
-        enrolmentHelper.agentEnrolmentsOpt(request)
+      val contractorRefOpt = enrolmentHelper.contractorEnrolmentsOpt(request)
+      val agentRefOpt      = enrolmentHelper.agentEnrolmentsOpt(request)
+
+      val responsePath = cisId match {
+        case "individual-123"             => getSubcontractorIndividual_200_ResponsePath
+        case "trust-123"                  => getSubcontractorTrust_200_ResponsePath
+        case "company-123"                => getSubcontractorCompany_200_ResponsePath
+        case "partnership-123"            => getSubcontractorPartnership_200_ResponsePath
+        case "individual-unverified-123"  => getSubcontractorIndividual_200_UnverifiedResponsePath
+        case "trust-unverified-123"       => getSubcontractorTrust_200_UnverifiedResponsePath
+        case "company-unverified-123"     => getSubcontractorCompany_200_UnverifiedResponsePath
+        case "partnership-unverified-123" => getSubcontractorPartnership_200_UnverifiedResponsePath
+        case _                            => getSubcontractorIndividual_200_ResponsePath
+      }
 
       (contractorRefOpt, agentRefOpt) match {
-
         case (Some(employerRef), _) =>
-          (employerRef.taxOfficeNumber, employerRef.taxOfficeReference) match {
-            case ("500", _) =>
+          employerRef.taxOfficeNumber match {
+            case "500" =>
               InternalServerError(Json.obj("message" -> "Unexpected error"))
 
-            case ("502", _) =>
+            case "502" =>
               BadGateway(Json.obj("message" -> "formp failed"))
 
             case _ =>
-              Ok(
-                Json.parse(
-                  resourceHelper.resourceAsString(getSubcontractor_200_ResponsePath)
-                )
-              )
+              Ok(Json.parse(resourceHelper.resourceAsString(responsePath)))
           }
 
         case (None, Some(_)) =>
-          Ok(
-            Json.parse(
-              resourceHelper.resourceAsString(getSubcontractor_200_ResponsePath)
-            )
-          )
+          Ok(Json.parse(resourceHelper.resourceAsString(responsePath)))
 
-        case (None, None) =>
+        case _ =>
           logger.warn("[SubcontractorController][getSubcontractor] Missing contractor and agent enrolments")
           InternalServerError(Json.obj("message" -> "Missing enrolments"))
       }

@@ -2195,6 +2195,35 @@ or
 }
 ```
 
+**Endpoint**: `POST /ccis/subcontractor/delete`
+
+**Description**: delete subcontractor
+
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: Any valid value
+
+or
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: Any valid value
+- Identifier Name: TaxOfficeReference
+- Identifier Value: Any valid value
+
+#### Happy Path
+
+To trigger the happy path, ensure you provide a valid request body:
+```json
+{
+  "instanceId": "abc-123",
+  "subbieResourceRef": "10"
+}
+```
+- Response status: `204`
+- Response body: _empty_
 
 **Endpoint**: `POST cis/monthly-return-item/update `
 

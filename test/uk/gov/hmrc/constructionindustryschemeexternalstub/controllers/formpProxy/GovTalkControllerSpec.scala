@@ -53,12 +53,15 @@ class GovTalkControllerSpec extends SpecBase {
         )
       )
 
-    def okResponse: JsObject =
+    def okResponse(
+      formResultId: String = "12890",
+      gatewayUrl: String = "http://localhost:9712/submission/ChRIS/CISR/Filing/sync/CIS300MR"
+    ): JsObject =
       Json.obj(
         "govtalk_status" -> Json.arr(
           Json.obj(
             "userIdentifier"  -> "1",
-            "formResultID"    -> "12890",
+            "formResultID"    -> formResultId,
             "correlationID"   -> "C742D5DEE7EB4D15B4F7EFD50B890525",
             "formLock"        -> "false",
             "createDate"      -> "2026-02-03T00:00:00",
@@ -67,7 +70,7 @@ class GovTalkControllerSpec extends SpecBase {
             "numPolls"        -> 0,
             "pollInterval"    -> 0,
             "protocolStatus"  -> "dataRequest",
-            "gatewayURL"      -> "http://localhost:9712/submission/ChRIS/CISR/Filing/sync/CIS300MR"
+            "gatewayURL"      -> gatewayUrl
           )
         )
       )
@@ -76,22 +79,27 @@ class GovTalkControllerSpec extends SpecBase {
       (
         "90001",
         verificationResponsePath,
-        "verification"
+        "verification",
+        "http://localhost:6997/submission/ChRIS/poll/IR-CIS-VERIFY/0?final=SUBMITTED"
       ),
       (
         "90002",
         monthlyReturnResponsePath,
-        "monthly return"
+        "monthly return",
+        "http://localhost:6997/submission/ChRIS/poll/IR-CIS-CIS300MR/0?final=SUBMITTED"
       ),
       (
         "90003",
         defaultResponsePath,
-        "default"
+        "default",
+        "http://localhost:9712/submission/ChRIS/CISR/Filing/sync/CIS300MR"
       )
-    ).foreach { case (submissionId, responsePath, responseType) =>
+    ).foreach { case (submissionId, responsePath, responseType, gatewayUrl) =>
       s"returns the $responseType response when stage=polling and submissionId=$submissionId" in new Setup {
+        val response = okResponse(submissionId, gatewayUrl)
+
         when(mockResourceHelper.resourceAsString(responsePath))
-          .thenReturn(okResponse.toString)
+          .thenReturn(response.toString)
 
         val request: FakeRequest[JsValue] =
           makeJsonRequest(
@@ -103,7 +111,7 @@ class GovTalkControllerSpec extends SpecBase {
           controller.getGovTalkStatus()(request)
 
         status(result) mustBe OK
-        contentAsJson(result) mustBe okResponse
+        contentAsJson(result) mustBe response
 
         verify(mockResourceHelper).resourceAsString(responsePath)
         verifyNoMoreInteractions(mockResourceHelper)

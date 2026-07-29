@@ -47,13 +47,5 @@
     "verificationDate": "2026-06-15T10:05:00",
     "lastMonthlyReturnDate": "2026-05-15T10:05:00",
     "pendingVerifications": 0
-  },
-  "otherInfo": [
-    {
-      "utr": "1111111111"
-    },
-    {
-      "utr": "2222222222"
-    }
-  ]
+  }
 }

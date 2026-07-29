@@ -189,7 +189,7 @@ class MonthlyReturnController @Inject() (
         .foldErrorsIntoBadRequest { req =>
           val fixturePath =
             if (req.taxMonth == 3) getMonthlyReturnForEdit_nosubmission_200_ResponsePath
-            else if (req.taxMonth == 4) getMonthlyReturnForEdit_nil_200_ResponsePath
+//            else if (req.taxMonth == 4) getMonthlyReturnForEdit_nil_200_ResponsePath    TODO: pls uncomment to enable no subcontractors scenario testing
             else getMonthlyReturnForEdit_200_ResponsePath
           Future.successful(Ok(resourceHelper.resourceAsString(fixturePath)))
         }

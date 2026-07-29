@@ -81,14 +81,9 @@ final class GetSubcontractorResponseSpec extends PlaySpec {
       pendingVerifications = Some(0)
     )
 
-    val otherInfo = GetSubcontractorOtherInfo(
-      utr = "1111111111"
-    )
-
     val model = GetSubcontractorResponse(
       scheme = Some(scheme),
-      subcontractor = Some(subcontractor),
-      otherInfo = Seq(otherInfo)
+      subcontractor = Some(subcontractor)
     )
 
     "serialize to JSON" in {
@@ -102,8 +97,6 @@ final class GetSubcontractorResponseSpec extends PlaySpec {
       (json \ "subcontractor" \ "subbieResourceRef").as[Long] mustBe 456L
       (json \ "subcontractor" \ "utr").as[String] mustBe "0987654321"
       (json \ "subcontractor" \ "subcontractorType").as[String] mustBe "soletrader"
-
-      (json \ "otherInfo")(0).\("utr").as[String] mustBe "1111111111"
     }
 
     "deserialize from JSON" in {
@@ -158,12 +151,7 @@ final class GetSubcontractorResponseSpec extends PlaySpec {
           |    "updatedTaxTreatment": "NET",
           |    "lastMonthlyReturnDate": "2026-05-15T10:05:00",
           |    "pendingVerifications": 0
-          |  },
-          |  "otherInfo": [
-          |    {
-          |      "utr": "1111111111"
-          |    }
-          |  ]
+          |  }
           |}
           |""".stripMargin
       )
@@ -176,8 +164,7 @@ final class GetSubcontractorResponseSpec extends PlaySpec {
         """
           |{
           |  "scheme": null,
-          |  "subcontractor": null,
-          |  "otherInfo": []
+          |  "subcontractor": null
           |}
           |""".stripMargin
       )
@@ -185,34 +172,11 @@ final class GetSubcontractorResponseSpec extends PlaySpec {
       json.validate[GetSubcontractorResponse] mustBe JsSuccess(
         GetSubcontractorResponse(
           scheme = None,
-          subcontractor = None,
-          otherInfo = Seq.empty
+          subcontractor = None
         )
       )
     }
 
-    "fail to deserialize when required fields are missing" in {
-      Json
-        .obj()
-        .validate[GetSubcontractorResponse]
-        .isError mustBe true
-    }
   }
 
-  "GetSubcontractorOtherInfo" should {
-
-    "serialize to JSON" in {
-      Json.toJson(GetSubcontractorOtherInfo("1111111111")) mustBe Json.obj(
-        "utr" -> "1111111111"
-      )
-    }
-
-    "deserialize from JSON" in {
-      Json
-        .obj("utr" -> "1111111111")
-        .validate[GetSubcontractorOtherInfo] mustBe JsSuccess(
-        GetSubcontractorOtherInfo("1111111111")
-      )
-    }
-  }
 }

@@ -2195,7 +2195,7 @@ or
 }
 ```
 
-**Endpoint**: `POST /ccis/subcontractor/delete`
+**Endpoint**: `POST /cis/subcontractor/delete`
 
 **Description**: delete subcontractor
 
@@ -2219,7 +2219,7 @@ To trigger the happy path, ensure you provide a valid request body:
 ```json
 {
   "instanceId": "abc-123",
-  "subbieResourceRef": "10"
+  "subbieResourceRef": 10
 }
 ```
 - Response status: `204`

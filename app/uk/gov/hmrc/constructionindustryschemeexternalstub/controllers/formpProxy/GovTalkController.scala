@@ -35,8 +35,12 @@ class GovTalkController @Inject() (
 
   private val govTalkReturnResponsePath = "/resources/govTalk"
 
-  private val getGovTalkStatus200ResponsePath =
+  private val getGovTalkStatus200ResponsePath                =
     s"$govTalkReturnResponsePath/getGovTalkStatus-200-response.json"
+  private val getGovTalkStatus200_monthlyReturn_ResponsePath =
+    s"$govTalkReturnResponsePath/getGovTalkStatus-monthlyReturn-200-response.json"
+  private val getGovTalkStatus200_verification_ResponsePath  =
+    s"$govTalkReturnResponsePath/getGovTalkStatus-verification-200-response.json"
 
   def getGovTalkStatus: Action[JsValue] =
     Action(parse.json) { request =>
@@ -53,16 +57,32 @@ class GovTalkController @Inject() (
                 "errors"  -> JsError.toJson(errors)
               )
             ),
-          _ => scenarioResult(scenario, govTalkStatusResult(stage))
+          govTalkRequest =>
+            scenarioResult(
+              scenario,
+              govTalkStatusResult(
+                stage,
+                govTalkRequest.formResultID
+              )
+            )
         )
     }
 
-  private def govTalkStatusResult(stage: Option[String]): Result =
+  private def govTalkStatusResult(stage: Option[String], submissionId: String): Result =
     stage match {
-      case Some("initial") => NotFound
+      case Some("initial") =>
+        NotFound
       case Some("polling") =>
-        Ok(Json.parse(resourceHelper.resourceAsString(getGovTalkStatus200ResponsePath)))
-      case _               => NotFound
+        submissionId match {
+          case "90001" =>
+            Ok(Json.parse(resourceHelper.resourceAsString(getGovTalkStatus200_verification_ResponsePath)))
+          case "90002" =>
+            Ok(Json.parse(resourceHelper.resourceAsString(getGovTalkStatus200_monthlyReturn_ResponsePath)))
+          case _       =>
+            Ok(Json.parse(resourceHelper.resourceAsString(getGovTalkStatus200ResponsePath)))
+        }
+      case _               =>
+        NotFound
     }
 
   private def scenarioResult(

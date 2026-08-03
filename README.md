@@ -867,6 +867,16 @@ To trigger the happy path, ensure you provide a valid request body similar to ex
 }
 ```
 
+#### Stub Response Variance
+
+The stub varies the response based on `taxMonth` to support different amendment journey scenarios:
+
+| `taxMonth` | Fixture | Scenario |
+|---|---|---|
+| `1` (or any other) | `getMonthlyReturnForEdit-200-response.json` | Standard return with subcontractors and a prior `submissionId` — resubmission path |
+| `3` | `getMonthlyReturnForEdit-nosubmission-200-response.json` | Standard return with subcontractors but **no** prior `submissionId` — new submission path |
+| `4` | `getMonthlyReturnForEdit-nil-200-response.json` | Nil return, no subcontractors, no prior `submissionId` — routes to MRAR06 or MRAR06b depending on `isOriginalNilReturn` |
+
 **Endpoint**: `POST /cis/monthly-return/standard/create`
 
 **Description**: Creates a standard monthly return record in the monthly return table.

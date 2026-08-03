@@ -17,8 +17,11 @@
 package uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.chris
 
 import com.typesafe.config.ConfigFactory
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.stream.Materializer
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.*
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
@@ -31,9 +34,13 @@ import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{ACKNOWLEDGE, F
 import uk.gov.hmrc.constructionindustryschemeexternalstub.services.ChrisService
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.ResourceHelper
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.xml.NodeSeq
 
-class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
+class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar with ScalaFutures {
+
+  private implicit val system: ActorSystem = ActorSystem("ChrisControllerSpec")
+  private implicit val mat: Materializer   = Materializer(system)
 
   private val configuration = new Configuration(ConfigFactory.load("test-application.conf"))
 
@@ -245,6 +252,73 @@ class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
         status(response) mustBe code
         contentType(response).get mustBe "application/xml"
       }
+    }
+
+    "fail the response entity stream from submitCISMessage when taxOfficeNumber is 781" in {
+      val cisMessage =
+        <GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
+          <Header>
+            <MessageDetails>
+              <Class>IR-CIS-CIS300MR</Class>
+              <CorrelationID>CORR-ENTITY-FAIL</CorrelationID>
+            </MessageDetails>
+          </Header>
+          <GovTalkDetails>
+            <Keys>
+              <Key Type="TaxOfficeNumber">781</Key>
+              <Key Type="TaxOfficeReference">EZ00125</Key>
+            </Keys>
+          </GovTalkDetails>
+          <Body/>
+        </GovTalkMessage>
+
+      val request  = postRequest.withXmlBody(cisMessage)
+      val response = testInstance.submitCISMessage().apply(request)
+
+      // A 200 header is emitted, but consuming the streamed entity fails mid-stream (premature close).
+      status(response) mustBe OK
+      response.flatMap(_.body.consumeData).failed.futureValue mustBe a[Throwable]
+    }
+
+    "fail the response entity stream from getCISResponse when final=CONNECTION_ABORT and pollCount has reached the terminal" in {
+      val pollRequestXml =
+        <GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
+          <Header>
+            <MessageDetails>
+              <CorrelationID>CORR-POLL-ENTITY-FAIL</CorrelationID>
+            </MessageDetails>
+          </Header>
+          <Body/>
+        </GovTalkMessage>
+
+      val request  = FakeRequest("POST", "/dummy-path?final=CONNECTION_ABORT").withXmlBody(pollRequestXml)
+      val response = testInstance.getCISResponse(2).apply(request)
+
+      status(response) mustBe OK
+      response.flatMap(_.body.consumeData).failed.futureValue mustBe a[Throwable]
+    }
+
+    "return a normal poll response from getCISResponse when final=CONNECTION_ABORT but pollCount is before the terminal" in {
+      val correlationId = "CORR-POLL-PRE-ABORT"
+
+      val pollRequestXml =
+        <GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
+          <Header>
+            <MessageDetails>
+              <CorrelationID>{correlationId}</CorrelationID>
+            </MessageDetails>
+          </Header>
+          <Body/>
+        </GovTalkMessage>
+
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn("[correlationId]-[pollUrl]-[digestValue]")
+
+      val request  = FakeRequest("POST", "/dummy-path?final=CONNECTION_ABORT").withXmlBody(pollRequestXml)
+      val response = testInstance.getCISResponse(1).apply(request)
+
+      status(response) mustBe OK
+      contentAsString(response) mustBe s"$correlationId--NO_IRMARK_FOUND"
     }
 
     "return fatal error response for submitCISMessage when initial status is FATAL_ERROR" in {

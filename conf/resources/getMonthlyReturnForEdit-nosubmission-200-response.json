@@ -461,28 +461,11 @@
       "costOfMaterials": "200.00",
       "totalDeducted": "200.00",
       "unmatchedTaxRateIndicator": "Y",
-      "subcontractorId": 31275,
-      "subcontractorName": "Blake Smith",
+      "subcontractorId": 10903,
+      "subcontractorName": "Alice, A",
       "verificationNumber": "V1000000001",
       "itemResourceReference": 2
     }
   ],
-  "submission": [
-    {
-      "submissionId": 1,
-      "submissionType": "MONTHLY_RETURN",
-      "activeObjectId": 30001,
-      "status": "SUBMITTED",
-      "hmrcMarkGenerated": "9AjFBxlBohmcRZ8s/2IV0QaYzz0=",
-      "hmrcMarkGgis": "9AjFBxlBohmcRZ8s/2IV0QaYzz0=",
-      "emailRecipient": "test@test.com",
-      "acceptedTime": "2018-04-06T08:46:08.081",
-      "createDate": "2018-02-23T16:26:25",
-      "lastUpdate": "2018-02-23T16:26:30",
-      "schemeId": 13343,
-      "agentId": "-",
-      "l_Migrated": 1,
-      "submissionRequestDate": "2018-02-23T16:26:27"
-    }
-  ]
+  "submission": []
 }

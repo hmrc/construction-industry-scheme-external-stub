@@ -24,7 +24,6 @@ import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.*
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests._
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{CreateVerifications, DeleteVerifications}
 
 import javax.inject.Inject
@@ -54,6 +53,8 @@ class VerificationController @Inject() (
     s"$verificationResponsePath/getSubmissionWithVerificationBatch-200-response.json"
   private val getSubmittedVerifications_200_ResponsePath                                   =
     s"$verificationResponsePath/getSubmittedVerifications-200-response.json"
+  private val getSubmissionWithVerificationBatch_200_ResponsePath                          =
+    s"$verificationResponsePath/getSubmissionWithVerificationBatch-200-response.json"
 
   private def withEnrolmentDispatch(onSuccess: => Result)(implicit request: AuthenticatedRequest[_]): Result =
     enrolmentHelper.contractorEnrolmentsOpt(request) match {
@@ -161,22 +162,22 @@ class VerificationController @Inject() (
     }
 
   def updateVerificationSubmission(): Action[JsValue] =
-    authorise(parse.json) { implicit request =>
+    Action(parse.json) { implicit request =>
       request.body
         .validate[UpdateVerificationSubmissionRequest]
         .fold(
           errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
-          _ => withEnrolmentDispatch(NoContent)
+          _ => NoContent
         )
     }
 
   def processVerificationResponseFromChris(): Action[JsValue] =
-    authorise(parse.json) { implicit request =>
+    Action(parse.json) { implicit request =>
       request.body
         .validate[ProcessVerificationResponseFromChrisRequest]
         .fold(
           errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
-          _ => withEnrolmentDispatch(NoContent)
+          _ => NoContent
         )
     }
 
@@ -237,6 +238,21 @@ class VerificationController @Inject() (
                     InternalServerError
                 }
             }
+        )
+    }
+
+  def getSubmissionWithVerificationBatch: Action[JsValue] =
+    Action(parse.json) { implicit request =>
+      request.body
+        .validate[GetSubmissionWithVerificationBatchRequest]
+        .fold(
+          errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
+          _ =>
+            Ok(
+              Json.parse(
+                resourceHelper.resourceAsString(getSubmissionWithVerificationBatch_200_ResponsePath)
+              )
+            )
         )
     }
 

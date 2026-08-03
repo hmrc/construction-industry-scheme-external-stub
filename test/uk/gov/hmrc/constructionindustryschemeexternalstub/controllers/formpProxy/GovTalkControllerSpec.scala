@@ -33,22 +33,35 @@ class GovTalkControllerSpec extends SpecBase {
   ".getGovTalkStatus" - {
 
     val getGovTalkStatusUrl = "/cis/govtalkstatus/get"
-    val responsePath        = "/resources/govTalk/getGovTalkStatus-200-response.json"
 
-    def validRequestBody: JsValue =
+    val defaultResponsePath =
+      "/resources/govTalk/getGovTalkStatus-200-response.json"
+
+    val monthlyReturnResponsePath =
+      "/resources/govTalk/getGovTalkStatus-monthlyReturn-200-response.json"
+
+    val verificationResponsePath =
+      "/resources/govTalk/getGovTalkStatus-verification-200-response.json"
+
+    def validRequestBody(
+      submissionId: String = "90003"
+    ): JsValue =
       Json.toJson(
         GetGovTalkStatusRequest(
           userIdentifier = "123",
-          formResultID = "YE2025"
+          formResultID = submissionId
         )
       )
 
-    def okResponse: JsObject =
+    def okResponse(
+      formResultId: String = "12890",
+      gatewayUrl: String = "http://localhost:9712/submission/ChRIS/CISR/Filing/sync/CIS300MR"
+    ): JsObject =
       Json.obj(
         "govtalk_status" -> Json.arr(
           Json.obj(
             "userIdentifier"  -> "1",
-            "formResultID"    -> "12890",
+            "formResultID"    -> formResultId,
             "correlationID"   -> "C742D5DEE7EB4D15B4F7EFD50B890525",
             "formLock"        -> "false",
             "createDate"      -> "2026-02-03T00:00:00",
@@ -57,30 +70,63 @@ class GovTalkControllerSpec extends SpecBase {
             "numPolls"        -> 0,
             "pollInterval"    -> 0,
             "protocolStatus"  -> "dataRequest",
-            "gatewayURL"      -> "http://localhost:9712/submission/ChRIS/CISR/Filing/sync/CIS300MR"
+            "gatewayURL"      -> gatewayUrl
           )
         )
       )
 
-    "returns 200 with valid data when stage=polling" in new Setup {
-      when(mockResourceHelper.resourceAsString(responsePath))
-        .thenReturn(okResponse.toString)
+    Seq(
+      (
+        "90001",
+        verificationResponsePath,
+        "verification",
+        "http://localhost:6997/submission/ChRIS/poll/IR-CIS-VERIFY/0?final=SUBMITTED"
+      ),
+      (
+        "90002",
+        monthlyReturnResponsePath,
+        "monthly return",
+        "http://localhost:6997/submission/ChRIS/poll/IR-CIS-CIS300MR/0?final=SUBMITTED"
+      ),
+      (
+        "90003",
+        defaultResponsePath,
+        "default",
+        "http://localhost:9712/submission/ChRIS/CISR/Filing/sync/CIS300MR"
+      )
+    ).foreach { case (submissionId, responsePath, responseType, gatewayUrl) =>
+      s"returns the $responseType response when stage=polling and submissionId=$submissionId" in new Setup {
+        val response = okResponse(submissionId, gatewayUrl)
 
-      val request: FakeRequest[JsValue] =
-        makeJsonRequest(validRequestBody, s"$getGovTalkStatusUrl?stage=polling")
+        when(mockResourceHelper.resourceAsString(responsePath))
+          .thenReturn(response.toString)
 
-      val result: Future[Result] = controller.getGovTalkStatus()(request)
+        val request: FakeRequest[JsValue] =
+          makeJsonRequest(
+            validRequestBody(submissionId),
+            s"$getGovTalkStatusUrl?stage=polling"
+          )
 
-      status(result) mustBe OK
-      contentAsJson(result) mustBe okResponse
-      verify(mockResourceHelper).resourceAsString(responsePath)
+        val result: Future[Result] =
+          controller.getGovTalkStatus()(request)
+
+        status(result) mustBe OK
+        contentAsJson(result) mustBe response
+
+        verify(mockResourceHelper).resourceAsString(responsePath)
+        verifyNoMoreInteractions(mockResourceHelper)
+      }
     }
 
     "returns 404 when stage=initial" in new Setup {
       val request: FakeRequest[JsValue] =
-        makeJsonRequest(validRequestBody, s"$getGovTalkStatusUrl?stage=initial")
+        makeJsonRequest(
+          validRequestBody(),
+          s"$getGovTalkStatusUrl?stage=initial"
+        )
 
-      val result: Future[Result] = controller.getGovTalkStatus()(request)
+      val result: Future[Result] =
+        controller.getGovTalkStatus()(request)
 
       status(result) mustBe NOT_FOUND
       verifyNoInteractions(mockResourceHelper)
@@ -88,9 +134,13 @@ class GovTalkControllerSpec extends SpecBase {
 
     "returns 404 when stage is missing" in new Setup {
       val request: FakeRequest[JsValue] =
-        makeJsonRequest(validRequestBody, getGovTalkStatusUrl)
+        makeJsonRequest(
+          validRequestBody(),
+          getGovTalkStatusUrl
+        )
 
-      val result: Future[Result] = controller.getGovTalkStatus()(request)
+      val result: Future[Result] =
+        controller.getGovTalkStatus()(request)
 
       status(result) mustBe NOT_FOUND
       verifyNoInteractions(mockResourceHelper)
@@ -99,54 +149,65 @@ class GovTalkControllerSpec extends SpecBase {
     "returns 404 for scenario 404" in new Setup {
       val request: FakeRequest[JsValue] =
         makeJsonRequest(
-          validRequestBody,
+          validRequestBody("90001"),
           s"$getGovTalkStatusUrl?stage=polling&scenario=404"
         )
 
-      val result: Future[Result] = controller.getGovTalkStatus()(request)
+      val result: Future[Result] =
+        controller.getGovTalkStatus()(request)
 
       status(result) mustBe NOT_FOUND
       verifyNoInteractions(mockResourceHelper)
     }
 
     "returns 400 BadRequest for invalid JSON" in new Setup {
-      val invalidBody: JsObject = Json.obj("nope" -> "nope")
+      val invalidBody: JsObject =
+        Json.obj("nope" -> "nope")
 
       val request: FakeRequest[JsValue] =
-        makeJsonRequest(invalidBody, s"$getGovTalkStatusUrl?stage=polling")
+        makeJsonRequest(
+          invalidBody,
+          s"$getGovTalkStatusUrl?stage=polling"
+        )
 
-      val result: Future[Result] = controller.getGovTalkStatus()(request)
+      val result: Future[Result] =
+        controller.getGovTalkStatus()(request)
 
       status(result) mustBe BAD_REQUEST
       (contentAsJson(result) \ "message").as[String] mustBe "Invalid payload"
+
       verifyNoInteractions(mockResourceHelper)
     }
 
     "returns 502 for scenario 502" in new Setup {
       val request: FakeRequest[JsValue] =
         makeJsonRequest(
-          validRequestBody,
+          validRequestBody("90001"),
           s"$getGovTalkStatusUrl?stage=polling&scenario=502"
         )
 
-      val result: Future[Result] = controller.getGovTalkStatus()(request)
+      val result: Future[Result] =
+        controller.getGovTalkStatus()(request)
 
       status(result) mustBe BAD_GATEWAY
       (contentAsJson(result) \ "message").as[String] must include("formp failed")
+
       verifyNoInteractions(mockResourceHelper)
     }
 
     "returns 500 for scenario 500" in new Setup {
       val request: FakeRequest[JsValue] =
         makeJsonRequest(
-          validRequestBody,
+          validRequestBody("90001"),
           s"$getGovTalkStatusUrl?stage=polling&scenario=500"
         )
 
-      val result: Future[Result] = controller.getGovTalkStatus()(request)
+      val result: Future[Result] =
+        controller.getGovTalkStatus()(request)
 
       status(result) mustBe INTERNAL_SERVER_ERROR
       (contentAsJson(result) \ "message").as[String] mustBe "Unexpected error"
+
       verifyNoInteractions(mockResourceHelper)
     }
   }
@@ -245,7 +306,7 @@ class GovTalkControllerSpec extends SpecBase {
         Json.toJson(
           UpdateGovTalkStatusRequest(
             userIdentifier = "123",
-            formResultID = "YE2025",
+            formResultID = "90003",
             endStateDate = Some(LocalDateTime.parse("2026-02-03T00:00:00")),
             protocolStatus = "dataRequest"
           )

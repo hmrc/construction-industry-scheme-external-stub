@@ -1,8 +1,8 @@
 {
   "govtalk_status": [
     {
-      "userIdentifier": "instance-monthly-return-001",
-      "formResultID": "90002",
+      "userIdentifier": "10001",
+      "formResultID": "90001",
       "correlationID": "C742D5DEE7EB4D15B4F7EFD50B890525",
       "formLock": "N",
       "createDate": "2026-02-03T00:00:00",
@@ -11,7 +11,7 @@
       "numPolls": 0,
       "pollInterval": 0,
       "protocolStatus": "dataRequest",
-      "gatewayURL": "http://localhost:6997/submission/ChRIS/poll/IR-CIS-CIS300MR/0?final=DEPARTMENTAL_ERROR"
+      "gatewayURL": "http://localhost:6997/submission/ChRIS/poll/IR-CIS-VERIFY/0?final=SUBMITTED"
     }
   ]
 }

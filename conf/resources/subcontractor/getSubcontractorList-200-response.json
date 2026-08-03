@@ -1,56 +1,61 @@
 {
-  "subcontractors":
-  [
+  "subcontractors": [
     {
-      "subcontractorId": "10101",
-      "subbieResourceRef": "1",
-      "type": "soletrader",
+      "subcontractorId": 10101,
+      "subbieResourceRef": 1,
+      "subcontractorType": "soletrader",
       "utr": "1111111111",
       "tradingName": "AAA",
-      "version": "1"
+      "createDate": "2026-01-01T00:00:00",
+      "version": 1
     },
     {
-      "subcontractorId": "20202",
-      "subbieResourceRef": "2",
-      "type": "soletrader",
+      "subcontractorId": 20202,
+      "subbieResourceRef": 2,
+      "subcontractorType": "soletrader",
       "utr": "2222222222",
       "tradingName": "BBB",
-      "version": "2"
+      "createDate": "2026-01-15T00:00:00",
+      "version": 2
     },
     {
-      "subcontractorId": "30303",
-      "subbieResourceRef": "3",
-      "type": "soletrader",
+      "subcontractorId": 30303,
+      "subbieResourceRef": 3,
+      "subcontractorType": "soletrader",
       "firstName": "John",
       "surname": "Smith",
+      "createDate": "2026-02-20T00:00:00",
       "addressLine1": "1 Main Street",
       "country": "GB",
       "postcode": "AA1 1AA",
-      "version": "3"
+      "version": 3
     },
     {
-      "subcontractorId": "40404",
-      "subbieResourceRef": "4",
-      "type": "soletrader",
+      "subcontractorId": 40404,
+      "subbieResourceRef": 4,
+      "subcontractorType": "soletrader",
       "utr": "4444444444",
       "tradingName": "CCC",
-      "version": "4"
+      "createDate": "2026-01-01T00:00:00",
+      "version": 4
     },
     {
-      "subcontractorId": "50505",
-      "subbieResourceRef": "5",
-      "type": "soletrader",
+      "subcontractorId": 50505,
+      "subbieResourceRef": 5,
+      "subcontractorType": "soletrader",
       "utr": "1211317359",
       "tradingName": "DDD",
-      "version": "5"
+      "createDate": "2026-03-10T00:00:00",
+      "version": 5
     },
     {
-      "subcontractorId": "60606",
-      "subbieResourceRef": "6",
-      "type": "soletrader",
+      "subcontractorId": 60606,
+      "subbieResourceRef": 6,
+      "subcontractorType": "soletrader",
       "utr": "3536885673",
       "tradingName": "EEE",
-      "version": "6"
+      "createDate": "2026-01-07T00:00:00",
+      "version": 6
     }
   ]
 }

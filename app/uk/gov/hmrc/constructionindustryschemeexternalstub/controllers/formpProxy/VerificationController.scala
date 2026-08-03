@@ -19,7 +19,6 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProx
 import play.api.Logging
 import play.api.libs.json.{JsError, JsValue, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.AuthenticatedRequest
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -53,8 +52,6 @@ class VerificationController @Inject() (
     s"$verificationResponsePath/getSubmissionWithVerificationBatch-200-response.json"
   private val getSubmittedVerifications_200_ResponsePath                                   =
     s"$verificationResponsePath/getSubmittedVerifications-200-response.json"
-  private val getSubmissionWithVerificationBatch_200_ResponsePath                          =
-    s"$verificationResponsePath/getSubmissionWithVerificationBatch-200-response.json"
 
   private def withEnrolmentDispatch(onSuccess: => Result)(implicit request: AuthenticatedRequest[_]): Result =
     enrolmentHelper.contractorEnrolmentsOpt(request) match {
@@ -181,7 +178,7 @@ class VerificationController @Inject() (
         )
     }
 
-  def getSubmissionWithVerificationBatch(
+  def getSubmissionWithVerificationBatchByRefs(
     instanceId: String,
     verificationBatchResourceRef: Long
   ): Action[AnyContent] =

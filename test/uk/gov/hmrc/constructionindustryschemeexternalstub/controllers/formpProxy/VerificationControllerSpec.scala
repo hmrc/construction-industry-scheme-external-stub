@@ -1275,7 +1275,7 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
         val req: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, url)
 
         val res: Future[Result] =
-          controller.getSubmissionWithVerificationBatch(
+          controller.getSubmissionWithVerificationBatchByRefs(
             instanceId,
             verificationBatchResourceRef
           )(req)
@@ -1339,7 +1339,7 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
         val req: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, url)
 
         val res: Future[Result] =
-          controller.getSubmissionWithVerificationBatch(
+          controller.getSubmissionWithVerificationBatchByRefs(
             instanceId,
             verificationBatchResourceRef
           )(req)
@@ -1360,7 +1360,7 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
         val req: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, url)
 
         val res: Future[Result] =
-          controller.getSubmissionWithVerificationBatch(
+          controller.getSubmissionWithVerificationBatchByRefs(
             instanceId,
             verificationBatchResourceRef
           )(req)
@@ -1380,7 +1380,7 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
         val req: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, url)
 
         val res: Future[Result] =
-          controller.getSubmissionWithVerificationBatch(
+          controller.getSubmissionWithVerificationBatchByRefs(
             instanceId,
             verificationBatchResourceRef
           )(req)
@@ -1400,7 +1400,7 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
         val req: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, url)
 
         val res: Future[Result] =
-          controller.getSubmissionWithVerificationBatch(
+          controller.getSubmissionWithVerificationBatchByRefs(
             instanceId,
             verificationBatchResourceRef
           )(req)

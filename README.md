@@ -2579,6 +2579,13 @@ The response includes:
 }
 ```
 
+* TaxOfficeNumber = `502` → Response status: `502`
+
+```json
+{
+  "message": "formp failed"
+}
+```
 ### ChRIS
 
 **Endpoint**: `POST /submission/ChRIS/CISR/Filing/sync/CIS300MR`

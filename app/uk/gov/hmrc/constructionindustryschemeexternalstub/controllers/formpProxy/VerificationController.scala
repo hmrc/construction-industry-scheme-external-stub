@@ -184,7 +184,7 @@ class VerificationController @Inject() (
   ): Action[AnyContent] =
     authorise { implicit request =>
       logger.info(
-        s"[VerificationController][getSubmissionWithVerificationBatch] Returning stubbed response for instanceId=$instanceId, verificationBatchResourceRef=$verificationBatchResourceRef"
+        s"[VerificationController][getSubmissionWithVerificationBatchByRefs] Returning stubbed response for instanceId=$instanceId, verificationBatchResourceRef=$verificationBatchResourceRef"
       )
 
       withEnrolmentDispatch(

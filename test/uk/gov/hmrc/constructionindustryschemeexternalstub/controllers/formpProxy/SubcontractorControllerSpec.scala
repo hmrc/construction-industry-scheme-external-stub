@@ -17,15 +17,15 @@
 package uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy
 
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito._
+import org.mockito.Mockito.*
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.FakeAuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.base.SpecBase
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.EmployerReference
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.CreateAndUpdateSubcontractorRequest
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateAndUpdateSubcontractorRequest, DeleteSubcontractorRequest}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.ContractorScheme
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.response.{GetSubcontractorListResponse, GetSubcontractorResponse, Subcontractor}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
@@ -146,6 +146,9 @@ class SubcontractorControllerSpec extends SpecBase {
         )
       )
     )
+
+  private val deleteSubcontractorUrl: String =
+    "/cis/subcontractor/delete"
 
   ".createAndUpdateSubcontractor" - {
 
@@ -461,6 +464,25 @@ class SubcontractorControllerSpec extends SpecBase {
 
       status(res) mustBe INTERNAL_SERVER_ERROR
       (contentAsJson(res) \ "message").as[String] mustBe "Missing enrolments"
+    }
+  }
+
+  ".deleteSubcontractor" - {
+
+    "returns 201 Created for a valid request body" in new Setup {
+      val requestBody = DeleteSubcontractorRequest(
+        instanceId = "abc-123",
+        subbieResourceRef = 10L
+      )
+
+      val request: FakeRequest[DeleteSubcontractorRequest] =
+        FakeRequest(POST, deleteSubcontractorUrl)
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(requestBody)
+
+      val result: Future[Result] = controller.deleteSubcontractor(request)
+
+      status(result) mustBe NO_CONTENT
     }
   }
 

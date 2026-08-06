@@ -9,7 +9,7 @@
       "subbieResourceRef":  13,
       "utr": "8786438047",
       "nino": "AB623456C",
-      "subcontractorType": "SoleTrader"
+      "subcontractorType": "soletrader"
     },
     {
       "subcontractorId": 1,
@@ -20,7 +20,7 @@
       "subbieResourceRef":  10,
       "utr": "1111111111",
       "nino": "AA123456A",
-      "subcontractorType": "SoleTrader"
+      "subcontractorType": "soletrader"
     }
   ],
   "verificationBatch": {

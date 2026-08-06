@@ -23,7 +23,7 @@ import uk.gov.hmrc.constructionindustryschemeexternalstub.models.*
 
 class GetCurrentVerificationBatchResponseSpec extends AnyWordSpec with Matchers {
 
-  "GetNewestVerificationBatchResponse Json format" should {
+  "GetCurrentVerificationBatchResponse Json format" should {
 
     "write a response to JSON" in {
       val model = GetCurrentVerificationBatchResponse(

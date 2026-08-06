@@ -269,7 +269,8 @@
   "verificationBatch": {
       "verificationBatchId": 99,
       "status": "STARTED",
-      "verificationNumber": "VB00000001"
+      "verificationNumber": "VB00000001",
+      "verifBatchResourceRef": 9
     },
   "verifications": [
     {
@@ -278,7 +279,8 @@
       "verificationNumber": "V0000000001",
       "taxTreatment": "0",
       "verificationBatchId": 99,
-      "subcontractorId": 1
+      "subcontractorId": 1,
+      "verificationResourceRef": 10
     }
   ],
   "submission": {

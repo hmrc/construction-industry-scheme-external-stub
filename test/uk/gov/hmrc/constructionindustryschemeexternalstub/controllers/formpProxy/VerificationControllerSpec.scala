@@ -19,7 +19,7 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProx
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
 import org.scalatest.freespec.AnyFreeSpec
-import play.api.libs.json.{JsNull, JsValue, Json}
+import play.api.libs.json.{JsNull, JsObject, JsValue, Json}
 import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -28,6 +28,7 @@ import uk.gov.hmrc.constructionindustryschemeexternalstub.base.SpecBase
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{CreateVerifications, DeleteVerifications, EmployerReference}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
+
 import scala.concurrent.Future
 import java.time.LocalDateTime
 
@@ -1455,6 +1456,46 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
 
       verifyNoInteractions(mockResourceHelper)
       verifyNoInteractions(mockEnrolmentsHelper)
+    }
+  }
+
+  ".proceedInsufficientVerification" - {
+
+    val postUrl = "/cis/verification/proceed-with-insufficient-data"
+
+    val validJson: JsValue =
+      Json.toJson(
+        ProceedInsufficientVerificationRequest(
+          instanceId = "1",
+          verificationBatchResourceRef = 10L,
+          verificationResourceRef = 9L,
+          proceed = "Y"
+        )
+      )
+
+    "returns 200 on valid payload" in new Setup {
+      val req: FakeRequest[JsValue] = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(validJson)
+
+      val res: Future[Result] = controller.proceedInsufficientVerification()(req)
+
+      status(res) mustBe OK
+      contentAsString(res) mustBe ""
+    }
+
+    "returns 400 BadRequest when JSON is invalid" in new Setup {
+      val invalidJson: JsObject = Json.obj() // missing required fields
+
+      val req: FakeRequest[JsObject] = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(invalidJson)
+
+      val res: Future[Result] = controller.proceedInsufficientVerification()(req)
+
+      status(res) mustBe BAD_REQUEST
+      (contentAsJson(res) \ "message").as[String] mustBe "Invalid payload"
+      (contentAsJson(res) \ "errors").isDefined mustBe true
     }
   }
 

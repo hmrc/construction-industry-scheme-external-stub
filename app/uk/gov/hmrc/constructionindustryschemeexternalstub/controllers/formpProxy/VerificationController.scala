@@ -234,4 +234,13 @@ class VerificationController @Inject() (
         )
     }
 
+  def proceedInsufficientVerification(): Action[JsValue] =
+    authorise(parse.json) { implicit request =>
+      request.body
+        .validate[ProceedInsufficientVerificationRequest]
+        .fold(
+          errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
+          _ => Ok
+        )
+    }
 }

@@ -18,7 +18,7 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests
 
 import play.api.libs.json.{Json, OFormat}
 
-final case class ProceedInsufficientVerificationRequest(
+case class ProceedInsufficientVerificationRequest(
   instanceId: String,
   verificationBatchResourceRef: Long,
   verificationResourceRef: Long,

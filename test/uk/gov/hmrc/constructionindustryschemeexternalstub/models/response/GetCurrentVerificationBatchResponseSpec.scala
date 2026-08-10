@@ -21,6 +21,8 @@ import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.{JsSuccess, Json}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.*
 
+import java.time.LocalDateTime
+
 class GetCurrentVerificationBatchResponseSpec extends AnyWordSpec with Matchers {
 
   "GetNewestVerificationBatchResponse Json format" should {
@@ -32,14 +34,35 @@ class GetCurrentVerificationBatchResponseSpec extends AnyWordSpec with Matchers 
             subcontractorId = 1L,
             subbieResourceRef = Some(10L),
             firstName = Some("John"),
-            surname = Some("Smith"),
             secondName = None,
+            surname = Some("Smith"),
             tradingName = Some("ACME"),
             utr = Some("1111111111"),
             nino = Some("AA123456A"),
             crn = Some("AC012345"),
             partnerUtr = Some("5860920998"),
-            partnershipTradingName = Some("ACME Trading")
+            partnershipTradingName = Some("ACME Trading"),
+            subcontractorType = Some("soletrader"),
+            addressLine1 = None,
+            addressLine2 = None,
+            addressLine3 = None,
+            addressLine4 = None,
+            country = None,
+            postcode = None,
+            emailAddress = Some("john.smith@test.com"),
+            phoneNumber = Some("01911234567"),
+            mobilePhoneNumber = Some("07123456789"),
+            worksReferenceNumber = Some("WR001"),
+            matched = Some("Y"),
+            autoVerified = Some("Y"),
+            verified = Some("Y"),
+            verificationNumber = Some("V123456789"),
+            taxTreatment = Some("0"),
+            verificationDate = Some(LocalDateTime.parse("2026-08-07T10:00:00")),
+            version = Some(1),
+            updatedTaxTreatment = None,
+            lastMonthlyReturnDate = Some(LocalDateTime.parse("2026-07-31T00:00:00")),
+            pendingVerifications = Some(0)
           )
         ),
         verificationBatch = Some(
@@ -53,7 +76,13 @@ class GetCurrentVerificationBatchResponseSpec extends AnyWordSpec with Matchers 
             verificationId = 1001L,
             verificationBatchId = Some(99L),
             subcontractorId = Some(1L),
-            verificationResourceRef = Some(1L)
+            verificationResourceRef = Some(1L),
+            subcontractorName = Some("John Smith"),
+            verificationNumber = Some("V123456789"),
+            taxTreatment = Some("0"),
+            actionIndicator = Some("A"),
+            proceed = Some("Y"),
+            matched = Some("Y")
           )
         )
       )
@@ -73,6 +102,21 @@ class GetCurrentVerificationBatchResponseSpec extends AnyWordSpec with Matchers 
       (sub0 \ "crn").as[String] mustBe "AC012345"
       (sub0 \ "partnerUtr").as[String] mustBe "5860920998"
       (sub0 \ "partnershipTradingName").as[String] mustBe "ACME Trading"
+      (sub0 \ "subcontractorType").as[String] mustBe "soletrader"
+      (sub0 \ "emailAddress").as[String] mustBe "john.smith@test.com"
+      (sub0 \ "phoneNumber").as[String] mustBe "01911234567"
+      (sub0 \ "mobilePhoneNumber").as[String] mustBe "07123456789"
+      (sub0 \ "worksReferenceNumber").as[String] mustBe "WR001"
+      (sub0 \ "matched").as[String] mustBe "Y"
+      (sub0 \ "autoVerified").as[String] mustBe "Y"
+      (sub0 \ "verified").as[String] mustBe "Y"
+      (sub0 \ "verificationNumber").as[String] mustBe "V123456789"
+      (sub0 \ "taxTreatment").as[String] mustBe "0"
+      (sub0 \ "verificationDate").as[String] mustBe "2026-08-07T10:00:00"
+      (sub0 \ "version").as[Int] mustBe 1
+      (sub0 \ "updatedTaxTreatment").toOption mustBe None
+      (sub0 \ "lastMonthlyReturnDate").as[String] mustBe "2026-07-31T00:00:00"
+      (sub0 \ "pendingVerifications").as[Int] mustBe 0
 
       val vb0 = json \ "verificationBatch"
 
@@ -85,6 +129,12 @@ class GetCurrentVerificationBatchResponseSpec extends AnyWordSpec with Matchers 
       (v0 \ "verificationBatchId").as[Long] mustBe 99L
       (v0 \ "subcontractorId").as[Long] mustBe 1L
       (v0 \ "verificationResourceRef").as[Long] mustBe 1L
+      (v0 \ "subcontractorName").as[String] mustBe "John Smith"
+      (v0 \ "verificationNumber").as[String] mustBe "V123456789"
+      (v0 \ "taxTreatment").as[String] mustBe "0"
+      (v0 \ "actionIndicator").as[String] mustBe "A"
+      (v0 \ "proceed").as[String] mustBe "Y"
+      (v0 \ "matched").as[String] mustBe "Y"
     }
 
     "round-trip (model -> json -> model) without losing data" in {

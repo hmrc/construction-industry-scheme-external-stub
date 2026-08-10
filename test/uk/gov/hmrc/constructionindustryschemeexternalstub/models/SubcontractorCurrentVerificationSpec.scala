@@ -19,6 +19,8 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub.models
 import uk.gov.hmrc.constructionindustryschemeexternalstub.base.SpecBase
 import play.api.libs.json.Json
 
+import java.time.LocalDateTime
+
 class SubcontractorCurrentVerificationSpec extends SpecBase {
   "SubcontractorCurrentVerification" - {
     "serialize to JSON correctly" in {
@@ -26,28 +28,53 @@ class SubcontractorCurrentVerificationSpec extends SpecBase {
         subcontractorId = 1L,
         subbieResourceRef = Some(10L),
         firstName = Some("John"),
-        surname = Some("Smith"),
         secondName = None,
+        surname = Some("Smith"),
         tradingName = Some("ACME"),
         utr = Some("1111111111"),
         nino = Some("AA123456A"),
         crn = Some("AC012345"),
         partnerUtr = Some("5860920998"),
-        partnershipTradingName = Some("ACME Trading")
+        partnershipTradingName = Some("ACME Trading"),
+        subcontractorType = Some("soletrader"),
+        addressLine1 = None,
+        addressLine2 = None,
+        addressLine3 = None,
+        addressLine4 = None,
+        country = None,
+        postcode = None,
+        emailAddress = Some("john.smith@test.com"),
+        phoneNumber = Some("01911234567"),
+        mobilePhoneNumber = Some("07123456789"),
+        worksReferenceNumber = Some("WR001"),
+        matched = Some("Y"),
+        autoVerified = Some("Y"),
+        verified = Some("Y"),
+        verificationNumber = Some("V123456789"),
+        taxTreatment = Some("0"),
+        verificationDate = Some(LocalDateTime.parse("2026-08-07T10:00:00")),
+        version = Some(1),
+        updatedTaxTreatment = None,
+        lastMonthlyReturnDate = Some(LocalDateTime.parse("2026-07-31T00:00:00")),
+        pendingVerifications = Some(0)
       )
       val json           = Json.toJson(subcontractors)
 
-      (json \ "subcontractorId").as[Long] mustBe 1L
-      (json \ "subbieResourceRef").as[Long] mustBe 10L
-      (json \ "firstName").as[String] mustBe "John"
-      (json \ "surname").as[String] mustBe "Smith"
-      (json \ "secondName").toOption mustBe None
-      (json \ "tradingName").as[String] mustBe "ACME"
-      (json \ "utr").as[String] mustBe "1111111111"
-      (json \ "nino").as[String] mustBe "AA123456A"
-      (json \ "crn").as[String] mustBe "AC012345"
-      (json \ "partnerUtr").as[String] mustBe "5860920998"
-      (json \ "partnershipTradingName").as[String] mustBe "ACME Trading"
+      (json \ "subcontractorType").as[String] mustBe "soletrader"
+      (json \ "emailAddress").as[String] mustBe "john.smith@test.com"
+      (json \ "phoneNumber").as[String] mustBe "01911234567"
+      (json \ "mobilePhoneNumber").as[String] mustBe "07123456789"
+      (json \ "worksReferenceNumber").as[String] mustBe "WR001"
+      (json \ "matched").as[String] mustBe "Y"
+      (json \ "autoVerified").as[String] mustBe "Y"
+      (json \ "verified").as[String] mustBe "Y"
+      (json \ "verificationNumber").as[String] mustBe "V123456789"
+      (json \ "taxTreatment").as[String] mustBe "0"
+      (json \ "verificationDate").as[String] mustBe "2026-08-07T10:00:00"
+      (json \ "version").as[Int] mustBe 1
+      (json \ "updatedTaxTreatment").toOption mustBe None
+      (json \ "lastMonthlyReturnDate").as[String] mustBe "2026-07-31T00:00:00"
+      (json \ "pendingVerifications").as[Int] mustBe 0
     }
     "deserialize from JSON correctly" in {
       val json   = Json.parse(
@@ -55,44 +82,84 @@ class SubcontractorCurrentVerificationSpec extends SpecBase {
           |{
           |  "subcontractorId": 1,
           |  "subbieResourceRef": 10,
-          |  "firstName" : "John",
-          |  "surname" : "Smith",
-          |  "secondName" : "Paul",
-          |  "tradingName" : "ACME",
-          |  "utr" : "1111111111",
-          |  "nino" : "AA123456A",
-          |  "crn" : "AC012345",
-          |  "partnerUtr" : "5860920998",
-          |  "partnershipTradingName" : "ACME Trading"
+          |  "subcontractorType": "soletrader",
+          |  "firstName": "John",
+          |  "surname": "Smith",
+          |  "secondName": "Paul",
+          |  "tradingName": "ACME",
+          |  "utr": "1111111111",
+          |  "nino": "AA123456A",
+          |  "crn": "AC012345",
+          |  "partnerUtr": "5860920998",
+          |  "partnershipTradingName": "ACME Trading",
+          |  "emailAddress": "john.smith@test.com",
+          |  "phoneNumber": "01911234567",
+          |  "mobilePhoneNumber": "07123456789",
+          |  "worksReferenceNumber": "WR001",
+          |  "matched": "Y",
+          |  "autoVerified": "Y",
+          |  "verified": "Y",
+          |  "verificationNumber": "V123456789",
+          |  "taxTreatment": "0",
+          |  "verificationDate": "2026-08-07T10:00:00",
+          |  "version": 1,
+          |  "updatedTaxTreatment": null,
+          |  "lastMonthlyReturnDate": "2026-07-31T00:00:00",
+          |  "pendingVerifications": 0
           |}
           |""".stripMargin
       )
       val result = json.as[SubcontractorCurrentVerification]
-      result.subcontractorId mustBe 1L
-      result.subbieResourceRef mustBe Some(10L)
-      result.firstName mustBe Some("John")
-      result.surname mustBe Some("Smith")
-      result.secondName mustBe Some("Paul")
-      result.tradingName mustBe Some("ACME")
-      result.utr mustBe Some("1111111111")
-      result.nino mustBe Some("AA123456A")
-      result.crn mustBe Some("AC012345")
-      result.partnerUtr mustBe Some("5860920998")
-      result.partnershipTradingName mustBe Some("ACME Trading")
+      result.subcontractorType mustBe Some("soletrader")
+      result.emailAddress mustBe Some("john.smith@test.com")
+      result.phoneNumber mustBe Some("01911234567")
+      result.mobilePhoneNumber mustBe Some("07123456789")
+      result.worksReferenceNumber mustBe Some("WR001")
+      result.matched mustBe Some("Y")
+      result.autoVerified mustBe Some("Y")
+      result.verified mustBe Some("Y")
+      result.verificationNumber mustBe Some("V123456789")
+      result.taxTreatment mustBe Some("0")
+      result.verificationDate mustBe Some(LocalDateTime.parse("2026-08-07T10:00:00"))
+      result.version mustBe Some(1)
+      result.updatedTaxTreatment mustBe None
+      result.lastMonthlyReturnDate mustBe Some(LocalDateTime.parse("2026-07-31T00:00:00"))
+      result.pendingVerifications mustBe Some(0)
     }
     "round-trip serialize and deserialize correctly" in {
       val subcontractors = SubcontractorCurrentVerification(
         subcontractorId = 1L,
         subbieResourceRef = Some(10L),
         firstName = Some("John"),
-        surname = Some("Smith"),
         secondName = None,
+        surname = Some("Smith"),
         tradingName = Some("ACME"),
         utr = Some("1111111111"),
         nino = Some("AA123456A"),
         crn = Some("AC012345"),
         partnerUtr = Some("5860920998"),
-        partnershipTradingName = Some("ACME Trading")
+        partnershipTradingName = Some("ACME Trading"),
+        subcontractorType = Some("soletrader"),
+        addressLine1 = None,
+        addressLine2 = None,
+        addressLine3 = None,
+        addressLine4 = None,
+        country = None,
+        postcode = None,
+        emailAddress = Some("john.smith@test.com"),
+        phoneNumber = Some("01911234567"),
+        mobilePhoneNumber = Some("07123456789"),
+        worksReferenceNumber = Some("WR001"),
+        matched = Some("Y"),
+        autoVerified = Some("Y"),
+        verified = Some("Y"),
+        verificationNumber = Some("V123456789"),
+        taxTreatment = Some("0"),
+        verificationDate = Some(LocalDateTime.parse("2026-08-07T10:00:00")),
+        version = Some(1),
+        updatedTaxTreatment = None,
+        lastMonthlyReturnDate = Some(LocalDateTime.parse("2026-07-31T00:00:00")),
+        pendingVerifications = Some(0)
       )
       val json           = Json.toJson(subcontractors)
       val result         = json.as[SubcontractorCurrentVerification]

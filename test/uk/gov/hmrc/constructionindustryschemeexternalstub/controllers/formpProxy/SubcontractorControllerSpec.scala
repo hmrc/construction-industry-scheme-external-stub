@@ -25,9 +25,9 @@ import play.api.test.Helpers.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.FakeAuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.base.SpecBase
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.EmployerReference
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateAndUpdateSubcontractorRequest, DeleteSubcontractorRequest}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests._
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.ContractorScheme
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.response.{GetSubcontractorListResponse, GetSubcontractorResponse, Subcontractor}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.response._
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 
 import scala.concurrent.Future
@@ -38,6 +38,7 @@ class SubcontractorControllerSpec extends SpecBase {
   private val updateSubcontractorUrl                                        = "/cis/subcontractor/create-and-update"
   private val getListCisId: String                                          = "cis-123"
   private val getSubcontractorListUrl: String                               = s"/cis/subcontractors/$getListCisId"
+  private val updateExistingSubcontractorUrl: String                        = "/cis/subcontractor/update"
   private val sampleSubcontractorListResponse: GetSubcontractorListResponse =
     GetSubcontractorListResponse(
       subcontractors = List(
@@ -483,6 +484,135 @@ class SubcontractorControllerSpec extends SpecBase {
       val result: Future[Result] = controller.deleteSubcontractor(request)
 
       status(result) mustBe NO_CONTENT
+    }
+  }
+
+  ".updateSubcontractor" - {
+
+    val validUpdateJson: JsValue =
+      Json.parse(
+        """
+          |{
+          |  "cisId": "abc-123",
+          |  "subcontractor": {
+          |    "subcontractorId": 999,
+          |    "subbieResourceRef": 10,
+          |    "utr": "1234567890",
+          |    "pageVisited": 1,
+          |    "firstName": "John",
+          |    "nino": "AA123456A",
+          |    "secondName": "Q",
+          |    "surname": "Smith",
+          |    "tradingName": "John Smith Trading",
+          |    "subcontractorType": "soletrader",
+          |    "addressLine1": "1 Main Street",
+          |    "addressLine2": "Flat 2",
+          |    "addressLine3": "London",
+          |    "country": "GB",
+          |    "postcode": "AA1 1AA",
+          |    "matched": "Y",
+          |    "autoVerified": "N",
+          |    "verified": "Y",
+          |    "verificationNumber": "V123456",
+          |    "taxTreatment": "NET",
+          |    "updatedTaxTreatment": "NET",
+          |    "version": 5,
+          |    "pendingVerifications": 0
+          |  }
+          |}
+          |""".stripMargin
+      )
+
+    "returns 200 with incremented version for contractor enrolment" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("200", "")))
+
+      val req: FakeRequest[JsValue] =
+        makeJsonRequest(validUpdateJson, updateExistingSubcontractorUrl)
+
+      val res: Future[Result] =
+        controller.updateSubcontractor(req)
+
+      status(res) mustBe OK
+      contentAsJson(res) mustBe Json.toJson(UpdateSubcontractorResponse(6))
+      (contentAsJson(res) \ "version").as[Int] mustBe 6
+    }
+
+    "returns 200 with incremented version when contractor enrolment is missing but agent enrolment is present" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(Some("agent-123"))
+
+      val req: FakeRequest[JsValue] =
+        makeJsonRequest(validUpdateJson, updateExistingSubcontractorUrl)
+
+      val res: Future[Result] =
+        controller.updateSubcontractor(req)
+
+      status(res) mustBe OK
+      contentAsJson(res) mustBe Json.obj("version" -> 6)
+    }
+
+    "returns 400 BadRequest when payload is invalid" in new Setup {
+      val invalidJson: JsValue =
+        Json.obj("bad" -> "payload")
+
+      val req: FakeRequest[JsValue] =
+        makeJsonRequest(invalidJson, updateExistingSubcontractorUrl)
+
+      val res: Future[Result] =
+        controller.updateSubcontractor(req)
+
+      status(res) mustBe BAD_REQUEST
+      (contentAsJson(res) \ "message").as[String] mustBe "Invalid payload"
+      (contentAsJson(res) \ "errors").isDefined mustBe true
+    }
+
+    "returns 502 BadGateway for taxOfficeNumber = 502" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("502", "")))
+
+      val req: FakeRequest[JsValue] =
+        makeJsonRequest(validUpdateJson, updateExistingSubcontractorUrl)
+
+      val res: Future[Result] =
+        controller.updateSubcontractor(req)
+
+      status(res) mustBe BAD_GATEWAY
+      (contentAsJson(res) \ "message").as[String] mustBe "formp failed"
+    }
+
+    "returns 500 with generic message for taxOfficeNumber = 500" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("500", "")))
+
+      val req: FakeRequest[JsValue] =
+        makeJsonRequest(validUpdateJson, updateExistingSubcontractorUrl)
+
+      val res: Future[Result] =
+        controller.updateSubcontractor(req)
+
+      status(res) mustBe INTERNAL_SERVER_ERROR
+      (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
+    }
+
+    "returns 500 when no contractor enrolment and no agent enrolment found" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      val req: FakeRequest[JsValue] =
+        makeJsonRequest(validUpdateJson, updateExistingSubcontractorUrl)
+
+      val res: Future[Result] =
+        controller.updateSubcontractor(req)
+
+      status(res) mustBe INTERNAL_SERVER_ERROR
+      (contentAsJson(res) \ "message").as[String] mustBe "Missing enrolments"
     }
   }
 

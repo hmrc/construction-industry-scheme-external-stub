@@ -3453,40 +3453,66 @@ staging = https://construction-industry-scheme-external-stub.protected.mdtp:443/
     <Header>
         <MessageDetails>
             <Class>IR-CIS-VERIFY</Class>
-            <Qualifier>error</Qualifier>
+            <Qualifier>response</Qualifier>
             <Function>submit</Function>
-            <TransactionID></TransactionID>
             <CorrelationID>[correlationId]</CorrelationID>
-            <ResponseEndPoint PollInterval="2">[pollingUrlHost]submission/ChRIS/IR-CIS-VERIFY/Filing/data/true</ResponseEndPoint>
+            <ResponseEndPoint/>
+            <GatewayTimestamp>2025-12-01T11:41:05.431</GatewayTimestamp>
             <Transformation>XML</Transformation>
-            <GatewayTimestamp>2025-12-01T10:51:31.225</GatewayTimestamp>
         </MessageDetails>
     </Header>
     <GovTalkDetails>
         <Keys/>
-        <GovTalkErrors>
-            <Error>
-                <RaisedBy>ChRIS</RaisedBy>
-                <Number>3001</Number>
-                <Type>business</Type>
-                <Text>Your submission failed due to business validation errors. Please see below for details.</Text>
-                <Location></Location>
-            </Error>
-        </GovTalkErrors>
     </GovTalkDetails>
     <Body>
-        <ErrorResponse SchemaVersion="2.0">
-            <Application>
-                <MessageCount>1</MessageCount>
-            </Application>
-            <Error>
-                <RaisedBy>ChRIS</RaisedBy>
-                <Number>2021</Number>
-                <Type>business</Type>
-                <Text>The supplied IRmark is incorrect.</Text>
-                <Location>IRmark</Location>
-            </Error>
-        </ErrorResponse>
+        <SuccessResponse xmlns="http://www.inlandrevenue.gov.uk/SuccessResponse">
+            <IRmarkReceipt>
+                <dsig:Signature xmlns:dsig="http://www.w3.org/2000/09/xmldsig#">
+                    <dsig:SignedInfo>
+                        <dsig:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+                        <dsig:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+                        <dsig:Reference>
+                            <dsig:Transforms>
+                                <dsig:Transform Algorithm="http://www.w3.org/TR/1999/REC-xpath-19991116">
+                                    <dsig:XPath>(count(ancestor-or-self::node()|/gti:GovTalkMessage/gti:Body)=count(ancestor-or-self::node())) and (count(ancestor-or-self::node()|/gti:GovTalkMessage/gti:Body/*[name()='IRenvelope']/*[name()='IRheader']/*[name()='IRmark'])!=count(ancestor-or-self::node()))</dsig:XPath>
+                                </dsig:Transform>
+                                <dsig:Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/>
+                            </dsig:Transforms>
+                            <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+                            <dsig:DigestValue/>
+                        </dsig:Reference>
+                    </dsig:SignedInfo>
+                    <dsig:SignatureValue>xjd0lzhAQrnHZsE5inNCOVsmwcQ9HTu+CFUoyqEcOhVvxj2jvYGcjkhu7sZkZJ9RBjBcEP/eQTbesMTrnUgofuMqaROt8ZyD/RJKFIwh5TtNzYzDM55Pa3GDd2ZXcmfR38mS9KPwqc5Ty+Eqv69FxqivCQk46H20F8fnWnx85H4=</dsig:SignatureValue> <dsig:KeyInfo>
+                    <dsig:X509Data>
+                        <dsig:X509Certificate>MIID0zCCAzygAwIBAgIBADANBgkqhkiG9w0BAQQFADCBqDELMAkGA1UEBhMCbmwxFjAUBgNVBAgTDU5vb3JkLUhvbGxhbmQxFzAVBgNVBAoTDk1vYmlsZWZpc2guY29tMRAwDgYDVQQHEwdaYWFuZGFtMRIwEAYDVQQLEwlNYXJrZXRpbmcxGzAZBgNVBAMTEnd3dy5tb2JpbGVmaXNoLmNvbTElMCMGCSqGSIb3DQEJARYWY29udGFjdEBtb2JpbGVmaXNoLmNvbTAeFw0xMTEwMTMxMDI2NTZaFw0xMjEwMTIxMDI2NTZaMIGoMQswCQYDVQQGEwJubDEWMBQGA1UECBMNTm9vcmQtSG9sbGFuZDEXMBUGA1UEChMOTW9iaWxlZmlzaC5jb20xEDAOBgNVBAcTB1phYW5kYW0xEjAQBgNVBAsTCU1hcmtldGluZzEbMBkGA1UEAxMSd3d3Lm1vYmlsZWZpc2guY29tMSUwIwYJKoZIhvcNAQkBFhZjb250YWN0QG1vYmlsZWZpc2guY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQD3o83CcmMMOC/fnjVv2puirJTs36+al6RDBe2tbFLKKODd29DZbmH9/6R77VPZACvXxBdRzMls//YRVHoJyJVudy+B4siUfHP80pssg2ZXCmCtUZGS71ohmlHcGQGTVLj8wmicf/DfmMAgq19OFZJP5LUn3md/MQBOUYrFXt21dQIDAQABo4IBCTCCAQUwHQYDVR0OBBYEFAIuWYA/BMx8Gn/YOILevnJthkIZMIHVBgNVHSMEgc0wgcqAFAIuWYA/BMx8Gn/YOILevnJthkIZoYGupIGrMIGoMQswCQYDVQQGEwJubDEWMBQGA1UECBMNTm9vcmQtSG9sbGFuZDEXMBUGA1UEChMOTW9iaWxlZmlzaC5jb20xEDAOBgNVBAcTB1phYW5kYW0xEjAQBgNVBAsTCU1hcmtldGluZzEbMBkGA1UEAxMSd3d3Lm1vYmlsZWZpc2guY29tMSUwIwYJKoZIhvcNAQkBFhZjb250YWN0QG1vYmlsZWZpc2guY29tggEAMAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEEBQADgYEABCb+f82DKWIWBczTeKGc6Ka5U7oys/itCY7XOYMIvXYPj+tb+5PBrmTO3jZNoZso9cYYFcDGXySbk6wSZiEPlbMqkoYE62E6dVXAmbza3ZNNIX/yEpkE3ZeBBtYzJMPQme9jrMgwgMIhgVzQNL2KPkbWOtQfoYgnThHQKLBry6Y=</dsig:X509Certificate>
+                    </dsig:X509Data>
+                </dsig:KeyInfo>
+                </dsig:Signature>
+                <Message code="1">HMRC has received the IR-CIS-VERIFY document ref: 123/GL01 at 08.46 on 06/04/2017. The associated IRmark was: . We advise you to keep this receipt in both electronic and hardcopy versions for your records. You may wish to use them to identify your submission in the future.</Message>
+            </IRmarkReceipt>
+            <Message code="9004">The Subcontractor Verification has been processed and passed full validation</Message>
+            <AcceptedTime>2017-04-06T08:46:08.081</AcceptedTime>
+            <ResponseData>
+                <CISresponse xmlns="http://www.govtalk.gov.uk/taxation/CISresponse">
+                    <Contractor>
+                        <UTR>1234657890</UTR>
+                        <AOref>125PA12345000</AOref>
+                    </Contractor>
+                    <Subcontractor>
+                        <Name>
+                            <Fore>Noel</Fore>
+                            <Sur>Armstrong</Sur>
+                        </Name>
+                        <TradingName>DBB Construction</TradingName>
+                        <UTR>8786438047</UTR>
+                        <NINO>AB623456C</NINO>
+                        <Matched>Y</Matched>
+                        <TaxTreatment>net</TaxTreatment>
+                        <VerificationNumber>V1000000007</VerificationNumber>
+                    </Subcontractor>
+                </CISresponse>
+            </ResponseData>
+        </SuccessResponse>
     </Body>
 </GovTalkMessage>
 ```

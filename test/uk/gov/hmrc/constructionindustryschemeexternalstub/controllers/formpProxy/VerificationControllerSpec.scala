@@ -25,9 +25,9 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.FakeAuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.base.SpecBase
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{CreateVerifications, DeleteVerifications, EmployerReference}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.*
 import scala.concurrent.Future
 import java.time.LocalDateTime
 

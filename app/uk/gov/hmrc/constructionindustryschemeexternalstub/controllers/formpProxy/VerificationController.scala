@@ -182,17 +182,15 @@ class VerificationController @Inject() (
     instanceId: String,
     verificationBatchResourceRef: Long
   ): Action[AnyContent] =
-    authorise { implicit request =>
+    Action {
       logger.info(
         s"[VerificationController][getSubmissionWithVerificationBatchByRefs] Returning stubbed response for instanceId=$instanceId, verificationBatchResourceRef=$verificationBatchResourceRef"
       )
 
-      withEnrolmentDispatch(
-        Ok(
-          Json.parse(
-            resourceHelper.resourceAsString(
-              getSubmissionWithVerificationBatch_200_ResponsePath
-            )
+      Ok(
+        Json.parse(
+          resourceHelper.resourceAsString(
+            getSubmissionWithVerificationBatch_200_ResponsePath
           )
         )
       )

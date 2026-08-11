@@ -11,16 +11,16 @@
     },
     {
       "subcontractorId": 20202,
-      "subbieResourceRef": 27,
-      "subcontractorType": "soletrader",
+      "subbieResourceRef": 11,
+      "subcontractorType": "partnership",
       "utr": "2222222222",
-      "tradingName": "BBB",
+      "tradingName": "testPartnership",
       "createDate": "2026-01-15T00:00:00",
       "version": 2
     },
     {
       "subcontractorId": 30303,
-      "subbieResourceRef": 3,
+      "subbieResourceRef": 12,
       "subcontractorType": "soletrader",
       "firstName": "John",
       "surname": "Smith",
@@ -50,10 +50,19 @@
     },
     {
       "subcontractorId": 60606,
-      "subbieResourceRef": 6,
-      "subcontractorType": "soletrader",
+      "subbieResourceRef": 13,
+      "subcontractorType": "trust",
       "utr": "3536885673",
-      "tradingName": "EEE",
+      "tradingName": "Electric Builders",
+      "createDate": "2026-01-07T00:00:00",
+      "version": 6
+    },
+    {
+      "subcontractorId": 31267,
+      "subbieResourceRef": 8,
+      "subcontractorType": "company",
+      "utr": "3536885673",
+      "tradingName": "DBB Construction",
       "createDate": "2026-01-07T00:00:00",
       "version": 6
     }

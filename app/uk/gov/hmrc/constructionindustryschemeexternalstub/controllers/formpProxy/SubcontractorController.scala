@@ -98,11 +98,11 @@ class SubcontractorController @Inject() (
     authorise { implicit request =>
 
       val canDelete =
-        subbieResourceRef != 27L
+        subbieResourceRef != 7L
 
       val subcontractorName =
-        if (subbieResourceRef == 27L) {
-          "Gamma Builders"
+        if (subbieResourceRef == 7L) {
+          "Delta Trust"
         } else {
           "Test Subcontractor"
         }
@@ -127,15 +127,15 @@ class SubcontractorController @Inject() (
       val agentRefOpt      = enrolmentHelper.agentEnrolmentsOpt(request)
 
       val responsePath = subbieResourceRef match {
-        case 12 => getSubcontractorIndividual_200_ResponsePath
-        case 13 => getSubcontractorTrust_200_ResponsePath
-        case 8  => getSubcontractorCompany_200_ResponsePath
-        case 11 => getSubcontractorPartnership_200_ResponsePath
-        case 3  => getSubcontractorIndividual_200_UnverifiedResponsePath
-        case 14 => getSubcontractorTrust_200_UnverifiedResponsePath
-        case 7  => getSubcontractorCompany_200_UnverifiedResponsePath
-        case 15 => getSubcontractorPartnership_200_UnverifiedResponsePath
-        case _  => getSubcontractorIndividual_200_ResponsePath
+        case 1 => getSubcontractorIndividual_200_ResponsePath
+        case 2 => getSubcontractorIndividual_200_UnverifiedResponsePath
+        case 3 => getSubcontractorCompany_200_ResponsePath
+        case 4 => getSubcontractorCompany_200_UnverifiedResponsePath
+        case 5 => getSubcontractorPartnership_200_ResponsePath
+        case 6 => getSubcontractorPartnership_200_UnverifiedResponsePath
+        case 7 => getSubcontractorTrust_200_ResponsePath
+        case 8 => getSubcontractorTrust_200_UnverifiedResponsePath
+        case _ => getSubcontractorIndividual_200_ResponsePath
       }
 
       (contractorRefOpt, agentRefOpt) match {

@@ -35,24 +35,28 @@ class VerificationController @Inject() (
 )() extends BackendController(cc)
     with Logging {
 
-  private val verificationResponsePath                                                     = "/resources/verification"
-  private val getNewestVerificationBatch_200_ResponsePath                                  =
+  private val verificationResponsePath                                                           = "/resources/verification"
+  private val getNewestVerificationBatch_200_ResponsePath                                        =
     s"$verificationResponsePath/getNewestVerificationBatch-200-response.json"
-  private val getCurrentVerificationBatch_200_verificationBatchStatus_none_ResponsePath    =
+  private val getCurrentVerificationBatch_200_verificationBatchStatus_none_ResponsePath          =
     s"$verificationResponsePath/getCurrentVerificationBatch-200-verificationBatchStatus-none-response.json"
-  private val getCurrentVerificationBatch_200_verificationBatchStatus_started_ResponsePath =
+  private val getCurrentVerificationBatch_200_verificationBatchStatus_started_ResponsePath       =
     s"$verificationResponsePath/getCurrentVerificationBatch-200-verificationBatchStatus-started-response.json"
-  private val getCurrentVerificationBatch_200_verificationBatchStatus_chris_ResponsePath   =
+  private val getCurrentVerificationBatch_200_verificationBatchStatus_chris_ResponsePath         =
     s"$verificationResponsePath/getCurrentVerificationBatch-200-verificationBatchStatus-chris-response.json"
-  private val getLastSubmittedVerificationBatch_200_ResponsePath                           =
+  private val getLastSubmittedVerificationBatch_200_ResponsePath                                 =
     s"$verificationResponsePath/getLastSubmittedVerificationBatch-200-response.json"
-  private val createVerificationBatchAndVerifications_201_ResponsePath                     =
+  private val getLastSubmittedVerificationBatch_200_verificationBatchStatus_pending_ResponsePath =
+    s"$verificationResponsePath/getLastSubmittedVerificationBatch-200-verificationBatchStatus-pending-response.json"
+  private val getLastSubmittedVerificationBatch_200_verificationBatchStatus_none_ResponsePath    =
+    s"$verificationResponsePath/getLastSubmittedVerificationBatch-200-verificationBatchStatus-none-response.json"
+  private val createVerificationBatchAndVerifications_201_ResponsePath                           =
     s"$verificationResponsePath/createVerificationBatchAndVerifications-201-response.json"
-  private val createSubmissionForVerification_201_ResponsePath                             =
+  private val createSubmissionForVerification_201_ResponsePath                                   =
     s"$verificationResponsePath/createSubmissionForVerification-201-response.json"
-  private val getSubmissionWithVerificationBatch_200_ResponsePath                          =
+  private val getSubmissionWithVerificationBatch_200_ResponsePath                                =
     s"$verificationResponsePath/getSubmissionWithVerificationBatch-200-response.json"
-  private val getSubmittedVerifications_200_ResponsePath                                   =
+  private val getSubmittedVerifications_200_ResponsePath                                         =
     s"$verificationResponsePath/getSubmittedVerifications-200-response.json"
 
   private def withEnrolmentDispatch(onSuccess: => Result)(implicit request: AuthenticatedRequest[_]): Result =
@@ -79,9 +83,17 @@ class VerificationController @Inject() (
 
   def getLastSubmittedVerificationBatch(instanceId: String): Action[AnyContent] =
     authorise { implicit request =>
-      withEnrolmentDispatch(
-        Ok(Json.parse(resourceHelper.resourceAsString(getLastSubmittedVerificationBatch_200_ResponsePath)))
-      )
+      withEnrolmentDispatch {
+        val responsePath =
+          instanceId match {
+            case "1" => getLastSubmittedVerificationBatch_200_verificationBatchStatus_pending_ResponsePath
+            case "2" => getLastSubmittedVerificationBatch_200_ResponsePath
+            case "3" => getLastSubmittedVerificationBatch_200_verificationBatchStatus_none_ResponsePath
+            case _   => getLastSubmittedVerificationBatch_200_ResponsePath
+          }
+
+        Ok(Json.parse(resourceHelper.resourceAsString(responsePath)))
+      }
     }
 
   def getCurrentVerificationBatch(instanceId: String): Action[AnyContent] =

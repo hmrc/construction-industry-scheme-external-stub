@@ -44,6 +44,8 @@ class VerificationController @Inject() (
     s"$verificationResponsePath/getCurrentVerificationBatch-200-verificationBatchStatus-started-response.json"
   private val getCurrentVerificationBatch_200_verificationBatchStatus_chris_ResponsePath   =
     s"$verificationResponsePath/getCurrentVerificationBatch-200-verificationBatchStatus-chris-response.json"
+  private val getLastSubmittedVerificationBatch_200_ResponsePath                           =
+    s"$verificationResponsePath/getLastSubmittedVerificationBatch-200-response.json"
   private val createVerificationBatchAndVerifications_201_ResponsePath                     =
     s"$verificationResponsePath/createVerificationBatchAndVerifications-201-response.json"
   private val createSubmissionForVerification_201_ResponsePath                             =
@@ -72,6 +74,13 @@ class VerificationController @Inject() (
     authorise { implicit request =>
       withEnrolmentDispatch(
         Ok(Json.parse(resourceHelper.resourceAsString(getNewestVerificationBatch_200_ResponsePath)))
+      )
+    }
+
+  def getLastSubmittedVerificationBatch(instanceId: String): Action[AnyContent] =
+    authorise { implicit request =>
+      withEnrolmentDispatch(
+        Ok(Json.parse(resourceHelper.resourceAsString(getLastSubmittedVerificationBatch_200_ResponsePath)))
       )
     }
 

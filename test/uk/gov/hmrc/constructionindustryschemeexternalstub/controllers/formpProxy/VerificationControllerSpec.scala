@@ -55,19 +55,36 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
         .thenReturn(None)
 
       val responseJson: JsValue = Json.parse(
-        s"""
-           |{
-           |  "subcontractors": [
-           |    { "subcontractorId": 1 }
-           |  ],
-           |  "verificationBatch": { "verificationBatchId": 99 },
-           |  "verifications": [
-           |    { "verificationId": 1001 }
-           |  ],
-           |  "submission": { "submissionId": 555 },
-           |  "monthlyReturn": { "monthlyReturnId": 777 }
-           |}
-           |""".stripMargin
+        """
+          |{
+          |  "subcontractors": [
+          |    {
+          |      "subcontractorId": 1,
+          |      "subbieResourceRef": 10
+          |    }
+          |  ],
+          |  "verificationBatch": {
+          |    "verificationBatchId": 99,
+          |    "status": "SUBMITTED"
+          |  },
+          |  "verifications": [
+          |    {
+          |      "verificationId": 1001,
+          |      "matched": "Y",
+          |      "verificationNumber": "V0000000001",
+          |      "actionIndicator": "VERIFY",
+          |      "proceed": "Y",
+          |      "verificationResourceRef": 10
+          |    }
+          |  ],
+          |  "submission": {
+          |    "submissionId": 555
+          |  },
+          |  "monthlyReturn": {
+          |    "monthlyReturnId": 777
+          |  }
+          |}
+          |""".stripMargin
       )
 
       when(mockResourceHelper.resourceAsString(any()))
@@ -82,14 +99,26 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
       val body = contentAsJson(res)
 
       body mustBe responseJson
+      val subcontractor = (body \ "subcontractors")(0)
 
-      (body \ "subcontractors")(0).\("subcontractorId").as[Long] mustBe 1L
+      (subcontractor \ "subcontractorId").as[Long] mustBe 1L
+      (subcontractor \ "subbieResourceRef").as[Long] mustBe 10L
 
       (body \ "verificationBatch").\("verificationBatchId").as[Long] mustBe 99L
       (body \ "verifications")(0).\("verificationId").as[Long] mustBe 1001L
 
       (body \ "submission").\("submissionId").as[Long] mustBe 555L
       (body \ "monthlyReturn").\("monthlyReturnId").as[Long] mustBe 777L
+      (body \ "verificationBatch" \ "status").as[String] mustBe "SUBMITTED"
+
+      val verification = (body \ "verifications")(0)
+
+      (verification \ "verificationId").as[Long] mustBe 1001L
+      (verification \ "matched").as[String] mustBe "Y"
+      (verification \ "verificationNumber").as[String] mustBe "V0000000001"
+      (verification \ "actionIndicator").as[String] mustBe "VERIFY"
+      (verification \ "proceed").as[String] mustBe "Y"
+      (verification \ "verificationResourceRef").as[Long] mustBe 10L
     }
 
     "returns 200 OK with JSON body on success (agent enrolment)" in new Setup {

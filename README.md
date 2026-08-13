@@ -2519,9 +2519,9 @@ Optional fields: `govtalkErrorCode`, `govtalkErrorType`, `govtalkErrorMessage`.
 - Response status: `204`
 - Response body: _empty_
 
-**Endpoint**: `POST /cis/verification/proceed-with-insufficient-data  `
+**Endpoint**: `POST /cis/verification/proceed`
 
-**Description**: Proceed Verification with insufficient data.
+**Description**: Proceed Verification with insufficient/unmatched data.
 
 #### Happy Path
 
@@ -2545,7 +2545,8 @@ To trigger the happy path, ensure you provide a valid request body:
   "instanceId": "1",
   "verificationBatchResourceRef": 10,
   "verificationResourceRef": 9,
-  "proceed": "Y"
+  "proceed": "Y",
+  "taxTreatment": "NotKnown"
 }
 ```
 - Enrolments: request must have either HMRC-CIS-ORG or IR-PAYE-AGENT Enrolment

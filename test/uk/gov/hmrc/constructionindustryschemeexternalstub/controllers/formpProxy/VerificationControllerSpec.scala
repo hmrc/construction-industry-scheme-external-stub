@@ -1573,17 +1573,18 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
     }
   }
 
-  ".proceedInsufficientVerification" - {
+  ".proceedVerification" - {
 
-    val postUrl = "/cis/verification/proceed-with-insufficient-data"
+    val postUrl = "/cis/verification/proceed"
 
     val validJson: JsValue =
       Json.toJson(
-        ProceedInsufficientVerificationRequest(
+        ProceedVerificationRequest(
           instanceId = "1",
           verificationBatchResourceRef = 10L,
           verificationResourceRef = 9L,
-          proceed = "Y"
+          proceed = "Y",
+          taxTreatment = Some("NotKnown")
         )
       )
 
@@ -1592,7 +1593,7 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
         .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
         .withBody(validJson)
 
-      val res: Future[Result] = controller.proceedInsufficientVerification()(req)
+      val res: Future[Result] = controller.proceedVerification()(req)
 
       status(res) mustBe OK
       contentAsString(res) mustBe ""
@@ -1605,7 +1606,7 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
         .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
         .withBody(invalidJson)
 
-      val res: Future[Result] = controller.proceedInsufficientVerification()(req)
+      val res: Future[Result] = controller.proceedVerification()(req)
 
       status(res) mustBe BAD_REQUEST
       (contentAsJson(res) \ "message").as[String] mustBe "Invalid payload"

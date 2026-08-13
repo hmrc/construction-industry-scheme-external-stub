@@ -98,11 +98,11 @@ class SubcontractorController @Inject() (
     authorise { implicit request =>
 
       val canDelete =
-        subbieResourceRef != 27L
+        subbieResourceRef != 7L
 
       val subcontractorName =
-        if (subbieResourceRef == 27L) {
-          "Gamma Builders"
+        if (subbieResourceRef == 7L) {
+          "Delta Trust"
         } else {
           "Test Subcontractor"
         }
@@ -126,16 +126,16 @@ class SubcontractorController @Inject() (
       val contractorRefOpt = enrolmentHelper.contractorEnrolmentsOpt(request)
       val agentRefOpt      = enrolmentHelper.agentEnrolmentsOpt(request)
 
-      val responsePath = cisId match {
-        case "individual-123"             => getSubcontractorIndividual_200_ResponsePath
-        case "trust-123"                  => getSubcontractorTrust_200_ResponsePath
-        case "company-123"                => getSubcontractorCompany_200_ResponsePath
-        case "partnership-123"            => getSubcontractorPartnership_200_ResponsePath
-        case "individual-unverified-123"  => getSubcontractorIndividual_200_UnverifiedResponsePath
-        case "trust-unverified-123"       => getSubcontractorTrust_200_UnverifiedResponsePath
-        case "company-unverified-123"     => getSubcontractorCompany_200_UnverifiedResponsePath
-        case "partnership-unverified-123" => getSubcontractorPartnership_200_UnverifiedResponsePath
-        case _                            => getSubcontractorIndividual_200_ResponsePath
+      val responsePath = subbieResourceRef match {
+        case 1 => getSubcontractorIndividual_200_ResponsePath
+        case 2 => getSubcontractorIndividual_200_UnverifiedResponsePath
+        case 3 => getSubcontractorCompany_200_ResponsePath
+        case 4 => getSubcontractorCompany_200_UnverifiedResponsePath
+        case 5 => getSubcontractorPartnership_200_ResponsePath
+        case 6 => getSubcontractorPartnership_200_UnverifiedResponsePath
+        case 7 => getSubcontractorTrust_200_ResponsePath
+        case 8 => getSubcontractorTrust_200_UnverifiedResponsePath
+        case _ => getSubcontractorIndividual_200_ResponsePath
       }
 
       (contractorRefOpt, agentRefOpt) match {

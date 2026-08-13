@@ -14,23 +14,24 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.constructionindustryschemeexternalstub.models
+package uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests
 
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.SubcontractorType
 
-case class VerificationCurrentVerification(
-  verificationId: Long,
-  verificationBatchId: Option[Long],
-  subcontractorId: Option[Long],
-  verificationResourceRef: Option[Long],
-  subcontractorName: Option[String],
+final case class PrepopulationSubcontractor(
+  subcontractorType: SubcontractorType,
+  utr: String,
   verificationNumber: Option[String],
-  taxTreatment: Option[String],
-  actionIndicator: Option[String],
-  proceed: Option[String],
-  matched: Option[String]
+  firstName: Option[String],
+  secondName: Option[String],
+  surname: Option[String],
+  tradingName: Option[String],
+  partnershipTradingName: Option[String],
+  verified: Option[String],
+  autoVerified: Option[String]
 )
 
-object VerificationCurrentVerification {
-  given format: OFormat[VerificationCurrentVerification] = Json.format[VerificationCurrentVerification]
+object PrepopulationSubcontractor {
+  implicit val format: OFormat[PrepopulationSubcontractor] = Json.format[PrepopulationSubcontractor]
 }

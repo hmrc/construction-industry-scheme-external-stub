@@ -48,6 +48,8 @@ class ChrisController @Inject() (
     s"$monthlyNilReturnResponsePath/submitCISMessage-acknowledgement-response.xml"
   private val submitCISMessage_success_ResponsePath               =
     s"$monthlyNilReturnResponsePath/submitCISMessage-success-response.xml"
+  private val submitCISMessage_success_no_receipt_ResponsePath    =
+    s"$monthlyNilReturnResponsePath/submitCISMessage-success-no-receipt-response.xml"
   private val submitCISMessage_fatalError_ResponsePath            =
     s"$monthlyNilReturnResponsePath/submitCISMessage-fatalError-response.xml"
   private val submitCISMessage_businessError_ResponsePath         =
@@ -76,6 +78,8 @@ class ChrisController @Inject() (
     s"$verificationResponsePath/submitCISVerifyMessage-departmentalError-3000-response.xml"
   private val submitCISVerifyMessage_success_ResponsePath                =
     s"$verificationResponsePath/submitCISVerifyMessage-success-response.xml"
+  private val submitCISVerifyMessage_success_no_receipt_ResponsePath     =
+    s"$verificationResponsePath/submitCISVerifyMessage-success-no-receipt-response.xml"
   private val submitCISVerifyMessage_delete_ResponsePath                 =
     s"$verificationResponsePath/submitCISVerifyMessage-delete-response.xml"
 
@@ -157,12 +161,13 @@ class ChrisController @Inject() (
       deleteResponsePath = submitCISMessage_delete_ResponsePath,
       finalStatusResponsePaths = Map(
         "ACKNOWLEDGE"            -> submitCISMessage_acknowledgement_ResponsePath,
-        "SUBMITTED_NO_RECEIPT"   -> submitCISMessage_irMarkMismatchError_ResponsePath,
+        "SUBMITTED_NO_RECEIPT"   -> submitCISMessage_success_no_receipt_ResponsePath,
         "FATAL_ERROR"            -> submitCISMessage_fatalError_ResponsePath,
         "DEPARTMENTAL_ERROR"     -> submitCISMessage_businessError_ResponsePath,
         "RECOVERABLE_ERROR_3000" -> submitCISMessage_recoverableError_3000_ResponsePath,
         "RECOVERABLE_ERROR_2005" -> submitCISMessage_recoverableError_2005_ResponsePath,
-        "RECOVERABLE_ERROR_1000" -> submitCISMessage_recoverableError_1000_ResponsePath
+        "RECOVERABLE_ERROR_1000" -> submitCISMessage_recoverableError_1000_ResponsePath,
+        "IRMARK_MISMATCH_ERROR"  -> submitCISMessage_irMarkMismatchError_ResponsePath
       ),
       defaultResponsePath = submitCISMessage_success_ResponsePath
     )
@@ -175,10 +180,11 @@ class ChrisController @Inject() (
       deleteResponsePath = submitCISVerifyMessage_delete_ResponsePath,
       finalStatusResponsePaths = Map(
         "ACKNOWLEDGE"             -> submitCISVerifyMessage_acknowledgement_ResponsePath,
-        "SUBMITTED_NO_RECEIPT"    -> submitCISVerifyMessage_irMarkMismatchError_ResponsePath,
+        "SUBMITTED_NO_RECEIPT"    -> submitCISVerifyMessage_success_no_receipt_ResponsePath,
         "FATAL_ERROR"             -> submitCISVerifyMessage_fatalError_ResponsePath,
         "DEPARTMENTAL_ERROR"      -> submitCISVerifyMessage_businessError_ResponsePath,
-        "DEPARTMENTAL_ERROR_3000" -> submitCISVerifyMessage_departmentalError_3000_ResponsePath
+        "DEPARTMENTAL_ERROR_3000" -> submitCISVerifyMessage_departmentalError_3000_ResponsePath,
+        "IRMARK_MISMATCH_ERROR"   -> submitCISVerifyMessage_irMarkMismatchError_ResponsePath
       ),
       defaultResponsePath = submitCISVerifyMessage_success_ResponsePath
     )

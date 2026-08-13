@@ -19,7 +19,6 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProx
 import play.api.Logging
 import play.api.libs.json.{JsError, JsValue, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.AuthenticatedRequest
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -49,10 +48,10 @@ class VerificationController @Inject() (
     s"$verificationResponsePath/createVerificationBatchAndVerifications-201-response.json"
   private val createSubmissionForVerification_201_ResponsePath                             =
     s"$verificationResponsePath/createSubmissionForVerification-201-response.json"
-  private val getSubmittedVerifications_200_ResponsePath                                   =
-    s"$verificationResponsePath/getSubmittedVerifications-200-response.json"
   private val getSubmissionWithVerificationBatch_200_ResponsePath                          =
     s"$verificationResponsePath/getSubmissionWithVerificationBatch-200-response.json"
+  private val getSubmittedVerifications_200_ResponsePath                                   =
+    s"$verificationResponsePath/getSubmittedVerifications-200-response.json"
 
   private def withEnrolmentDispatch(onSuccess: => Result)(implicit request: AuthenticatedRequest[_]): Result =
     enrolmentHelper.contractorEnrolmentsOpt(request) match {
@@ -177,6 +176,24 @@ class VerificationController @Inject() (
           errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
           _ => NoContent
         )
+    }
+
+  def getSubmissionWithVerificationBatchByRefs(
+    instanceId: String,
+    verificationBatchResourceRef: Long
+  ): Action[AnyContent] =
+    Action {
+      logger.info(
+        s"[VerificationController][getSubmissionWithVerificationBatchByRefs] Returning stubbed response for instanceId=$instanceId, verificationBatchResourceRef=$verificationBatchResourceRef"
+      )
+
+      Ok(
+        Json.parse(
+          resourceHelper.resourceAsString(
+            getSubmissionWithVerificationBatch_200_ResponsePath
+          )
+        )
+      )
     }
 
   def getSubmittedVerifications: Action[JsValue] =

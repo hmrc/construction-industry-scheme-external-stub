@@ -359,7 +359,7 @@ class SubcontractorControllerSpec extends SpecBase {
       )
     }
 
-    "returns subcontractor details with canBeDeleted = false for resource ref 27" in new Setup {
+    "returns subcontractor details with canBeDeleted = false for resource ref 7" in new Setup {
 
       val req =
         FakeRequest(
@@ -368,12 +368,12 @@ class SubcontractorControllerSpec extends SpecBase {
         )
 
       val res =
-        controller.getSubcontractorForDelete(deleteStatusCisId, 27L)(req)
+        controller.getSubcontractorForDelete(deleteStatusCisId, 7L)(req)
 
       status(res) mustBe OK
 
       contentAsJson(res) mustBe Json.obj(
-        "subcontractorName"         -> "Gamma Builders",
+        "subcontractorName"         -> "Delta Trust",
         "subcontractorCanBeDeleted" -> false
       )
     }

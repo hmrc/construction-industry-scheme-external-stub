@@ -214,8 +214,9 @@ final class GetNewestVerificationBatchResponseSpec extends AnyWordSpec with Matc
         .filter(_.isUnmatched.isEmpty)
         .map(_.verificationId) mustBe Seq.empty
 
-      verification(1011L).isUnmatched mustBe Some(true)
-      verification(1012L).isUnmatched mustBe Some(true)
+      Seq(1001L, 1006L, 1007L).foreach { id =>
+        verification(id).isUnmatched mustBe Some(false)
+      }
 
       val matchProceedN = verification(1011L)
       matchProceedN.matched mustBe Some("Y")

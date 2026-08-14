@@ -27,7 +27,8 @@ final case class Verification(
   subcontractorId: Option[Long],
   actionIndicator: Option[String] = None,
   proceed: Option[String] = None,
-  verificationResourceRef: Option[Long] = None
+  verificationResourceRef: Option[Long] = None,
+  isUnmatched: Option[Boolean] = None
 )
 
 object Verification:

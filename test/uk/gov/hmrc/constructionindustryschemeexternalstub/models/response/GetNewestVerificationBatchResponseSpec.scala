@@ -76,7 +76,8 @@ final class GetNewestVerificationBatchResponseSpec extends AnyWordSpec with Matc
             subcontractorId = Some(1L),
             actionIndicator = Some("VERIFY"),
             proceed = Some("Y"),
-            verificationResourceRef = Some(10L)
+            verificationResourceRef = Some(10L),
+            isUnmatched = Some(false)
           )
         ),
         submission = Some(
@@ -148,6 +149,7 @@ final class GetNewestVerificationBatchResponseSpec extends AnyWordSpec with Matc
       (v0 \ "actionIndicator").as[String] mustBe "VERIFY"
       (v0 \ "proceed").as[String] mustBe "Y"
       (v0 \ "verificationResourceRef").as[Long] mustBe 10L
+      (v0 \ "isUnmatched").as[Boolean] mustBe false
 
       val subm0 = json \ "submission"
 
@@ -185,6 +187,47 @@ final class GetNewestVerificationBatchResponseSpec extends AnyWordSpec with Matc
 
       val json = Json.toJson(model)
       json.validate[GetNewestVerificationBatchResponse] mustBe JsSuccess(model)
+    }
+
+    "cover F3a rules 3 and 4 in the stub response" in {
+      val stream =
+        Option(
+          getClass.getResourceAsStream(
+            "/resources/verification/getNewestVerificationBatch-200-response.json"
+          )
+        ).getOrElse(
+          fail("getNewestVerificationBatch-200-response.json was not found")
+        )
+
+      val response =
+        try
+          Json.parse(stream).as[GetNewestVerificationBatchResponse]
+        finally
+          stream.close()
+
+      def verification(id: Long): Verification =
+        response.verifications
+          .find(_.verificationId == id)
+          .getOrElse(fail(s"Verification $id was not found"))
+
+      response.verifications
+        .filter(_.isUnmatched.isEmpty)
+        .map(_.verificationId) mustBe Seq.empty
+
+      verification(1011L).isUnmatched mustBe Some(true)
+      verification(1012L).isUnmatched mustBe Some(true)
+
+      val matchProceedN = verification(1011L)
+      matchProceedN.matched mustBe Some("Y")
+      matchProceedN.actionIndicator mustBe Some("MATCH")
+      matchProceedN.proceed mustBe Some("N")
+      matchProceedN.isUnmatched mustBe Some(true)
+
+      val verifyProceedN = verification(1012L)
+      verifyProceedN.matched mustBe Some("Y")
+      verifyProceedN.actionIndicator mustBe Some("VERIFY")
+      verifyProceedN.proceed mustBe Some("N")
+      verifyProceedN.isUnmatched mustBe Some(true)
     }
   }
 }

@@ -33,7 +33,11 @@ final class VerificationSpec extends AnyWordSpec with Matchers {
           |  "verificationNumber": "V0000000001",
           |  "taxTreatment": "0",
           |  "verificationBatchId": 99,
-          |  "subcontractorId": 1
+          |  "subcontractorId": 1,
+          |  "actionIndicator": "MATCH",
+          |  "proceed": "N",
+          |  "verificationResourceRef": 10,
+          |  "isUnmatched": true
           |}
           |""".stripMargin
       )
@@ -45,6 +49,10 @@ final class VerificationSpec extends AnyWordSpec with Matchers {
       out.taxTreatment mustBe Some("0")
       out.verificationBatchId mustBe Some(99L)
       out.subcontractorId mustBe Some(1L)
+      out.actionIndicator mustBe Some("MATCH")
+      out.proceed mustBe Some("N")
+      out.verificationResourceRef mustBe Some(10L)
+      out.isUnmatched mustBe Some(true)
     }
 
     "write model to JSON" in {
@@ -54,7 +62,11 @@ final class VerificationSpec extends AnyWordSpec with Matchers {
         verificationNumber = Some("V0000000001"),
         taxTreatment = None,
         verificationBatchId = Some(99L),
-        subcontractorId = Some(1L)
+        subcontractorId = Some(1L),
+        actionIndicator = Some("VERIFY"),
+        proceed = Some("Y"),
+        verificationResourceRef = Some(10L),
+        isUnmatched = Some(false)
       )
 
       val json = Json.toJson(model)
@@ -65,6 +77,10 @@ final class VerificationSpec extends AnyWordSpec with Matchers {
       (json \ "taxTreatment").toOption mustBe None
       (json \ "verificationBatchId").as[Long] mustBe 99L
       (json \ "subcontractorId").as[Long] mustBe 1L
+      (json \ "actionIndicator").as[String] mustBe "VERIFY"
+      (json \ "proceed").as[String] mustBe "Y"
+      (json \ "verificationResourceRef").as[Long] mustBe 10L
+      (json \ "isUnmatched").as[Boolean] mustBe false
     }
 
     "round-trip (model -> json -> model) without losing data" in {

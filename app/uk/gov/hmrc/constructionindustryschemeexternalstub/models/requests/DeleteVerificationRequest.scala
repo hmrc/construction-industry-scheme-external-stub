@@ -18,10 +18,10 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests
 
 import play.api.libs.json.{Json, OFormat}
 
-case class DeleteVerificationsRequest(
+case class DeleteVerificationRequest(
   instanceId: String,
   verificationResourceRef: Long
 )
 
-object DeleteVerificationsRequest:
-  given format: OFormat[DeleteVerificationsRequest] = Json.format[DeleteVerificationsRequest]
+object DeleteVerificationRequest:
+  given format: OFormat[DeleteVerificationRequest] = Json.format[DeleteVerificationRequest]

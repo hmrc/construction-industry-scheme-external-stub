@@ -1579,7 +1579,7 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
 
     val validJson: JsValue =
       Json.toJson(
-        DeleteVerificationsRequest(
+        DeleteVerificationRequest(
           instanceId = "1",
           verificationResourceRef = 9L
         )

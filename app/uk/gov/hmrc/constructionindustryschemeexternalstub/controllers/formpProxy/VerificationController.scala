@@ -251,4 +251,10 @@ class VerificationController @Inject() (
         )
     }
 
+  def deleteVerification(): Action[JsValue] =
+    authorise(parse.json) { implicit request =>
+      request.body
+        .validate[DeleteVerificationsRequest]
+        .fold(errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))), _ => Ok)
+    }
 }

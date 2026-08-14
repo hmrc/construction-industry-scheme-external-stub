@@ -45,6 +45,7 @@ POST       /cis/verification/response/process                       uk.gov.hmrc.
 GET        /cis/verification/submission-batch/:instanceId/:verificationBatchResourceRef     uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.VerificationController.getSubmissionWithVerificationBatchByRefs(instanceId: String, verificationBatchResourceRef: Long)
 POST       /cis/verification/submitted-verifications                uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.VerificationController.getSubmittedVerifications()
 POST       /cis/verification/submission-batch                       uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.VerificationController.getSubmissionWithVerificationBatch
+POST       /cis/verification/delete                                 uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.VerificationController.deleteVerification()
 
 GET        /cis/batchpoll-submissions                               uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.BatchPollController.getBatchPollSubmissions()
 

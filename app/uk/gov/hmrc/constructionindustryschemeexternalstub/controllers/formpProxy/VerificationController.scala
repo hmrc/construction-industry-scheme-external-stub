@@ -38,6 +38,12 @@ class VerificationController @Inject() (
   private val verificationResponsePath                                                     = "/resources/verification"
   private val getNewestVerificationBatch_200_ResponsePath                                  =
     s"$verificationResponsePath/getNewestVerificationBatch-200-response.json"
+  private val getNewestVerificationBatch_200_Inactive_ResponsePath                         =
+    s"$verificationResponsePath/getNewestVerificationBatch-200-response-inactive.json"
+  private val getNewestVerificationBatch_200_ReverifyOnly_ResponsePath                     =
+    s"$verificationResponsePath/getNewestVerificationBatch-200-response-no-newly-added.json"
+  private val getNewestVerificationBatch_200_VerifyOnly_ResponsePath                       =
+    s"$verificationResponsePath/getNewestVerificationBatch-200-response-no-reverify.json"
   private val getCurrentVerificationBatch_200_verificationBatchStatus_none_ResponsePath    =
     s"$verificationResponsePath/getCurrentVerificationBatch-200-verificationBatchStatus-none-response.json"
   private val getCurrentVerificationBatch_200_verificationBatchStatus_started_ResponsePath =
@@ -68,11 +74,28 @@ class VerificationController @Inject() (
         }
     }
 
+//  def getNewestVerificationBatch(instanceId: String): Action[AnyContent] =
+//    authorise { implicit request =>
+//      withEnrolmentDispatch(
+//        Ok(Json.parse(resourceHelper.resourceAsString(getNewestVerificationBatch_200_ResponsePath)))
+//      )
+//    }
+
   def getNewestVerificationBatch(instanceId: String): Action[AnyContent] =
     authorise { implicit request =>
-      withEnrolmentDispatch(
-        Ok(Json.parse(resourceHelper.resourceAsString(getNewestVerificationBatch_200_ResponsePath)))
-      )
+      withEnrolmentDispatch {
+        val responsePath =
+          instanceId match {
+            case "1"   => getNewestVerificationBatch_200_ResponsePath
+            case "800" => getNewestVerificationBatch_200_ResponsePath
+            case "125" => getNewestVerificationBatch_200_VerifyOnly_ResponsePath
+            case "175" => getNewestVerificationBatch_200_ReverifyOnly_ResponsePath
+            case "150" => getNewestVerificationBatch_200_Inactive_ResponsePath
+            case _     => getNewestVerificationBatch_200_ResponsePath
+          }
+
+        Ok(Json.parse(resourceHelper.resourceAsString(responsePath)))
+      }
     }
 
   def getCurrentVerificationBatch(instanceId: String): Action[AnyContent] =

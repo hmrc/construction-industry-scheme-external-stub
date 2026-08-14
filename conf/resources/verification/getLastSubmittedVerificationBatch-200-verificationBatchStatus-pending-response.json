@@ -76,21 +76,8 @@
   ],
   "submission": {
     "submissionId": 1234,
-    "submissionType": "CT600",
     "activeObjectId": 98765,
     "status": "ACCEPTED",
-    "hmrcMarkGenerated": "20260811115300",
-    "hmrcMarkGgis": "ABC123XYZ456",
-    "emailRecipient": "test@example.com",
-    "acceptedTime": "2026-08-11T11:53:00",
-    "createDate": "2026-08-11T11:45:00",
-    "lastUpdate": "2026-08-11T11:53:00",
-    "schemeId": 456789,
-    "agentId": "AGENT123",
-    "l_Migrated": 0,
-    "submissionRequestDate": "2026-08-11T11:50:00",
-    "govTalkErrorCode": null,
-    "govTalkErrorType": null,
-    "govTalkErrorMessage": null
+    "submissionRequestDate": "2026-08-11T11:50:00"
   }
 }

@@ -24,7 +24,7 @@ case class GetLastSubmittedVerificationBatchResponse(
   subcontractors: Seq[SubcontractorLastVerification],
   verifications: Seq[VerificationLastVerification],
   verificationBatch: Option[VerificationBatchLastVerification],
-  submission: Option[Submission]
+  submission: Option[SubmissionNewVerification]
 )
 
 object GetLastSubmittedVerificationBatchResponse {

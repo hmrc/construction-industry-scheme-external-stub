@@ -34,7 +34,7 @@
   "verificationBatch": {
     "verificationBatchId": 99,
     "verifBatchResourceRef": 1234567,
-    "verificationBatchStatus": "ACCEPTED"
+    "status": "ACCEPTED"
   },
   "verifications": [
     {

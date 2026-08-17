@@ -71,7 +71,7 @@ class GetLastSubmittedVerificationBatchResponseSpec extends AnyWordSpec with Mat
         ),
         verificationBatch = Some(
           VerificationBatchLastVerification(
-            verificationBatchId = Some(99L),
+            verificationBatchId = 99L,
             verifBatchResourceRef = Some(1234567L),
             status = Some("ACCEPTED")
           )
@@ -84,7 +84,8 @@ class GetLastSubmittedVerificationBatchResponseSpec extends AnyWordSpec with Mat
             matched = Some("Y"),
             verificationNumber = Some("V0000000001"),
             taxTreatment = Some("0"),
-            subcontractorName = Some("James Star")
+            subcontractorName = Some("James Star"),
+            subcontractorId = Some(22L)
           )
         ),
         submission = Some(
@@ -158,7 +159,7 @@ class GetLastSubmittedVerificationBatchResponseSpec extends AnyWordSpec with Mat
         ),
         verificationBatch = Some(
           VerificationBatchLastVerification(
-            verificationBatchId = Some(99L),
+            verificationBatchId = 99L,
             verifBatchResourceRef = Some(1234567L),
             status = Some("ACCEPTED")
           )
@@ -171,7 +172,8 @@ class GetLastSubmittedVerificationBatchResponseSpec extends AnyWordSpec with Mat
             matched = Some("Y"),
             verificationNumber = Some("V0000000001"),
             taxTreatment = Some("0"),
-            subcontractorName = Some("James Star")
+            subcontractorName = Some("James Star"),
+            subcontractorId = Some(22L)
           )
         ),
         submission = Some(

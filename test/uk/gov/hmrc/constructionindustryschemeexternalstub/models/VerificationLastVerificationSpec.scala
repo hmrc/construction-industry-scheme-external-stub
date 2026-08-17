@@ -29,7 +29,8 @@ class VerificationLastVerificationSpec extends SpecBase {
         matched = Some("Y"),
         verificationNumber = Some("V0000000001"),
         taxTreatment = Some("0"),
-        subcontractorName = Some("James Star")
+        subcontractorName = Some("James Star"),
+        subcontractorId = Some(22L)
       )
       val json         = Json.toJson(verification)
       (json \ "verificationId").as[Long] mustBe 1001L
@@ -39,6 +40,7 @@ class VerificationLastVerificationSpec extends SpecBase {
       (json \ "verificationNumber").as[String] mustBe "V0000000001"
       (json \ "taxTreatment").as[String] mustBe "0"
       (json \ "subcontractorName").as[String] mustBe "James Star"
+      (json \ "subcontractorId").as[Long] mustBe 22L
     }
     "deserialize from JSON correctly" in {
       val json   = Json.parse(
@@ -49,7 +51,8 @@ class VerificationLastVerificationSpec extends SpecBase {
            | "matched": "Y",
            | "verificationNumber": "V0000000001",
            | "taxTreatment": "0",
-           | "subcontractorName": "James Star"
+           | "subcontractorName": "James Star",
+           | "subcontractorId": 22
            |}""".stripMargin
       )
       val result = json.as[VerificationLastVerification]
@@ -60,6 +63,7 @@ class VerificationLastVerificationSpec extends SpecBase {
       result.verificationNumber mustBe Some("V0000000001")
       result.taxTreatment mustBe Some("0")
       result.subcontractorName mustBe Some("James Star")
+      result.subcontractorId mustBe Some(22L)
     }
 
     "round-trip serialize and deserialize correctly" in {
@@ -70,7 +74,8 @@ class VerificationLastVerificationSpec extends SpecBase {
         matched = Some("Y"),
         verificationNumber = Some("V0000000001"),
         taxTreatment = Some("0"),
-        subcontractorName = Some("James Star")
+        subcontractorName = Some("James Star"),
+        subcontractorId = Some(22L)
       )
       val json         = Json.toJson(verification)
       val result       = json.as[VerificationLastVerification]

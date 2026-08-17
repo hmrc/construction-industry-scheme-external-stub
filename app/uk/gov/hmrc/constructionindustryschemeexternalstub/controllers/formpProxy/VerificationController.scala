@@ -89,8 +89,8 @@ class VerificationController @Inject() (
             case "1"   => getNewestVerificationBatch_200_ResponsePath
             case "800" => getNewestVerificationBatch_200_ResponsePath
             case "125" => getNewestVerificationBatch_200_VerifyOnly_ResponsePath
-            case "175" => getNewestVerificationBatch_200_ReverifyOnly_ResponsePath
-            case "150" => getNewestVerificationBatch_200_Inactive_ResponsePath
+            case "150" => getNewestVerificationBatch_200_ReverifyOnly_ResponsePath
+            case "175" => getNewestVerificationBatch_200_Inactive_ResponsePath
             case _     => getNewestVerificationBatch_200_ResponsePath
           }
 
@@ -105,6 +105,9 @@ class VerificationController @Inject() (
           instanceId match {
             case "1"   => getCurrentVerificationBatch_200_verificationBatchStatus_started_ResponsePath
             case "800" => getCurrentVerificationBatch_200_verificationBatchStatus_chris_ResponsePath
+            case "125" => getCurrentVerificationBatch_200_verificationBatchStatus_chris_ResponsePath
+            case "150" => getCurrentVerificationBatch_200_verificationBatchStatus_chris_ResponsePath
+            case "175" => getCurrentVerificationBatch_200_verificationBatchStatus_chris_ResponsePath
             case _     => getCurrentVerificationBatch_200_verificationBatchStatus_none_ResponsePath
           }
 

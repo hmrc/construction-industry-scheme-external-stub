@@ -71,7 +71,6 @@ class CisTaxpayerController @Inject() (
                         "message" -> s"CIS taxpayer not found for TON=${er.taxOfficeNumber}, TOR=${er.taxOfficeReference}"
                       )
                     )
-                  case ("500", _)     => InternalServerError(Json.obj("message" -> "Unexpected error"))
                   case (_, "EZ10800") =>
                     val json    =
                       Json.parse(resourceHelper.resourceAsString(getCisTaxpayerByTaxReference_200_ResponsePath))

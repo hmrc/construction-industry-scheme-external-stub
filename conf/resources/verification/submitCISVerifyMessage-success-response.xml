@@ -60,6 +60,18 @@
                         <TaxTreatment>net</TaxTreatment>
                         <VerificationNumber>V1000000007</VerificationNumber>
                     </Subcontractor>
+                    <Subcontractor>
+                        <Name>
+                            <Fore>John</Fore>
+                            <Sur>Smith</Sur>
+                        </Name>
+                        <TradingName>ACME</TradingName>
+                        <UTR>1111111111</UTR>
+                        <NINO>AA123456A</NINO>
+                        <Matched>matched</Matched>
+                        <TaxTreatment>net</TaxTreatment>
+                        <VerificationNumber>V0000000001</VerificationNumber>
+                    </Subcontractor>
                 </CISresponse>
             </ResponseData>
         </SuccessResponse>

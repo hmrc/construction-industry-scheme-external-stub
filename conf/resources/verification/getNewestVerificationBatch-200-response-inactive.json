@@ -74,7 +74,7 @@
       "tradingName": "DBB Construction",
       "partnershipTradingName": null,
       "verified": null,
-      "verificationNumber": "V1000000007",
+      "verificationNumber": null,
       "taxTreatment": null,
       "verificationDate": null,
       "lastMonthlyReturnDate": null,
@@ -289,7 +289,7 @@
     },
   "monthlyReturn": {
       "monthlyReturnId": 777,
-      "decNoMoreSubPayments": null
+      "decNoMoreSubPayments": "Y"
     },
   "monthlyReturnSubmission": {
     "submissionId": 888,

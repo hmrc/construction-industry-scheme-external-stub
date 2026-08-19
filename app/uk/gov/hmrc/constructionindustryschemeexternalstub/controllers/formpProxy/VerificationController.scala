@@ -74,13 +74,6 @@ class VerificationController @Inject() (
         }
     }
 
-//  def getNewestVerificationBatch(instanceId: String): Action[AnyContent] =
-//    authorise { implicit request =>
-//      withEnrolmentDispatch(
-//        Ok(Json.parse(resourceHelper.resourceAsString(getNewestVerificationBatch_200_ResponsePath)))
-//      )
-//    }
-
   def getNewestVerificationBatch(instanceId: String): Action[AnyContent] =
     authorise { implicit request =>
       withEnrolmentDispatch {
@@ -276,5 +269,4 @@ class VerificationController @Inject() (
             )
         )
     }
-
 }

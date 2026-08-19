@@ -3,7 +3,7 @@
       "accountsOfficeReference": "123PA00123456",
       "name": "John",
       "utr": "1111111111",
-      "emailAddress": "ops@example.com"
+      "emailAddress": null
     },
   "subcontractors": [
     {

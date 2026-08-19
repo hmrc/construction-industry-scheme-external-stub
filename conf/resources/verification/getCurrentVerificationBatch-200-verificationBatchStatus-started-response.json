@@ -256,7 +256,7 @@
       "verificationNumber": "V987654321",
       "taxTreatment": "2",
       "actionIndicator": "A",
-      "proceed": "N",
+      "proceed": "Y",
       "matched": "Y"
     }
   ]

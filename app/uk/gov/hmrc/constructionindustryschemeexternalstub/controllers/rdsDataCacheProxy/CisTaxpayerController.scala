@@ -35,9 +35,16 @@ class CisTaxpayerController @Inject() (
 )() extends BackendController(cc)
     with Logging {
 
-  private val monthlyNilReturnResponsePath                  = "/resources"
-  private val getCisTaxpayerByTaxReference_200_ResponsePath =
+  private val monthlyNilReturnResponsePath                             = "/resources"
+  private val verificationResponsePath                                 = "/resources/verification"
+  private val getCisTaxpayerByTaxReference_200_ResponsePath            =
     s"$monthlyNilReturnResponsePath/getCisTaxpayerByTaxReference-200-response.json"
+  private val getNewestVerificationBatch_200_VerifyOnly_ResponsePath   =
+    s"$verificationResponsePath/getNewestVerificationBatch-200-response-no-reverify.json"
+  private val getNewestVerificationBatch_200_ReverifyOnly_ResponsePath =
+    s"$verificationResponsePath/getNewestVerificationBatch-200-response-no-newly-added.json"
+  private val getNewestVerificationBatch_200_Inactive_ResponsePath     =
+    s"$verificationResponsePath/getNewestVerificationBatch-200-response-inactive.json"
 
   def getCisTaxpayerByTaxReference: Action[JsValue] =
     authorise(parse.json) { implicit request =>
@@ -78,6 +85,48 @@ class CisTaxpayerController @Inject() (
                         )
                       )
                     Ok(updated)
+                  case (_, "EZ00125") =>
+                    val json    =
+                      Json
+                        .parse(resourceHelper.resourceAsString(getNewestVerificationBatch_200_VerifyOnly_ResponsePath))
+                    val updated = json
+                      .as[JsObject]
+                      .deepMerge(
+                        Json.obj(
+                          "uniqueId"        -> "125",
+                          "taxOfficeNumber" -> er.taxOfficeNumber,
+                          "taxOfficeRef"    -> er.taxOfficeReference
+                        )
+                      )
+                    Ok(updated)
+                  case (_, "EZ00150") =>
+                    val json    =
+                      Json.parse(
+                        resourceHelper.resourceAsString(getNewestVerificationBatch_200_ReverifyOnly_ResponsePath)
+                      )
+                    val updated = json
+                      .as[JsObject]
+                      .deepMerge(
+                        Json.obj(
+                          "uniqueId"        -> "150",
+                          "taxOfficeNumber" -> er.taxOfficeNumber,
+                          "taxOfficeRef"    -> er.taxOfficeReference
+                        )
+                      )
+                    Ok(updated)
+                  case (_, "EZ00175") =>
+                    val json    =
+                      Json.parse(resourceHelper.resourceAsString(getNewestVerificationBatch_200_Inactive_ResponsePath))
+                    val updated = json
+                      .as[JsObject]
+                      .deepMerge(
+                        Json.obj(
+                          "uniqueId"        -> "175",
+                          "taxOfficeNumber" -> er.taxOfficeNumber,
+                          "taxOfficeRef"    -> er.taxOfficeReference
+                        )
+                      )
+                    Ok(updated)
                   case (ton, tor)     =>
                     val json    =
                       Json.parse(resourceHelper.resourceAsString(getCisTaxpayerByTaxReference_200_ResponsePath))
@@ -89,7 +138,6 @@ class CisTaxpayerController @Inject() (
                           "taxOfficeRef"    -> tor
                         )
                       )
-
                     Ok(updated)
                 }
               case None                     => InternalServerError
@@ -97,5 +145,4 @@ class CisTaxpayerController @Inject() (
           }
         )
     }
-
 }

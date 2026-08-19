@@ -36,8 +36,7 @@ final class VerificationSpec extends AnyWordSpec with Matchers {
           |  "subcontractorId": 1,
           |  "actionIndicator": "MATCH",
           |  "proceed": "N",
-          |  "verificationResourceRef": 10,
-          |  "isUnmatched": true
+          |  "verificationResourceRef": 10
           |}
           |""".stripMargin
       )
@@ -52,7 +51,6 @@ final class VerificationSpec extends AnyWordSpec with Matchers {
       out.actionIndicator mustBe Some("MATCH")
       out.proceed mustBe Some("N")
       out.verificationResourceRef mustBe Some(10L)
-      out.isUnmatched mustBe Some(true)
     }
 
     "write model to JSON" in {
@@ -65,8 +63,7 @@ final class VerificationSpec extends AnyWordSpec with Matchers {
         subcontractorId = Some(1L),
         actionIndicator = Some("VERIFY"),
         proceed = Some("Y"),
-        verificationResourceRef = Some(10L),
-        isUnmatched = Some(false)
+        verificationResourceRef = Some(10L)
       )
 
       val json = Json.toJson(model)
@@ -80,7 +77,6 @@ final class VerificationSpec extends AnyWordSpec with Matchers {
       (json \ "actionIndicator").as[String] mustBe "VERIFY"
       (json \ "proceed").as[String] mustBe "Y"
       (json \ "verificationResourceRef").as[Long] mustBe 10L
-      (json \ "isUnmatched").as[Boolean] mustBe false
     }
 
     "round-trip (model -> json -> model) without losing data" in {

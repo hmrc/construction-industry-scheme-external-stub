@@ -74,8 +74,7 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
           |      "verificationNumber": "V0000000001",
           |      "actionIndicator": "VERIFY",
           |      "proceed": "Y",
-          |      "verificationResourceRef": 10,
-          |      "isUnmatched": false
+          |      "verificationResourceRef": 10
           |    }
           |  ],
           |  "submission": {
@@ -120,7 +119,6 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
       (verification \ "actionIndicator").as[String] mustBe "VERIFY"
       (verification \ "proceed").as[String] mustBe "Y"
       (verification \ "verificationResourceRef").as[Long] mustBe 10L
-      (verification \ "isUnmatched").as[Boolean] mustBe false
     }
 
     "returns 200 OK with JSON body on success (agent enrolment)" in new Setup {

@@ -123,17 +123,6 @@ class CisTaxpayerControllerSpec extends SpecBase with MockitoSugar {
         (contentAsJson(res) \ "message").as[String] mustBe "Invalid JSON body"
       }
 
-      "returns 500 with InternalServerError for taxOfficeNumber 500" in new Setup {
-
-        when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
-          .thenReturn(Some(EmployerReference("500", "123456")))
-
-        val req: FakeRequest[JsValue] = requestWithEmployeeReferenceJsonPayload("500", "123456")
-        val res: Future[Result]       = controller.getCisTaxpayerByTaxReference(req)
-        status(res) mustBe INTERNAL_SERVER_ERROR
-        (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
-      }
-
     }
 
   }

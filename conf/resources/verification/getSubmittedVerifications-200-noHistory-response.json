@@ -1,0 +1,26 @@
+{
+  "scheme": [
+    {
+      "schemeId": 123,
+      "instanceId": "abc-123",
+      "accountsOfficeReference": "123PA00123456",
+      "taxOfficeNumber": "123",
+      "taxOfficeReference": "AB456",
+      "utr": "1234567890",
+      "name": "Test Contractor Ltd",
+      "emailAddress": "contractor@example.com",
+      "displayWelcomePage": "Y",
+      "prePopCount": 1,
+      "prePopSuccessful": "Y",
+      "subcontractorCounter": 1,
+      "verificationBatchCounter": 1,
+      "createDate": "2026-06-15T10:00:00Z",
+      "lastUpdate": "2026-06-15T10:05:00Z",
+      "version": 1
+    }
+  ],
+  "subcontractors": [],
+  "verificationBatches": [],
+  "verifications": [],
+  "submissions": []
+}

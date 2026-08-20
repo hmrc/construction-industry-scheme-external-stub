@@ -258,6 +258,18 @@
       "actionIndicator": "A",
       "proceed": "N",
       "matched": "Y"
+    },
+    {
+      "verificationId": 1003,
+      "verificationBatchId": 99,
+      "subcontractorId": 3,
+      "verificationResourceRef": 12,
+      "subcontractorName": null,
+      "verificationNumber": "V987654321",
+      "taxTreatment": null,
+      "actionIndicator": "A",
+      "proceed": "N",
+      "matched": "Y"
     }
   ]
 }

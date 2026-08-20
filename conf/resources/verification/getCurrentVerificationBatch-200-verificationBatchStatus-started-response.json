@@ -47,11 +47,11 @@
     {
       "subcontractorType": "partnership",
       "subcontractorId": 3,
-      "firstName": "Charlie",
-      "secondName": "D",
-      "surname": "Green",
+      "firstName": null,
+      "secondName": null,
+      "surname": null,
       "tradingName": null,
-      "partnershipTradingName": "C&G Partnership",
+      "partnershipTradingName": null,
       "subbieResourceRef":  12,
       "utr": "3333333333",
       "partnerUtr": "2121432134",
@@ -256,7 +256,19 @@
       "verificationNumber": "V987654321",
       "taxTreatment": "2",
       "actionIndicator": "A",
-      "proceed": "Y",
+      "proceed": "N",
+      "matched": "Y"
+    },
+    {
+      "verificationId": 1003,
+      "verificationBatchId": 99,
+      "subcontractorId": 3,
+      "verificationResourceRef": 12,
+      "subcontractorName": null,
+      "verificationNumber": "V987654321",
+      "taxTreatment": null,
+      "actionIndicator": "A",
+      "proceed": "N",
       "matched": "Y"
     }
   ]

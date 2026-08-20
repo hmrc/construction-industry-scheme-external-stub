@@ -73,7 +73,10 @@ final class GetNewestVerificationBatchResponseSpec extends AnyWordSpec with Matc
             verificationNumber = Some("V0000000001"),
             taxTreatment = Some("0"),
             verificationBatchId = Some(99L),
-            subcontractorId = Some(1L)
+            subcontractorId = Some(1L),
+            actionIndicator = Some("VERIFY"),
+            proceed = Some("Y"),
+            verificationResourceRef = Some(10L)
           )
         ),
         submission = Some(
@@ -142,6 +145,9 @@ final class GetNewestVerificationBatchResponseSpec extends AnyWordSpec with Matc
       (v0 \ "taxTreatment").as[String] mustBe "0"
       (v0 \ "verificationBatchId").as[Long] mustBe 99L
       (v0 \ "subcontractorId").as[Long] mustBe 1L
+      (v0 \ "actionIndicator").as[String] mustBe "VERIFY"
+      (v0 \ "proceed").as[String] mustBe "Y"
+      (v0 \ "verificationResourceRef").as[Long] mustBe 10L
 
       val subm0 = json \ "submission"
 
@@ -179,6 +185,59 @@ final class GetNewestVerificationBatchResponseSpec extends AnyWordSpec with Matc
 
       val json = Json.toJson(model)
       json.validate[GetNewestVerificationBatchResponse] mustBe JsSuccess(model)
+    }
+
+    "provide source data for the unmatched verification decision matrix" in {
+      val stream =
+        Option(
+          getClass.getResourceAsStream(
+            "/resources/verification/getNewestVerificationBatch-200-response.json"
+          )
+        ).getOrElse(
+          fail("getNewestVerificationBatch-200-response.json was not found")
+        )
+
+      val response =
+        try
+          Json.parse(stream).as[GetNewestVerificationBatchResponse]
+        finally
+          stream.close()
+
+      def verification(id: Long): Verification =
+        response.verifications
+          .find(_.verificationId == id)
+          .getOrElse(fail(s"Verification $id was not found"))
+
+      val missingVerificationNumber = verification(1002L)
+
+      missingVerificationNumber.verificationNumber mustBe None
+
+      val edit = verification(1003L)
+
+      edit.verificationNumber mustBe Some("V0000000003")
+      edit.actionIndicator mustBe Some("EDIT")
+
+      val matchNotY = verification(1004L)
+
+      matchNotY.verificationNumber mustBe Some("V0000000004")
+      matchNotY.actionIndicator mustBe Some("MATCH")
+      matchNotY.matched mustBe Some("N")
+
+      val verifyNotY = verification(1005L)
+
+      verifyNotY.verificationNumber mustBe Some("V0000000005")
+      verifyNotY.actionIndicator mustBe Some("VERIFY")
+      verifyNotY.matched mustBe Some("N")
+
+      val matchY = verification(1006L)
+
+      matchY.actionIndicator mustBe Some("MATCH")
+      matchY.matched mustBe Some("Y")
+
+      val verifyY = verification(1007L)
+
+      verifyY.actionIndicator mustBe Some("VERIFY")
+      verifyY.matched mustBe Some("Y")
     }
   }
 }

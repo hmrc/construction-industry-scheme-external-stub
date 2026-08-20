@@ -14,21 +14,20 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.constructionindustryschemeexternalstub.models
+package uk.gov.hmrc.constructionindustryschemeexternalstub.models.response
 
 import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.*
 
-final case class Verification(
-  verificationId: Long,
-  matched: Option[String],
-  verificationNumber: Option[String],
-  taxTreatment: Option[String],
-  verificationBatchId: Option[Long],
-  subcontractorId: Option[Long],
-  actionIndicator: Option[String] = None,
-  proceed: Option[String] = None,
-  verificationResourceRef: Option[Long] = None
+case class GetLastSubmittedVerificationBatchResponse(
+  scheme: Option[ContractorSchemeLastVerification],
+  subcontractors: Seq[SubcontractorLastVerification],
+  verifications: Seq[VerificationLastVerification],
+  verificationBatch: Option[VerificationBatchLastVerification],
+  submission: Option[SubmissionNewVerification]
 )
 
-object Verification:
-  given format: OFormat[Verification] = Json.format[Verification]
+object GetLastSubmittedVerificationBatchResponse {
+  given format: OFormat[GetLastSubmittedVerificationBatchResponse] =
+    Json.format[GetLastSubmittedVerificationBatchResponse]
+}

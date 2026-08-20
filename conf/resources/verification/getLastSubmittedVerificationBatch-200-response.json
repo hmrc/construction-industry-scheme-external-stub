@@ -1,0 +1,83 @@
+{
+  "scheme": {
+    "accountsOfficeReference": "123PA00123456",
+    "name": "ABC Construction Ltd",
+    "utr": "1111111111",
+    "emailAddress": "ops@example.com"
+  },
+  "subcontractors": [
+    {
+      "subcontractorId": 1,
+      "subbieResourceRef": 10,
+      "subcontractorType": "soletrader",
+      "utr": "1111111111"
+    },
+    {
+      "subcontractorId": 2,
+      "subbieResourceRef": 11,
+      "subcontractorType": "company",
+      "utr": "2222222222"
+    },
+    {
+      "subcontractorId": 3,
+      "subbieResourceRef": 12,
+      "subcontractorType": "partnership",
+      "utr": "3333333333"
+    },
+    {
+      "subcontractorId": 4,
+      "subbieResourceRef": 13,
+      "subcontractorType": "trust",
+      "utr": null
+    }
+  ],
+  "verificationBatch": {
+    "verificationBatchId": 99,
+    "verifBatchResourceRef": 1234567,
+    "status": "STARTED"
+  },
+  "verifications": [
+    {
+      "verificationId": 1001,
+      "verificationBatchId": 99,
+      "verificationResourceRef": 12345,
+      "matched": "Y",
+      "verificationNumber": "V0000000001",
+      "taxTreatment": "0",
+      "subcontractorName": "John Smith"
+    },
+    {
+      "verificationId": 1002,
+      "verificationBatchId": 99,
+      "verificationResourceRef": 12346,
+      "matched": "N",
+      "verificationNumber": "V0000000002",
+      "taxTreatment": "20",
+      "subcontractorName": "ABC Construction"
+    },
+    {
+      "verificationId": 1003,
+      "verificationBatchId": 99,
+      "verificationResourceRef": 12347,
+      "matched": null,
+      "verificationNumber": null,
+      "taxTreatment": null,
+      "subcontractorName": "XYZ Traders"
+    },
+    {
+      "verificationId": 1004,
+      "verificationBatchId": 99,
+      "verificationResourceRef": 12347,
+      "matched": null,
+      "verificationNumber": null,
+      "taxTreatment": null,
+      "subcontractorName": "XYZ Traders"
+    }
+  ],
+  "submission": {
+    "submissionId": 1234,
+    "activeObjectId": 98765,
+    "status": "ACCEPTED",
+    "submissionRequestDate": "2026-08-11T11:50:00"
+  }
+}

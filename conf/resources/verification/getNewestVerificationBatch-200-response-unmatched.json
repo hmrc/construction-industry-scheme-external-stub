@@ -1,10 +1,10 @@
 {
   "scheme": {
-    "accountsOfficeReference": "123PA00123456",
-    "name": "John",
-    "utr": "1111111111",
-    "emailAddress": "ops@example.com"
-  },
+      "accountsOfficeReference": "123PA00123456",
+      "name": "John",
+      "utr": "1111111111",
+      "emailAddress": "ops@example.com"
+    },
   "subcontractors": [
     {
       "subcontractorId": 1,
@@ -101,7 +101,7 @@
       "createDate": "2026-04-10T14:15:00",
       "subcontractorType": "soletrader",
       "subbieResourceRef":  14,
-      "utr": "8786438046",
+      "utr": null,
       "partnerUtr": null,
       "crn":  "99999",
       "nino": "AA123456A"
@@ -267,10 +267,10 @@
     }
   ],
   "verificationBatch": {
-    "verificationBatchId": 99,
-    "status": "SUBMITTED",
-    "verificationNumber": "VB00000001"
-  },
+      "verificationBatchId": 99,
+      "status": "SUBMITTED",
+      "verificationNumber": "VB00000001"
+    },
   "verifications": [
     {
       "verificationId": 1001,
@@ -286,14 +286,14 @@
     },{
       "verificationId": 1002,
       "matched": "Y",
-      "verificationNumber": "V0000000002",
+      "verificationNumber": null,
       "taxTreatment": "0",
       "verificationBatchId": 99,
       "subcontractorId": 1,
       "actionIndicator": null,
       "proceed": "Y",
       "verificationResourceRef": 10,
-      "isUnmatched": false
+      "isUnmatched": true
     },
     {
       "verificationId": 1003,
@@ -302,14 +302,14 @@
       "taxTreatment": "0",
       "verificationBatchId": 99,
       "subcontractorId": 2,
-      "actionIndicator": "MATCH",
+      "actionIndicator": "EDIT",
       "proceed": "Y",
       "verificationResourceRef": 11,
-      "isUnmatched": false
+      "isUnmatched": true
     },
     {
       "verificationId": 1004,
-      "matched": "Y",
+      "matched": "N",
       "verificationNumber": "V0000000004",
       "taxTreatment": "0",
       "verificationBatchId": 99,
@@ -317,19 +317,19 @@
       "actionIndicator": "MATCH",
       "proceed": "Y",
       "verificationResourceRef": 12,
-      "isUnmatched": false
+      "isUnmatched": true
     },
     {
       "verificationId": 1005,
-      "matched": "Y",
+      "matched": "N",
       "verificationNumber": "V0000000005",
       "taxTreatment": "0",
       "verificationBatchId": 99,
       "subcontractorId": 10908,
-      "actionIndicator": "MATCH",
+      "actionIndicator": "VERIFY",
       "proceed": "Y",
       "verificationResourceRef": 13,
-      "isUnmatched": false
+      "isUnmatched": true
     },
     {
       "verificationId": 1006,
@@ -365,31 +365,31 @@
       "actionIndicator": "UNKNOWN",
       "proceed": "Y",
       "verificationResourceRef": 16,
-      "isUnmatched": false
+      "isUnmatched": true
     },
     {
       "verificationId": 1009,
       "matched": "N",
-      "verificationNumber": "V0000000009",
+      "verificationNumber": null,
       "taxTreatment": "0",
       "verificationBatchId": 99,
       "subcontractorId": 9999,
       "actionIndicator": "VERIFY",
       "proceed": "Y",
       "verificationResourceRef": 9999,
-      "isUnmatched": false
+      "isUnmatched": true
     },
     {
       "verificationId": 1010,
       "matched": "N",
-      "verificationNumber": "V0000000010",
+      "verificationNumber": null,
       "taxTreatment": "0",
       "verificationBatchId": 99,
       "subcontractorId": null,
       "actionIndicator": "VERIFY",
       "proceed": "Y",
       "verificationResourceRef": null,
-      "isUnmatched": false
+      "isUnmatched": true
     },
     {
       "verificationId": 1011,
@@ -401,7 +401,7 @@
       "actionIndicator": "MATCH",
       "proceed": "N",
       "verificationResourceRef": 17,
-      "isUnmatched": false
+      "isUnmatched": true
     },
     {
       "verificationId": 1012,
@@ -413,19 +413,19 @@
       "actionIndicator": "VERIFY",
       "proceed": "N",
       "verificationResourceRef": 18,
-      "isUnmatched": false
+      "isUnmatched": true
     }
   ],
   "submission": {
-    "submissionId": 555,
-    "activeObjectId": 99,
-    "status": "ACCEPTED",
-    "submissionRequestDate": "2026-04-01T10:00:00"
-  },
+      "submissionId": 555,
+      "activeObjectId": 99,
+      "status": "ACCEPTED",
+      "submissionRequestDate": "2026-04-01T10:00:00"
+    },
   "monthlyReturn": {
-    "monthlyReturnId": 777,
-    "decNoMoreSubPayments": null
-  },
+      "monthlyReturnId": 777,
+      "decNoMoreSubPayments": null
+    },
   "monthlyReturnSubmission": {
     "submissionId": 888,
     "submissionRequestDate": "2026-04-01T10:00:00"

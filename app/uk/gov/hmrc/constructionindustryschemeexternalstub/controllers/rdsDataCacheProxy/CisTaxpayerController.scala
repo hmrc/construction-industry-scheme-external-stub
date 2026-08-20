@@ -35,16 +35,9 @@ class CisTaxpayerController @Inject() (
 )() extends BackendController(cc)
     with Logging {
 
-  private val monthlyNilReturnResponsePath                             = "/resources"
-  private val verificationResponsePath                                 = "/resources/verification"
-  private val getCisTaxpayerByTaxReference_200_ResponsePath            =
+  private val monthlyNilReturnResponsePath                  = "/resources"
+  private val getCisTaxpayerByTaxReference_200_ResponsePath =
     s"$monthlyNilReturnResponsePath/getCisTaxpayerByTaxReference-200-response.json"
-  private val getNewestVerificationBatch_200_VerifyOnly_ResponsePath   =
-    s"$verificationResponsePath/getNewestVerificationBatch-200-response-no-reverify.json"
-  private val getNewestVerificationBatch_200_ReverifyOnly_ResponsePath =
-    s"$verificationResponsePath/getNewestVerificationBatch-200-response-no-newly-added.json"
-  private val getNewestVerificationBatch_200_Inactive_ResponsePath     =
-    s"$verificationResponsePath/getNewestVerificationBatch-200-response-inactive.json"
 
   def getCisTaxpayerByTaxReference: Action[JsValue] =
     authorise(parse.json) { implicit request =>
@@ -59,75 +52,42 @@ class CisTaxpayerController @Inject() (
               )
             ),
           er => {
-            val enrolments = enrolmentHelper
+            val uniqueIdMap: Map[String, String] = Map(
+              "EZ10800" -> "800",
+              "EZ00125" -> "125",
+              "EZ00150" -> "150",
+              "EZ00175" -> "175",
+              "EZ00200" -> "200",
+              "EZ00225" -> "225"
+            )
+            val enrolments                       = enrolmentHelper
               .contractorEnrolmentsOpt(request)
               .orElse(enrolmentHelper.agentEnrolmentsOpt(request))
             enrolments match {
               case Some(enrolmentReference) =>
                 (er.taxOfficeNumber, er.taxOfficeReference) match {
-                  case ("404", _)     =>
+                  case ("404", _)                                =>
                     NotFound(
                       Json.obj(
                         "message" -> s"CIS taxpayer not found for TON=${er.taxOfficeNumber}, TOR=${er.taxOfficeReference}"
                       )
                     )
-                  case ("500", _)     => InternalServerError(Json.obj("message" -> "Unexpected error"))
-                  case (_, "EZ10800") =>
-                    val json    =
+                  case ("500", _)                                => InternalServerError(Json.obj("message" -> "Unexpected error"))
+                  case (_, toRef) if uniqueIdMap.contains(toRef) =>
+                    val uniqueId = uniqueIdMap(toRef)
+                    val json     =
                       Json.parse(resourceHelper.resourceAsString(getCisTaxpayerByTaxReference_200_ResponsePath))
-                    val updated = json
+                    val updated  = json
                       .as[JsObject]
                       .deepMerge(
                         Json.obj(
-                          "uniqueId"        -> "800",
+                          "uniqueId"        -> uniqueId,
                           "taxOfficeNumber" -> er.taxOfficeNumber,
                           "taxOfficeRef"    -> er.taxOfficeReference
                         )
                       )
                     Ok(updated)
-                  case (_, "EZ00125") =>
-                    val json    =
-                      Json
-                        .parse(resourceHelper.resourceAsString(getNewestVerificationBatch_200_VerifyOnly_ResponsePath))
-                    val updated = json
-                      .as[JsObject]
-                      .deepMerge(
-                        Json.obj(
-                          "uniqueId"        -> "125",
-                          "taxOfficeNumber" -> er.taxOfficeNumber,
-                          "taxOfficeRef"    -> er.taxOfficeReference
-                        )
-                      )
-                    Ok(updated)
-                  case (_, "EZ00150") =>
-                    val json    =
-                      Json.parse(
-                        resourceHelper.resourceAsString(getNewestVerificationBatch_200_ReverifyOnly_ResponsePath)
-                      )
-                    val updated = json
-                      .as[JsObject]
-                      .deepMerge(
-                        Json.obj(
-                          "uniqueId"        -> "150",
-                          "taxOfficeNumber" -> er.taxOfficeNumber,
-                          "taxOfficeRef"    -> er.taxOfficeReference
-                        )
-                      )
-                    Ok(updated)
-                  case (_, "EZ00175") =>
-                    val json    =
-                      Json.parse(resourceHelper.resourceAsString(getNewestVerificationBatch_200_Inactive_ResponsePath))
-                    val updated = json
-                      .as[JsObject]
-                      .deepMerge(
-                        Json.obj(
-                          "uniqueId"        -> "175",
-                          "taxOfficeNumber" -> er.taxOfficeNumber,
-                          "taxOfficeRef"    -> er.taxOfficeReference
-                        )
-                      )
-                    Ok(updated)
-                  case (ton, tor)     =>
+                  case (ton, tor)                                =>
                     val json    =
                       Json.parse(resourceHelper.resourceAsString(getCisTaxpayerByTaxReference_200_ResponsePath))
                     val updated = json

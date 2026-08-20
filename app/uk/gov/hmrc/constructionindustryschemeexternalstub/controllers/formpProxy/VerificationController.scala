@@ -44,6 +44,10 @@ class VerificationController @Inject() (
     s"$verificationResponsePath/getNewestVerificationBatch-200-response-no-newly-added.json"
   private val getNewestVerificationBatch_200_VerifyOnly_ResponsePath                              =
     s"$verificationResponsePath/getNewestVerificationBatch-200-response-no-reverify.json"
+  private val getNewestVerificationBatch_200_Pending_ResponsePath                                 =
+    s"$verificationResponsePath/getNewestVerificationBatch-200-response-verification-in-progress.json"
+  private val getNewestVerificationBatch_200_no_Subcontractor_ResponsePath                        =
+    s"$verificationResponsePath/getNewestVerificationBatch-200-response-no-subcontractor.json"
   private val getCurrentVerificationBatch_200_verificationBatchStatus_none_ResponsePath           =
     s"$verificationResponsePath/getCurrentVerificationBatch-200-verificationBatchStatus-none-response.json"
   private val getCurrentVerificationBatch_200_verificationBatchStatus_started_ResponsePath        =
@@ -66,6 +70,10 @@ class VerificationController @Inject() (
     s"$verificationResponsePath/getSubmissionWithVerificationBatch-200-response.json"
   private val getSubmittedVerifications_200_ResponsePath                                          =
     s"$verificationResponsePath/getSubmittedVerifications-200-response.json"
+  private val getSubmittedVerifications_200_multiYear_ResponsePath                                =
+    s"$verificationResponsePath/getSubmittedVerifications-200-multiTaxYears-response.json"
+  private val getSubmittedVerifications_200_noHistory_ResponsePath                                =
+    s"$verificationResponsePath/getSubmittedVerifications-200-noHistory-response.json"
 
   private def withEnrolmentDispatch(onSuccess: => Result)(implicit request: AuthenticatedRequest[_]): Result =
     enrolmentHelper.contractorEnrolmentsOpt(request) match {
@@ -92,6 +100,8 @@ class VerificationController @Inject() (
             case "125" => getNewestVerificationBatch_200_VerifyOnly_ResponsePath
             case "150" => getNewestVerificationBatch_200_ReverifyOnly_ResponsePath
             case "175" => getNewestVerificationBatch_200_Inactive_ResponsePath
+            case "200" => getNewestVerificationBatch_200_Pending_ResponsePath
+            case "225" => getNewestVerificationBatch_200_no_Subcontractor_ResponsePath
             case _     => getNewestVerificationBatch_200_ResponsePath
           }
 
@@ -104,10 +114,10 @@ class VerificationController @Inject() (
       withEnrolmentDispatch {
         val responsePath =
           instanceId match {
-            case "1" => getLastSubmittedVerificationBatch_200_verificationBatchStatus_pending_ResponsePath
-            case "2" => getLastSubmittedVerificationBatch_200_verificationBatchStatus_accepted_ResponsePath
-            case "3" => getLastSubmittedVerificationBatch_200_verificationBatchStatus_none_ResponsePath
-            case _   => getLastSubmittedVerificationBatch_200_ResponsePath
+            case "150" => getLastSubmittedVerificationBatch_200_verificationBatchStatus_pending_ResponsePath
+            case "175" => getLastSubmittedVerificationBatch_200_verificationBatchStatus_accepted_ResponsePath
+            case "225" => getLastSubmittedVerificationBatch_200_verificationBatchStatus_none_ResponsePath
+            case _     => getLastSubmittedVerificationBatch_200_ResponsePath
           }
 
         Ok(Json.parse(resourceHelper.resourceAsString(responsePath)))
@@ -253,6 +263,20 @@ class VerificationController @Inject() (
 
                   case ("502", _) =>
                     BadGateway(Json.obj("message" -> "formp failed"))
+
+                  case (_, "EZ00150") =>
+                    Ok(
+                      Json.parse(
+                        resourceHelper.resourceAsString(getSubmittedVerifications_200_multiYear_ResponsePath)
+                      )
+                    )
+
+                  case (_, "EZ00225") =>
+                    Ok(
+                      Json.parse(
+                        resourceHelper.resourceAsString(getSubmittedVerifications_200_noHistory_ResponsePath)
+                      )
+                    )
 
                   case _ =>
                     Ok(

@@ -41,16 +41,16 @@
       "createDate": "2026-04-05T09:30:00",
       "subcontractorType": "company",
       "subbieResourceRef":  11,
-      "utr": null,
+      "utr": "2222222222",
       "partnerUtr": null,
       "crn":  "99999",
       "nino": "AA123456A"
     },
     {
       "subcontractorId": 3,
-      "firstName": null,
-      "secondName": null,
-      "surname": null,
+      "firstName": "Charlie",
+      "secondName": "D",
+      "surname": "Green",
       "tradingName": null,
       "partnershipTradingName": null,
       "verified": null,
@@ -61,7 +61,7 @@
       "createDate": "2026-04-10T14:15:00",
       "subcontractorType": "soletrader",
       "subbieResourceRef":  12,
-      "utr": null,
+      "utr": "3333333333",
       "partnerUtr": null,
       "crn":  "99999",
       "nino": "AA123456A"
@@ -112,7 +112,7 @@
       "secondName": null,
       "surname": "null",
       "tradingName": null,
-      "partnershipTradingName": "KKK Partnership",
+      "partnershipTradingName": "Flooring & Tiles",
       "verified": null,
       "verificationNumber": "V0000000006",
       "taxTreatment": null,
@@ -290,7 +290,7 @@
       "taxTreatment": "0",
       "verificationBatchId": 99,
       "subcontractorId": 1,
-      "actionIndicator": null,
+      "actionIndicator": "VERIFY",
       "proceed": "Y",
       "verificationResourceRef": 10,
       "isUnmatched": false
@@ -357,19 +357,19 @@
     },
     {
       "verificationId": 1008,
-      "matched": "N",
+      "matched": "Y",
       "verificationNumber": "V0000000008",
       "taxTreatment": "0",
       "verificationBatchId": 99,
       "subcontractorId": 7,
-      "actionIndicator": "UNKNOWN",
+      "actionIndicator": "VERIFY",
       "proceed": "Y",
       "verificationResourceRef": 16,
       "isUnmatched": false
     },
     {
       "verificationId": 1009,
-      "matched": "N",
+      "matched": "Y",
       "verificationNumber": "V0000000009",
       "taxTreatment": "0",
       "verificationBatchId": 99,
@@ -381,7 +381,7 @@
     },
     {
       "verificationId": 1010,
-      "matched": "N",
+      "matched": "Y",
       "verificationNumber": "V0000000010",
       "taxTreatment": "0",
       "verificationBatchId": 99,
@@ -411,7 +411,7 @@
       "verificationBatchId": 99,
       "subcontractorId": 9,
       "actionIndicator": "VERIFY",
-      "proceed": "N",
+      "proceed": "Y",
       "verificationResourceRef": 18,
       "isUnmatched": false
     }

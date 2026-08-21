@@ -406,7 +406,7 @@ To trigger the happy path, ensure you provide a valid request body:
 - Response body:
 ```json
 {
-  "messageId": 1
+  "messageIDOut": 1
 }
 ```
 

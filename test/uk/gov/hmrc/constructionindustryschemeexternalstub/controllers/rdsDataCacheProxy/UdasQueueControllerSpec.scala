@@ -137,7 +137,7 @@ class UdasQueueControllerSpec extends AnyFreeSpec with Matchers with ScalaFuture
         val res: Future[Result] = controller.enqueueClob()(req)
 
         status(res) mustBe OK
-        contentAsJson(res) mustBe Json.obj("messageId" -> 1)
+        contentAsJson(res) mustBe Json.obj("messageIDOut" -> 1)
 
       }
 

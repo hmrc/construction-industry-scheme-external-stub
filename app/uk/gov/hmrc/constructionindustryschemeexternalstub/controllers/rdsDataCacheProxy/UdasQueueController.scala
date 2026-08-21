@@ -64,7 +64,7 @@ class UdasQueueController @Inject() (
               agentReference match {
                 case "400" => BadRequest(Json.obj("error" -> "credentialId and serviceName must be provided"))
                 case "500" => InternalServerError(Json.obj("error" -> "could not enqueue clob"))
-                case _     => Ok(Json.obj("messageId" -> 1))
+                case _     => Ok(Json.obj("messageIDOut" -> 1))
               }
             case None                 => InternalServerError
           }

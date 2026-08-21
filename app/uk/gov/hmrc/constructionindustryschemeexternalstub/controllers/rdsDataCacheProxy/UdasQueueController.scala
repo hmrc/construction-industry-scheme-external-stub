@@ -17,10 +17,10 @@
 package uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.rdsDataCacheProxy
 
 import play.api.Logging
-import play.api.libs.json.Json
+import play.api.libs.json.{JsError, JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.EnqueueMessageHeaderRequest
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{EnqueueClobRequest, EnqueueMessageHeaderRequest}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.EnrolmentsHelper
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -35,17 +35,39 @@ class UdasQueueController @Inject() (
     extends BackendController(cc)
     with Logging {
 
-  def enqueueMessageHeader(): Action[EnqueueMessageHeaderRequest] = authorise(parse.json[EnqueueMessageHeaderRequest]) {
-    implicit request =>
-      val identifier = enrolmentHelper.agentEnrolmentsOpt(request)
-      identifier match {
-        case Some(agentReference) =>
-          agentReference match {
-            case "400" => BadRequest(Json.obj("error" -> "credentialId and serviceName must be provided"))
-            case "500" => InternalServerError(Json.obj("error" -> "could enqueue message header"))
-            case _     => Ok(Json.obj("messageId" -> "10"))
+  def enqueueMessageHeader(): Action[JsValue] = authorise(parse.json) { implicit request =>
+    request.body
+      .validate[EnqueueMessageHeaderRequest]
+      .fold(
+        errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
+        _ =>
+          enrolmentHelper.agentEnrolmentsOpt(request) match {
+            case Some(agentReference) =>
+              agentReference match {
+                case "400" => BadRequest(Json.obj("error" -> "credentialId and serviceName must be provided"))
+                case "500" => InternalServerError(Json.obj("error" -> "could not enqueue message header"))
+                case _     => Ok(Json.obj("messageId" -> 1))
+              }
+            case None                 => InternalServerError
           }
-        case None                 => InternalServerError
-      }
+      )
+  }
+
+  def enqueueClob(): Action[JsValue] = authorise(parse.json) { implicit request =>
+    request.body
+      .validate[EnqueueClobRequest]
+      .fold(
+        errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
+        _ =>
+          enrolmentHelper.agentEnrolmentsOpt(request) match {
+            case Some(agentReference) =>
+              agentReference match {
+                case "400" => BadRequest(Json.obj("error" -> "credentialId and serviceName must be provided"))
+                case "500" => InternalServerError(Json.obj("error" -> "could not enqueue clob"))
+                case _     => Ok(Json.obj("messageId" -> 1))
+              }
+            case None                 => InternalServerError
+          }
+      )
   }
 }

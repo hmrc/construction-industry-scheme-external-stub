@@ -370,7 +370,43 @@ To trigger the happy path, ensure you provide a valid request body:
 - Response body:
 ```json
 {
-  "messageId": "10"
+  "messageId": 1
+}
+```
+
+**Endpoint**: `POST /cis/enqueue-clob `
+
+**Description**: Enqueue Clob UDASQ table
+
+#### Happy Path
+
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: 123456
+
+- Request body:
+```json
+{
+    "messageId": 12345,
+    "sender": "Portal",
+    "queueName": "AGTAUTH",
+    "replyQueue": "",
+    "correlationId": "",
+    "filter": "RemoveClient",
+    "payload": {
+      "IRAgentID": "123456789",
+      "Service": "CIS",
+      "TaxReference": "123/ABC123"
+    }
+}
+```
+
+- Response status: `200`
+- Response body:
+```json
+{
+  "messageId": 1
 }
 ```
 

@@ -22,81 +22,165 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.mvc.{ControllerComponents, PlayBodyParsers, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.{AuthAction, FakeAuthAction}
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.EnqueueMessageHeaderRequest
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{EnqueueClobRequest, EnqueueMessageHeaderRequest}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.EnrolmentsHelper
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class UdasQueueControllerSpec extends AnyFreeSpec with Matchers with ScalaFutures with MockitoSugar {
-  ".enqueueMessageHeader" - {
 
-    "returns 200 with status when service succeeds for an unknown agentReference" in new Setup {
-      val request: EnqueueMessageHeaderRequest = EnqueueMessageHeaderRequest(
-        sender = "Portal",
-        queueName = "AGTAUTH",
-        replyQueue = "",
-        correlationId = "",
-        filter = "RemoveClient"
-      )
-      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
-        .thenReturn(Some("200"))
+  "CisTaxpayerController" - {
 
-      val req = FakeRequest(POST, "/rds-datacache-proxy/cis/enqueue-message-header").withBody(request)
+    ".enqueueMessageHeader" - {
 
-      val res: Future[Result] = controller.enqueueMessageHeader()(req)
+      val postUrl = "/cis/enqueue-message-header"
 
-      status(res) mustBe OK
-      contentAsJson(res) mustBe Json.obj("messageId" -> "10")
+      val validJson: JsValue =
+        Json.toJson(
+          EnqueueMessageHeaderRequest(
+            sender = "Portal",
+            queueName = "AGTAUTH",
+            replyQueue = "",
+            correlationId = "",
+            filter = "RemoveClient"
+          )
+        )
 
+      "returns 200 with status when service succeeds for an unknown agentReference" in new Setup {
+
+        when(mockEnrolmentsHelper.agentEnrolmentsOpt(any())).thenReturn(Some("200"))
+
+        val req: FakeRequest[JsValue] =
+          FakeRequest(POST, postUrl).withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON).withBody(validJson)
+
+        val res: Future[Result] = controller.enqueueMessageHeader()(req)
+
+        status(res) mustBe OK
+        contentAsJson(res) mustBe Json.obj("messageId" -> 1)
+
+      }
+
+      "propagates UpstreamErrorResponse for agentReference = 400" in new Setup {
+
+        when(mockEnrolmentsHelper.agentEnrolmentsOpt(any())).thenReturn(Some("400"))
+
+        val req: FakeRequest[JsValue] =
+          FakeRequest(POST, postUrl).withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON).withBody(validJson)
+
+        val res: Future[Result] = controller.enqueueMessageHeader()(req)
+
+        status(res) mustBe BAD_REQUEST
+        (contentAsJson(res) \ "error").as[String] must include("credentialId and serviceName must be provided")
+
+      }
+
+      "returns 500 with generic message for agentReference = 500" in new Setup {
+
+        when(mockEnrolmentsHelper.agentEnrolmentsOpt(any())).thenReturn(Some("500"))
+
+        val req: FakeRequest[JsValue] =
+          FakeRequest(POST, postUrl).withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON).withBody(validJson)
+
+        val res: Future[Result] = controller.enqueueMessageHeader()(req)
+
+        status(res) mustBe INTERNAL_SERVER_ERROR
+        (contentAsJson(res) \ "error").as[String] mustBe "could not enqueue message header"
+      }
+
+      "returns 400 BadRequest when JSON is invalid" in new Setup {
+        val invalidJson: JsObject = Json.obj()
+
+        val req: FakeRequest[JsValue] =
+          FakeRequest(POST, postUrl).withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON).withBody(invalidJson)
+
+        val res: Future[Result] = controller.enqueueMessageHeader()(req)
+
+        status(res) mustBe BAD_REQUEST
+        (contentAsJson(res) \ "message").as[String] mustBe "Invalid payload"
+        (contentAsJson(res) \ "errors").isDefined mustBe true
+      }
     }
 
-    "propagates UpstreamErrorResponse for agentReference = 400" in new Setup {
-      val request: EnqueueMessageHeaderRequest = EnqueueMessageHeaderRequest(
-        sender = "Portal",
-        queueName = "AGTAUTH",
-        replyQueue = "",
-        correlationId = "",
-        filter = "RemoveClient"
-      )
+    ".enqueueClob" - {
 
-      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
-        .thenReturn(Some("400"))
+      val postUrl = "/cis/enqueue-clob"
 
-      val req: FakeRequest[EnqueueMessageHeaderRequest] =
-        FakeRequest(POST, "/rds-datacache-proxy/cis/enqueue-message-header").withBody(request)
+      val validJson: JsValue =
+        Json.toJson(
+          EnqueueClobRequest(
+            messageId = 12345L,
+            sender = "Portal",
+            queueName = "AGTAUTH",
+            replyQueue = "",
+            correlationId = "",
+            filter = "RemoveClient",
+            payload = Map(
+              "IRAgentID"    -> "123456789",
+              "Service"      -> "CIS",
+              "TaxReference" -> "123/ABC123"
+            )
+          )
+        )
 
-      val res: Future[Result] = controller.enqueueMessageHeader()(req)
+      "returns 200 with status when service succeeds for an unknown agentReference" in new Setup {
 
-      status(res) mustBe BAD_REQUEST
-      (contentAsJson(res) \ "error").as[String] must include("credentialId and serviceName must be provided")
+        when(mockEnrolmentsHelper.agentEnrolmentsOpt(any())).thenReturn(Some("200"))
 
+        val req: FakeRequest[JsValue] =
+          FakeRequest(POST, postUrl).withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON).withBody(validJson)
+
+        val res: Future[Result] = controller.enqueueClob()(req)
+
+        status(res) mustBe OK
+        contentAsJson(res) mustBe Json.obj("messageId" -> 1)
+
+      }
+
+      "propagates UpstreamErrorResponse for agentReference = 400" in new Setup {
+
+        when(mockEnrolmentsHelper.agentEnrolmentsOpt(any())).thenReturn(Some("400"))
+
+        val req: FakeRequest[JsValue] =
+          FakeRequest(POST, postUrl).withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON).withBody(validJson)
+
+        val res: Future[Result] = controller.enqueueClob()(req)
+
+        status(res) mustBe BAD_REQUEST
+        (contentAsJson(res) \ "error").as[String] must include("credentialId and serviceName must be provided")
+
+      }
+
+      "returns 500 with generic message for agentReference = 500" in new Setup {
+
+        when(mockEnrolmentsHelper.agentEnrolmentsOpt(any())).thenReturn(Some("500"))
+
+        val req: FakeRequest[JsValue] =
+          FakeRequest(POST, postUrl).withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON).withBody(validJson)
+
+        val res: Future[Result] = controller.enqueueClob()(req)
+
+        status(res) mustBe INTERNAL_SERVER_ERROR
+        (contentAsJson(res) \ "error").as[String] mustBe "could not enqueue clob"
+      }
+
+      "returns 400 BadRequest when JSON is invalid" in new Setup {
+        val invalidJson: JsObject = Json.obj()
+
+        val req: FakeRequest[JsValue] =
+          FakeRequest(POST, postUrl).withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON).withBody(invalidJson)
+
+        val res: Future[Result] = controller.enqueueClob()(req)
+
+        status(res) mustBe BAD_REQUEST
+        (contentAsJson(res) \ "message").as[String] mustBe "Invalid payload"
+        (contentAsJson(res) \ "errors").isDefined mustBe true
+      }
     }
-
-    "returns 500 with generic message for agentReference = 500" in new Setup {
-      val request: EnqueueMessageHeaderRequest = EnqueueMessageHeaderRequest(
-        sender = "Portal",
-        queueName = "AGTAUTH",
-        replyQueue = "",
-        correlationId = "",
-        filter = "RemoveClient"
-      )
-
-      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
-        .thenReturn(Some("500"))
-
-      val req: FakeRequest[EnqueueMessageHeaderRequest] =
-        FakeRequest(POST, "/formp-proxy/cis/enqueue-message-header").withBody(request)
-      val res: Future[Result]                           = controller.enqueueMessageHeader()(req)
-
-      status(res) mustBe INTERNAL_SERVER_ERROR
-      (contentAsJson(res) \ "error").as[String] mustBe "could enqueue message header"
-    }
-
   }
 
   private trait Setup {

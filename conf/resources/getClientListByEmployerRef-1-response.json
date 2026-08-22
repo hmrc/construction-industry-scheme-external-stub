@@ -1,0 +1,15 @@
+{
+  "clients": [
+    {
+      "uniqueId": "1",
+      "taxOfficeNumber": "123",
+      "taxOfficeRef": "EZ00100",
+      "employerName1": "ABC Ltd",
+      "schemeName": "UHD Contractor Control Group"
+    }
+  ],
+  "totalCount": 1,
+  "clientNameStartingCharacters": [
+    "A"
+  ]
+}

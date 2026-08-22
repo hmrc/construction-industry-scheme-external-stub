@@ -36,8 +36,9 @@ class ClientController @Inject() (
     extends BackendController(cc)
     with Logging {
 
-  private val responsePath                   = "/resources"
-  private val getClientList_200_ResponsePath = s"$responsePath/getClientList-200-response.json"
+  private val responsePath                            = "/resources"
+  private val getClientList_200_ResponsePath          = s"$responsePath/getClientList-200-response.json"
+  private val getClientListByEmployerRef_ResponsePath = s"$responsePath/getClientListByEmployerRef-1-response.json"
 
   private val getClientList_200_Alt_ResponsePath =
     s"$responsePath/getClientList-200-alt-response.json"
@@ -116,5 +117,28 @@ class ClientController @Inject() (
       }
     }
 
+  }
+
+  def getClientsByEmployersReference(
+    irAgentId: String,
+    credentialId: String,
+    employerRef: String
+  ): Action[AnyContent] = authorise { implicit request =>
+    if (irAgentId.trim().isEmpty || credentialId.trim().isEmpty || employerRef.trim().isEmpty) {
+      BadRequest(Json.obj("error" -> "credentialId and irAgentId and employerRef must be provided"))
+    } else {
+      val identifier = enrolmentHelper.agentEnrolmentsOpt(request)
+      identifier match {
+        case Some(_) =>
+          irAgentId match {
+            case "400" => BadRequest(Json.obj("error" -> "credentialId and irAgentId must be provided"))
+            case "500" => InternalServerError(Json.obj("error" -> "Could not get client list"))
+            // case "000123" => Ok(resourceHelper.resourceAsString(getClientList_200_Alt_ResponsePath))
+            case _     =>
+              Ok(resourceHelper.resourceAsString(getClientListByEmployerRef_ResponsePath))
+          }
+        case None    => InternalServerError
+      }
+    }
   }
 }

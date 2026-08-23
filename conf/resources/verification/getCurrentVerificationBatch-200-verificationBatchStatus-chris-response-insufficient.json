@@ -37,12 +37,12 @@
       "subcontractorId": 5,
       "firstName": null,
       "secondName": null,
-      "surname": "Wood",
+      "surname": null,
       "tradingName": "WYZ Trader",
       "subbieResourceRef": 14,
       "utr": null,
       "nino": "AA123456A",
-      "subcontractorType": "company"
+      "subcontractorType": "soletrader"
     }
   ],
   "verificationBatch": {

@@ -121,6 +121,40 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
       (verification \ "verificationResourceRef").as[Long] mustBe 10L
     }
 
+    Seq(
+      (
+        "250",
+        "/resources/verification/getNewestVerificationBatch-200-response-unmatched.json"
+      ),
+      (
+        "275",
+        "/resources/verification/getNewestVerificationBatch-200-response-insufficient.json"
+      )
+    ).foreach { case (testInstanceId, expectedResponsePath) =>
+      s"select the correct segregated response for instanceId $testInstanceId" in new Setup {
+        when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+          .thenReturn(Some(EmployerReference("200", "")))
+        when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+          .thenReturn(None)
+        when(mockResourceHelper.resourceAsString(expectedResponsePath))
+          .thenReturn(Json.obj().toString())
+
+        val request =
+          FakeRequest(
+            GET,
+            s"/cis/verification-batch/newest/$testInstanceId"
+          )
+
+        val result =
+          controller.getNewestVerificationBatch(testInstanceId)(request)
+
+        status(result) mustBe OK
+        contentAsJson(result) mustBe Json.obj()
+
+        verify(mockResourceHelper).resourceAsString(expectedResponsePath)
+      }
+    }
+
     "returns 200 OK with JSON body on success (agent enrolment)" in new Setup {
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
         .thenReturn(None)
@@ -381,6 +415,32 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
 
         body mustBe responseJson
         (body \ "verificationBatch" \ "verificationBatchId").as[Long] mustBe 800L
+      }
+
+      "select the insufficient current-verification response for instanceId 275" in new Setup {
+        val expectedResponsePath =
+          "/resources/verification/getCurrentVerificationBatch-200-verificationBatchStatus-chris-response-insufficient.json"
+
+        when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+          .thenReturn(Some(EmployerReference("200", "")))
+        when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+          .thenReturn(None)
+        when(mockResourceHelper.resourceAsString(expectedResponsePath))
+          .thenReturn(Json.obj().toString())
+
+        val request =
+          FakeRequest(
+            GET,
+            "/cis/verification-batch/current/275"
+          )
+
+        val result =
+          controller.getCurrentVerificationBatch("275")(request)
+
+        status(result) mustBe OK
+        contentAsJson(result) mustBe Json.obj()
+
+        verify(mockResourceHelper).resourceAsString(expectedResponsePath)
       }
 
       "returns 502 BadGateway for taxOfficeNumber = 502 (contractor enrolment)" in new Setup {

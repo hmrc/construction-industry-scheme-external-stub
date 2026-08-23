@@ -281,8 +281,7 @@
       "subcontractorId": 1,
       "actionIndicator": "VERIFY",
       "proceed": "Y",
-      "verificationResourceRef": 10,
-      "isUnmatched": false
+      "verificationResourceRef": 10
     },
     {
       "verificationId": 1003,
@@ -293,8 +292,7 @@
       "subcontractorId": 2,
       "actionIndicator": "VERIFY",
       "proceed": "Y",
-      "verificationResourceRef": 11,
-      "isUnmatched": false
+      "verificationResourceRef": 11
     },
     {
       "verificationId": 1004,
@@ -305,8 +303,7 @@
       "subcontractorId": 3,
       "actionIndicator": "MATCH",
       "proceed": "Y",
-      "verificationResourceRef": 12,
-      "isUnmatched": false
+      "verificationResourceRef": 12
     },
     {
       "verificationId": 1005,
@@ -317,8 +314,7 @@
       "subcontractorId": 10908,
       "actionIndicator": "VERIFY",
       "proceed": "Y",
-      "verificationResourceRef": 13,
-      "isUnmatched": false
+      "verificationResourceRef": 13
     },
     {
       "verificationId": 1006,
@@ -329,8 +325,7 @@
       "subcontractorId": 5,
       "actionIndicator": "MATCH",
       "proceed": "Y",
-      "verificationResourceRef": 14,
-      "isUnmatched": false
+      "verificationResourceRef": 14
     },
     {
       "verificationId": 1007,
@@ -341,8 +336,7 @@
       "subcontractorId": 6,
       "actionIndicator": "VERIFY",
       "proceed": "Y",
-      "verificationResourceRef": 15,
-      "isUnmatched": false
+      "verificationResourceRef": 15
     },
     {
       "verificationId": 1008,
@@ -353,8 +347,7 @@
       "subcontractorId": 7,
       "actionIndicator": "VERIFY",
       "proceed": "Y",
-      "verificationResourceRef": 16,
-      "isUnmatched": false
+      "verificationResourceRef": 16
     },
     {
       "verificationId": 1009,
@@ -365,8 +358,7 @@
       "subcontractorId": 8,
       "actionIndicator": "VERIFY",
       "proceed": "Y",
-      "verificationResourceRef": 17,
-      "isUnmatched": false
+      "verificationResourceRef": 17
     },
     {
       "verificationId": 1010,
@@ -377,8 +369,7 @@
       "subcontractorId": 9,
       "actionIndicator": "VERIFY",
       "proceed": "Y",
-      "verificationResourceRef": 18,
-      "isUnmatched": false
+      "verificationResourceRef": 18
     },
     {
       "verificationId": 1011,
@@ -389,8 +380,7 @@
       "subcontractorId": 10,
       "actionIndicator": "MATCH",
       "proceed": "N",
-      "verificationResourceRef": 19,
-      "isUnmatched": false
+      "verificationResourceRef": 19
     },
     {
       "verificationId": 1012,
@@ -401,8 +391,7 @@
       "subcontractorId": 11,
       "actionIndicator": "VERIFY",
       "proceed": "N",
-      "verificationResourceRef": 20,
-      "isUnmatched": false
+      "verificationResourceRef": 20
     }
   ],
   "submission": {

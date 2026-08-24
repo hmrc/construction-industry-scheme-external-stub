@@ -28,13 +28,13 @@ class DeleteVerificationRequestSpec extends AnyWordSpec with Matchers {
       val json = Json.parse("""
                               |{
                               |  "instanceId": "1",
-                              |  "verificationResourceRef": 10
+                              |  "verificationResourceRef": 9
                               |}
         """.stripMargin)
 
       val model = json.as[DeleteVerificationRequest]
       model.instanceId mustBe "1"
-      model.verificationResourceRef mustBe 10
+      model.verificationResourceRef mustBe 9L
 
       Json.toJson(model) mustBe json
     }
@@ -42,7 +42,7 @@ class DeleteVerificationRequestSpec extends AnyWordSpec with Matchers {
     "fail to read missing instanceId" in {
       val json = Json.parse("""
                               |{
-                              |  "verificationResourceRef": 10
+                              |  "verificationResourceRef": 9
                               |}
         """.stripMargin)
 

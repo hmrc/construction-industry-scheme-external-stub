@@ -24,4 +24,4 @@ case class DeleteVerificationRequest(
 )
 
 object DeleteVerificationRequest:
-  given format: OFormat[DeleteVerificationRequest] = Json.format[DeleteVerificationRequest]
+  given OFormat[DeleteVerificationRequest] = Json.format

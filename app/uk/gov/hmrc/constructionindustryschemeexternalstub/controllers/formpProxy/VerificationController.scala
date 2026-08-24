@@ -330,6 +330,9 @@ class VerificationController @Inject() (
     authorise(parse.json) { implicit request =>
       request.body
         .validate[DeleteVerificationRequest]
-        .fold(errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))), _ => Ok)
+        .fold(
+          errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
+          _ => NoContent
+        )
     }
 }

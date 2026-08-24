@@ -45,7 +45,7 @@
       "pendingVerifications": 0
     },
     {
-      "subcontractorType": "partnership",
+      "subcontractorType": "soletrader",
       "subcontractorId": 3,
       "firstName": "Charlie",
       "secondName": "D",
@@ -81,7 +81,7 @@
       "tradingName": "WYZ Trader",
       "partnershipTradingName": null,
       "subbieResourceRef": 14,
-      "utr": null,
+      "utr": "8786438046",
       "partnerUtr": null,
       "crn": "99999",
       "nino": "AA123456A",
@@ -149,7 +149,7 @@
       "partnershipTradingName": null,
       "subbieResourceRef":  18,
       "utr": "1111111111",
-      "partnerUtr": "6666",
+      "partnerUtr": null,
       "crn":  "99999",
       "nino": "AA123456A"
     },

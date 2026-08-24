@@ -1763,7 +1763,7 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
       Json.toJson(
         DeleteVerificationRequest(
           instanceId = "1",
-          verificationResourceRef = 9L
+          verificationResourceRef = 10L
         )
       )
 

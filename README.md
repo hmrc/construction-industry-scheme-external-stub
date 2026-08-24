@@ -2492,7 +2492,7 @@ To trigger the happy path, ensure you provide a valid request body:
 ```json
 {
   "instanceId": "1",
-  "verificationResourceRef": 9
+  "verificationResourceRef": 10
 }
 ```
 - Enrolments: request must have either HMRC-CIS-ORG or IR-PAYE-AGENT Enrolment

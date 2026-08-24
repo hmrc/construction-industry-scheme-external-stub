@@ -33,7 +33,7 @@
       "surname": null,
       "tradingName": "BROWN LIMITED",
       "partnershipTradingName": null,
-      "verified": null,
+      "verified": "Y",
       "verificationNumber": "V0000000002",
       "taxTreatment": null,
       "verificationDate": null,

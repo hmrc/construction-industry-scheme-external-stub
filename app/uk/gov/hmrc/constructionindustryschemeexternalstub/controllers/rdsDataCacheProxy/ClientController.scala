@@ -132,8 +132,7 @@ class ClientController @Inject() (
         case Some(_) =>
           irAgentId match {
             case "400" => BadRequest(Json.obj("error" -> "credentialId and irAgentId must be provided"))
-            case "500" => InternalServerError(Json.obj("error" -> "Could not get client list"))
-            // case "000123" => Ok(resourceHelper.resourceAsString(getClientList_200_Alt_ResponsePath))
+            case "500" => InternalServerError(Json.obj("error" -> "Could not get clients by employersRef"))
             case _     =>
               Ok(resourceHelper.resourceAsString(getClientListByEmployerRef_ResponsePath))
           }

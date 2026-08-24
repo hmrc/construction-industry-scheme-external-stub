@@ -186,6 +186,90 @@ class ClientControllerSpec extends SpecBase with MockitoSugar {
 
   }
 
+  ".getClientsByEmployersReference" - {
+
+    "returns 200 with client list when agentReference is unknown" in new Setup {
+
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(Some("200"))
+
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn(Json.toJson(clientList).toString)
+
+      val req: FakeRequest[AnyContentAsEmpty.type] =
+        FakeRequest(GET, "/client-ref?irAgentId=IR123456&credentialId=CRED-ABC-123$employerRef=IR123456/CRED-ABC-123")
+      val res: Future[Result]                      = controller.getClientsByEmployersReference(
+        irAgentId = "IR123456",
+        credentialId = "CRED-ABC-123",
+        employerRef = "IR123456/CRED-ABC-123"
+      )(req)
+
+      status(res) mustBe OK
+      contentAsJson(res) mustBe Json.toJson(clientList)
+    }
+
+    "returns 500 with error message when agentReference = 500" in new Setup {
+
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(Some("500"))
+
+      val req: FakeRequest[AnyContentAsEmpty.type] =
+        FakeRequest(GET, "/client-ref?irAgentId=500&credentialId=CRED-ABC-123,employerRef=IR123456/CRED-ABC-123")
+      val res: Future[Result]                      = controller.getClientsByEmployersReference(
+        irAgentId = "500",
+        credentialId = "CRED-ABC-123",
+        employerRef = "IR123456/CRED-ABC-123"
+      )(req)
+
+      status(res) mustBe INTERNAL_SERVER_ERROR
+      contentType(res) mustBe Some(JSON)
+      (contentAsJson(res) \ "error").as[String] mustBe "Could not get clients by employersRef"
+    }
+
+    "returns 400 when irAgentId is missing" in new Setup {
+
+      val req: FakeRequest[AnyContentAsEmpty.type] =
+        FakeRequest(GET, "/client-ref?irAgentId=&credentialId=CRED-ABC-123&employerRef=IR123456/CRED-ABC-123")
+      val res: Future[Result]                      = controller.getClientsByEmployersReference(
+        irAgentId = "",
+        credentialId = "CRED-ABC-123",
+        employerRef = "IR123456/CRED-ABC-123"
+      )(req)
+
+      status(res) mustBe BAD_REQUEST
+      (contentAsJson(res) \ "error").as[String] mustBe "credentialId and irAgentId and employerRef must be provided"
+    }
+
+    "returns 400 when credentialId is missing" in new Setup {
+
+      val req: FakeRequest[AnyContentAsEmpty.type] =
+        FakeRequest(GET, "/client-ref?irAgentId=IR123456&credentialId=&employerRef=IR123456/CRED-ABC-123")
+      val res: Future[Result]                      = controller.getClientsByEmployersReference(
+        irAgentId = "IR123456",
+        credentialId = "",
+        employerRef = "IR123456/CRED-ABC-123"
+      )(req)
+
+      status(res) mustBe BAD_REQUEST
+      (contentAsJson(res) \ "error").as[String] mustBe "credentialId and irAgentId and employerRef must be provided"
+    }
+
+    "returns 400 when employerRef is missing" in new Setup {
+
+      val req: FakeRequest[AnyContentAsEmpty.type] =
+        FakeRequest(GET, "/client-ref?irAgentId=IR123456&credentialId=CRED-ABC-123&employerRef=")
+      val res: Future[Result]                      = controller.getClientsByEmployersReference(
+        irAgentId = "IR123456",
+        credentialId = "CRED-ABC-123",
+        employerRef = ""
+      )(req)
+
+      status(res) mustBe BAD_REQUEST
+      (contentAsJson(res) \ "error").as[String] mustBe "credentialId and irAgentId and employerRef must be provided"
+    }
+
+  }
+
   ".hasClient" - {
 
     "returns 200 with hasClient true when irAgentId is '000123' and taxOfficeNumber is in allowed list" in new Setup {

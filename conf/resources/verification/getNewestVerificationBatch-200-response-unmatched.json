@@ -392,6 +392,17 @@
       "actionIndicator": "VERIFY",
       "proceed": "Y",
       "verificationResourceRef": 20
+    },
+    {
+      "verificationId": 1013,
+      "matched": "null",
+      "verificationNumber": "null",
+      "taxTreatment": "null",
+      "verificationBatchId": 99,
+      "subcontractorId": 23,
+      "actionIndicator": "VERIFY",
+      "proceed": "null",
+      "verificationResourceRef": 23
     }
   ],
   "submission": {

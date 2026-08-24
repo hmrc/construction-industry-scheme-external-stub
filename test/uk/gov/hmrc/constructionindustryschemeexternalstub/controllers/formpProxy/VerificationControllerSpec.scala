@@ -1776,7 +1776,7 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
 
       val res: Future[Result] = controller.proceedInsufficientVerification()(req)
 
-      status(res) mustBe OK
+      status(res) mustBe NO_CONTENT
       contentAsString(res) mustBe ""
     }
 

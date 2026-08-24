@@ -1763,8 +1763,8 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
       Json.toJson(
         ProceedInsufficientVerificationRequest(
           instanceId = "1",
-          verificationBatchResourceRef = 10L,
-          verificationResourceRef = 9L,
+          verificationBatchResourceRef = 9L,
+          verificationResourceRef = 10L,
           proceed = "Y"
         )
       )

@@ -2582,8 +2582,8 @@ To trigger the happy path, ensure you provide a valid request body:
 ```json
 {
   "instanceId": "1",
-  "verificationBatchResourceRef": 10,
-  "verificationResourceRef": 9,
+  "verificationBatchResourceRef": 9,
+  "verificationResourceRef": 10,
   "proceed": "Y"
 }
 ```

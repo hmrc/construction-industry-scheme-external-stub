@@ -28,16 +28,16 @@ class ProceedInsufficientVerificationRequestSpec extends AnyWordSpec with Matche
       val json = Json.parse("""
                               |{
                               |  "instanceId": "1",
-                              |  "verificationBatchResourceRef": 10,
-                              |  "verificationResourceRef": 9,
+                              |  "verificationBatchResourceRef": 9,
+                              |  "verificationResourceRef": 10,
                               |  "proceed": "Y"
                               |}
         """.stripMargin)
 
       val model = json.as[ProceedInsufficientVerificationRequest]
       model.instanceId mustBe "1"
-      model.verificationBatchResourceRef mustBe 10
-      model.verificationResourceRef mustBe 9
+      model.verificationBatchResourceRef mustBe 9
+      model.verificationResourceRef mustBe 10
       model.proceed mustBe "Y"
 
       Json.toJson(model) mustBe json
@@ -46,8 +46,8 @@ class ProceedInsufficientVerificationRequestSpec extends AnyWordSpec with Matche
     "fail to read missing instanceId" in {
       val json = Json.parse("""
                               |{
-                              |  "verificationBatchResourceRef": 10,
-                              |  "verificationResourceRef": 9,
+                              |  "verificationBatchResourceRef": 9,
+                              |  "verificationResourceRef": 10,
                               |  "proceed": "Y"
                               |}
         """.stripMargin)
@@ -60,7 +60,7 @@ class ProceedInsufficientVerificationRequestSpec extends AnyWordSpec with Matche
       val json = Json.parse("""
                               |{
                               |  "instanceId": "1",
-                              |  "verificationResourceRef": 9,
+                              |  "verificationResourceRef": 10,
                               |  "proceed": "Y"
                               |}
         """.stripMargin)
@@ -73,7 +73,7 @@ class ProceedInsufficientVerificationRequestSpec extends AnyWordSpec with Matche
       val json = Json.parse("""
                               |{
                               |  "instanceId": "1",
-                              |  "verificationBatchResourceRef": 10,
+                              |  "verificationBatchResourceRef": 9,
                               |  "proceed": "Y"
                               |}
         """.stripMargin)
@@ -86,8 +86,8 @@ class ProceedInsufficientVerificationRequestSpec extends AnyWordSpec with Matche
       val json = Json.parse("""
                               |{
                               |  "instanceId": "1",
-                              |  "verificationBatchResourceRef": 10,
-                              |  "verificationResourceRef": 9
+                              |  "verificationBatchResourceRef": 9,
+                              |  "verificationResourceRef": 10
                               |}
         """.stripMargin)
 

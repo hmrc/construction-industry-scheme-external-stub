@@ -90,6 +90,49 @@ class CisTaxpayerControllerSpec extends SpecBase with MockitoSugar {
         (contentAsJson(res) \ "taxOfficeRef").as[String] mustBe "EZ10800"
       }
 
+      Seq(
+        "EZ00250" -> "250",
+        "EZ00275" -> "275"
+      ).foreach { case (taxOfficeReference, expectedUniqueId) =>
+        s"must return uniqueId $expectedUniqueId when taxOfficeReference is $taxOfficeReference" in new Setup {
+          val baseTaxpayer: CisTaxpayer =
+            mkTaxpayer(
+              ton = "200",
+              tor = taxOfficeReference
+            )
+
+          when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+            .thenReturn(
+              Some(
+                EmployerReference(
+                  "200",
+                  taxOfficeReference
+                )
+              )
+            )
+
+          when(mockResourceHelper.resourceAsString(any()))
+            .thenReturn(Json.toJson(baseTaxpayer).toString)
+
+          val request: FakeRequest[JsValue] =
+            requestWithEmployeeReferenceJsonPayload(
+              "200",
+              taxOfficeReference
+            )
+
+          val result: Future[Result] =
+            controller.getCisTaxpayerByTaxReference(request)
+
+          status(result) mustBe OK
+
+          val response = contentAsJson(result)
+
+          (response \ "uniqueId").as[String] mustBe expectedUniqueId
+          (response \ "taxOfficeNumber").as[String] mustBe "200"
+          (response \ "taxOfficeRef").as[String] mustBe taxOfficeReference
+        }
+      }
+
       "return 404 with NOT FOUND message for taxOfficeNumber 404" in new Setup {
 
         when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))

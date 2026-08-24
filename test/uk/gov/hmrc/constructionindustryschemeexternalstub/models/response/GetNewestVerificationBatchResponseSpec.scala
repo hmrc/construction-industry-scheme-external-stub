@@ -18,7 +18,7 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub.models.response
 
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import play.api.libs.json.{JsSuccess, Json}
+import play.api.libs.json.{JsSuccess, JsValue, Json}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.*
 
 import java.time.LocalDateTime
@@ -191,10 +191,10 @@ final class GetNewestVerificationBatchResponseSpec extends AnyWordSpec with Matc
       val stream =
         Option(
           getClass.getResourceAsStream(
-            "/resources/verification/getNewestVerificationBatch-200-response.json"
+            "/resources/verification/getNewestVerificationBatch-200-response-unmatched.json"
           )
         ).getOrElse(
-          fail("getNewestVerificationBatch-200-response.json was not found")
+          fail("getNewestVerificationBatch-200-response-unmatched.json was not found")
         )
 
       val response =
@@ -208,24 +208,24 @@ final class GetNewestVerificationBatchResponseSpec extends AnyWordSpec with Matc
           .find(_.verificationId == id)
           .getOrElse(fail(s"Verification $id was not found"))
 
-      val missingVerificationNumber = verification(1002L)
+      val missingVerificationNumber = verification(1009L)
 
       missingVerificationNumber.verificationNumber mustBe None
 
-      val edit = verification(1003L)
+      val edit = verification(1010L)
 
-      edit.verificationNumber mustBe Some("V0000000003")
+      edit.verificationNumber mustBe Some("V0000000009")
       edit.actionIndicator mustBe Some("EDIT")
 
-      val matchNotY = verification(1004L)
+      val matchNotY = verification(1011L)
 
-      matchNotY.verificationNumber mustBe Some("V0000000004")
+      matchNotY.verificationNumber mustBe Some("V0000000010")
       matchNotY.actionIndicator mustBe Some("MATCH")
       matchNotY.matched mustBe Some("N")
 
-      val verifyNotY = verification(1005L)
+      val verifyNotY = verification(1012L)
 
-      verifyNotY.verificationNumber mustBe Some("V0000000005")
+      verifyNotY.verificationNumber mustBe Some("V0000000011")
       verifyNotY.actionIndicator mustBe Some("VERIFY")
       verifyNotY.matched mustBe Some("N")
 
@@ -238,6 +238,36 @@ final class GetNewestVerificationBatchResponseSpec extends AnyWordSpec with Matc
 
       verifyY.actionIndicator mustBe Some("VERIFY")
       verifyY.matched mustBe Some("Y")
+    }
+
+    Seq(
+      "getNewestVerificationBatch-200-response.json",
+      "getNewestVerificationBatch-200-response-unmatched.json",
+      "getNewestVerificationBatch-200-response-insufficient.json"
+    ).foreach { resourceName =>
+      s"not expose the derived isUnmatched field in $resourceName" in {
+        val stream =
+          Option(
+            getClass.getResourceAsStream(
+              s"/resources/verification/$resourceName"
+            )
+          ).getOrElse(
+            fail(s"$resourceName was not found")
+          )
+
+        val json =
+          try
+            Json.parse(stream)
+          finally
+            stream.close()
+
+        val verifications =
+          (json \ "verifications").as[Seq[JsValue]]
+
+        verifications.foreach { verification =>
+          (verification \ "isUnmatched").toOption mustBe None
+        }
+      }
     }
   }
 }

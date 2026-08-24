@@ -395,13 +395,13 @@
     },
     {
       "verificationId": 1013,
-      "matched": "null",
-      "verificationNumber": "null",
-      "taxTreatment": "null",
+      "matched": null,
+      "verificationNumber": null,
+      "taxTreatment": null,
       "verificationBatchId": 99,
       "subcontractorId": 23,
       "actionIndicator": "VERIFY",
-      "proceed": "null",
+      "proceed": null,
       "verificationResourceRef": 23
     }
   ],

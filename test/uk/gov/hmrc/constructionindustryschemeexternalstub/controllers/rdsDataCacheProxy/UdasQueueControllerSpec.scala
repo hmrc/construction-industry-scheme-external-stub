@@ -106,11 +106,13 @@ class UdasQueueControllerSpec extends AnyFreeSpec with Matchers with ScalaFuture
         val res: Future[Result] = controller.enqueueMessage()(req)
 
         status(res) mustBe BAD_REQUEST
-        (contentAsJson(res) \ "message").as[String] mustBe "Invalid payload"
+        (contentAsJson(res) \ "message").as[String] mustBe "Invalid Json"
         (contentAsJson(res) \ "errors").isDefined mustBe true
       }
 
       "returns 500 with generic message for missing agent" in new Setup {
+        when(mockEnrolmentsHelper.agentEnrolmentsOpt(any())).thenReturn(None)
+
         val req: FakeRequest[JsValue] =
           FakeRequest(POST, postUrl).withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON).withBody(validJson)
 

@@ -52,33 +52,44 @@ class CisTaxpayerController @Inject() (
               )
             ),
           er => {
-            val enrolments = enrolmentHelper
+            val uniqueIdMap: Map[String, String] = Map(
+              "EZ10800" -> "800",
+              "EZ00125" -> "125",
+              "EZ00150" -> "150",
+              "EZ00175" -> "175",
+              "EZ00200" -> "200",
+              "EZ00225" -> "225",
+              "EZ00250" -> "250",
+              "EZ00275" -> "275"
+            )
+            val enrolments                       = enrolmentHelper
               .contractorEnrolmentsOpt(request)
               .orElse(enrolmentHelper.agentEnrolmentsOpt(request))
             enrolments match {
               case Some(enrolmentReference) =>
                 (er.taxOfficeNumber, er.taxOfficeReference) match {
-                  case ("404", _)     =>
+                  case ("404", _)                                =>
                     NotFound(
                       Json.obj(
                         "message" -> s"CIS taxpayer not found for TON=${er.taxOfficeNumber}, TOR=${er.taxOfficeReference}"
                       )
                     )
-                  case ("500", _)     => InternalServerError(Json.obj("message" -> "Unexpected error"))
-                  case (_, "EZ10800") =>
-                    val json    =
+                  case ("500", _)                                => InternalServerError(Json.obj("message" -> "Unexpected error"))
+                  case (_, toRef) if uniqueIdMap.contains(toRef) =>
+                    val uniqueId = uniqueIdMap(toRef)
+                    val json     =
                       Json.parse(resourceHelper.resourceAsString(getCisTaxpayerByTaxReference_200_ResponsePath))
-                    val updated = json
+                    val updated  = json
                       .as[JsObject]
                       .deepMerge(
                         Json.obj(
-                          "uniqueId"        -> "800",
+                          "uniqueId"        -> uniqueId,
                           "taxOfficeNumber" -> er.taxOfficeNumber,
                           "taxOfficeRef"    -> er.taxOfficeReference
                         )
                       )
                     Ok(updated)
-                  case (ton, tor)     =>
+                  case (ton, tor)                                =>
                     val json    =
                       Json.parse(resourceHelper.resourceAsString(getCisTaxpayerByTaxReference_200_ResponsePath))
                     val updated = json
@@ -89,7 +100,6 @@ class CisTaxpayerController @Inject() (
                           "taxOfficeRef"    -> tor
                         )
                       )
-
                     Ok(updated)
                 }
               case None                     => InternalServerError
@@ -97,5 +107,4 @@ class CisTaxpayerController @Inject() (
           }
         )
     }
-
 }

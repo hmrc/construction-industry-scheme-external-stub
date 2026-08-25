@@ -2298,6 +2298,45 @@ To trigger the happy path, ensure you provide a valid request body:
 { "message": "Unexpected error" }
 ```
 
+### Get last submitted verification batch
+
+**Endpoint**: `GET /cis/verification-batch/last/:instanceId`
+
+**Description**: Returns the last submitted verification batch for the given CIS instance id. The response includes:
+- scheme (contractor registered under CIS),
+- subcontractors,
+- last submitted verification batch and its verifications,
+- related submissions,
+
+#### Happy Path (Organisation)
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 200
+- Identifier Name: TaxOfficeReference
+- Identifier Value: Any
+
+- Response status: `200`
+- Response body: `resources/verification/getLastSubmittedVerificationBatch-200-response`
+
+#### Happy Path (Agent)
+
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: Any
+
+- Response status: `200`
+- Response body: `resources/verification/getLastSubmittedVerificationBatch-200-response`
+
+#### Unhappy Paths (Organisation)
+
+- TaxOfficeNumber = `500` → Response status: `500`
+```json
+{ "message": "Unexpected error" }
+```
+
 ### Create verification batch and verifications
 
 **Endpoint**: `POST /cis/verification-batch/create`
@@ -2519,9 +2558,9 @@ Optional fields: `govtalkErrorCode`, `govtalkErrorType`, `govtalkErrorMessage`.
 - Response status: `204`
 - Response body: _empty_
 
-**Endpoint**: `POST /cis/verification/proceed`
+**Endpoint**: `POST /cis/verification/proceed-with-insufficient-data  `
 
-**Description**: Proceed Verification with insufficient/unmatched data.
+**Description**: Proceed Verification with insufficient data.
 
 #### Happy Path
 
@@ -2543,15 +2582,15 @@ To trigger the happy path, ensure you provide a valid request body:
 ```json
 {
   "instanceId": "1",
-  "verificationBatchResourceRef": 10,
-  "verificationResourceRef": 9,
+  "verificationBatchResourceRef": 9,
+  "verificationResourceRef": 10,
   "proceed": "Y",
   "taxTreatment": "NotKnown"
 }
 ```
 - Enrolments: request must have either HMRC-CIS-ORG or IR-PAYE-AGENT Enrolment
 
-- Response status: `200`
+- Response status: `204`
 - Response body: N/A
 
 ### Process verification response from ChRIS

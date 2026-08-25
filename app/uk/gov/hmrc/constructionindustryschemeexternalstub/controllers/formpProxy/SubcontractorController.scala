@@ -40,6 +40,8 @@ class SubcontractorController @Inject() (
   private val subcontractorResponsePath                              = "/resources/subcontractor"
   private val getSubcontractorList_200_ResponsePath                  =
     s"$subcontractorResponsePath/getSubcontractorList-200-response.json"
+  private val getSubcontractorList_noSubcontractor_200_ResponsePath  =
+    s"$subcontractorResponsePath/getSubcontractorList-200-noSubcontractor-response.json"
   private val getSubcontractorIndividual_200_ResponsePath            =
     s"$subcontractorResponsePath/getSubcontractorIndividual-200-verifiedResponse.json"
   private val getSubcontractorTrust_200_ResponsePath                 =
@@ -76,9 +78,11 @@ class SubcontractorController @Inject() (
 
         case (Some(employerRef), _) =>
           (employerRef.taxOfficeNumber, employerRef.taxOfficeReference) match {
-            case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
-            case ("502", _) => BadGateway(Json.obj("message" -> "formp failed"))
-            case _          => Ok(resourceHelper.resourceAsString(getSubcontractorList_200_ResponsePath))
+            case ("500", _)     => InternalServerError(Json.obj("message" -> "Unexpected error"))
+            case ("502", _)     => BadGateway(Json.obj("message" -> "formp failed"))
+            case (_, "EZ00225") =>
+              Ok(resourceHelper.resourceAsString(getSubcontractorList_noSubcontractor_200_ResponsePath))
+            case _              => Ok(resourceHelper.resourceAsString(getSubcontractorList_200_ResponsePath))
           }
 
         case (None, Some(agentRef)) =>

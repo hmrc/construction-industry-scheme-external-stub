@@ -18,7 +18,7 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub.models.response
 
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import play.api.libs.json.{JsSuccess, Json}
+import play.api.libs.json.{JsSuccess, JsValue, Json}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.*
 
 import java.time.LocalDateTime
@@ -73,7 +73,10 @@ final class GetNewestVerificationBatchResponseSpec extends AnyWordSpec with Matc
             verificationNumber = Some("V0000000001"),
             taxTreatment = Some("0"),
             verificationBatchId = Some(99L),
-            subcontractorId = Some(1L)
+            subcontractorId = Some(1L),
+            actionIndicator = Some("VERIFY"),
+            proceed = Some("Y"),
+            verificationResourceRef = Some(10L)
           )
         ),
         submission = Some(
@@ -142,6 +145,9 @@ final class GetNewestVerificationBatchResponseSpec extends AnyWordSpec with Matc
       (v0 \ "taxTreatment").as[String] mustBe "0"
       (v0 \ "verificationBatchId").as[Long] mustBe 99L
       (v0 \ "subcontractorId").as[Long] mustBe 1L
+      (v0 \ "actionIndicator").as[String] mustBe "VERIFY"
+      (v0 \ "proceed").as[String] mustBe "Y"
+      (v0 \ "verificationResourceRef").as[Long] mustBe 10L
 
       val subm0 = json \ "submission"
 
@@ -179,6 +185,89 @@ final class GetNewestVerificationBatchResponseSpec extends AnyWordSpec with Matc
 
       val json = Json.toJson(model)
       json.validate[GetNewestVerificationBatchResponse] mustBe JsSuccess(model)
+    }
+
+    "provide source data for the unmatched verification decision matrix" in {
+      val stream =
+        Option(
+          getClass.getResourceAsStream(
+            "/resources/verification/getNewestVerificationBatch-200-response-unmatched.json"
+          )
+        ).getOrElse(
+          fail("getNewestVerificationBatch-200-response-unmatched.json was not found")
+        )
+
+      val response =
+        try
+          Json.parse(stream).as[GetNewestVerificationBatchResponse]
+        finally
+          stream.close()
+
+      def verification(id: Long): Verification =
+        response.verifications
+          .find(_.verificationId == id)
+          .getOrElse(fail(s"Verification $id was not found"))
+
+      val missingVerificationNumber = verification(1009L)
+
+      missingVerificationNumber.verificationNumber mustBe None
+
+      val edit = verification(1010L)
+
+      edit.verificationNumber mustBe Some("V0000000009")
+      edit.actionIndicator mustBe Some("EDIT")
+
+      val matchNotY = verification(1011L)
+
+      matchNotY.verificationNumber mustBe Some("V0000000010")
+      matchNotY.actionIndicator mustBe Some("MATCH")
+      matchNotY.matched mustBe Some("N")
+
+      val verifyNotY = verification(1012L)
+
+      verifyNotY.verificationNumber mustBe Some("V0000000011")
+      verifyNotY.actionIndicator mustBe Some("VERIFY")
+      verifyNotY.matched mustBe Some("N")
+
+      val matchY = verification(1006L)
+
+      matchY.actionIndicator mustBe Some("MATCH")
+      matchY.matched mustBe Some("Y")
+
+      val verifyY = verification(1007L)
+
+      verifyY.actionIndicator mustBe Some("VERIFY")
+      verifyY.matched mustBe Some("Y")
+    }
+
+    Seq(
+      "getNewestVerificationBatch-200-response.json",
+      "getNewestVerificationBatch-200-response-unmatched.json",
+      "getNewestVerificationBatch-200-response-insufficient.json"
+    ).foreach { resourceName =>
+      s"not expose the derived isUnmatched field in $resourceName" in {
+        val stream =
+          Option(
+            getClass.getResourceAsStream(
+              s"/resources/verification/$resourceName"
+            )
+          ).getOrElse(
+            fail(s"$resourceName was not found")
+          )
+
+        val json =
+          try
+            Json.parse(stream)
+          finally
+            stream.close()
+
+        val verifications =
+          (json \ "verifications").as[Seq[JsValue]]
+
+        verifications.foreach { verification =>
+          (verification \ "isUnmatched").toOption mustBe None
+        }
+      }
     }
   }
 }

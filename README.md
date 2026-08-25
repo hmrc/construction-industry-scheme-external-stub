@@ -343,40 +343,9 @@ To trigger the happy path, ensure you provide a valid request body:
 }
 ```
 
+**Endpoint**: `POST /cis/enqueue-message `
 
-**Endpoint**: `POST /cis/enqueue-message-header`
-
-**Description**: Enqueue Message Header to UDASQ table
-
-#### Happy Path
-
-- Affinity Group: Agent
-- Enrolment Key: IR-PAYE-AGENT
-- Identifier Name: IRAgentReference
-- Identifier Value: 123456
-
-- Request body:
-```json
-{
-  "sender": "Portal",
-  "queueName": "AGTAUTH",
-  "replyQueue": "",
-  "correlationId": "",
-  "filter": "RemoveClient"
-}
-```
-
-- Response status: `200`
-- Response body:
-```json
-{
-  "messageId": 1
-}
-```
-
-**Endpoint**: `POST /cis/enqueue-clob `
-
-**Description**: Enqueue Clob UDASQ table
+**Description**: Enqueue message executes enqueue message header and enqueue clob
 
 #### Happy Path
 
@@ -388,11 +357,10 @@ To trigger the happy path, ensure you provide a valid request body:
 - Request body:
 ```json
 {
-    "messageId": 12345,
     "sender": "Portal",
     "queueName": "AGTAUTH",
     "replyQueue": "",
-    "correlationId": "",
+    "correlationID": "",
     "filter": "RemoveClient",
     "payload": {
       "IRAgentID": "123456789",

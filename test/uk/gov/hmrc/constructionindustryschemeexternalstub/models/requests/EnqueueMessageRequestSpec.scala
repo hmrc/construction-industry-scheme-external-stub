@@ -20,18 +20,17 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.Json
 
-class EnqueueClobRequestSpec extends AnyWordSpec with Matchers {
+class EnqueueMessageRequestSpec extends AnyWordSpec with Matchers {
 
   "EnqueueClobRequest (JSON)" should {
 
     "read and write with mandatory fields" in {
       val json = Json.parse("""
                               |{
-                              |  "messageId": 12345,
                               |  "sender": "Portal",
                               |  "queueName": "AGTAUTH",
                               |  "replyQueue": "",
-                              |  "correlationId": "",
+                              |  "correlationID": "",
                               |  "filter": "RemoveClient",
                               |  "payload": {
                               |    "IRAgentID": "123456789",
@@ -41,12 +40,11 @@ class EnqueueClobRequestSpec extends AnyWordSpec with Matchers {
                               |}
       """.stripMargin)
 
-      val model = json.as[EnqueueClobRequest]
-      model.messageId mustBe 12345L
+      val model = json.as[EnqueueMessageRequest]
       model.sender mustBe "Portal"
       model.queueName mustBe "AGTAUTH"
       model.replyQueue mustBe ""
-      model.correlationId mustBe ""
+      model.correlationID mustBe ""
       model.filter mustBe "RemoveClient"
       model.payload mustBe Map(
         "IRAgentID"    -> "123456789",
@@ -56,33 +54,13 @@ class EnqueueClobRequestSpec extends AnyWordSpec with Matchers {
       Json.toJson(model) mustBe json
     }
 
-    "fail to read missing messageId" in {
-      val json = Json.parse("""
-                              |{
-                              |  "sender": "Portal",
-                              |  "queueName": "AGTAUTH",
-                              |  "replyQueue": "",
-                              |  "correlationId": "",
-                              |  "filter": "RemoveClient",
-                              |  "payload": {
-                              |    "IRAgentID": "123456789",
-                              |    "Service": "CIS",
-                              |    "TaxReference" : "123/ABC123"
-                              |  }
-                              |}
-      """.stripMargin)
-
-      val result = json.validate[EnqueueClobRequest]
-      result.isError mustBe true
-    }
-
     "fail to read missing sender" in {
       val json = Json.parse("""
                               |{
                               |  "messageId": 12345,
                               |  "queueName": "AGTAUTH",
                               |  "replyQueue": "",
-                              |  "correlationId": "",
+                              |  "correlationID": "",
                               |  "filter": "RemoveClient",
                               |  "payload": {
                               |    "IRAgentID": "123456789",
@@ -92,7 +70,7 @@ class EnqueueClobRequestSpec extends AnyWordSpec with Matchers {
                               |}
       """.stripMargin)
 
-      val result = json.validate[EnqueueClobRequest]
+      val result = json.validate[EnqueueMessageRequest]
       result.isError mustBe true
     }
 
@@ -102,7 +80,7 @@ class EnqueueClobRequestSpec extends AnyWordSpec with Matchers {
                               |  "messageId": 12345,
                               |  "sender": "Portal",
                               |  "replyQueue": "",
-                              |  "correlationId": "",
+                              |  "correlationID": "",
                               |  "filter": "RemoveClient",
                               |  "payload": {
                               |    "IRAgentID": "123456789",
@@ -112,7 +90,7 @@ class EnqueueClobRequestSpec extends AnyWordSpec with Matchers {
                               |}
       """.stripMargin)
 
-      val result = json.validate[EnqueueClobRequest]
+      val result = json.validate[EnqueueMessageRequest]
       result.isError mustBe true
     }
 
@@ -122,7 +100,7 @@ class EnqueueClobRequestSpec extends AnyWordSpec with Matchers {
                               |  "messageId": 12345,
                               |  "sender": "Portal",
                               |  "queueName": "AGTAUTH",
-                              |  "correlationId": "",
+                              |  "correlationID": "",
                               |  "filter": "RemoveClient",
                               |  "payload": {
                               |    "IRAgentID": "123456789",
@@ -132,11 +110,11 @@ class EnqueueClobRequestSpec extends AnyWordSpec with Matchers {
                               |}
       """.stripMargin)
 
-      val result = json.validate[EnqueueClobRequest]
+      val result = json.validate[EnqueueMessageRequest]
       result.isError mustBe true
     }
 
-    "fail to read missing correlationId" in {
+    "fail to read missing correlationID" in {
       val json = Json.parse("""
                               |{
                               |  "messageId": 12345,
@@ -152,7 +130,7 @@ class EnqueueClobRequestSpec extends AnyWordSpec with Matchers {
                               |}
       """.stripMargin)
 
-      val result = json.validate[EnqueueClobRequest]
+      val result = json.validate[EnqueueMessageRequest]
       result.isError mustBe true
     }
 
@@ -172,7 +150,7 @@ class EnqueueClobRequestSpec extends AnyWordSpec with Matchers {
           |}
             """.stripMargin)
 
-      val result = json.validate[EnqueueClobRequest]
+      val result = json.validate[EnqueueMessageRequest]
       result.isError mustBe true
     }
 
@@ -183,12 +161,12 @@ class EnqueueClobRequestSpec extends AnyWordSpec with Matchers {
                               |  "sender": "Portal",
                               |  "queueName": "AGTAUTH",
                               |  "replyQueue": "",
-                              |  "correlationId": "",
+                              |  "correlationID": "",
                               |  "filter": "RemoveClient"
                               |}
       """.stripMargin)
 
-      val result = json.validate[EnqueueClobRequest]
+      val result = json.validate[EnqueueMessageRequest]
       result.isError mustBe true
     }
 
@@ -199,13 +177,13 @@ class EnqueueClobRequestSpec extends AnyWordSpec with Matchers {
           |  "sender": "Portal",
           |  "queueName": "AGTAUTH",
           |  "replyQueue": "",
-          |  "correlationId": "",
+          |  "correlationID": "",
           |  "filter": "RemoveClient",
           |  "payload": {}
           |}
         """.stripMargin)
 
-      val result = json.validate[EnqueueClobRequest]
+      val result = json.validate[EnqueueMessageRequest]
       result.isError mustBe true
     }
   }

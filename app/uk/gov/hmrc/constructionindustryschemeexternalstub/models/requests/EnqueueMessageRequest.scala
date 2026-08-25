@@ -16,16 +16,23 @@
 
 package uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{Json, JsonValidationError, OFormat, OWrites, Reads}
 
-final case class EnqueueMessageHeaderRequest(
+final case class EnqueueMessageRequest(
   sender: String,
   queueName: String,
   replyQueue: String,
-  correlationId: String,
-  filter: String
+  correlationID: String,
+  filter: String,
+  payload: Map[String, String]
 )
 
-object EnqueueMessageHeaderRequest {
-  implicit val format: OFormat[EnqueueMessageHeaderRequest] = Json.format[EnqueueMessageHeaderRequest]
+object EnqueueMessageRequest {
+  implicit private val reads: Reads[EnqueueMessageRequest] = Json
+    .reads[EnqueueMessageRequest]
+    .filter(JsonValidationError("payload must not be empty"))(_.payload.nonEmpty)
+
+  implicit private val writes: OWrites[EnqueueMessageRequest] = Json.writes[EnqueueMessageRequest]
+
+  implicit val format: OFormat[EnqueueMessageRequest] = OFormat(reads, writes)
 }

@@ -20,7 +20,7 @@ import play.api.Logging
 import play.api.libs.json.{JsError, JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{EnqueueClobRequest, EnqueueMessageHeaderRequest}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.EnqueueMessageRequest
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.EnrolmentsHelper
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -35,35 +35,17 @@ class UdasQueueController @Inject() (
     extends BackendController(cc)
     with Logging {
 
-  def enqueueMessageHeader(): Action[JsValue] = authorise(parse.json) { implicit request =>
+  def enqueueMessage(): Action[JsValue] = authorise(parse.json) { implicit request =>
     request.body
-      .validate[EnqueueMessageHeaderRequest]
+      .validate[EnqueueMessageRequest]
       .fold(
-        errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
+        errs => BadRequest(Json.obj("message" -> "Invalid Json", "errors" -> JsError.toJson(errs))),
         _ =>
           enrolmentHelper.agentEnrolmentsOpt(request) match {
             case Some(agentReference) =>
               agentReference match {
                 case "400" => BadRequest(Json.obj("error" -> "credentialId and serviceName must be provided"))
-                case "500" => InternalServerError(Json.obj("error" -> "could not enqueue message header"))
-                case _     => Ok(Json.obj("messageId" -> 1))
-              }
-            case None                 => InternalServerError
-          }
-      )
-  }
-
-  def enqueueClob(): Action[JsValue] = authorise(parse.json) { implicit request =>
-    request.body
-      .validate[EnqueueClobRequest]
-      .fold(
-        errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
-        _ =>
-          enrolmentHelper.agentEnrolmentsOpt(request) match {
-            case Some(agentReference) =>
-              agentReference match {
-                case "400" => BadRequest(Json.obj("error" -> "credentialId and serviceName must be provided"))
-                case "500" => InternalServerError(Json.obj("error" -> "could not enqueue clob"))
+                case "500" => InternalServerError(Json.obj("error" -> "could not enqueue message"))
                 case _     => Ok(Json.obj("messageIDOut" -> 1))
               }
             case None                 => InternalServerError

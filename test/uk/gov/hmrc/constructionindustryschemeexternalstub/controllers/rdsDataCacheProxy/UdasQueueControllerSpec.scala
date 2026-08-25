@@ -27,97 +27,26 @@ import play.api.mvc.{ControllerComponents, PlayBodyParsers, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.{AuthAction, FakeAuthAction}
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{EnqueueClobRequest, EnqueueMessageHeaderRequest}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.EnqueueMessageRequest
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.EnrolmentsHelper
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class UdasQueueControllerSpec extends AnyFreeSpec with Matchers with ScalaFutures with MockitoSugar {
 
-  "CisTaxpayerController" - {
-
-    ".enqueueMessageHeader" - {
-
-      val postUrl = "/cis/enqueue-message-header"
-
-      val validJson: JsValue =
-        Json.toJson(
-          EnqueueMessageHeaderRequest(
-            sender = "Portal",
-            queueName = "AGTAUTH",
-            replyQueue = "",
-            correlationId = "",
-            filter = "RemoveClient"
-          )
-        )
-
-      "returns 200 with status when service succeeds for an unknown agentReference" in new Setup {
-
-        when(mockEnrolmentsHelper.agentEnrolmentsOpt(any())).thenReturn(Some("200"))
-
-        val req: FakeRequest[JsValue] =
-          FakeRequest(POST, postUrl).withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON).withBody(validJson)
-
-        val res: Future[Result] = controller.enqueueMessageHeader()(req)
-
-        status(res) mustBe OK
-        contentAsJson(res) mustBe Json.obj("messageId" -> 1)
-
-      }
-
-      "propagates UpstreamErrorResponse for agentReference = 400" in new Setup {
-
-        when(mockEnrolmentsHelper.agentEnrolmentsOpt(any())).thenReturn(Some("400"))
-
-        val req: FakeRequest[JsValue] =
-          FakeRequest(POST, postUrl).withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON).withBody(validJson)
-
-        val res: Future[Result] = controller.enqueueMessageHeader()(req)
-
-        status(res) mustBe BAD_REQUEST
-        (contentAsJson(res) \ "error").as[String] must include("credentialId and serviceName must be provided")
-
-      }
-
-      "returns 500 with generic message for agentReference = 500" in new Setup {
-
-        when(mockEnrolmentsHelper.agentEnrolmentsOpt(any())).thenReturn(Some("500"))
-
-        val req: FakeRequest[JsValue] =
-          FakeRequest(POST, postUrl).withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON).withBody(validJson)
-
-        val res: Future[Result] = controller.enqueueMessageHeader()(req)
-
-        status(res) mustBe INTERNAL_SERVER_ERROR
-        (contentAsJson(res) \ "error").as[String] mustBe "could not enqueue message header"
-      }
-
-      "returns 400 BadRequest when JSON is invalid" in new Setup {
-        val invalidJson: JsObject = Json.obj()
-
-        val req: FakeRequest[JsValue] =
-          FakeRequest(POST, postUrl).withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON).withBody(invalidJson)
-
-        val res: Future[Result] = controller.enqueueMessageHeader()(req)
-
-        status(res) mustBe BAD_REQUEST
-        (contentAsJson(res) \ "message").as[String] mustBe "Invalid payload"
-        (contentAsJson(res) \ "errors").isDefined mustBe true
-      }
-    }
+  "UdasQueueController" - {
 
     ".enqueueClob" - {
 
-      val postUrl = "/cis/enqueue-clob"
+      val postUrl = "/cis/enqueue-message"
 
       val validJson: JsValue =
         Json.toJson(
-          EnqueueClobRequest(
-            messageId = 12345L,
+          EnqueueMessageRequest(
             sender = "Portal",
             queueName = "AGTAUTH",
             replyQueue = "",
-            correlationId = "",
+            correlationID = "",
             filter = "RemoveClient",
             payload = Map(
               "IRAgentID"    -> "123456789",
@@ -134,7 +63,7 @@ class UdasQueueControllerSpec extends AnyFreeSpec with Matchers with ScalaFuture
         val req: FakeRequest[JsValue] =
           FakeRequest(POST, postUrl).withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON).withBody(validJson)
 
-        val res: Future[Result] = controller.enqueueClob()(req)
+        val res: Future[Result] = controller.enqueueMessage()(req)
 
         status(res) mustBe OK
         contentAsJson(res) mustBe Json.obj("messageIDOut" -> 1)
@@ -148,7 +77,7 @@ class UdasQueueControllerSpec extends AnyFreeSpec with Matchers with ScalaFuture
         val req: FakeRequest[JsValue] =
           FakeRequest(POST, postUrl).withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON).withBody(validJson)
 
-        val res: Future[Result] = controller.enqueueClob()(req)
+        val res: Future[Result] = controller.enqueueMessage()(req)
 
         status(res) mustBe BAD_REQUEST
         (contentAsJson(res) \ "error").as[String] must include("credentialId and serviceName must be provided")
@@ -162,10 +91,10 @@ class UdasQueueControllerSpec extends AnyFreeSpec with Matchers with ScalaFuture
         val req: FakeRequest[JsValue] =
           FakeRequest(POST, postUrl).withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON).withBody(validJson)
 
-        val res: Future[Result] = controller.enqueueClob()(req)
+        val res: Future[Result] = controller.enqueueMessage()(req)
 
         status(res) mustBe INTERNAL_SERVER_ERROR
-        (contentAsJson(res) \ "error").as[String] mustBe "could not enqueue clob"
+        (contentAsJson(res) \ "error").as[String] mustBe "could not enqueue message"
       }
 
       "returns 400 BadRequest when JSON is invalid" in new Setup {
@@ -174,11 +103,20 @@ class UdasQueueControllerSpec extends AnyFreeSpec with Matchers with ScalaFuture
         val req: FakeRequest[JsValue] =
           FakeRequest(POST, postUrl).withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON).withBody(invalidJson)
 
-        val res: Future[Result] = controller.enqueueClob()(req)
+        val res: Future[Result] = controller.enqueueMessage()(req)
 
         status(res) mustBe BAD_REQUEST
         (contentAsJson(res) \ "message").as[String] mustBe "Invalid payload"
         (contentAsJson(res) \ "errors").isDefined mustBe true
+      }
+
+      "returns 500 with generic message for missing agent" in new Setup {
+        val req: FakeRequest[JsValue] =
+          FakeRequest(POST, postUrl).withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON).withBody(validJson)
+
+        val res: Future[Result] = controller.enqueueMessage()(req)
+
+        status(res) mustBe INTERNAL_SERVER_ERROR
       }
     }
   }

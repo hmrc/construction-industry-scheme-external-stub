@@ -5,7 +5,8 @@
       "taxOfficeNumber": "123",
       "taxOfficeRef": "EZ00100",
       "employerName1": "ABC Ltd",
-      "schemeName": "UHD Contractor Control Group"
+      "schemeName": "UHD Contractor Control Group",
+      "agentOwnRef": "UHD Contractor Own Ref"
     }
   ],
   "totalCount": 1,

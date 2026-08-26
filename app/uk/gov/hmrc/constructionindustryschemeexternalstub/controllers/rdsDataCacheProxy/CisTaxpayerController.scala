@@ -58,7 +58,9 @@ class CisTaxpayerController @Inject() (
               "EZ00150" -> "150",
               "EZ00175" -> "175",
               "EZ00200" -> "200",
-              "EZ00225" -> "225"
+              "EZ00225" -> "225",
+              "EZ00250" -> "250",
+              "EZ00275" -> "275"
             )
             val enrolments                       = enrolmentHelper
               .contractorEnrolmentsOpt(request)

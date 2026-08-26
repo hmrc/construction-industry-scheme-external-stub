@@ -1,10 +1,10 @@
 {
   "scheme": {
-    "accountsOfficeReference": "123PA00123456",
-    "name": "John",
-    "utr": "1111111111",
-    "emailAddress": "ops@example.com"
-  },
+      "accountsOfficeReference": "123PA00123456",
+      "name": "John",
+      "utr": "1111111111",
+      "emailAddress": "ops@example.com"
+    },
   "subcontractors": [
     {
       "subcontractorId": 1,
@@ -20,9 +20,9 @@
       "lastMonthlyReturnDate": null,
       "createDate": "2026-04-01T10:00:00",
       "subcontractorType": "soletrader",
-      "subbieResourceRef": 10,
-      "utr": "1111111111",
-      "partnerUtr": null,
+      "subbieResourceRef":  10,
+      "utr": null,
+      "partnerUtr": "6666",
       "crn":  "99999",
       "nino": "AA123456A"
     },
@@ -33,14 +33,14 @@
       "surname": null,
       "tradingName": "BROWN LIMITED",
       "partnershipTradingName": null,
-      "verified": "Y",
+      "verified": null,
       "verificationNumber": "V0000000002",
       "taxTreatment": null,
       "verificationDate": null,
       "lastMonthlyReturnDate": null,
       "createDate": "2026-04-05T09:30:00",
       "subcontractorType": "company",
-      "subbieResourceRef": 11,
+      "subbieResourceRef":  11,
       "utr": "2222222222",
       "partnerUtr": null,
       "crn":  "99999",
@@ -60,7 +60,7 @@
       "lastMonthlyReturnDate": null,
       "createDate": "2026-04-10T14:15:00",
       "subcontractorType": "soletrader",
-      "subbieResourceRef": 12,
+      "subbieResourceRef":  12,
       "utr": "3333333333",
       "partnerUtr": null,
       "crn":  "99999",
@@ -80,7 +80,7 @@
       "lastMonthlyReturnDate": null,
       "createDate": "2026-04-10T14:15:00",
       "subcontractorType": "soletrader",
-      "subbieResourceRef": 13,
+      "subbieResourceRef":  13,
       "utr": "8786438047",
       "partnerUtr": null,
       "crn":  null,
@@ -100,8 +100,8 @@
       "lastMonthlyReturnDate": null,
       "createDate": "2026-04-10T14:15:00",
       "subcontractorType": "soletrader",
-      "subbieResourceRef": 14,
-      "utr": "8786438046",
+      "subbieResourceRef":  14,
+      "utr": null,
       "partnerUtr": null,
       "crn":  "99999",
       "nino": "AA123456A"
@@ -120,8 +120,8 @@
       "lastMonthlyReturnDate": null,
       "createDate": "2026-04-10T14:15:00",
       "subcontractorType": "partnership",
-      "subbieResourceRef": 15,
-      "utr": "6666666666",
+      "subbieResourceRef":  15,
+      "utr": null,
       "partnerUtr": "6666666666",
       "crn":  "99999",
       "nino": "AA123456A"
@@ -131,7 +131,7 @@
       "firstName": null,
       "secondName": null,
       "surname": null,
-      "tradingName": "ABC Company",
+      "tradingName": null,
       "partnershipTradingName": null,
       "verified": null,
       "verificationNumber": "V0000000007",
@@ -140,7 +140,7 @@
       "lastMonthlyReturnDate": null,
       "createDate": "2026-04-10T14:15:00",
       "subcontractorType": "company",
-      "subbieResourceRef": 16,
+      "subbieResourceRef":  16,
       "utr": "5555555555",
       "partnerUtr": null,
       "crn":  "99999",
@@ -160,7 +160,7 @@
       "lastMonthlyReturnDate": null,
       "createDate": "2026-04-10T14:15:00",
       "subcontractorType": "trust",
-      "subbieResourceRef": 17,
+      "subbieResourceRef":  17,
       "utr": "7777777777",
       "partnerUtr": null,
       "crn":  "99999",
@@ -170,7 +170,7 @@
       "firstName": null,
       "secondName": null,
       "surname": null,
-      "tradingName": "Abc Trust",
+      "tradingName": "TBC Trust",
       "partnershipTradingName": null,
       "verified": null,
       "verificationNumber": "V0000000009",
@@ -179,7 +179,7 @@
       "lastMonthlyReturnDate": null,
       "createDate": "2026-04-10T14:15:00",
       "subcontractorType": "trust",
-      "subbieResourceRef": 18,
+      "subbieResourceRef":  18,
       "utr": "1111111111",
       "partnerUtr": null,
       "crn":  "99999",
@@ -199,8 +199,8 @@
       "lastMonthlyReturnDate": null,
       "createDate": "2026-04-10T14:15:00",
       "subcontractorType": "soletrader",
-      "subbieResourceRef": 19,
-      "utr": "7777777779",
+      "subbieResourceRef":  19,
+      "utr": null,
       "partnerUtr": null,
       "crn":  "99999",
       "nino": "AA123456A"
@@ -209,7 +209,7 @@
       "subcontractorId": 11,
       "firstName": "Linda",
       "secondName": "D",
-      "surname": "wood",
+      "surname": "Jones",
       "tradingName": null,
       "partnershipTradingName": null,
       "verified": null,
@@ -219,8 +219,8 @@
       "lastMonthlyReturnDate": null,
       "createDate": "2026-04-10T14:15:00",
       "subcontractorType": "soletrader",
-      "subbieResourceRef": 20,
-      "utr": "7777777776",
+      "subbieResourceRef":  20,
+      "utr": null,
       "partnerUtr": null,
       "crn":  "99999",
       "nino": "AA123456A"
@@ -239,8 +239,8 @@
       "lastMonthlyReturnDate": null,
       "createDate": "2026-04-10T14:15:00",
       "subcontractorType": "company",
-      "subbieResourceRef": 21,
-      "utr": "654455677777",
+      "subbieResourceRef":  21,
+      "utr": null,
       "partnerUtr": null,
       "crn":  "99999",
       "nino": "AA123456A"
@@ -259,33 +259,23 @@
       "lastMonthlyReturnDate": null,
       "createDate": "2026-04-10T14:15:00",
       "subcontractorType": "trust",
-      "subbieResourceRef": 22,
-      "utr": "65445567767",
+      "subbieResourceRef":  22,
+      "utr": null,
       "partnerUtr": null,
       "crn":  "99999",
       "nino": "AA123456A"
     }
   ],
   "verificationBatch": {
-    "verificationBatchId": 99,
-    "status": "SUBMITTED",
-    "verificationNumber": "VB00000001"
-  },
+      "verificationBatchId": 99,
+      "status": "SUBMITTED",
+      "verificationNumber": "VB00000001"
+    },
   "verifications": [
     {
-      "verificationId": 1001,
-      "matched": "Y",
-      "verificationNumber": "V0000000001",
-      "taxTreatment": "0",
-      "verificationBatchId": 99,
-      "subcontractorId": 1,
-      "actionIndicator": "VERIFY",
-      "proceed": "Y",
-      "verificationResourceRef": 10
-    },{
       "verificationId": 1002,
       "matched": "Y",
-      "verificationNumber": "V0000000002",
+      "verificationNumber": "V0000000001",
       "taxTreatment": "0",
       "verificationBatchId": 99,
       "subcontractorId": 1,
@@ -296,18 +286,18 @@
     {
       "verificationId": 1003,
       "matched": "Y",
-      "verificationNumber": "V0000000003",
+      "verificationNumber": "V0000000002",
       "taxTreatment": "0",
       "verificationBatchId": 99,
       "subcontractorId": 2,
-      "actionIndicator": "MATCH",
+      "actionIndicator": "VERIFY",
       "proceed": "Y",
       "verificationResourceRef": 11
     },
     {
       "verificationId": 1004,
       "matched": "Y",
-      "verificationNumber": "V0000000004",
+      "verificationNumber": "V0000000003",
       "taxTreatment": "0",
       "verificationBatchId": 99,
       "subcontractorId": 3,
@@ -318,18 +308,18 @@
     {
       "verificationId": 1005,
       "matched": "Y",
-      "verificationNumber": "V0000000005",
+      "verificationNumber": "V0000000004",
       "taxTreatment": "0",
       "verificationBatchId": 99,
       "subcontractorId": 10908,
-      "actionIndicator": "MATCH",
+      "actionIndicator": "VERIFY",
       "proceed": "Y",
       "verificationResourceRef": 13
     },
     {
       "verificationId": 1006,
       "matched": "Y",
-      "verificationNumber": "V0000000006",
+      "verificationNumber": "V0000000005",
       "taxTreatment": "0",
       "verificationBatchId": 99,
       "subcontractorId": 5,
@@ -340,7 +330,7 @@
     {
       "verificationId": 1007,
       "matched": "Y",
-      "verificationNumber": "V0000000007",
+      "verificationNumber": "V0000000006",
       "taxTreatment": "0",
       "verificationBatchId": 99,
       "subcontractorId": 6,
@@ -351,7 +341,7 @@
     {
       "verificationId": 1008,
       "matched": "Y",
-      "verificationNumber": "V0000000008",
+      "verificationNumber": "V0000000007",
       "taxTreatment": "0",
       "verificationBatchId": 99,
       "subcontractorId": 7,
@@ -362,58 +352,58 @@
     {
       "verificationId": 1009,
       "matched": "Y",
-      "verificationNumber": "V0000000009",
+      "verificationNumber": "V0000000008",
       "taxTreatment": "0",
       "verificationBatchId": 99,
-      "subcontractorId": 9999,
+      "subcontractorId": 8,
       "actionIndicator": "VERIFY",
       "proceed": "Y",
-      "verificationResourceRef": 9999
+      "verificationResourceRef": 17
     },
     {
       "verificationId": 1010,
       "matched": "Y",
-      "verificationNumber": "V0000000010",
-      "taxTreatment": "0",
-      "verificationBatchId": 99,
-      "subcontractorId": null,
-      "actionIndicator": "VERIFY",
-      "proceed": "Y",
-      "verificationResourceRef": null
-    },
-    {
-      "verificationId": 1011,
-      "matched": "Y",
-      "verificationNumber": "V0000000011",
-      "taxTreatment": "0",
-      "verificationBatchId": 99,
-      "subcontractorId": 8,
-      "actionIndicator": "MATCH",
-      "proceed": "N",
-      "verificationResourceRef": 17
-    },
-    {
-      "verificationId": 1012,
-      "matched": "Y",
-      "verificationNumber": "V0000000012",
+      "verificationNumber": "V0000000009",
       "taxTreatment": "0",
       "verificationBatchId": 99,
       "subcontractorId": 9,
       "actionIndicator": "VERIFY",
       "proceed": "Y",
       "verificationResourceRef": 18
+    },
+    {
+      "verificationId": 1011,
+      "matched": "Y",
+      "verificationNumber": "V0000000010",
+      "taxTreatment": "0",
+      "verificationBatchId": 99,
+      "subcontractorId": 10,
+      "actionIndicator": "MATCH",
+      "proceed": "N",
+      "verificationResourceRef": 19
+    },
+    {
+      "verificationId": 1012,
+      "matched": "Y",
+      "verificationNumber": "V0000000011",
+      "taxTreatment": "0",
+      "verificationBatchId": 99,
+      "subcontractorId": 11,
+      "actionIndicator": "VERIFY",
+      "proceed": "N",
+      "verificationResourceRef": 20
     }
   ],
   "submission": {
-    "submissionId": 555,
-    "activeObjectId": 99,
-    "status": "ACCEPTED",
-    "submissionRequestDate": "2026-04-01T10:00:00"
-  },
+      "submissionId": 555,
+      "activeObjectId": 99,
+      "status": "ACCEPTED",
+      "submissionRequestDate": "2026-04-01T10:00:00"
+    },
   "monthlyReturn": {
-    "monthlyReturnId": 777,
-    "decNoMoreSubPayments": null
-  },
+      "monthlyReturnId": 777,
+      "decNoMoreSubPayments": null
+    },
   "monthlyReturnSubmission": {
     "submissionId": 888,
     "submissionRequestDate": "2026-04-01T10:00:00"

@@ -147,5 +147,34 @@ class GetCurrentVerificationBatchResponseSpec extends AnyWordSpec with Matchers 
       val json = Json.toJson(model)
       json.validate[GetCurrentVerificationBatchResponse] mustBe JsSuccess(model)
     }
+
+    "read consistent insufficient subcontractor data from the segregated fixture" in {
+      val stream =
+        Option(
+          getClass.getResourceAsStream(
+            "/resources/verification/getCurrentVerificationBatch-200-verificationBatchStatus-chris-response-insufficient.json"
+          )
+        ).getOrElse(
+          fail(
+            "getCurrentVerificationBatch-200-verificationBatchStatus-chris-response-insufficient.json was not found"
+          )
+        )
+
+      val response =
+        try
+          Json.parse(stream).as[GetCurrentVerificationBatchResponse]
+        finally
+          stream.close()
+
+      val subcontractor =
+        response.subcontractors
+          .find(_.subcontractorId == 5L)
+          .getOrElse(fail("Subcontractor 5 was not found"))
+
+      subcontractor.subbieResourceRef mustBe Some(14L)
+      subcontractor.subcontractorType mustBe Some("soletrader")
+      subcontractor.tradingName mustBe Some("WYZ Trader")
+      subcontractor.utr mustBe None
+    }
   }
 }

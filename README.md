@@ -357,6 +357,7 @@ To trigger the happy path, ensure you provide a valid request body:
 - Request body:
 ```json
 {
+  "message": {
     "sender": "Portal",
     "queueName": "AGTAUTH",
     "replyQueue": "",
@@ -367,6 +368,31 @@ To trigger the happy path, ensure you provide a valid request body:
       "Service": "CIS",
       "TaxReference": "123/ABC123"
     }
+  },
+  "tracking": {
+    "message": {
+      "sender": "Portal",
+      "queueName": "AGTAUTH",
+      "replyQueue": "",
+      "correlationID": "",
+      "filter": "AGENTAUTH",
+      "payload": {
+        "GGIS_DTSTAMP": "20260826 191530123",
+        "MESSAGE_TYPE": "AGENT_AUTH_PORTAL",
+        "ADDITIONAL_INFO": "Request client removal",
+        "GW_AGENT_ID": "AGENT123",
+        "IR_CLIENT_REF": "123/ABC123",
+        "USER_ID": "user123",
+        "Service": "CIS"
+      }
+    },
+    "number": {
+      "dataType": 1,
+      "payload": {
+        "EVENT_TYPE": 1010
+      }
+    }
+  }
 }
 ```
 

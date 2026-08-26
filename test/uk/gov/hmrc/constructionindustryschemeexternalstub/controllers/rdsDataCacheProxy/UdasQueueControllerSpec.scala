@@ -27,6 +27,7 @@ import play.api.mvc.{ControllerComponents, PlayBodyParsers, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.{AuthAction, FakeAuthAction}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{EnqueueMessage, EnqueueNumber, EnqueueTracking}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.EnqueueMessageRequest
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.EnrolmentsHelper
 
@@ -36,22 +37,50 @@ class UdasQueueControllerSpec extends AnyFreeSpec with Matchers with ScalaFuture
 
   "UdasQueueController" - {
 
-    ".enqueueClob" - {
+    ".enqueue-message" - {
 
       val postUrl = "/cis/enqueue-message"
 
       val validJson: JsValue =
         Json.toJson(
           EnqueueMessageRequest(
-            sender = "Portal",
-            queueName = "AGTAUTH",
-            replyQueue = "",
-            correlationID = "",
-            filter = "RemoveClient",
-            payload = Map(
-              "IRAgentID"    -> "123456789",
-              "Service"      -> "CIS",
-              "TaxReference" -> "123/ABC123"
+            message = EnqueueMessage(
+              sender = "Portal",
+              queueName = "AGTAUTH",
+              replyQueue = "",
+              correlationID = "",
+              filter = "RemoveClient",
+              payload = Map(
+                "IRAgentID"    -> "123456789",
+                "Service"      -> "CIS",
+                "TaxReference" -> "123/ABC123"
+              )
+            ),
+            tracking = Some(
+              EnqueueTracking(
+                message = EnqueueMessage(
+                  sender = "Portal",
+                  queueName = "AGTAUTH",
+                  replyQueue = "",
+                  correlationID = "",
+                  filter = "AGENTAUTH",
+                  payload = Map(
+                    "GGIS_DTSTAMP"    -> "20260826 191530123",
+                    "MESSAGE_TYPE"    -> "AGENT_AUTH_PORTAL",
+                    "ADDITIONAL_INFO" -> "Request client removal",
+                    "GW_AGENT_ID"     -> "AGENT123",
+                    "IR_CLIENT_REF"   -> "123/ABC123",
+                    "USER_ID"         -> "user123",
+                    "Service"         -> "CIS"
+                  )
+                ),
+                number = EnqueueNumber(
+                  dataType = 1,
+                  payload = Map(
+                    "EVENT_TYPE" -> 1010L
+                  )
+                )
+              )
             )
           )
         )

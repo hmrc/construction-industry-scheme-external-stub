@@ -1692,6 +1692,148 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
     }
   }
 
+  ".deleteVerification" - {
+
+    val postUrl =
+      "/verification/delete"
+
+    val responsePath =
+      "/resources/verification/deleteVerification-200-response.json"
+
+    val validJson: JsValue =
+      Json.toJson(
+        DeleteVerificationRequest(
+          instanceId = "10001",
+          verificationResourceRef = 5L
+        )
+      )
+
+    val responseJson: JsValue =
+      Json.obj("verificationsCounter" -> 1L)
+
+    "returns 200 OK with JSON body on success (contractor enrolment)" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("200", "")))
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
+      when(mockResourceHelper.resourceAsString(responsePath))
+        .thenReturn(responseJson.toString())
+
+      val request =
+        FakeRequest(POST, postUrl)
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(validJson)
+
+      val result: Future[Result] =
+        controller.deleteVerification()(request)
+
+      status(result) mustBe OK
+      contentType(result) mustBe Some(JSON)
+      contentAsJson(result) mustBe responseJson
+
+      verify(mockResourceHelper).resourceAsString(responsePath)
+    }
+
+    "returns 200 OK with JSON body on success (agent enrolment)" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(None)
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(Some("IRAgentReference-123"))
+      when(mockResourceHelper.resourceAsString(responsePath))
+        .thenReturn(responseJson.toString())
+
+      val request =
+        FakeRequest(POST, postUrl)
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(validJson)
+
+      val result: Future[Result] =
+        controller.deleteVerification()(request)
+
+      status(result) mustBe OK
+      contentType(result) mustBe Some(JSON)
+      contentAsJson(result) mustBe responseJson
+
+      verify(mockResourceHelper).resourceAsString(responsePath)
+    }
+
+    "returns 400 BadRequest for an invalid payload" in new Setup {
+      val request =
+        FakeRequest(POST, postUrl)
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(Json.obj("instanceId" -> "10001"))
+
+      val result: Future[Result] =
+        controller.deleteVerification()(request)
+
+      status(result) mustBe BAD_REQUEST
+      (contentAsJson(result) \ "message").as[String] mustBe "Invalid payload"
+      (contentAsJson(result) \ "errors").isDefined mustBe true
+
+      verifyNoInteractions(mockResourceHelper)
+      verifyNoInteractions(mockEnrolmentsHelper)
+    }
+
+    "returns 502 BadGateway for taxOfficeNumber = 502 (contractor enrolment)" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("502", "")))
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      val request =
+        FakeRequest(POST, postUrl)
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(validJson)
+
+      val result: Future[Result] =
+        controller.deleteVerification()(request)
+
+      status(result) mustBe BAD_GATEWAY
+      (contentAsJson(result) \ "message").as[String] must include("formp failed")
+
+      verifyNoInteractions(mockResourceHelper)
+    }
+
+    "returns 500 InternalServerError for taxOfficeNumber = 500 (contractor enrolment)" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("500", "")))
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      val request =
+        FakeRequest(POST, postUrl)
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(validJson)
+
+      val result: Future[Result] =
+        controller.deleteVerification()(request)
+
+      status(result) mustBe INTERNAL_SERVER_ERROR
+      (contentAsJson(result) \ "message").as[String] mustBe "Unexpected error"
+
+      verifyNoInteractions(mockResourceHelper)
+    }
+
+    "returns 500 InternalServerError when no contractor enrolment and no agent enrolment found" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(None)
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      val request =
+        FakeRequest(POST, postUrl)
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(validJson)
+
+      val result: Future[Result] =
+        controller.deleteVerification()(request)
+
+      status(result) mustBe INTERNAL_SERVER_ERROR
+
+      verifyNoInteractions(mockResourceHelper)
+    }
+  }
+
   ".getSubmissionWithVerificationBatch" - {
 
     val postUrl =

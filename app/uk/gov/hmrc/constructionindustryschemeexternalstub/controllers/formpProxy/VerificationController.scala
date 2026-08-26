@@ -20,6 +20,7 @@ import play.api.Logging
 import play.api.libs.json.{JsError, JsValue, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.response.DeleteVerificationResponse
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.*
@@ -80,6 +81,8 @@ class VerificationController @Inject() (
     s"$verificationResponsePath/getSubmittedVerifications-200-multiTaxYears-response.json"
   private val getSubmittedVerifications_200_noHistory_ResponsePath                                    =
     s"$verificationResponsePath/getSubmittedVerifications-200-noHistory-response.json"
+  private val deleteVerification_200_ResponsePath                                                     =
+    s"$verificationResponsePath/deleteVerification-200-response.json"
 
   private def withEnrolmentDispatch(onSuccess: => Result)(implicit request: AuthenticatedRequest[_]): Result =
     enrolmentHelper.contractorEnrolmentsOpt(request) match {
@@ -205,6 +208,25 @@ class VerificationController @Inject() (
 
   private def hasNoSubcontractorToModify(request: ModifyVerificationsRequest): Boolean =
     request.deleteVerifications.isEmpty && request.createVerifications.isEmpty
+
+  def deleteVerification(): Action[JsValue] =
+    authorise(parse.json) { implicit request =>
+      request.body
+        .validate[DeleteVerificationRequest]
+        .fold(
+          errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
+          _ =>
+            withEnrolmentDispatch(
+              Ok(
+                Json.toJson(
+                  Json
+                    .parse(resourceHelper.resourceAsString(deleteVerification_200_ResponsePath))
+                    .as[DeleteVerificationResponse]
+                )
+              )
+            )
+        )
+    }
 
   def createSubmissionAndUpdateVerifications(): Action[JsValue] =
     authorise(parse.json) { implicit request =>

@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests
 
-import play.api.libs.json.{Json, JsonValidationError, OFormat, OWrites, Reads}
+import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{EnqueueMessage, EnqueueTracking}
 
 final case class EnqueueMessageRequest(

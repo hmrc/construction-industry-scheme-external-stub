@@ -33,8 +33,8 @@ class DeleteVerificationRequestSpec extends SpecBase {
       val json = Json.toJson(model)
 
       json mustBe Json.obj(
-        "instanceId"               -> "abc-123",
-        "verificationResourceRef"  -> 77L
+        "instanceId"              -> "abc-123",
+        "verificationResourceRef" -> 77L
       )
 
       json.as[DeleteVerificationRequest] mustBe model

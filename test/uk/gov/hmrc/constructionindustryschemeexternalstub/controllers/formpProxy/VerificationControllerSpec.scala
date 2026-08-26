@@ -25,9 +25,9 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.FakeAuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.base.SpecBase
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{CreateVerifications, DeleteVerifications, EmployerReference}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.*
 import scala.concurrent.Future
 import java.time.LocalDateTime
 
@@ -55,19 +55,36 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
         .thenReturn(None)
 
       val responseJson: JsValue = Json.parse(
-        s"""
-           |{
-           |  "subcontractors": [
-           |    { "subcontractorId": 1 }
-           |  ],
-           |  "verificationBatch": { "verificationBatchId": 99 },
-           |  "verifications": [
-           |    { "verificationId": 1001 }
-           |  ],
-           |  "submission": { "submissionId": 555 },
-           |  "monthlyReturn": { "monthlyReturnId": 777 }
-           |}
-           |""".stripMargin
+        """
+          |{
+          |  "subcontractors": [
+          |    {
+          |      "subcontractorId": 1,
+          |      "subbieResourceRef": 10
+          |    }
+          |  ],
+          |  "verificationBatch": {
+          |    "verificationBatchId": 99,
+          |    "status": "SUBMITTED"
+          |  },
+          |  "verifications": [
+          |    {
+          |      "verificationId": 1001,
+          |      "matched": "Y",
+          |      "verificationNumber": "V0000000001",
+          |      "actionIndicator": "VERIFY",
+          |      "proceed": "Y",
+          |      "verificationResourceRef": 10
+          |    }
+          |  ],
+          |  "submission": {
+          |    "submissionId": 555
+          |  },
+          |  "monthlyReturn": {
+          |    "monthlyReturnId": 777
+          |  }
+          |}
+          |""".stripMargin
       )
 
       when(mockResourceHelper.resourceAsString(any()))
@@ -82,14 +99,60 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
       val body = contentAsJson(res)
 
       body mustBe responseJson
+      val subcontractor = (body \ "subcontractors")(0)
 
-      (body \ "subcontractors")(0).\("subcontractorId").as[Long] mustBe 1L
+      (subcontractor \ "subcontractorId").as[Long] mustBe 1L
+      (subcontractor \ "subbieResourceRef").as[Long] mustBe 10L
 
       (body \ "verificationBatch").\("verificationBatchId").as[Long] mustBe 99L
       (body \ "verifications")(0).\("verificationId").as[Long] mustBe 1001L
 
       (body \ "submission").\("submissionId").as[Long] mustBe 555L
       (body \ "monthlyReturn").\("monthlyReturnId").as[Long] mustBe 777L
+      (body \ "verificationBatch" \ "status").as[String] mustBe "SUBMITTED"
+
+      val verification = (body \ "verifications")(0)
+
+      (verification \ "verificationId").as[Long] mustBe 1001L
+      (verification \ "matched").as[String] mustBe "Y"
+      (verification \ "verificationNumber").as[String] mustBe "V0000000001"
+      (verification \ "actionIndicator").as[String] mustBe "VERIFY"
+      (verification \ "proceed").as[String] mustBe "Y"
+      (verification \ "verificationResourceRef").as[Long] mustBe 10L
+    }
+
+    Seq(
+      (
+        "250",
+        "/resources/verification/getNewestVerificationBatch-200-response-unmatched.json"
+      ),
+      (
+        "275",
+        "/resources/verification/getNewestVerificationBatch-200-response-insufficient.json"
+      )
+    ).foreach { case (testInstanceId, expectedResponsePath) =>
+      s"select the correct segregated response for instanceId $testInstanceId" in new Setup {
+        when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+          .thenReturn(Some(EmployerReference("200", "")))
+        when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+          .thenReturn(None)
+        when(mockResourceHelper.resourceAsString(expectedResponsePath))
+          .thenReturn(Json.obj().toString())
+
+        val request =
+          FakeRequest(
+            GET,
+            s"/cis/verification-batch/newest/$testInstanceId"
+          )
+
+        val result =
+          controller.getNewestVerificationBatch(testInstanceId)(request)
+
+        status(result) mustBe OK
+        contentAsJson(result) mustBe Json.obj()
+
+        verify(mockResourceHelper).resourceAsString(expectedResponsePath)
+      }
     }
 
     "returns 200 OK with JSON body on success (agent enrolment)" in new Setup {
@@ -354,6 +417,32 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
         (body \ "verificationBatch" \ "verificationBatchId").as[Long] mustBe 800L
       }
 
+      "select the insufficient current-verification response for instanceId 275" in new Setup {
+        val expectedResponsePath =
+          "/resources/verification/getCurrentVerificationBatch-200-verificationBatchStatus-chris-response-insufficient.json"
+
+        when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+          .thenReturn(Some(EmployerReference("200", "")))
+        when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+          .thenReturn(None)
+        when(mockResourceHelper.resourceAsString(expectedResponsePath))
+          .thenReturn(Json.obj().toString())
+
+        val request =
+          FakeRequest(
+            GET,
+            "/cis/verification-batch/current/275"
+          )
+
+        val result =
+          controller.getCurrentVerificationBatch("275")(request)
+
+        status(result) mustBe OK
+        contentAsJson(result) mustBe Json.obj()
+
+        verify(mockResourceHelper).resourceAsString(expectedResponsePath)
+      }
+
       "returns 502 BadGateway for taxOfficeNumber = 502 (contractor enrolment)" in new Setup {
         when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
           .thenReturn(Some(EmployerReference("502", "")))
@@ -391,6 +480,99 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
 
         status(res) mustBe INTERNAL_SERVER_ERROR
       }
+    }
+
+  }
+
+  ".getLastSubmittedVerificationBatch" - {
+
+    "returns 200 OK with JSON body on success (contractor enrolment)" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("200", "")))
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      val responseJson: JsValue = Json.parse(
+        s"""
+           |{
+           |  "subcontractors": [
+           |    { "subcontractorId": 1 }
+           |  ],
+           |  "verificationBatch": { "verificationBatchId": 99 },
+           |  "verifications": [
+           |    { "verificationId": 1001 }
+           |  ],
+           |  "submission": { "submissionId": 555 },
+           |  "scheme": { "accountsOfficeReference": "123PA00123456" }
+           |}
+           |""".stripMargin
+      )
+
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn(responseJson.toString())
+
+      val req: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, url)
+      val res: Future[Result]                      = controller.getLastSubmittedVerificationBatch(instanceId)(req)
+
+      status(res) mustBe OK
+      contentType(res) mustBe Some(JSON)
+
+      val body: JsValue = contentAsJson(res)
+
+      body mustBe responseJson
+
+      (body \ "subcontractors")(0).\("subcontractorId").as[Long] mustBe 1L
+
+      (body \ "verificationBatch").\("verificationBatchId").as[Long] mustBe 99L
+      (body \ "verifications")(0).\("verificationId").as[Long] mustBe 1001L
+
+      (body \ "submission").\("submissionId").as[Long] mustBe 555L
+      (body \ "scheme").\("accountsOfficeReference").as[String] mustBe "123PA00123456"
+    }
+
+    "returns 200 OK with JSON body on success (agent enrolment)" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(None)
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(Some("IRAgentReference-123"))
+
+      val responseJson: JsValue = Json.parse(
+        s"""
+           |{
+           |  "subcontractors": [
+           |    { "subcontractorId": 1 }
+           |  ],
+           |  "verificationBatch": { "verificationBatchId": 99 },
+           |  "verifications": [
+           |    { "verificationId": 1001 }
+           |  ],
+           |  "submission": { "submissionId": 555 },
+           |  "scheme": { "accountsOfficeReference": "123PA00123456" }
+           |}
+           |""".stripMargin
+      )
+
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn(responseJson.toString())
+
+      val req: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, url)
+      val res: Future[Result]                      = controller.getLastSubmittedVerificationBatch(instanceId)(req)
+
+      status(res) mustBe OK
+      contentType(res) mustBe Some(JSON)
+      contentAsJson(res) mustBe responseJson
+    }
+
+    "returns 500 InternalServerError when no contractor enrolment and no agent enrolment found" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(None)
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      val req: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, url)
+      val res: Future[Result]                      = controller.getLastSubmittedVerificationBatch(instanceId)(req)
+
+      status(res) mustBe INTERNAL_SERVER_ERROR
     }
 
   }
@@ -1272,6 +1454,121 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
       val body = contentAsJson(res)
       (body \ "message").as[String] mustBe "Invalid payload"
       (body \ "errors").isDefined mustBe true
+    }
+  }
+
+  ".getSubmissionWithVerificationBatchByRefs" - {
+
+    val instanceId                   = "abc-123"
+    val verificationBatchResourceRef = 77L
+    val url                          =
+      s"/cis/verification/submission-batch/$instanceId/$verificationBatchResourceRef"
+
+    val responsePath =
+      "/resources/verification/getSubmissionWithVerificationBatch-200-response.json"
+
+    "returns 200 OK without performing an enrolment check" in new Setup {
+      val responseJson: JsValue =
+        Json.parse(
+          s"""
+             |{
+             |  "scheme": {
+             |    "schemeId": 1,
+             |    "instanceId": "$instanceId"
+             |  },
+             |  "subcontractors": [
+             |    {
+             |      "subcontractorId": 1,
+             |      "subbieResourceRef": 10
+             |    }
+             |  ],
+             |  "verifications": [
+             |    {
+             |      "verificationId": 1001,
+             |      "verificationResourceRef": 201
+             |    }
+             |  ],
+             |  "verificationBatch": {
+             |    "verificationBatchId": 99,
+             |    "verificationBatchResourceRef": $verificationBatchResourceRef
+             |  },
+             |  "submission": {
+             |    "submissionId": 555,
+             |    "submissionType": "CIS_VERIFY"
+             |  }
+             |}
+             |""".stripMargin
+        )
+
+      when(mockResourceHelper.resourceAsString(responsePath))
+        .thenReturn(responseJson.toString())
+
+      val request: FakeRequest[AnyContentAsEmpty.type] =
+        FakeRequest(GET, url)
+          .withHeaders(ACCEPT -> JSON)
+
+      val result: Future[Result] =
+        controller.getSubmissionWithVerificationBatchByRefs(
+          instanceId,
+          verificationBatchResourceRef
+        )(request)
+
+      status(result) mustBe OK
+      contentType(result) mustBe Some(JSON)
+      contentAsJson(result) mustBe responseJson
+
+      val body =
+        contentAsJson(result)
+
+      (body \ "scheme" \ "schemeId").as[Long] mustBe 1L
+      (body \ "scheme" \ "instanceId").as[String] mustBe instanceId
+      (body \ "subcontractors")(0)
+        .\("subcontractorId")
+        .as[Long] mustBe 1L
+      (body \ "verifications")(0)
+        .\("verificationId")
+        .as[Long] mustBe 1001L
+      (body \ "verificationBatch" \ "verificationBatchResourceRef")
+        .as[Long] mustBe verificationBatchResourceRef
+      (body \ "submission" \ "submissionId")
+        .as[Long] mustBe 555L
+
+      verify(mockResourceHelper).resourceAsString(responsePath)
+      verifyNoInteractions(mockEnrolmentsHelper)
+    }
+
+    "returns 200 OK through the application route without authentication or session headers" in {
+      val request: FakeRequest[AnyContentAsEmpty.type] =
+        FakeRequest(
+          GET,
+          "/formp-proxy/cis/verification/submission-batch/10001/5"
+        ).withHeaders(ACCEPT -> JSON)
+
+      val result: Future[Result] =
+        route(app, request).value
+
+      status(result) mustBe OK
+      contentType(result) mustBe Some(JSON)
+
+      val body =
+        contentAsJson(result)
+
+      (body \ "scheme" \ "instanceId")
+        .as[String] mustBe "10001"
+
+      (body \ "verificationBatch" \ "verificationBatchResourceRef")
+        .as[Long] mustBe 5L
+
+      (body \ "submission" \ "submissionId")
+        .as[Long] mustBe 90001L
+
+      (body \ "verifications")
+        .as[Seq[JsValue]]
+        .size mustBe 1
+
+      (body \ "subcontractors")
+        .as[Seq[JsValue]]
+        .size mustBe 1
     }
   }
 

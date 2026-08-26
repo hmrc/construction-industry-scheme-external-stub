@@ -6,7 +6,7 @@
       "secondName": null,
       "surname": "Armstrong",
       "tradingName": "DBB Construction",
-      "subbieResourceRef":  13,
+      "subbieResourceRef": 13,
       "utr": "8786438047",
       "nino": "AB623456C",
       "subcontractorType": "soletrader"
@@ -17,10 +17,32 @@
       "secondName": null,
       "surname": "Smith",
       "tradingName": "ACME",
-      "subbieResourceRef":  10,
+      "subbieResourceRef": 10,
       "utr": "1111111111",
       "nino": "AA123456A",
       "subcontractorType": "soletrader"
+    },
+    {
+      "subcontractorId": 7,
+      "firstName": null,
+      "secondName": null,
+      "surname": null,
+      "tradingName": "ABC Company",
+      "subbieResourceRef": 16,
+      "utr": "5555555555",
+      "nino": "AA123456A",
+      "subcontractorType": "company"
+    },
+    {
+      "subcontractorId": 5,
+      "firstName": null,
+      "secondName": null,
+      "surname": "Wood",
+      "tradingName": "WYZ Trader",
+      "subbieResourceRef": 14,
+      "utr": "8786438046",
+      "nino": "AA123456A",
+      "subcontractorType": "company"
     }
   ],
   "verificationBatch": {
@@ -39,6 +61,18 @@
       "verificationBatchId": 10910,
       "subcontractorId": 1,
       "verificationResourceRef": 10
+    },
+    {
+      "verificationId": 1003,
+      "verificationBatchId": 10910,
+      "subcontractorId": 7,
+      "verificationResourceRef": 16
+    },
+    {
+      "verificationId": 1004,
+      "verificationBatchId": 10910,
+      "subcontractorId": 5,
+      "verificationResourceRef": 14
     }
   ]
 }

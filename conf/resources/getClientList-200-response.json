@@ -699,6 +699,41 @@
       "taxOfficeRef": "EZ10800",
       "employerName1": "Lambda Builders 100",
       "schemeName": "UHD Contractor Control Group"
+    },
+    {
+      "uniqueId": "125",
+      "taxOfficeNumber": "754",
+      "taxOfficeRef": "EZ00125",
+      "employerName1": "Delta Tiles Ltd",
+      "schemeName": "Contractor UHD One Treatment Group"
+    },
+    {
+      "uniqueId": "150",
+      "taxOfficeNumber": "754",
+      "taxOfficeRef": "EZ00150",
+      "employerName1": "Bravo Builders Ltd",
+      "schemeName": "Contractor UHD One and Two Treatment Group"
+    },
+    {
+      "uniqueId": "175",
+      "taxOfficeNumber": "754",
+      "taxOfficeRef": "EZ00175",
+      "employerName1": "Charlie Construction Ltd",
+      "schemeName": "Contractor UHD Two Treatment Group"
+    },
+    {
+      "uniqueId": "200",
+      "taxOfficeNumber": "754",
+      "taxOfficeRef": "EZ00200",
+      "employerName1": "BROWN Construction Ltd",
+      "schemeName": "Contractor UHD Three Treatment Group"
+    },
+    {
+      "uniqueId": "225",
+      "taxOfficeNumber": "754",
+      "taxOfficeRef": "EZ00225",
+      "employerName1": "Theta Construction Ltd",
+      "schemeName": "Contractor UHD Four Treatment Group"
     }
   ],
   "totalCount": 100,

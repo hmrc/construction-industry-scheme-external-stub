@@ -40,6 +40,8 @@ class SubcontractorController @Inject() (
   private val subcontractorResponsePath                              = "/resources/subcontractor"
   private val getSubcontractorList_200_ResponsePath                  =
     s"$subcontractorResponsePath/getSubcontractorList-200-response.json"
+  private val getSubcontractorList_noSubcontractor_200_ResponsePath  =
+    s"$subcontractorResponsePath/getSubcontractorList-200-noSubcontractor-response.json"
   private val getSubcontractorIndividual_200_ResponsePath            =
     s"$subcontractorResponsePath/getSubcontractorIndividual-200-verifiedResponse.json"
   private val getSubcontractorTrust_200_ResponsePath                 =
@@ -76,9 +78,11 @@ class SubcontractorController @Inject() (
 
         case (Some(employerRef), _) =>
           (employerRef.taxOfficeNumber, employerRef.taxOfficeReference) match {
-            case ("500", _) => InternalServerError(Json.obj("message" -> "Unexpected error"))
-            case ("502", _) => BadGateway(Json.obj("message" -> "formp failed"))
-            case _          => Ok(resourceHelper.resourceAsString(getSubcontractorList_200_ResponsePath))
+            case ("500", _)     => InternalServerError(Json.obj("message" -> "Unexpected error"))
+            case ("502", _)     => BadGateway(Json.obj("message" -> "formp failed"))
+            case (_, "EZ00225") =>
+              Ok(resourceHelper.resourceAsString(getSubcontractorList_noSubcontractor_200_ResponsePath))
+            case _              => Ok(resourceHelper.resourceAsString(getSubcontractorList_200_ResponsePath))
           }
 
         case (None, Some(agentRef)) =>
@@ -98,11 +102,11 @@ class SubcontractorController @Inject() (
     authorise { implicit request =>
 
       val canDelete =
-        subbieResourceRef != 27L
+        subbieResourceRef != 7L
 
       val subcontractorName =
-        if (subbieResourceRef == 27L) {
-          "Gamma Builders"
+        if (subbieResourceRef == 7L) {
+          "Delta Trust"
         } else {
           "Test Subcontractor"
         }
@@ -126,16 +130,16 @@ class SubcontractorController @Inject() (
       val contractorRefOpt = enrolmentHelper.contractorEnrolmentsOpt(request)
       val agentRefOpt      = enrolmentHelper.agentEnrolmentsOpt(request)
 
-      val responsePath = cisId match {
-        case "individual-123"             => getSubcontractorIndividual_200_ResponsePath
-        case "trust-123"                  => getSubcontractorTrust_200_ResponsePath
-        case "company-123"                => getSubcontractorCompany_200_ResponsePath
-        case "partnership-123"            => getSubcontractorPartnership_200_ResponsePath
-        case "individual-unverified-123"  => getSubcontractorIndividual_200_UnverifiedResponsePath
-        case "trust-unverified-123"       => getSubcontractorTrust_200_UnverifiedResponsePath
-        case "company-unverified-123"     => getSubcontractorCompany_200_UnverifiedResponsePath
-        case "partnership-unverified-123" => getSubcontractorPartnership_200_UnverifiedResponsePath
-        case _                            => getSubcontractorIndividual_200_ResponsePath
+      val responsePath = subbieResourceRef match {
+        case 1 => getSubcontractorIndividual_200_ResponsePath
+        case 2 => getSubcontractorIndividual_200_UnverifiedResponsePath
+        case 3 => getSubcontractorCompany_200_ResponsePath
+        case 4 => getSubcontractorCompany_200_UnverifiedResponsePath
+        case 5 => getSubcontractorPartnership_200_ResponsePath
+        case 6 => getSubcontractorPartnership_200_UnverifiedResponsePath
+        case 7 => getSubcontractorTrust_200_ResponsePath
+        case 8 => getSubcontractorTrust_200_UnverifiedResponsePath
+        case _ => getSubcontractorIndividual_200_ResponsePath
       }
 
       (contractorRefOpt, agentRefOpt) match {

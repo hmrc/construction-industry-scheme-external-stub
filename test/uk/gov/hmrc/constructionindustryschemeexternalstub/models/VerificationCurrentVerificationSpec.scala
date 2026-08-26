@@ -26,7 +26,13 @@ class VerificationCurrentVerificationSpec extends SpecBase {
         verificationId = 1L,
         verificationBatchId = Some(10L),
         subcontractorId = Some(2L),
-        verificationResourceRef = Some(20L)
+        verificationResourceRef = Some(20L),
+        subcontractorName = Some("John Smith"),
+        verificationNumber = Some("V123456789"),
+        taxTreatment = Some("0"),
+        actionIndicator = Some("A"),
+        proceed = Some("Y"),
+        matched = Some("Y")
       )
       val json         = Json.toJson(verification)
 
@@ -34,6 +40,12 @@ class VerificationCurrentVerificationSpec extends SpecBase {
       (json \ "verificationBatchId").as[Long] mustBe 10L
       (json \ "subcontractorId").as[Long] mustBe 2L
       (json \ "verificationResourceRef").as[Long] mustBe 20L
+      (json \ "subcontractorName").as[String] mustBe "John Smith"
+      (json \ "verificationNumber").as[String] mustBe "V123456789"
+      (json \ "taxTreatment").as[String] mustBe "0"
+      (json \ "actionIndicator").as[String] mustBe "A"
+      (json \ "proceed").as[String] mustBe "Y"
+      (json \ "matched").as[String] mustBe "Y"
     }
     "deserialize from JSON correctly" in {
       val json   = Json.parse(
@@ -42,7 +54,13 @@ class VerificationCurrentVerificationSpec extends SpecBase {
           |  "verificationId": 1,
           |  "verificationBatchId": 10,
           |  "subcontractorId": 2,
-          |  "verificationResourceRef": 20
+          |  "verificationResourceRef": 20,
+          |  "subcontractorName": "John Smith",
+          |  "verificationNumber": "V123456789",
+          |  "taxTreatment": "0",
+          |  "actionIndicator": "A",
+          |  "proceed": "Y",
+          |  "matched": "Y"
           |}
           |""".stripMargin
       )
@@ -51,13 +69,25 @@ class VerificationCurrentVerificationSpec extends SpecBase {
       result.verificationBatchId mustBe Some(10L)
       result.subcontractorId mustBe Some(2L)
       result.verificationResourceRef mustBe Some(20L)
+      result.subcontractorName mustBe Some("John Smith")
+      result.verificationNumber mustBe Some("V123456789")
+      result.taxTreatment mustBe Some("0")
+      result.actionIndicator mustBe Some("A")
+      result.proceed mustBe Some("Y")
+      result.matched mustBe Some("Y")
     }
     "round-trip serialize and deserialize correctly" in {
       val verification = VerificationCurrentVerification(
         verificationId = 1L,
         verificationBatchId = Some(10L),
         subcontractorId = Some(2L),
-        verificationResourceRef = Some(20L)
+        verificationResourceRef = Some(20L),
+        subcontractorName = Some("John Smith"),
+        verificationNumber = Some("V123456789"),
+        taxTreatment = Some("0"),
+        actionIndicator = Some("A"),
+        proceed = Some("Y"),
+        matched = Some("Y")
       )
       val json         = Json.toJson(verification)
       val result       = json.as[VerificationCurrentVerification]

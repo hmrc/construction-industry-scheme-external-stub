@@ -377,7 +377,7 @@ To trigger the happy path, ensure you provide a valid request body:
       "correlationID": "",
       "filter": "AGENTAUTH",
       "payload": {
-        "GGIS_DTSTAMP": "20260826",
+        "GGIS_DTSTAMP": "20260827 154512747",
         "MESSAGE_TYPE": "AGENT_AUTH_PORTAL",
         "ADDITIONAL_INFO": "Request client removal",
         "GW_AGENT_ID": "AGENT123",

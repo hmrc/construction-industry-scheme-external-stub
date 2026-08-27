@@ -60,7 +60,7 @@ class UdasQueueControllerSpec extends AnyFreeSpec with Matchers with ScalaFuture
               EnqueueTracking(
                 message = EnqueueMessage(
                   sender = "Portal",
-                  queueName = "AGTAUTH",
+                  queueName = "Tracking",
                   replyQueue = "",
                   correlationID = "",
                   filter = "AGENTAUTH",

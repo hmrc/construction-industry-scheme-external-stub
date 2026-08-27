@@ -372,7 +372,7 @@ To trigger the happy path, ensure you provide a valid request body:
   "tracking": {
     "message": {
       "sender": "Portal",
-      "queueName": "AGTAUTH",
+      "queueName": "Tracking",
       "replyQueue": "",
       "correlationID": "",
       "filter": "AGENTAUTH",

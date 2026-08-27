@@ -33,7 +33,7 @@
       "surname": null,
       "tradingName": "BROWN LIMITED",
       "partnershipTradingName": null,
-      "verified": null,
+      "verified": "Y",
       "verificationNumber": "V0000000002",
       "taxTreatment": null,
       "verificationDate": null,
@@ -407,7 +407,7 @@
   "submission": {
     "submissionId": 555,
     "activeObjectId": 99,
-    "status": "ACCEPTED",
+    "status": "SUBMITTED",
     "submissionRequestDate": "2026-04-01T10:00:00"
   },
   "monthlyReturn": {

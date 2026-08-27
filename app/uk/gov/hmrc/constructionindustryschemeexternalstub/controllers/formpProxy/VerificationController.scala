@@ -90,10 +90,7 @@ class VerificationController @Inject() (
           case _     => onSuccess
         }
       case None                     =>
-        enrolmentHelper.agentEnrolmentsOpt(request) match {
-          case Some(_) => onSuccess
-          case None    => InternalServerError
-        }
+        onSuccess
     }
 
   def getNewestVerificationBatch(instanceId: String): Action[AnyContent] =
@@ -296,17 +293,11 @@ class VerificationController @Inject() (
                 }
 
               case None =>
-                enrolmentHelper.agentEnrolmentsOpt(request) match {
-                  case Some(_) =>
-                    Ok(
-                      Json.parse(
-                        resourceHelper.resourceAsString(getSubmittedVerifications_200_ResponsePath)
-                      )
-                    )
-
-                  case None =>
-                    InternalServerError
-                }
+                Ok(
+                  Json.parse(
+                    resourceHelper.resourceAsString(getSubmittedVerifications_200_ResponsePath)
+                  )
+                )
             }
         )
     }

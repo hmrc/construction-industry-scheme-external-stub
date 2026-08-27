@@ -320,7 +320,7 @@ class SubcontractorControllerSpec extends SpecBase {
       (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
     }
 
-    "returns 500 when no contractor enrolment and no agent enrolment found" in new Setup {
+    "returns 200 with subcontractor list when no enrolments are present" in new Setup {
 
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
         .thenReturn(None)
@@ -328,11 +328,14 @@ class SubcontractorControllerSpec extends SpecBase {
       when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
         .thenReturn(None)
 
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn(Json.toJson(sampleSubcontractorListResponse).toString)
+
       val req: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, getSubcontractorListUrl)
       val res: Future[Result]                      = controller.getSubcontractorList(getListCisId)(req)
 
-      status(res) mustBe INTERNAL_SERVER_ERROR
-      (contentAsJson(res) \ "message").as[String] mustBe "Missing enrolments"
+      status(res) mustBe OK
+      contentAsJson(res) mustBe Json.toJson(sampleSubcontractorListResponse)
     }
   }
 
@@ -449,7 +452,7 @@ class SubcontractorControllerSpec extends SpecBase {
       (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
     }
 
-    "returns 500 when no contractor enrolment and no agent enrolment found" in new Setup {
+    "returns 200 with subcontractor response when no enrolments are present" in new Setup {
 
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
         .thenReturn(None)
@@ -457,13 +460,15 @@ class SubcontractorControllerSpec extends SpecBase {
       when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
         .thenReturn(None)
 
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn(Json.toJson(sampleGetSubcontractorResponse).toString)
+
       val res =
         controller.getSubcontractor("individual-123", getSubcontractorSubbieResourceRef)(
           FakeRequest(GET, getSubcontractorUrl)
         )
 
-      status(res) mustBe INTERNAL_SERVER_ERROR
-      (contentAsJson(res) \ "message").as[String] mustBe "Missing enrolments"
+      status(res) mustBe OK
     }
   }
 

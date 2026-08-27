@@ -38,9 +38,15 @@ class InternalAuthAction @Inject() (
     request.headers.get("Authorization") match {
       case Some(token) if token == expectedToken =>
         block(
-          AuthenticatedRequest(request, "internal-service", "internal-service", SessionId("internal"), Enrolments(Set.empty))
+          AuthenticatedRequest(
+            request,
+            "internal-service",
+            "internal-service",
+            SessionId("internal"),
+            Enrolments(Set.empty)
+          )
         )
-      case _ =>
+      case _                                     =>
         Future.successful(Results.Unauthorized)
     }
 }

@@ -23,10 +23,10 @@ import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.Authen
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-/** Routes requests to InternalAuthAction when the Authorization header matches the configured
-  * internal-auth token; otherwise falls through to the standard GG session DefaultAuthAction.
-  * This lets formpProxy endpoints accept service-to-service calls (which CIS makes with an
-  * internal-auth token) while rds-datacache-proxy endpoints continue to use user session auth.
+/** Routes requests to InternalAuthAction when the Authorization header matches the configured internal-auth token;
+  * otherwise falls through to the standard GG session DefaultAuthAction. This lets formpProxy endpoints accept
+  * service-to-service calls (which CIS makes with an internal-auth token) while rds-datacache-proxy endpoints continue
+  * to use user session auth.
   */
 class CompositeAuthAction @Inject() (
   defaultAuth: DefaultAuthAction,

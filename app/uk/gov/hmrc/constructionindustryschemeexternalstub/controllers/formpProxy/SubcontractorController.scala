@@ -21,8 +21,8 @@ import play.api.libs.json.{JsError, JsValue, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.EmployerReference
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{CreateAndUpdateSubcontractorRequest, DeleteSubcontractorRequest}
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.response.GetSubcontractorForDeleteResponse
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests._
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.response._
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -167,5 +167,61 @@ class SubcontractorController @Inject() (
   def deleteSubcontractor: Action[DeleteSubcontractorRequest] =
     authorise.async(parse.json[DeleteSubcontractorRequest]) { _ =>
       Future.successful(NoContent)
+    }
+
+  def updateSubcontractor: Action[JsValue] =
+    authorise(parse.json) { implicit request =>
+      request.body
+        .validate[UpdateSubcontractorRequest]
+        .fold(
+          errs =>
+            BadRequest(
+              Json.obj(
+                "message" -> "Invalid payload",
+                "errors"  -> JsError.toJson(errs)
+              )
+            ),
+          body => {
+            val contractorRefOpt: Option[EmployerReference] =
+              enrolmentHelper.contractorEnrolmentsOpt(request)
+
+            val agentRefOpt: Option[String] =
+              enrolmentHelper.agentEnrolmentsOpt(request)
+
+            (contractorRefOpt, agentRefOpt) match {
+
+              case (Some(employerRef), _) =>
+                employerRef.taxOfficeNumber match {
+                  case "500" =>
+                    InternalServerError(Json.obj("message" -> "Unexpected error"))
+
+                  case "502" =>
+                    BadGateway(Json.obj("message" -> "formp failed"))
+
+                  case _ =>
+                    Ok(
+                      Json.toJson(
+                        UpdateSubcontractorResponse(
+                          version = body.subcontractor.version.getOrElse(0) + 1
+                        )
+                      )
+                    )
+                }
+
+              case (None, Some(_)) =>
+                Ok(
+                  Json.toJson(
+                    UpdateSubcontractorResponse(
+                      version = body.subcontractor.version.getOrElse(0) + 1
+                    )
+                  )
+                )
+
+              case (None, None) =>
+                logger.warn("[SubcontractorController][updateSubcontractor] Missing contractor and agent enrolments")
+                InternalServerError(Json.obj("message" -> "Missing enrolments"))
+            }
+          }
+        )
     }
 }

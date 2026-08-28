@@ -20,7 +20,6 @@ import play.api.Logging
 import play.api.libs.json.{JsError, JsValue, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.response.DeleteVerificationResponse
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.*
@@ -218,11 +217,8 @@ class VerificationController @Inject() (
           _ =>
             withEnrolmentDispatch(
               Ok(
-                Json.toJson(
-                  Json
-                    .parse(resourceHelper.resourceAsString(deleteVerification_200_ResponsePath))
-                    .as[DeleteVerificationResponse]
-                )
+                Json
+                  .parse(resourceHelper.resourceAsString(deleteVerification_200_ResponsePath))
               )
             )
         )

@@ -2468,7 +2468,7 @@ To trigger the happy path, ensure you provide a valid request body:
 
 ### Delete verification
 
-**Endpoint**: `POST /verification/delete`
+**Endpoint**: `POST /cis/verification/delete`
 
 **Description**: Deletes a verification record for the provided verification resource reference.
 

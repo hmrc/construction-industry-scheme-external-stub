@@ -33,6 +33,7 @@ GET        /cis/subcontractors/:cisId                               uk.gov.hmrc.
 GET        /cis/subcontractor/:cisId/:subbieResourceRef/delete-status   uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubcontractorController.getSubcontractorForDelete(cisId: String, subbieResourceRef: Long)
 GET        /cis/subcontractor/:cisId/:subbieResourceRef             uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubcontractorController.getSubcontractor(cisId: String, subbieResourceRef: Long)
 POST       /cis/subcontractor/delete                                uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubcontractorController.deleteSubcontractor
+POST        /cis/subcontractor/update                               uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubcontractorController.updateSubcontractor
 
 POST       /cis/monthly-return-item/update                          uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.updateMonthlyReturnItem()
 GET        /cis/verification-batch/newest/:instanceId               uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.VerificationController.getNewestVerificationBatch(instanceId: String)
@@ -40,6 +41,8 @@ GET        /cis/verification-batch/last/:instanceId                 uk.gov.hmrc.
 GET        /cis/verification-batch/current/:instanceId              uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.VerificationController.getCurrentVerificationBatch(instanceId: String)
 POST       /cis/verification-batch/create                           uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.VerificationController.createVerificationBatchAndVerifications()
 POST       /cis/verification-batch/modify                           uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.VerificationController.modifyVerifications()
+POST       /cis/verification/proceed-with-insufficient-data         uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.VerificationController.proceedInsufficientVerification()
+
 POST       /verification/delete                                     uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.VerificationController.deleteVerification()
 POST       /cis/verification/submission/create                      uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.VerificationController.createSubmissionAndUpdateVerifications()
 POST       /cis/verification/submission/update                      uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.VerificationController.updateVerificationSubmission()

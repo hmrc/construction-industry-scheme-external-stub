@@ -2610,6 +2610,40 @@ Optional fields: `govtalkErrorCode`, `govtalkErrorType`, `govtalkErrorMessage`.
 - Response status: `204`
 - Response body: _empty_
 
+**Endpoint**: `POST /cis/verification/proceed-with-insufficient-data  `
+
+**Description**: Proceed Verification with insufficient data.
+
+#### Happy Path
+
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: Any valid value
+
+or
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: Any valid value
+- Identifier Name: TaxOfficeReference
+- Identifier Value: Any valid value
+
+To trigger the happy path, ensure you provide a valid request body:
+```json
+{
+  "instanceId": "1",
+  "verificationBatchResourceRef": 9,
+  "verificationResourceRef": 10,
+  "proceed": "Y"
+}
+```
+- Enrolments: request must have either HMRC-CIS-ORG or IR-PAYE-AGENT Enrolment
+
+- Response status: `204`
+- Response body: N/A
+
 ### Process verification response from ChRIS
 
 **Endpoint**: `POST /cis/verification/response/process`
@@ -3889,3 +3923,52 @@ To trigger the happy path, ensure you provide a valid request body:
 ### License
 
 This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html").
+
+**Endpoint**: `POST /cis/subcontractor/update`
+
+**Description**: Updates an existing subcontractor and returns the updated subcontractor version.
+
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: Any valid value
+
+or
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: Any valid value
+- Identifier Name: TaxOfficeReference
+- Identifier Value: Any valid value
+
+#### Happy Path
+
+To trigger the happy path, ensure you provide a valid request body:
+
+```json
+{
+  "cisId": "abc-123",
+  "subcontractor": {
+    "subcontractorId": 999,
+    "subbieResourceRef": 10,
+    "utr": "1234567890",
+    "firstName": "John",
+    "secondName": "James",
+    "surname": "Smith",
+    "nino": "AA123456A",
+    "tradingName": "Smith Trading",
+    "subcontractorType": "soletrader",
+    "addressLine1": "No 32",
+    "addressLine2": "Street 1",
+    "addressLine3": "Main Place",
+    "addressLine4": "London",
+    "postcode": "ABC 123",
+    "country": "GB",
+    "emailAddress": "test@test.com",
+    "phoneNumber": "07446677888",
+    "mobilePhoneNumber": "07123456789",
+    "worksReferenceNumber": "1234567-AB",
+    "version": 1
+  }
+}

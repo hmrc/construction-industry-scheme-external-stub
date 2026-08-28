@@ -2584,7 +2584,7 @@ To trigger the happy path, ensure you provide a valid request body:
   "instanceId": "1",
   "verificationBatchResourceRef": 9,
   "verificationResourceRef": 10,
-  "proceed": "Y",
+  "proceed": true,
   "taxTreatment": "NotKnown"
 }
 ```

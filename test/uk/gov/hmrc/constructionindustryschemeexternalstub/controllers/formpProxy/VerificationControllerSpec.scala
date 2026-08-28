@@ -1765,7 +1765,7 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
           instanceId = "1",
           verificationBatchResourceRef = 9L,
           verificationResourceRef = 10L,
-          proceed = "Y",
+          proceed = true,
           taxTreatment = Some("NotKnown")
         )
       )

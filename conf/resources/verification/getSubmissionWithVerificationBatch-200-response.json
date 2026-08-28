@@ -39,7 +39,7 @@
  "verificationBatch": {
   "verificationBatchId": 10910,
   "schemeId": 123,
-  "verificationsCounter": 1,
+  "verificationsCounter": 2,
   "verificationBatchResourceRef": 5,
   "proceedSession": "Y",
   "confirmArrangement": "Y",
@@ -58,6 +58,14 @@
       "verificationResourceRef": 13,
       "actionIndicator": "VERIFY",
       "proceed": "Y"
+    },
+    {
+      "verificationId": 1002,
+      "verificationBatchId": 10910,
+      "subcontractorId": 10909,
+      "verificationResourceRef": 20,
+      "actionIndicator": "VERIFY",
+      "proceed": "Y"
     }
   ],
   "subcontractors": [
@@ -70,6 +78,17 @@
       "subbieResourceRef": 13,
       "utr": "8786438047",
       "nino": "AB623456C",
+      "subcontractorType": "SoleTrader"
+    },
+    {
+      "subcontractorId": 10909,
+      "firstName": "John",
+      "secondName": null,
+      "surname": "Smith",
+      "tradingName": "ACME",
+      "subbieResourceRef": 20,
+      "utr": "1111111111",
+      "nino": "AA123456A",
       "subcontractorType": "SoleTrader"
     }
   ]

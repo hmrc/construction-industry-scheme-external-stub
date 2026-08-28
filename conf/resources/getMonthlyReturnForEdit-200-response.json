@@ -29,7 +29,7 @@
       "decInformationCorrect": "Y",
       "decNoMoreSubPayments": "Y",
       "decNilReturnNoPayments": "N",
-      "status": "STARTED",
+      "status": "SUBMITTED",
       "lastUpdate": "2026-01-01T23:24:56",
       "amendment": "N"
     }

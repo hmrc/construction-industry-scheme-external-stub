@@ -22,6 +22,7 @@ import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.base.SpecBase
+import uk.gov.hmrc.constructionindustryschemeexternalstub.config.AppConfig
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.ResourceHelper
 
@@ -130,6 +131,46 @@ class GovTalkControllerSpec extends SpecBase {
 
       status(result) mustBe NOT_FOUND
       verifyNoInteractions(mockResourceHelper)
+    }
+
+    "replaces the polling URL host using the configured callback for a verification response" in new Setup {
+      val responseTemplate =
+        okResponse(
+          formResultId = "90001",
+          gatewayUrl = "[pollingUrlHost]submission/ChRIS/poll/IR-CIS-VERIFY/0?final=SUBMITTED"
+        )
+
+      when(mockAppConfig.callback)
+        .thenReturn("https://staging-external-stub.example/")
+
+      when(
+        mockResourceHelper.resourceAsString(
+          verificationResponsePath
+        )
+      ).thenReturn(responseTemplate.toString)
+
+      val request: FakeRequest[JsValue] =
+        makeJsonRequest(
+          validRequestBody("90001"),
+          s"$getGovTalkStatusUrl?stage=polling"
+        )
+
+      val result: Future[Result] =
+        controller.getGovTalkStatus()(request)
+
+      status(result) mustBe OK
+
+      val gatewayUrl =
+        (contentAsJson(result) \\ "gatewayURL").head
+          .as[String]
+
+      gatewayUrl mustBe
+        "https://staging-external-stub.example/submission/ChRIS/poll/IR-CIS-VERIFY/0?final=SUBMITTED"
+
+      verify(mockResourceHelper)
+        .resourceAsString(verificationResponsePath)
+
+      verify(mockAppConfig).callback
     }
 
     "returns 404 when stage is missing" in new Setup {
@@ -517,10 +558,18 @@ class GovTalkControllerSpec extends SpecBase {
   }
 
   private trait Setup {
-    val mockResourceHelper: ResourceHelper = mock[ResourceHelper]
+    val mockAppConfig: AppConfig =
+      mock[AppConfig]
+
+    val mockResourceHelper: ResourceHelper =
+      mock[ResourceHelper]
+
+    when(mockAppConfig.callback)
+      .thenReturn("http://localhost:6997/")
 
     lazy val controller =
       new GovTalkController(
+        appConfig = mockAppConfig,
         resourceHelper = mockResourceHelper,
         cc = cc
       )

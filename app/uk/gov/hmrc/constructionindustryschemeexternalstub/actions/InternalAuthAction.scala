@@ -18,7 +18,7 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub.actions
 
 import play.api.Configuration
 import play.api.mvc.*
-import uk.gov.hmrc.auth.core.Enrolments
+import uk.gov.hmrc.auth.core.{Enrolment, EnrolmentIdentifier, Enrolments}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.AuthenticatedRequest
 import uk.gov.hmrc.http.SessionId
 
@@ -43,10 +43,29 @@ class InternalAuthAction @Inject() (
             "internal-service",
             "internal-service",
             SessionId("internal"),
-            Enrolments(Set.empty)
+            enrolmentsFromHeaders(request)
           )
         )
       case _                                     =>
         Future.successful(Results.Unauthorized)
+    }
+
+  private def enrolmentsFromHeaders[A](request: Request[A]): Enrolments =
+    (request.headers.get("X-Tax-Office-Number"), request.headers.get("X-Tax-Office-Reference")) match {
+      case (Some(taxOfficeNumber), Some(taxOfficeReference)) =>
+        Enrolments(
+          Set(
+            Enrolment(
+              "HMRC-CIS-ORG",
+              Seq(
+                EnrolmentIdentifier("TaxOfficeNumber", taxOfficeNumber),
+                EnrolmentIdentifier("TaxOfficeReference", taxOfficeReference)
+              ),
+              "Activated"
+            )
+          )
+        )
+      case _                                                 =>
+        Enrolments(Set.empty)
     }
 }

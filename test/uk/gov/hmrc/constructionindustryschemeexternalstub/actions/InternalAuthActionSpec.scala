@@ -24,6 +24,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.{BodyParsers, Results}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
+import uk.gov.hmrc.auth.core.Enrolments
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -82,6 +83,46 @@ class InternalAuthActionSpec extends AnyWordSpec with Matchers with BeforeAndAft
 
       status(result) mustBe OK
       capturedCredentialId mustBe "internal-service"
+    }
+
+    "build HMRC-CIS-ORG enrolments from X-Tax-Office-Number and X-Tax-Office-Reference headers" in {
+      var capturedEnrolments: Enrolments = Enrolments(Set.empty)
+      val request                        = FakeRequest().withHeaders(
+        "Authorization"          -> token,
+        "X-Tax-Office-Number"    -> "754",
+        "X-Tax-Office-Reference" -> "EZ10350"
+      )
+
+      val result = action.invokeBlock(
+        request,
+        req => {
+          capturedEnrolments = req.enrolments
+          Future.successful(Results.Ok("ok"))
+        }
+      )
+
+      status(result) mustBe OK
+
+      val cisEnrolment = capturedEnrolments.getEnrolment("HMRC-CIS-ORG")
+      cisEnrolment mustBe defined
+      cisEnrolment.flatMap(_.getIdentifier("TaxOfficeNumber")).map(_.value) mustBe Some("754")
+      cisEnrolment.flatMap(_.getIdentifier("TaxOfficeReference")).map(_.value) mustBe Some("EZ10350")
+    }
+
+    "produce empty enrolments when enrolment headers are absent" in {
+      var capturedEnrolments: Enrolments = Enrolments(Set(null))
+      val request                        = FakeRequest().withHeaders("Authorization" -> token)
+
+      val result = action.invokeBlock(
+        request,
+        req => {
+          capturedEnrolments = req.enrolments
+          Future.successful(Results.Ok("ok"))
+        }
+      )
+
+      status(result) mustBe OK
+      capturedEnrolments.enrolments mustBe empty
     }
   }
 }

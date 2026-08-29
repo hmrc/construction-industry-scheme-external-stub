@@ -343,6 +343,41 @@ To trigger the happy path, ensure you provide a valid request body:
 }
 ```
 
+**Endpoint**: `POST /cis/enqueue-message `
+
+**Description**: Enqueue message executes enqueue message header and enqueue clob
+
+#### Happy Path
+
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: 123456
+
+- Request body:
+```json
+{
+    "sender": "Portal",
+    "queueName": "AGTAUTH",
+    "replyQueue": "",
+    "correlationID": "",
+    "filter": "RemoveClient",
+    "payload": {
+      "IRAgentID": "123456789",
+      "Service": "CIS",
+      "TaxReference": "123/ABC123"
+    }
+}
+```
+
+- Response status: `200`
+- Response body:
+```json
+{
+  "messageIDOut": 1
+}
+```
+
 ### FormP Proxy
 
 **Endpoint**: `POST /monthly-returns `

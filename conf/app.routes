@@ -60,6 +60,8 @@ GET        /cis/has-client                                          uk.gov.hmrc.
 POST       /cis/prepop-contractor                                   uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.rdsDataCacheProxy.PrepopController.getSchemePrepopByKnownFacts
 POST       /cis/prepop-subcontractor                                uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.rdsDataCacheProxy.PrepopController.getSubcontractorPrepopByKnownFacts
 
+POST       /cis/enqueue-message                                      uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.rdsDataCacheProxy.UdasQueueController.enqueueMessage()
+
 # stubbed client-exchange-proxy routes
 GET        /:serviceId/:credentialId/:agentId/clientlist            uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.clientExchangeProxy.ClientlistController.updateClientList(serviceId, credentialId, agentId)
 

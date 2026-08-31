@@ -34,6 +34,7 @@ GET        /cis/subcontractor/:cisId/:subbieResourceRef/delete-status   uk.gov.h
 GET        /cis/subcontractor/:cisId/:subbieResourceRef             uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubcontractorController.getSubcontractor(cisId: String, subbieResourceRef: Long)
 POST       /cis/subcontractor/delete                                uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubcontractorController.deleteSubcontractor
 POST        /cis/subcontractor/update                               uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubcontractorController.updateSubcontractor
+POST        /cis/subcontractor/edit                                 uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubcontractorController.updateSubcontractorForEdit
 
 POST       /cis/monthly-return-item/update                          uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.updateMonthlyReturnItem()
 GET        /cis/verification-batch/newest/:instanceId               uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.VerificationController.getNewestVerificationBatch(instanceId: String)

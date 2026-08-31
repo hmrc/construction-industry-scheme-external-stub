@@ -224,4 +224,77 @@ class SubcontractorController @Inject() (
           }
         )
     }
+
+  def updateSubcontractorForEdit: Action[JsValue] =
+    authorise(parse.json) { implicit request =>
+      request.body
+        .validate[UpdateSubcontractorRequest]
+        .fold(
+          errs =>
+            BadRequest(
+              Json.obj(
+                "message" -> "Invalid payload",
+                "errors"  -> JsError.toJson(errs)
+              )
+            ),
+          body => {
+
+            val contractorRefOpt: Option[EmployerReference] =
+              enrolmentHelper.contractorEnrolmentsOpt(request)
+
+            val agentRefOpt: Option[String] =
+              enrolmentHelper.agentEnrolmentsOpt(request)
+
+            (contractorRefOpt, agentRefOpt) match {
+
+              case (Some(employerRef), _) =>
+                employerRef.taxOfficeNumber match {
+
+                  case "500" =>
+                    InternalServerError(
+                      Json.obj(
+                        "message" -> "Unexpected error"
+                      )
+                    )
+
+                  case "502" =>
+                    BadGateway(
+                      Json.obj(
+                        "message" -> "formp failed"
+                      )
+                    )
+
+                  case _ =>
+                    Ok(
+                      Json.toJson(
+                        UpdateSubcontractorResponse(
+                          version = body.subcontractor.version.getOrElse(0) + 1
+                        )
+                      )
+                    )
+                }
+
+              case (None, Some(_)) =>
+                Ok(
+                  Json.toJson(
+                    UpdateSubcontractorResponse(
+                      version = body.subcontractor.version.getOrElse(0) + 1
+                    )
+                  )
+                )
+
+              case (None, None) =>
+                logger.warn(
+                  "[SubcontractorController][updateSubcontractorForEdit] Missing contractor and agent enrolments"
+                )
+
+                InternalServerError(
+                  Json.obj(
+                    "message" -> "Missing enrolments"
+                  )
+                )
+            }
+          }
+        )
+    }
 }

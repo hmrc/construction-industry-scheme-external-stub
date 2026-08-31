@@ -198,38 +198,6 @@
       "createDate": "2026-06-15T10:00:00",
       "verified": null,
       "lastMonthlyReturnDate": "2026-05-15T10:05:00"
-    },
-    {
-      "subcontractorId": 13013,
-      "subbieResourceRef": 13,
-      "utr": null,
-      "firstName": null,
-      "secondName": null,
-      "surname": null,
-      "tradingName": null,
-      "subcontractorType": "soletrader",
-      "emailAddress": "subcontractor@example.com",
-      "version": 3,
-      "taxTreatment": null,
-      "createDate": "2026-06-15T10:00:00",
-      "verified": null,
-      "lastMonthlyReturnDate": "2026-05-15T10:05:00"
-    },
-    {
-      "subcontractorId": 14014,
-      "subbieResourceRef": 14,
-      "utr": null,
-      "firstName": null,
-      "secondName": "Paul",
-      "surname": null,
-      "tradingName": null,
-      "subcontractorType": "soletrader",
-      "emailAddress": "subcontractor@example.com",
-      "version": 3,
-      "taxTreatment": null,
-      "createDate": "2026-06-15T10:00:00",
-      "verified": null,
-      "lastMonthlyReturnDate": "2026-05-15T10:05:00"
     }
   ]
 }

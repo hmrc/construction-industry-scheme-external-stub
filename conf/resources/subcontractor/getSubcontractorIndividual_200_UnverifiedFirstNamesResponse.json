@@ -1,0 +1,60 @@
+{
+  "scheme": {
+    "schemeId": 10800,
+    "instanceId": "800",
+    "accountsOfficeReference": "125PA12345000",
+    "taxOfficeNumber": "754",
+    "taxOfficeReference": "EZ10800",
+    "utr": "1234657895",
+    "name": "Test Scheme",
+    "emailAddress": "test@test",
+    "displayWelcomePage": "N",
+    "prePopCount": 3,
+    "prePopSuccessful": "N",
+    "subcontractorCounter": 8,
+    "verificationBatchCounter": 0,
+    "lastUpdate": "2026-08-05T10:23:56Z",
+    "version": 3
+  },
+  "subcontractor": {
+    "subcontractorId": 11011,
+    "subbieResourceRef": 11,
+    "utr": null,
+    "pageVisited": 1,
+    "firstName": "Ann",
+    "nino": "AA123456A",
+    "secondName": null,
+    "surname": null,
+    "tradingName": "Green Ltd",
+    "subcontractorType": "soletrader",
+    "addressLine1": "1 Main Street",
+    "addressLine2": "Flat 2",
+    "addressLine3": "London",
+    "country": "GB",
+    "postcode": "AA1 1AA",
+    "emailAddress": "subcontractor@example.com",
+    "phoneNumber": "01234567890",
+    "mobilePhoneNumber": "07123456789",
+    "worksReferenceNumber": "WR-123",
+    "version": 3,
+    "taxTreatment": "NET",
+    "updatedTaxTreatment": "NET",
+    "verificationNumber": "V123456",
+    "createDate": "2026-06-15T10:00:00",
+    "lastUpdate": "2026-06-15T10:05:00",
+    "matched": null,
+    "verified": null,
+    "autoVerified": null,
+    "verificationDate": null,
+    "lastMonthlyReturnDate": "2026-05-15T10:05:00",
+    "pendingVerifications": 0
+  },
+  "otherInfo": [
+    {
+      "utr": "1111111111"
+    },
+    {
+      "utr": "2222222222"
+    }
+  ]
+}

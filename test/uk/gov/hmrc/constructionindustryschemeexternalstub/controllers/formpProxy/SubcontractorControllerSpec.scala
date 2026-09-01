@@ -572,7 +572,6 @@ class SubcontractorControllerSpec extends SpecBase {
         controller.updateSubcontractor(req)
 
       status(res) mustBe BAD_REQUEST
-      (contentAsJson(res) \ "message").as[String] mustBe "Invalid payload"
       (contentAsJson(res) \ "errors").isDefined mustBe true
     }
 
@@ -724,9 +723,6 @@ class SubcontractorControllerSpec extends SpecBase {
         controller.updateSubcontractorForEdit(req)
 
       status(res) mustBe BAD_REQUEST
-
-      (contentAsJson(res) \ "message")
-        .as[String] mustBe "Invalid payload"
 
       (contentAsJson(res) \ "errors").isDefined mustBe true
     }

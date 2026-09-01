@@ -173,6 +173,46 @@ class GovTalkControllerSpec extends SpecBase {
       verify(mockAppConfig).callback
     }
 
+    "replaces the polling URL host using the configured callback for a monthly-return response" in new Setup {
+      val responseTemplate =
+        okResponse(
+          formResultId = "90002",
+          gatewayUrl = "[pollingUrlHost]submission/ChRIS/poll/IR-CIS-CIS300MR/0?final=SUBMITTED"
+        )
+
+      when(mockAppConfig.callback)
+        .thenReturn("https://staging-external-stub.example/")
+
+      when(
+        mockResourceHelper.resourceAsString(
+          monthlyReturnResponsePath
+        )
+      ).thenReturn(responseTemplate.toString)
+
+      val request: FakeRequest[JsValue] =
+        makeJsonRequest(
+          validRequestBody("90002"),
+          s"$getGovTalkStatusUrl?stage=polling"
+        )
+
+      val result: Future[Result] =
+        controller.getGovTalkStatus()(request)
+
+      status(result) mustBe OK
+
+      val gatewayUrl =
+        (contentAsJson(result) \\ "gatewayURL").head
+          .as[String]
+
+      gatewayUrl mustBe
+        "https://staging-external-stub.example/submission/ChRIS/poll/IR-CIS-CIS300MR/0?final=SUBMITTED"
+
+      verify(mockResourceHelper)
+        .resourceAsString(monthlyReturnResponsePath)
+
+      verify(mockAppConfig).callback
+    }
+
     "returns 404 when stage is missing" in new Setup {
       val request: FakeRequest[JsValue] =
         makeJsonRequest(

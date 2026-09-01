@@ -52,6 +52,8 @@ class MonthlyReturnController @Inject() (
     "/resources/retrieveSubmittedMonthlyReturns-200-response.json"
   private val getMonthlyReturnForEdit_200_ResponsePath              =
     "/resources/getMonthlyReturnForEdit-200-response.json"
+  private val getMonthlyReturnForEdit_batchPolling_200_ResponsePath =
+    "/resources/getMonthlyReturnForEdit-batch-polling-200-response.json"
   private val getMonthlyReturnForEdit_nosubmission_200_ResponsePath =
     "/resources/getMonthlyReturnForEdit-nosubmission-200-response.json"
   private val getMonthlyReturnForEdit_nil_200_ResponsePath          =
@@ -188,9 +190,25 @@ class MonthlyReturnController @Inject() (
         .validate[GetMonthlyReturnForEditRequest]
         .foldErrorsIntoBadRequest { req =>
           val fixturePath =
-            if (req.taxMonth == 3) getMonthlyReturnForEdit_nosubmission_200_ResponsePath
-//            else if (req.taxMonth == 4) getMonthlyReturnForEdit_nil_200_ResponsePath    TODO: pls uncomment to enable no subcontractors scenario testing
-            else getMonthlyReturnForEdit_200_ResponsePath
+            (
+              req.instanceId,
+              req.taxYear,
+              req.taxMonth,
+              req.isAmendment
+            ) match {
+              case ("10001", 2025, 6, Some(false)) =>
+                getMonthlyReturnForEdit_batchPolling_200_ResponsePath
+
+              case (_, _, 3, _) =>
+                getMonthlyReturnForEdit_nosubmission_200_ResponsePath
+
+              // TODO: Re-enable when the nil-return scenario is required.
+              // case (_, _, 4, _) =>
+              //   getMonthlyReturnForEdit_nil_200_ResponsePath
+
+              case _ =>
+                getMonthlyReturnForEdit_200_ResponsePath
+            }
           Future.successful(Ok(resourceHelper.resourceAsString(fixturePath)))
         }
     }

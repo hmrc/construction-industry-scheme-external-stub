@@ -52,7 +52,7 @@ class SubmissionController @Inject() (
                   case _          => createSubmissionSuccessResponse
                 }
               case (_, Some(_))                  => createSubmissionSuccessResponse
-              case (None, None)                  => InternalServerError
+              case (None, None)                  => createSubmissionSuccessResponse
             }
         )
     }

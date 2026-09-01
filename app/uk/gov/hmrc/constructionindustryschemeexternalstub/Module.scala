@@ -18,7 +18,7 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub
 
 import play.api.{Configuration, Environment}
 import play.api.inject.{Binding, Module as AppModule}
-import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.{AuthAction, DefaultAuthAction}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.{AuthAction, CompositeAuthAction}
 
 class Module extends AppModule:
 
@@ -27,5 +27,5 @@ class Module extends AppModule:
     configuration: Configuration
   ): Seq[Binding[_]] =
     List(
-      bind[AuthAction].to(classOf[DefaultAuthAction])
+      bind[AuthAction].to(classOf[CompositeAuthAction])
     )

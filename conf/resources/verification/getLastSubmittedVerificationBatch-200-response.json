@@ -55,7 +55,7 @@
       "verificationNumber": "V0000000002",
       "taxTreatment": "unmatched",
       "subcontractorName": "ABC Construction",
-      "actionIndicator": "match"
+      "actionIndicator": "verify"
     },
     {
       "verificationId": 1003,

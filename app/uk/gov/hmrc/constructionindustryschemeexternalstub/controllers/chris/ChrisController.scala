@@ -186,7 +186,7 @@ class ChrisController @Inject() (
         "DEPARTMENTAL_ERROR_3000" -> submitCISVerifyMessage_departmentalError_3000_ResponsePath,
         "IRMARK_MISMATCH_ERROR"   -> submitCISVerifyMessage_irMarkMismatchError_ResponsePath
       ),
-      defaultResponsePath = submitCISVerifyMessage_success_ResponsePath
+      defaultResponsePath = submitCISVerifyMessage_businessError_ResponsePath
     )
   }
 

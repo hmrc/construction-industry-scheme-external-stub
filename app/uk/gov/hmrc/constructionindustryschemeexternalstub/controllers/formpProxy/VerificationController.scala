@@ -60,6 +60,8 @@ class VerificationController @Inject() (
     s"$verificationResponsePath/getCurrentVerificationBatch-200-verificationBatchStatus-chris-response.json"
   private val getCurrentVerificationBatch_200_verificationBatchStatus_Insufficient_chris_ResponsePath =
     s"$verificationResponsePath/getCurrentVerificationBatch-200-verificationBatchStatus-chris-response-insufficient.json"
+  private val getLastSubmittedVerificationBatch_200_AllVerified_ResponsePath                          =
+    s"$verificationResponsePath/getLastSubmittedVerificationBatch-200-allVerified-response.json"
   private val getLastSubmittedVerificationBatch_200_ResponsePath                                      =
     s"$verificationResponsePath/getLastSubmittedVerificationBatch-200-response.json"
   private val getLastSubmittedVerificationBatch_200_verificationBatchStatus_accepted_ResponsePath     =
@@ -119,6 +121,7 @@ class VerificationController @Inject() (
       withEnrolmentDispatch {
         val responsePath =
           instanceId match {
+            case "125" => getLastSubmittedVerificationBatch_200_AllVerified_ResponsePath
             case "150" => getLastSubmittedVerificationBatch_200_verificationBatchStatus_pending_ResponsePath
             case "175" => getLastSubmittedVerificationBatch_200_verificationBatchStatus_accepted_ResponsePath
             case "225" => getLastSubmittedVerificationBatch_200_verificationBatchStatus_none_ResponsePath

@@ -18,12 +18,13 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests
 
 import play.api.libs.json.{Json, OFormat}
 
-case class ProceedInsufficientVerificationRequest(
+case class ProceedVerificationRequest(
   instanceId: String,
   verificationBatchResourceRef: Long,
   verificationResourceRef: Long,
-  proceed: String
+  proceed: Boolean,
+  taxTreatment: Option[String]
 )
-object ProceedInsufficientVerificationRequest {
-  given format: OFormat[ProceedInsufficientVerificationRequest] = Json.format
+object ProceedVerificationRequest {
+  given format: OFormat[ProceedVerificationRequest] = Json.format
 }

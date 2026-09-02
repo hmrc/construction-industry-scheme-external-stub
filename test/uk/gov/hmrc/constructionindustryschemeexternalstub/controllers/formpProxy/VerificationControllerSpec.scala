@@ -1768,26 +1768,72 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
     }
   }
 
-  ".proceedInsufficientVerification" - {
+  ".proceedVerification" - {
 
-    val postUrl = "/cis/verification/proceed-with-insufficient-data"
+    val postUrl = "/cis/verification/proceed"
 
     val validJson: JsValue =
       Json.toJson(
-        ProceedInsufficientVerificationRequest(
+        ProceedVerificationRequest(
           instanceId = "1",
           verificationBatchResourceRef = 9L,
           verificationResourceRef = 10L,
-          proceed = "Y"
+          proceed = true,
+          taxTreatment = Some("NotKnown")
         )
       )
 
-    "returns 200 on valid payload" in new Setup {
+    "returns 204 on valid payload with taxTreatment = NotKnown" in new Setup {
       val req: FakeRequest[JsValue] = FakeRequest(POST, postUrl)
         .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
         .withBody(validJson)
 
-      val res: Future[Result] = controller.proceedInsufficientVerification()(req)
+      val res: Future[Result] = controller.proceedVerification()(req)
+
+      status(res) mustBe NO_CONTENT
+      contentAsString(res) mustBe ""
+    }
+
+    "returns 204 on valid payload without taxTreatment" in new Setup {
+
+      val validJsonWithoutTaxTreatment: JsValue =
+        Json.toJson(
+          ProceedVerificationRequest(
+            instanceId = "1",
+            verificationBatchResourceRef = 9L,
+            verificationResourceRef = 10L,
+            proceed = true,
+            taxTreatment = None
+          )
+        )
+
+      val req: FakeRequest[JsValue] = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(validJsonWithoutTaxTreatment)
+
+      val res: Future[Result] = controller.proceedVerification()(req)
+
+      status(res) mustBe NO_CONTENT
+      contentAsString(res) mustBe ""
+    }
+
+    "returns 204 on valid payload with proceed = false" in new Setup {
+      val validJsonWithFalseProceed: JsValue =
+        Json.toJson(
+          ProceedVerificationRequest(
+            instanceId = "1",
+            verificationBatchResourceRef = 9L,
+            verificationResourceRef = 10L,
+            proceed = false,
+            taxTreatment = Some("NotKnown")
+          )
+        )
+
+      val req: FakeRequest[JsValue] = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(validJsonWithFalseProceed)
+
+      val res: Future[Result] = controller.proceedVerification()(req)
 
       status(res) mustBe NO_CONTENT
       contentAsString(res) mustBe ""
@@ -1800,7 +1846,7 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
         .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
         .withBody(invalidJson)
 
-      val res: Future[Result] = controller.proceedInsufficientVerification()(req)
+      val res: Future[Result] = controller.proceedVerification()(req)
 
       status(res) mustBe BAD_REQUEST
       (contentAsJson(res) \ "message").as[String] mustBe "Invalid payload"

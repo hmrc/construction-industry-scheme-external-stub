@@ -48,7 +48,6 @@
       "taxTreatment": "net",
       "verified": "Y",
       "verificationNumber": "V1000000007",
-      "taxTreatment": "net",
       "verificationDate": "2026-02-24T00:00:00",
       "lastMonthlyReturnDate": "2026-02-24T00:00:00",
       "version": 1
@@ -171,7 +170,7 @@
       "subcontractorId": 11011,
       "subbieResourceRef": 11,
       "utr": null,
-      "firstName": "Anna",
+      "firstName": "Ann",
       "secondName": null,
       "surname": null,
       "tradingName": "Green Ltd",

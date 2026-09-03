@@ -59,17 +59,17 @@ class SubcontractorController @Inject() (
   private val getSubcontractorPartnership_200_UnverifiedResponsePath           =
     s"$subcontractorResponsePath/getSubcontractorPartnership-200-unverifiedResponse.json"
   private val getSubcontractorIndividual_200_UnverifiedNameResponsePath        =
-    s"$subcontractorResponsePath/getSubcontractorIndividual_200_UnverifiedNameResponse.json"
+    s"$subcontractorResponsePath/getSubcontractorIndividual_200_unverifiedNameResponse.json"
   private val getSubcontractorIndividual_200_UnverifiedBothNamesResponsePath   =
-    s"$subcontractorResponsePath/getSubcontractorIndividual_200_UnverifiedBothNamesResponse.json"
+    s"$subcontractorResponsePath/getSubcontractorIndividual_200_unverifiedBothNamesResponse.json"
   private val getSubcontractorIndividual_200_UnverifiedFirstNamesResponsePath  =
-    s"$subcontractorResponsePath/getSubcontractorIndividual_200_UnverifiedFirstNamesResponse.json"
+    s"$subcontractorResponsePath/getSubcontractorIndividual_200_unverifiedFirstNamesResponse.json"
   private val getSubcontractorIndividual_200_UnverifiedLastNamesResponsePath   =
-    s"$subcontractorResponsePath/getSubcontractorIndividual_200_UnverifiedLastNamesResponse.json"
+    s"$subcontractorResponsePath/getSubcontractorIndividual_200_unverifiedLastNamesResponse.json"
   private val getSubcontractorIndividual_200_UnverifiedNoNamesResponsePath     =
-    s"$subcontractorResponsePath/getSubcontractorIndividual_200_UnverifiedNoNamesResponse.json"
+    s"$subcontractorResponsePath/getSubcontractorIndividual_200_unverifiedNoNamesResponse.json"
   private val getSubcontractorIndividual_200_UnverifiedMiddleNamesResponsePath =
-    s"$subcontractorResponsePath/getSubcontractorIndividual_200_UnverifiedMiddleNamesResponse.json"
+    s"$subcontractorResponsePath/getSubcontractorIndividual_200_unverifiedMiddleNamesResponse.json"
 
   def createAndUpdateSubcontractor(): Action[JsValue] =
     authorise(parse.json) { implicit request =>

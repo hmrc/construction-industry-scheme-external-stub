@@ -92,7 +92,7 @@ class MonthlyReturnController @Inject() (
                       case _        => Ok(resourceHelper.resourceAsString(retrieveMonthlyReturns_200_ResponsePath))
                     }
 
-                  case None => InternalServerError(Json.obj("message" -> "Missing enrolment"))
+                  case None => Ok(resourceHelper.resourceAsString(retrieveMonthlyReturns_200_ResponsePath))
                 }
             }
           }
@@ -113,7 +113,7 @@ class MonthlyReturnController @Inject() (
             case _          => Created(resourceHelper.resourceAsString(createNilMonthlyReturn_200_ResponsePath))
           }
         case (_, Some(_))                  => Created(resourceHelper.resourceAsString(createNilMonthlyReturn_200_ResponsePath))
-        case (None, None)                  => InternalServerError
+        case (None, None)                  => Created(resourceHelper.resourceAsString(createNilMonthlyReturn_200_ResponsePath))
       }
     }
 
@@ -160,7 +160,7 @@ class MonthlyReturnController @Inject() (
             case ("000", _) => Ok(resourceHelper.resourceAsString(getSchemeEmail_null_200_ResponsePath))
             case _          => Ok(resourceHelper.resourceAsString(getSchemeEmail_200_ResponsePath))
           }
-        case None                     => InternalServerError
+        case None                     => Ok(resourceHelper.resourceAsString(getSchemeEmail_200_ResponsePath))
       }
     }
 

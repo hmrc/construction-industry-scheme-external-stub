@@ -101,8 +101,7 @@ class SubcontractorController @Inject() (
           Ok(resourceHelper.resourceAsString(getSubcontractorList_200_ResponsePath))
 
         case (None, None) =>
-          logger.warn("[SubcontractorController][getSubcontractorList] Missing contractor and agent enrolments")
-          InternalServerError(Json.obj("message" -> "Missing enrolments"))
+          Ok(resourceHelper.resourceAsString(getSubcontractorList_200_ResponsePath))
       }
 
     }
@@ -177,8 +176,7 @@ class SubcontractorController @Inject() (
           Ok(Json.parse(resourceHelper.resourceAsString(responsePath)))
 
         case _ =>
-          logger.warn("[SubcontractorController][getSubcontractor] Missing contractor and agent enrolments")
-          InternalServerError(Json.obj("message" -> "Missing enrolments"))
+          Ok(Json.parse(resourceHelper.resourceAsString(responsePath)))
       }
     }
 

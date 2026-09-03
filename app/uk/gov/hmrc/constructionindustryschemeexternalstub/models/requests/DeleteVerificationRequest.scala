@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.constructionindustryschemeexternalstub
+package uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests
 
-import play.api.{Configuration, Environment}
-import play.api.inject.{Binding, Module as AppModule}
-import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.{AuthAction, CompositeAuthAction}
+import play.api.libs.json.{Json, OFormat}
 
-class Module extends AppModule:
+case class DeleteVerificationRequest(
+  instanceId: String,
+  verificationResourceRef: Long
+)
 
-  override def bindings(
-    environment: Environment,
-    configuration: Configuration
-  ): Seq[Binding[_]] =
-    List(
-      bind[AuthAction].to(classOf[CompositeAuthAction])
-    )
+object DeleteVerificationRequest {
+  given OFormat[DeleteVerificationRequest] =
+    Json.format[DeleteVerificationRequest]
+}

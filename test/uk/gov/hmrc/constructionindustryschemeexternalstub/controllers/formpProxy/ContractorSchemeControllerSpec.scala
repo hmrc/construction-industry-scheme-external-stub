@@ -67,9 +67,15 @@ class ContractorSchemeControllerSpec extends AnyWordSpec with Matchers with Mock
         .resourceAsString(eqTo("/resources/contractorSchemes/getScheme-200-sub1-response.json"))
     }
 
-    "return 500 when enrolments are missing" in {
+    "return 200 with default JSON when no enrolments are present" in {
       val mockResourceHelper   = mock[ResourceHelper]
       val mockEnrolmentsHelper = mock[EnrolmentsHelper]
+
+      when(
+        mockResourceHelper.resourceAsString(
+          eqTo("/resources/contractorSchemes/getScheme-200-sub1-response.json")
+        )
+      ).thenReturn("""{ "schemeId": 1000 }""")
 
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
         .thenReturn(None)
@@ -87,10 +93,11 @@ class ContractorSchemeControllerSpec extends AnyWordSpec with Matchers with Mock
 
       val result = controller.getScheme("any")(FakeRequest(GET, "/formp-proxy/scheme/any"))
 
-      status(result) mustBe INTERNAL_SERVER_ERROR
-      (contentAsJson(result) \ "message").as[String] mustBe "Missing enrolments"
+      status(result) mustBe OK
+      (contentAsJson(result) \ "schemeId").as[Int] mustBe 1000
 
-      verify(mockResourceHelper, never()).resourceAsString(any[String])
+      verify(mockResourceHelper)
+        .resourceAsString(eqTo("/resources/contractorSchemes/getScheme-200-sub1-response.json"))
     }
   }
 

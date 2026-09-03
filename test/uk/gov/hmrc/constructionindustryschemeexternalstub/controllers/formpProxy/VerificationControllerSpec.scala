@@ -1708,7 +1708,7 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
   ".deleteVerification" - {
 
     val postUrl =
-      "/verification/delete"
+      "/cis/verification/delete"
 
     val responsePath =
       "/resources/verification/deleteVerification-200-response.json"
@@ -1827,11 +1827,13 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
       verifyNoInteractions(mockResourceHelper)
     }
 
-    "returns 500 InternalServerError when no contractor enrolment and no agent enrolment found" in new Setup {
+    "returns 200 OK with JSON body when no contractor enrolment is found" in new Setup {
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
         .thenReturn(None)
       when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
         .thenReturn(None)
+      when(mockResourceHelper.resourceAsString(responsePath))
+        .thenReturn(responseJson.toString())
 
       val request =
         FakeRequest(POST, postUrl)
@@ -1841,9 +1843,11 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
       val result: Future[Result] =
         controller.deleteVerification()(request)
 
-      status(result) mustBe INTERNAL_SERVER_ERROR
+      status(result) mustBe OK
+      contentType(result) mustBe Some(JSON)
+      contentAsJson(result) mustBe responseJson
 
-      verifyNoInteractions(mockResourceHelper)
+      verify(mockResourceHelper).resourceAsString(responsePath)
     }
   }
 

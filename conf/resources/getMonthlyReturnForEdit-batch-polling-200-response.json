@@ -440,6 +440,7 @@
       "worksReferenceNumber": "123",
       "createDate": "2026-01-05T10:23:56",
       "lastUpdate": "2026-01-05T10:23:56",
+      "schemeId": 10100,
       "subbieResourceRef": 11,
       "matched": "Y",
       "autoVerified": "Y",
@@ -463,7 +464,7 @@
       "unmatchedTaxRateIndicator": "Y",
       "subcontractorId": 31275,
       "subcontractorName": "Blake Smith",
-      "verificationNumber": "V1000000001",
+      "verificationNumber": "V1000000007",
       "itemResourceReference": 2
     }
   ],

@@ -196,7 +196,7 @@ class MonthlyReturnController @Inject() (
               req.taxMonth,
               req.isAmendment
             ) match {
-              case ("10001", 2025, 6, Some(false)) =>
+              case ("10001", 2025, 6, isAmendment) if !isAmendment.contains(true) =>
                 getMonthlyReturnForEdit_batchPolling_200_ResponsePath
 
               case (_, _, 3, _) =>

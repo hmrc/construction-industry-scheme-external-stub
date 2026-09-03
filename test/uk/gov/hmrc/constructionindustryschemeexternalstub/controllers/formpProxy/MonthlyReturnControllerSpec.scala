@@ -534,6 +534,83 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
       status(res) mustBe BAD_REQUEST
       (contentAsJson(res) \ "message").as[String] mustBe "Invalid JSON body"
     }
+
+    "returns the batch-polling fixture when isAmendment is omitted" in new Setup {
+      val response =
+        Json.obj(
+          "monthlyReturn" -> Json.arr(
+            Json.obj(
+              "taxYear"  -> 2025,
+              "taxMonth" -> 6,
+              "status"   -> "SUBMITTED"
+            )
+          )
+        )
+
+      when(
+        mockResourceHelper.resourceAsString(
+          "/resources/getMonthlyReturnForEdit-batch-polling-200-response.json"
+        )
+      ).thenReturn(response.toString)
+
+      val req: FakeRequest[JsValue] =
+        FakeRequest(POST, "/formp-proxy/cis/monthly-return-edit")
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(
+            Json.obj(
+              "instanceId" -> "10001",
+              "taxYear"    -> 2025,
+              "taxMonth"   -> 6
+            )
+          )
+
+      val result: Future[Result] =
+        controller.getMonthlyReturnForEdit(req)
+
+      status(result) mustBe OK
+      contentAsJson(result) mustBe response
+
+      verify(mockResourceHelper).resourceAsString(
+        "/resources/getMonthlyReturnForEdit-batch-polling-200-response.json"
+      )
+    }
+
+    "returns the normal fixture when isAmendment is true" in new Setup {
+      val response =
+        Json.obj(
+          "monthlyReturn" -> Json.arr(
+            Json.obj("status" -> "STARTED")
+          )
+        )
+
+      when(
+        mockResourceHelper.resourceAsString(
+          "/resources/getMonthlyReturnForEdit-200-response.json"
+        )
+      ).thenReturn(response.toString)
+
+      val req: FakeRequest[JsValue] =
+        FakeRequest(POST, "/formp-proxy/cis/monthly-return-edit")
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(
+            Json.obj(
+              "instanceId"  -> "10001",
+              "taxYear"     -> 2025,
+              "taxMonth"    -> 6,
+              "isAmendment" -> true
+            )
+          )
+
+      val result: Future[Result] =
+        controller.getMonthlyReturnForEdit(req)
+
+      status(result) mustBe OK
+      contentAsJson(result) mustBe response
+
+      verify(mockResourceHelper).resourceAsString(
+        "/resources/getMonthlyReturnForEdit-200-response.json"
+      )
+    }
   }
 
   "MonthlyReturnController getMonthlyReturnComplete" - {

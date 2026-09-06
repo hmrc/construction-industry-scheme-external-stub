@@ -18,11 +18,12 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProx
 
 import play.api.Logging
 import play.api.libs.json.{JsError, JsValue, Json}
-import play.api.mvc.{Action, AnyContent, ControllerComponents}
+import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.EmployerReference
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests._
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.response._
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.*
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.response.*
+import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.JsResultUtils.foldErrorsIntoBadRequest
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -168,58 +169,84 @@ class SubcontractorController @Inject() (
     }
 
   def updateSubcontractor: Action[JsValue] =
-    authorise(parse.json) { implicit request =>
+    authorise.async(parse.json) { implicit request =>
       request.body
         .validate[UpdateSubcontractorRequest]
-        .fold(
-          errs =>
-            BadRequest(
-              Json.obj(
-                "message" -> "Invalid payload",
-                "errors"  -> JsError.toJson(errs)
+        .foldErrorsIntoBadRequest { body =>
+          handleUpdateSubcontractor(
+            body,
+            "updateSubcontractor"
+          )
+        }
+    }
+
+  def updateSubcontractorForEdit: Action[JsValue] =
+    authorise.async(parse.json) { implicit request =>
+      request.body
+        .validate[UpdateSubcontractorRequest]
+        .foldErrorsIntoBadRequest { body =>
+          handleUpdateSubcontractor(
+            body,
+            "updateSubcontractorForEdit"
+          )
+        }
+    }
+
+  private def handleUpdateSubcontractor(
+    body: UpdateSubcontractorRequest,
+    actionName: String
+  )(implicit request: AuthenticatedRequest[_]): Future[Result] = {
+
+    val contractorRefOpt =
+      enrolmentHelper.contractorEnrolmentsOpt(request)
+
+    val agentRefOpt =
+      enrolmentHelper.agentEnrolmentsOpt(request)
+
+    Future.successful {
+      (contractorRefOpt, agentRefOpt) match {
+
+        case (Some(employerRef), _) =>
+          employerRef.taxOfficeNumber match {
+
+            case "500" =>
+              InternalServerError(
+                Json.obj("message" -> "Unexpected error")
               )
-            ),
-          body => {
-            val contractorRefOpt: Option[EmployerReference] =
-              enrolmentHelper.contractorEnrolmentsOpt(request)
 
-            val agentRefOpt: Option[String] =
-              enrolmentHelper.agentEnrolmentsOpt(request)
+            case "502" =>
+              BadGateway(
+                Json.obj("message" -> "formp failed")
+              )
 
-            (contractorRefOpt, agentRefOpt) match {
-
-              case (Some(employerRef), _) =>
-                employerRef.taxOfficeNumber match {
-                  case "500" =>
-                    InternalServerError(Json.obj("message" -> "Unexpected error"))
-
-                  case "502" =>
-                    BadGateway(Json.obj("message" -> "formp failed"))
-
-                  case _ =>
-                    Ok(
-                      Json.toJson(
-                        UpdateSubcontractorResponse(
-                          version = body.subcontractor.version.getOrElse(0) + 1
-                        )
-                      )
-                    )
-                }
-
-              case (None, Some(_)) =>
-                Ok(
-                  Json.toJson(
-                    UpdateSubcontractorResponse(
-                      version = body.subcontractor.version.getOrElse(0) + 1
-                    )
+            case _ =>
+              Ok(
+                Json.toJson(
+                  UpdateSubcontractorResponse(
+                    version = body.subcontractor.version.getOrElse(0) + 1
                   )
                 )
-
-              case (None, None) =>
-                logger.warn("[SubcontractorController][updateSubcontractor] Missing contractor and agent enrolments")
-                InternalServerError(Json.obj("message" -> "Missing enrolments"))
-            }
+              )
           }
-        )
+
+        case (None, Some(_)) =>
+          Ok(
+            Json.toJson(
+              UpdateSubcontractorResponse(
+                version = body.subcontractor.version.getOrElse(0) + 1
+              )
+            )
+          )
+
+        case (None, None) =>
+          logger.warn(
+            s"[SubcontractorController][$actionName] Missing contractor and agent enrolments"
+          )
+
+          InternalServerError(
+            Json.obj("message" -> "Missing enrolments")
+          )
+      }
     }
+  }
 }

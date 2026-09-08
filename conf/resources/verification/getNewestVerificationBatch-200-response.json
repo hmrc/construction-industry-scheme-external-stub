@@ -268,7 +268,7 @@
   ],
   "verificationBatch": {
     "verificationBatchId": 99,
-    "status": "SUBMITTED",
+    "status": "VALIDATED",
     "verificationNumber": "VB00000001"
   },
   "verifications": [
@@ -281,39 +281,7 @@
       "subcontractorId": 1,
       "actionIndicator": "VERIFY",
       "proceed": "Y",
-      "verificationResourceRef": 10
-    },{
-      "verificationId": 1002,
-      "matched": "Y",
-      "verificationNumber": "V0000000002",
-      "taxTreatment": "0",
-      "verificationBatchId": 99,
-      "subcontractorId": 1,
-      "actionIndicator": "VERIFY",
-      "proceed": "Y",
-      "verificationResourceRef": 10
-    },
-    {
-      "verificationId": 1003,
-      "matched": "Y",
-      "verificationNumber": "V0000000003",
-      "taxTreatment": "0",
-      "verificationBatchId": 99,
-      "subcontractorId": 2,
-      "actionIndicator": "MATCH",
-      "proceed": "Y",
-      "verificationResourceRef": 11
-    },
-    {
-      "verificationId": 1004,
-      "matched": "Y",
-      "verificationNumber": "V0000000004",
-      "taxTreatment": "0",
-      "verificationBatchId": 99,
-      "subcontractorId": 3,
-      "actionIndicator": "MATCH",
-      "proceed": "Y",
-      "verificationResourceRef": 12
+      "verificationResourceRef": 43
     },
     {
       "verificationId": 1005,
@@ -324,84 +292,7 @@
       "subcontractorId": 10908,
       "actionIndicator": "MATCH",
       "proceed": "Y",
-      "verificationResourceRef": 13
-    },
-    {
-      "verificationId": 1006,
-      "matched": "Y",
-      "verificationNumber": "V0000000006",
-      "taxTreatment": "0",
-      "verificationBatchId": 99,
-      "subcontractorId": 5,
-      "actionIndicator": "MATCH",
-      "proceed": "Y",
-      "verificationResourceRef": 14
-    },
-    {
-      "verificationId": 1007,
-      "matched": "Y",
-      "verificationNumber": "V0000000007",
-      "taxTreatment": "0",
-      "verificationBatchId": 99,
-      "subcontractorId": 6,
-      "actionIndicator": "VERIFY",
-      "proceed": "Y",
-      "verificationResourceRef": 15
-    },
-    {
-      "verificationId": 1008,
-      "matched": "Y",
-      "verificationNumber": "V0000000008",
-      "taxTreatment": "0",
-      "verificationBatchId": 99,
-      "subcontractorId": 7,
-      "actionIndicator": "VERIFY",
-      "proceed": "Y",
-      "verificationResourceRef": 16
-    },
-    {
-      "verificationId": 1009,
-      "matched": "Y",
-      "verificationNumber": "V0000000009",
-      "taxTreatment": "0",
-      "verificationBatchId": 99,
-      "subcontractorId": 9999,
-      "actionIndicator": "VERIFY",
-      "proceed": "Y",
-      "verificationResourceRef": 9999
-    },
-    {
-      "verificationId": 1010,
-      "matched": "Y",
-      "verificationNumber": "V0000000010",
-      "taxTreatment": "0",
-      "verificationBatchId": 99,
-      "subcontractorId": null,
-      "actionIndicator": "VERIFY",
-      "proceed": "Y",
-      "verificationResourceRef": null
-    },
-    {
-      "verificationId": 1011,
-      "matched": "Y",
-      "verificationNumber": "V0000000011",
-      "taxTreatment": "0",
-      "verificationBatchId": 99,
-      "subcontractorId": 8,
-      "actionIndicator": "MATCH",
-      "proceed": "N",
-      "verificationResourceRef": 17
-    },
-    {
-      "verificationId": 1012,
-      "matched": "Y",
-      "verificationNumber": "V0000000012",
-      "taxTreatment": "0",
-      "verificationBatchId": 99,
-      "subcontractorId": 9,
-      "actionIndicator": "VERIFY",
-      "proceed": "Y",
-      "verificationResourceRef": 18
+      "verificationResourceRef": 53
     }
   ],
   "submission": {

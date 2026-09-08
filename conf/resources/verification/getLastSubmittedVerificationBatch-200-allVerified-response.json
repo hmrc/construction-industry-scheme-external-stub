@@ -21,20 +21,26 @@
     {
       "subcontractorId": 3,
       "subbieResourceRef": 12,
-      "subcontractorType": "partnership",
+      "subcontractorType": "trust",
       "utr": "3333333333"
     },
     {
       "subcontractorId": 4,
       "subbieResourceRef": 13,
-      "subcontractorType": "trust",
-      "utr": null
+      "subcontractorType": "company",
+      "utr": "8458583934"
+    },
+    {
+      "subcontractorId": 5,
+      "subbieResourceRef": 14,
+      "subcontractorType": "partnership",
+      "utr": "8653576940"
     }
   ],
   "verificationBatch": {
     "verificationBatchId": 99,
     "verifBatchResourceRef": 1234567,
-    "status": "STARTED"
+    "status": "SUBMITTED"
   },
   "verifications": [
     {
@@ -51,37 +57,47 @@
       "verificationId": 1002,
       "verificationBatchId": 99,
       "verificationResourceRef": 12346,
-      "matched": "N",
+      "matched": "Y",
       "verificationNumber": "V0000000002",
       "taxTreatment": "unmatched",
       "subcontractorName": "ABC Construction",
-      "actionIndicator": "verify"
+      "actionIndicator": "match"
     },
     {
       "verificationId": 1003,
       "verificationBatchId": 99,
       "verificationResourceRef": 12347,
-      "matched": null,
-      "verificationNumber": null,
-      "taxTreatment": null,
-      "subcontractorName": "XYZ Traders",
+      "matched": "Y",
+      "verificationNumber": "V0000000003",
+      "taxTreatment": "unmatched",
+      "subcontractorName": "SMA Traders",
       "actionIndicator": "verify"
     },
     {
       "verificationId": 1004,
       "verificationBatchId": 99,
       "verificationResourceRef": 12347,
-      "matched": null,
-      "verificationNumber": null,
-      "taxTreatment": null,
-      "subcontractorName": "XYZ Traders",
+      "matched": "Y",
+      "verificationNumber": "V0000000004",
+      "taxTreatment": "net",
+      "subcontractorName": "XYZ Blacksmiths",
+      "actionIndicator": "verify"
+    },
+    {
+      "verificationId": 1005,
+      "verificationBatchId": 99,
+      "verificationResourceRef": 12347,
+      "matched": "Y",
+      "verificationNumber": "V0000000005",
+      "taxTreatment": "gross",
+      "subcontractorName": "Fair Partnership",
       "actionIndicator": "verify"
     }
   ],
   "submission": {
     "submissionId": 1234,
     "activeObjectId": 98765,
-    "status": "ACCEPTED",
+    "status": "SUBMITTED",
     "submissionRequestDate": "2026-08-11T11:50:00"
   }
 }

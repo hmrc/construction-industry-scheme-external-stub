@@ -2466,6 +2466,58 @@ To trigger the happy path, ensure you provide a valid request body:
 - Response status: `204`
 - Response body: _empty_
 
+### Delete verification
+
+**Endpoint**: `POST /cis/verification/delete`
+
+**Description**: Deletes a verification record for the provided verification resource reference.
+
+#### Happy Path (Organisation)
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 200
+- Identifier Name: TaxOfficeReference
+- Identifier Value: Any
+
+#### Happy Path (Agent)
+
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: Any
+
+#### Unhappy Paths (Organisation)
+
+- TaxOfficeNumber = `500` → Response status: `500`
+```json
+{ "message": "Unexpected error" }
+```
+- TaxOfficeNumber = `502` → Response status: `502`
+```json
+{ "message": "formp failed" }
+```
+
+#### Request body
+
+```json
+{
+  "instanceId": "abc-123",
+  "verificationResourceRef": 111
+}
+```
+
+#### Response body
+
+```json
+{
+  "verificationsCounter": 1
+}
+```
+
+- Response status: `200`
+- Response body: `resources/verification/deleteVerification-200-response.json`
 
 ### Create submission for verification
 

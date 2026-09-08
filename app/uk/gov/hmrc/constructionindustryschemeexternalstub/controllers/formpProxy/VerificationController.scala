@@ -60,6 +60,8 @@ class VerificationController @Inject() (
     s"$verificationResponsePath/getCurrentVerificationBatch-200-verificationBatchStatus-chris-response.json"
   private val getCurrentVerificationBatch_200_verificationBatchStatus_Insufficient_chris_ResponsePath =
     s"$verificationResponsePath/getCurrentVerificationBatch-200-verificationBatchStatus-chris-response-insufficient.json"
+  private val getLastSubmittedVerificationBatch_200_AllVerified_ResponsePath                          =
+    s"$verificationResponsePath/getLastSubmittedVerificationBatch-200-allVerified-response.json"
   private val getLastSubmittedVerificationBatch_200_ResponsePath                                      =
     s"$verificationResponsePath/getLastSubmittedVerificationBatch-200-response.json"
   private val getLastSubmittedVerificationBatch_200_verificationBatchStatus_accepted_ResponsePath     =
@@ -80,6 +82,8 @@ class VerificationController @Inject() (
     s"$verificationResponsePath/getSubmittedVerifications-200-multiTaxYears-response.json"
   private val getSubmittedVerifications_200_noHistory_ResponsePath                                    =
     s"$verificationResponsePath/getSubmittedVerifications-200-noHistory-response.json"
+  private val deleteVerification_200_ResponsePath                                                     =
+    s"$verificationResponsePath/deleteVerification-200-response.json"
 
   private def withEnrolmentDispatch(onSuccess: => Result)(implicit request: AuthenticatedRequest[_]): Result =
     enrolmentHelper.contractorEnrolmentsOpt(request) match {
@@ -90,10 +94,7 @@ class VerificationController @Inject() (
           case _     => onSuccess
         }
       case None                     =>
-        enrolmentHelper.agentEnrolmentsOpt(request) match {
-          case Some(_) => onSuccess
-          case None    => InternalServerError
-        }
+        onSuccess
     }
 
   def getNewestVerificationBatch(instanceId: String): Action[AnyContent] =
@@ -122,6 +123,7 @@ class VerificationController @Inject() (
       withEnrolmentDispatch {
         val responsePath =
           instanceId match {
+            case "125" => getLastSubmittedVerificationBatch_200_AllVerified_ResponsePath
             case "150" => getLastSubmittedVerificationBatch_200_verificationBatchStatus_pending_ResponsePath
             case "175" => getLastSubmittedVerificationBatch_200_verificationBatchStatus_accepted_ResponsePath
             case "225" => getLastSubmittedVerificationBatch_200_verificationBatchStatus_none_ResponsePath
@@ -205,6 +207,22 @@ class VerificationController @Inject() (
 
   private def hasNoSubcontractorToModify(request: ModifyVerificationsRequest): Boolean =
     request.deleteVerifications.isEmpty && request.createVerifications.isEmpty
+
+  def deleteVerification(): Action[JsValue] =
+    authorise(parse.json) { implicit request =>
+      request.body
+        .validate[DeleteVerificationRequest]
+        .fold(
+          errs => BadRequest(Json.obj("message" -> "Invalid payload", "errors" -> JsError.toJson(errs))),
+          _ =>
+            withEnrolmentDispatch(
+              Ok(
+                Json
+                  .parse(resourceHelper.resourceAsString(deleteVerification_200_ResponsePath))
+              )
+            )
+        )
+    }
 
   def createSubmissionAndUpdateVerifications(): Action[JsValue] =
     authorise(parse.json) { implicit request =>
@@ -296,17 +314,11 @@ class VerificationController @Inject() (
                 }
 
               case None =>
-                enrolmentHelper.agentEnrolmentsOpt(request) match {
-                  case Some(_) =>
-                    Ok(
-                      Json.parse(
-                        resourceHelper.resourceAsString(getSubmittedVerifications_200_ResponsePath)
-                      )
-                    )
-
-                  case None =>
-                    InternalServerError
-                }
+                Ok(
+                  Json.parse(
+                    resourceHelper.resourceAsString(getSubmittedVerifications_200_ResponsePath)
+                  )
+                )
             }
         )
     }

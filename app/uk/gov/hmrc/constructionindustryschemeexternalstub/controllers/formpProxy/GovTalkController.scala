@@ -81,10 +81,10 @@ class GovTalkController @Inject() (
       case Some("polling") =>
         submissionId match {
           case "90001" =>
-            Ok(verificationGovTalkStatusResponse)
+            Ok(govTalkStatusResponse(getGovTalkStatus200_verification_ResponsePath))
 
           case "90002" =>
-            Ok(Json.parse(resourceHelper.resourceAsString(getGovTalkStatus200_monthlyReturn_ResponsePath)))
+            Ok(govTalkStatusResponse(getGovTalkStatus200_monthlyReturn_ResponsePath))
           case _       =>
             Ok(Json.parse(resourceHelper.resourceAsString(getGovTalkStatus200ResponsePath)))
         }
@@ -107,12 +107,10 @@ class GovTalkController @Inject() (
         defaultResult
     }
 
-  private def verificationGovTalkStatusResponse: JsValue =
+  private def govTalkStatusResponse(responsePath: String): JsValue =
     Json.parse(
       resourceHelper
-        .resourceAsString(
-          getGovTalkStatus200_verification_ResponsePath
-        )
+        .resourceAsString(responsePath)
         .replace(
           "[pollingUrlHost]",
           appConfig.callback

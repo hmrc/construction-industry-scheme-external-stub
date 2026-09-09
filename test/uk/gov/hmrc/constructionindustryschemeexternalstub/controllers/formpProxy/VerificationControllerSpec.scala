@@ -1572,13 +1572,34 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
       (body \ "submission" \ "submissionId")
         .as[Long] mustBe 90001L
 
-      (body \ "verifications")
-        .as[Seq[JsValue]]
-        .size mustBe 1
+      (body \ "verificationBatch" \ "verificationsCounter")
+        .as[Int] mustBe 2
 
-      (body \ "subcontractors")
-        .as[Seq[JsValue]]
-        .size mustBe 1
+      val verifications =
+        (body \ "verifications").as[Seq[JsValue]]
+
+      verifications.map { verification =>
+        (verification \ "verificationId").as[Long]
+      } mustBe Seq(1001L, 1002L)
+
+      verifications.map { verification =>
+        (verification \ "subcontractorId").as[Long]
+      } mustBe Seq(10908L, 10909L)
+
+      verifications.map { verification =>
+        (verification \ "verificationResourceRef").as[Long]
+      } mustBe Seq(13L, 20L)
+
+      val subcontractors =
+        (body \ "subcontractors").as[Seq[JsValue]]
+
+      subcontractors.map { subcontractor =>
+        (subcontractor \ "subcontractorId").as[Long]
+      } mustBe Seq(10908L, 10909L)
+
+      subcontractors.map { subcontractor =>
+        (subcontractor \ "subbieResourceRef").as[Long]
+      } mustBe Seq(13L, 20L)
     }
   }
 

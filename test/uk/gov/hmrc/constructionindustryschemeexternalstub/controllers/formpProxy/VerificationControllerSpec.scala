@@ -19,7 +19,7 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProx
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.*
 import org.scalatest.freespec.AnyFreeSpec
-import play.api.libs.json.{JsNull, JsValue, Json}
+import play.api.libs.json.{JsNull, JsObject, JsValue, Json}
 import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -214,16 +214,18 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
       (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
     }
 
-    "returns 500 InternalServerError when no contractor enrolment and no agent enrolment found" in new Setup {
+    "returns 200 OK when no enrolments are present" in new Setup {
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
         .thenReturn(None)
       when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
         .thenReturn(None)
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn(Json.obj().toString())
 
       val req: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, url)
       val res: Future[Result]                      = controller.getNewestVerificationBatch(instanceId)(req)
 
-      status(res) mustBe INTERNAL_SERVER_ERROR
+      status(res) mustBe OK
     }
 
     ".getCurrentVerificationBatch" - {
@@ -469,16 +471,18 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
         (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
       }
 
-      "returns 500 InternalServerError when no contractor enrolment and no agent enrolment found" in new Setup {
+      "returns 200 OK when no enrolments are present" in new Setup {
         when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
           .thenReturn(None)
         when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
           .thenReturn(None)
+        when(mockResourceHelper.resourceAsString(any()))
+          .thenReturn(Json.obj().toString())
 
         val req: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, url)
         val res: Future[Result]                      = controller.getCurrentVerificationBatch(instanceId)(req)
 
-        status(res) mustBe INTERNAL_SERVER_ERROR
+        status(res) mustBe OK
       }
     }
 
@@ -563,16 +567,18 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
       contentAsJson(res) mustBe responseJson
     }
 
-    "returns 500 InternalServerError when no contractor enrolment and no agent enrolment found" in new Setup {
+    "returns 200 OK when no enrolments are present" in new Setup {
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
         .thenReturn(None)
       when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
         .thenReturn(None)
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn(Json.obj().toString())
 
       val req: FakeRequest[AnyContentAsEmpty.type] = FakeRequest(GET, url)
       val res: Future[Result]                      = controller.getLastSubmittedVerificationBatch(instanceId)(req)
 
-      status(res) mustBe INTERNAL_SERVER_ERROR
+      status(res) mustBe OK
     }
 
   }
@@ -669,11 +675,13 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
       (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
     }
 
-    "returns 500 InternalServerError when no contractor enrolment and no agent enrolment found" in new Setup {
+    "returns 201 Created when no enrolments are present" in new Setup {
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
         .thenReturn(None)
       when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
         .thenReturn(None)
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn(Json.obj("verifBatchResourceRef" -> 10).toString())
 
       val req = FakeRequest(POST, postUrl)
         .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
@@ -681,7 +689,7 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
 
       val res: Future[Result] = controller.createVerificationBatchAndVerifications()(req)
 
-      status(res) mustBe INTERNAL_SERVER_ERROR
+      status(res) mustBe CREATED
     }
   }
 
@@ -968,7 +976,7 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
       (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
     }
 
-    "returns 500 InternalServerError when no contractor enrolment and no agent enrolment found" in new Setup {
+    "returns 204 NoContent when no enrolments are present" in new Setup {
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
         .thenReturn(None)
       when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
@@ -980,7 +988,7 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
 
       val res: Future[Result] = controller.modifyVerifications()(req)
 
-      status(res) mustBe INTERNAL_SERVER_ERROR
+      status(res) mustBe NO_CONTENT
     }
 
     "returns 500 InternalServerError when only instanceId is present (contractor enrolment)" in new Setup {
@@ -1297,11 +1305,13 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
       (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
     }
 
-    "returns 500 InternalServerError when no contractor enrolment and no agent enrolment found" in new Setup {
+    "returns 201 Created when no enrolments are present" in new Setup {
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
         .thenReturn(None)
       when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
         .thenReturn(None)
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn(Json.obj("submissionId" -> 555).toString())
 
       val req = FakeRequest(POST, postUrl)
         .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
@@ -1309,7 +1319,7 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
 
       val res: Future[Result] = controller.createSubmissionAndUpdateVerifications()(req)
 
-      status(res) mustBe INTERNAL_SERVER_ERROR
+      status(res) mustBe CREATED
     }
   }
 
@@ -1562,13 +1572,34 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
       (body \ "submission" \ "submissionId")
         .as[Long] mustBe 90001L
 
-      (body \ "verifications")
-        .as[Seq[JsValue]]
-        .size mustBe 1
+      (body \ "verificationBatch" \ "verificationsCounter")
+        .as[Int] mustBe 2
 
-      (body \ "subcontractors")
-        .as[Seq[JsValue]]
-        .size mustBe 1
+      val verifications =
+        (body \ "verifications").as[Seq[JsValue]]
+
+      verifications.map { verification =>
+        (verification \ "verificationId").as[Long]
+      } mustBe Seq(1001L, 1002L)
+
+      verifications.map { verification =>
+        (verification \ "subcontractorId").as[Long]
+      } mustBe Seq(10908L, 10909L)
+
+      verifications.map { verification =>
+        (verification \ "verificationResourceRef").as[Long]
+      } mustBe Seq(13L, 20L)
+
+      val subcontractors =
+        (body \ "subcontractors").as[Seq[JsValue]]
+
+      subcontractors.map { subcontractor =>
+        (subcontractor \ "subcontractorId").as[Long]
+      } mustBe Seq(10908L, 10909L)
+
+      subcontractors.map { subcontractor =>
+        (subcontractor \ "subbieResourceRef").as[Long]
+      } mustBe Seq(13L, 20L)
     }
   }
 
@@ -1676,11 +1707,13 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
       (contentAsJson(res) \ "message").as[String] mustBe "Unexpected error"
     }
 
-    "returns 500 InternalServerError when neither contractor nor agent enrolment exists" in new Setup {
+    "returns 200 OK when neither contractor nor agent enrolment exists" in new Setup {
       when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
         .thenReturn(None)
       when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
         .thenReturn(None)
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn(responseJson.toString())
 
       val req = FakeRequest(POST, postUrl)
         .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
@@ -1688,7 +1721,154 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
 
       val res: Future[Result] = controller.getSubmittedVerifications()(req)
 
-      status(res) mustBe INTERNAL_SERVER_ERROR
+      status(res) mustBe OK
+      contentAsJson(res) mustBe responseJson
+    }
+  }
+
+  ".deleteVerification" - {
+
+    val postUrl =
+      "/cis/verification/delete"
+
+    val responsePath =
+      "/resources/verification/deleteVerification-200-response.json"
+
+    val validJson: JsValue =
+      Json.toJson(
+        DeleteVerificationRequest(
+          instanceId = "10001",
+          verificationResourceRef = 5L
+        )
+      )
+
+    val responseJson: JsValue =
+      Json.obj("verificationsCounter" -> 1L)
+
+    "returns 200 OK with JSON body on success (contractor enrolment)" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("200", "")))
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
+      when(mockResourceHelper.resourceAsString(responsePath))
+        .thenReturn(responseJson.toString())
+
+      val request =
+        FakeRequest(POST, postUrl)
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(validJson)
+
+      val result: Future[Result] =
+        controller.deleteVerification()(request)
+
+      status(result) mustBe OK
+      contentType(result) mustBe Some(JSON)
+      contentAsJson(result) mustBe responseJson
+
+      verify(mockResourceHelper).resourceAsString(responsePath)
+    }
+
+    "returns 200 OK with JSON body on success (agent enrolment)" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(None)
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(Some("IRAgentReference-123"))
+      when(mockResourceHelper.resourceAsString(responsePath))
+        .thenReturn(responseJson.toString())
+
+      val request =
+        FakeRequest(POST, postUrl)
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(validJson)
+
+      val result: Future[Result] =
+        controller.deleteVerification()(request)
+
+      status(result) mustBe OK
+      contentType(result) mustBe Some(JSON)
+      contentAsJson(result) mustBe responseJson
+
+      verify(mockResourceHelper).resourceAsString(responsePath)
+    }
+
+    "returns 400 BadRequest for an invalid payload" in new Setup {
+      val request =
+        FakeRequest(POST, postUrl)
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(Json.obj("instanceId" -> "10001"))
+
+      val result: Future[Result] =
+        controller.deleteVerification()(request)
+
+      status(result) mustBe BAD_REQUEST
+      (contentAsJson(result) \ "message").as[String] mustBe "Invalid payload"
+      (contentAsJson(result) \ "errors").isDefined mustBe true
+
+      verifyNoInteractions(mockResourceHelper)
+      verifyNoInteractions(mockEnrolmentsHelper)
+    }
+
+    "returns 502 BadGateway for taxOfficeNumber = 502 (contractor enrolment)" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("502", "")))
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      val request =
+        FakeRequest(POST, postUrl)
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(validJson)
+
+      val result: Future[Result] =
+        controller.deleteVerification()(request)
+
+      status(result) mustBe BAD_GATEWAY
+      (contentAsJson(result) \ "message").as[String] must include("formp failed")
+
+      verifyNoInteractions(mockResourceHelper)
+    }
+
+    "returns 500 InternalServerError for taxOfficeNumber = 500 (contractor enrolment)" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("500", "")))
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
+
+      val request =
+        FakeRequest(POST, postUrl)
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(validJson)
+
+      val result: Future[Result] =
+        controller.deleteVerification()(request)
+
+      status(result) mustBe INTERNAL_SERVER_ERROR
+      (contentAsJson(result) \ "message").as[String] mustBe "Unexpected error"
+
+      verifyNoInteractions(mockResourceHelper)
+    }
+
+    "returns 200 OK with JSON body when no contractor enrolment is found" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(None)
+      when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+        .thenReturn(None)
+      when(mockResourceHelper.resourceAsString(responsePath))
+        .thenReturn(responseJson.toString())
+
+      val request =
+        FakeRequest(POST, postUrl)
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(validJson)
+
+      val result: Future[Result] =
+        controller.deleteVerification()(request)
+
+      status(result) mustBe OK
+      contentType(result) mustBe Some(JSON)
+      contentAsJson(result) mustBe responseJson
+
+      verify(mockResourceHelper).resourceAsString(responsePath)
     }
   }
 
@@ -1752,6 +1932,46 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
 
       verifyNoInteractions(mockResourceHelper)
       verifyNoInteractions(mockEnrolmentsHelper)
+    }
+  }
+
+  ".proceedInsufficientVerification" - {
+
+    val postUrl = "/cis/verification/proceed-with-insufficient-data"
+
+    val validJson: JsValue =
+      Json.toJson(
+        ProceedInsufficientVerificationRequest(
+          instanceId = "1",
+          verificationBatchResourceRef = 9L,
+          verificationResourceRef = 10L,
+          proceed = "Y"
+        )
+      )
+
+    "returns 200 on valid payload" in new Setup {
+      val req: FakeRequest[JsValue] = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(validJson)
+
+      val res: Future[Result] = controller.proceedInsufficientVerification()(req)
+
+      status(res) mustBe NO_CONTENT
+      contentAsString(res) mustBe ""
+    }
+
+    "returns 400 BadRequest when JSON is invalid" in new Setup {
+      val invalidJson: JsObject = Json.obj() // missing required fields
+
+      val req: FakeRequest[JsObject] = FakeRequest(POST, postUrl)
+        .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+        .withBody(invalidJson)
+
+      val res: Future[Result] = controller.proceedInsufficientVerification()(req)
+
+      status(res) mustBe BAD_REQUEST
+      (contentAsJson(res) \ "message").as[String] mustBe "Invalid payload"
+      (contentAsJson(res) \ "errors").isDefined mustBe true
     }
   }
 

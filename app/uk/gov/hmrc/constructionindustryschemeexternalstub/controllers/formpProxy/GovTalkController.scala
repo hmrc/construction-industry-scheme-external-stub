@@ -19,6 +19,7 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProx
 import play.api.Logging
 import play.api.libs.json.{JsError, JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents, Result}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.config.AppConfig
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.JsResultUtils.foldErrorsIntoBadRequest
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.ResourceHelper
@@ -28,6 +29,7 @@ import javax.inject.Inject
 import scala.concurrent.Future
 
 class GovTalkController @Inject() (
+  appConfig: AppConfig,
   resourceHelper: ResourceHelper,
   cc: ControllerComponents
 ) extends BackendController(cc)
@@ -68,16 +70,21 @@ class GovTalkController @Inject() (
         )
     }
 
-  private def govTalkStatusResult(stage: Option[String], submissionId: String): Result =
+  private def govTalkStatusResult(
+    stage: Option[String],
+    submissionId: String
+  ): Result =
     stage match {
       case Some("initial") =>
         NotFound
+
       case Some("polling") =>
         submissionId match {
           case "90001" =>
-            Ok(Json.parse(resourceHelper.resourceAsString(getGovTalkStatus200_verification_ResponsePath)))
+            Ok(govTalkStatusResponse(getGovTalkStatus200_verification_ResponsePath))
+
           case "90002" =>
-            Ok(Json.parse(resourceHelper.resourceAsString(getGovTalkStatus200_monthlyReturn_ResponsePath)))
+            Ok(govTalkStatusResponse(getGovTalkStatus200_monthlyReturn_ResponsePath))
           case _       =>
             Ok(Json.parse(resourceHelper.resourceAsString(getGovTalkStatus200ResponsePath)))
         }
@@ -99,6 +106,16 @@ class GovTalkController @Inject() (
       case _           =>
         defaultResult
     }
+
+  private def govTalkStatusResponse(responsePath: String): JsValue =
+    Json.parse(
+      resourceHelper
+        .resourceAsString(responsePath)
+        .replace(
+          "[pollingUrlHost]",
+          appConfig.callback
+        )
+    )
 
   def updateGovTalkStatusCorrelationId: Action[JsValue] =
     Action.async(parse.json) { request =>

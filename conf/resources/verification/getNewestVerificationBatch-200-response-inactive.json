@@ -278,13 +278,27 @@
       "verificationNumber": "V0000000001",
       "taxTreatment": "0",
       "verificationBatchId": 99,
-      "subcontractorId": 1
+      "subcontractorId": 1,
+      "actionIndicator": "VERIFY",
+      "proceed": "Y",
+      "verificationResourceRef": 10
+    },
+    {
+      "verificationId": 1005,
+      "matched": "Y",
+      "verificationNumber": "V0000000005",
+      "taxTreatment": "0",
+      "verificationBatchId": 99,
+      "subcontractorId": 10908,
+      "actionIndicator": "MATCH",
+      "proceed": "Y",
+      "verificationResourceRef": 13
     }
   ],
   "submission": {
       "submissionId": 555,
       "activeObjectId": 99,
-      "status": "ACCEPTED",
+      "status": "SUBMITTED",
       "submissionRequestDate": "2026-04-01T10:00:00"
     },
   "monthlyReturn": {

@@ -1,0 +1,29 @@
+<GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
+    <EnvelopeVersion>2.0</EnvelopeVersion>
+    <Header>
+        <MessageDetails>
+            <Class>IR-CIS-VERIFY</Class>
+            <Qualifier>error</Qualifier>
+            <Function>submit</Function>
+            <TransactionID></TransactionID>
+            <CorrelationID>[correlationId]</CorrelationID>
+            <ResponseEndPoint PollInterval="2"></ResponseEndPoint>
+            <Transformation>XML</Transformation>
+            <GatewayTimestamp>[gatewayTimestamp]</GatewayTimestamp>
+        </MessageDetails>
+    </Header>
+    <GovTalkDetails>
+        <Keys/>
+        <GovTalkErrors>
+            <Error>
+                <RaisedBy>Gateway</RaisedBy>
+                <Number>3999</Number>
+                <Type>business</Type>
+                <Text>Verification failed due to ChRIS business validation.</Text>
+            </Error>
+        </GovTalkErrors>
+    </GovTalkDetails>
+    <Body>
+        <ErrorResponse/>
+    </Body>
+</GovTalkMessage>

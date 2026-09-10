@@ -65,22 +65,34 @@ class ChrisController @Inject() (
   private val submitCISMessage_recoverableError_1000_ResponsePath =
     s"$monthlyNilReturnResponsePath/submitCISMessage-recoverableError-1000-response.xml"
 
-  private val verificationResponsePath                                   = "/resources/verification"
-  private val submitCISVerifyMessage_acknowledgement_ResponsePath        =
+  private val verificationResponsePath                                         = "/resources/verification"
+  private val submitCISVerifyMessage_acknowledgement_ResponsePath              =
     s"$verificationResponsePath/submitCISVerifyMessage-acknowledgement-response.xml"
-  private val submitCISVerifyMessage_fatalError_ResponsePath             =
+  private val submitCISVerifyMessage_fatalError_ResponsePath                   =
     s"$verificationResponsePath/submitCISVerifyMessage-fatalError-response.xml"
-  private val submitCISVerifyMessage_irMarkMismatchError_ResponsePath    =
+  private val submitCISVerifyMessage_irMarkMismatchError_ResponsePath          =
     s"$verificationResponsePath/submitCISVerifyMessage-irMarkMismatchError-response.xml"
-  private val submitCISVerifyMessage_businessError_ResponsePath          =
+  private val submitCISVerifyMessage_businessError_ResponsePath                =
     s"$verificationResponsePath/submitCISVerifyMessage-businessError-response.xml"
-  private val submitCISVerifyMessage_departmentalError_3000_ResponsePath =
-    s"$verificationResponsePath/submitCISVerifyMessage-departmentalError-3000-response.xml"
-  private val submitCISVerifyMessage_success_ResponsePath                =
+  private val submitCISVerifyMessage_departmentalError_3001_ResponsePath       =
+    s"$verificationResponsePath/submitCISVerifyMessage-departmentalError-3001-response.xml"
+  private val submitCISVerifyMessage_departmentalError_business_ResponsePath   =
+    s"$verificationResponsePath/submitCISVerifyMessage-departmentalError-business-response.xml"
+  private val submitCISVerifyMessage_departmentalError_department_ResponsePath =
+    s"$verificationResponsePath/submitCISVerifyMessage-departmentalError-department-response.xml"
+  private val submitCISVerifyMessage_fatalError_3000_ResponsePath              =
+    s"$verificationResponsePath/submitCISVerifyMessage-fatalError-3000-response.xml"
+  private val submitCISVerifyMessage_fatalError_1000_ResponsePath              =
+    s"$verificationResponsePath/submitCISVerifyMessage-fatalError-1000-response.xml"
+  private val submitCISVerifyMessage_fatalError_2005_ResponsePath              =
+    s"$verificationResponsePath/submitCISVerifyMessage-fatalError-2005-response.xml"
+  private val submitCISVerifyMessage_fatalError_unknown_ResponsePath           =
+    s"$verificationResponsePath/submitCISVerifyMessage-fatalError-unknown-response.xml"
+  private val submitCISVerifyMessage_success_ResponsePath                      =
     s"$verificationResponsePath/submitCISVerifyMessage-success-response.xml"
-  private val submitCISVerifyMessage_success_no_receipt_ResponsePath     =
+  private val submitCISVerifyMessage_success_no_receipt_ResponsePath           =
     s"$verificationResponsePath/submitCISVerifyMessage-success-no-receipt-response.xml"
-  private val submitCISVerifyMessage_delete_ResponsePath                 =
+  private val submitCISVerifyMessage_delete_ResponsePath                       =
     s"$verificationResponsePath/submitCISVerifyMessage-delete-response.xml"
 
   private val ServerErrorTriggerTaxOfficeNumbers: Set[String] = (500 to 505).map(_.toString).toSet
@@ -179,12 +191,19 @@ class ChrisController @Inject() (
       request = request,
       deleteResponsePath = submitCISVerifyMessage_delete_ResponsePath,
       finalStatusResponsePaths = Map(
-        "ACKNOWLEDGE"             -> submitCISVerifyMessage_acknowledgement_ResponsePath,
-        "SUBMITTED_NO_RECEIPT"    -> submitCISVerifyMessage_success_no_receipt_ResponsePath,
-        "FATAL_ERROR"             -> submitCISVerifyMessage_fatalError_ResponsePath,
-        "DEPARTMENTAL_ERROR"      -> submitCISVerifyMessage_businessError_ResponsePath,
-        "DEPARTMENTAL_ERROR_3000" -> submitCISVerifyMessage_departmentalError_3000_ResponsePath,
-        "IRMARK_MISMATCH_ERROR"   -> submitCISVerifyMessage_irMarkMismatchError_ResponsePath
+        "ACKNOWLEDGE"                   -> submitCISVerifyMessage_acknowledgement_ResponsePath,
+        "SUBMITTED_NO_RECEIPT"          -> submitCISVerifyMessage_success_no_receipt_ResponsePath,
+        "FATAL_ERROR"                   -> submitCISVerifyMessage_fatalError_ResponsePath,
+        "DEPARTMENTAL_ERROR"            -> submitCISVerifyMessage_businessError_ResponsePath,
+        "DEPARTMENTAL_ERROR_3000"       -> submitCISVerifyMessage_fatalError_3000_ResponsePath,
+        "DEPARTMENTAL_ERROR_3001"       -> submitCISVerifyMessage_departmentalError_3001_ResponsePath,
+        "DEPARTMENTAL_ERROR_BUSINESS"   -> submitCISVerifyMessage_departmentalError_business_ResponsePath,
+        "DEPARTMENTAL_ERROR_DEPARTMENT" -> submitCISVerifyMessage_departmentalError_department_ResponsePath,
+        "FATAL_ERROR_3000"              -> submitCISVerifyMessage_fatalError_3000_ResponsePath,
+        "FATAL_ERROR_1000"              -> submitCISVerifyMessage_fatalError_1000_ResponsePath,
+        "FATAL_ERROR_2005"              -> submitCISVerifyMessage_fatalError_2005_ResponsePath,
+        "FATAL_ERROR_UNKNOWN"           -> submitCISVerifyMessage_fatalError_unknown_ResponsePath,
+        "IRMARK_MISMATCH_ERROR"         -> submitCISVerifyMessage_irMarkMismatchError_ResponsePath
       ),
       defaultResponsePath = submitCISVerifyMessage_success_ResponsePath
     )

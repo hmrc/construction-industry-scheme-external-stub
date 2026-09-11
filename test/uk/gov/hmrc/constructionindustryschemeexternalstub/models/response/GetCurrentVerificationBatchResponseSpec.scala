@@ -25,7 +25,7 @@ import java.time.LocalDateTime
 
 class GetCurrentVerificationBatchResponseSpec extends AnyWordSpec with Matchers {
 
-  "GetNewestVerificationBatchResponse Json format" should {
+  "GetCurrentVerificationBatchResponse Json format" should {
 
     "write a response to JSON" in {
       val model = GetCurrentVerificationBatchResponse(

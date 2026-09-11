@@ -67,8 +67,7 @@ class ContractorSchemeController @Inject() (
           agentSchemeResult(agentRef)
 
         case (None, None) =>
-          logger.warn("[ContractorSchemeController][getScheme] Missing contractor and agent enrolments")
-          InternalServerError(Json.obj("message" -> "Missing enrolments"))
+          Ok(schemeJson(getScheme_sub1_ResponsePath))
       }
     }
 

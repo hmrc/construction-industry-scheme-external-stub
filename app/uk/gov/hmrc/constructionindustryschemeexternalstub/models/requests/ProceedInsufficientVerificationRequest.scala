@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.constructionindustryschemeexternalstub
+package uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests
 
-import play.api.{Configuration, Environment}
-import play.api.inject.{Binding, Module as AppModule}
-import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.{AuthAction, CompositeAuthAction}
+import play.api.libs.json.{Json, OFormat}
 
-class Module extends AppModule:
-
-  override def bindings(
-    environment: Environment,
-    configuration: Configuration
-  ): Seq[Binding[_]] =
-    List(
-      bind[AuthAction].to(classOf[CompositeAuthAction])
-    )
+case class ProceedInsufficientVerificationRequest(
+  instanceId: String,
+  verificationBatchResourceRef: Long,
+  verificationResourceRef: Long,
+  proceed: String
+)
+object ProceedInsufficientVerificationRequest {
+  given format: OFormat[ProceedInsufficientVerificationRequest] = Json.format
+}

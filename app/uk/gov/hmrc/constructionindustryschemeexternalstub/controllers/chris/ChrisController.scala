@@ -74,6 +74,8 @@ class ChrisController @Inject() (
     s"$verificationResponsePath/submitCISVerifyMessage-irMarkMismatchError-response.xml"
   private val submitCISVerifyMessage_businessError_ResponsePath                =
     s"$verificationResponsePath/submitCISVerifyMessage-businessError-response.xml"
+  private val submitCISVerifyMessage_departmentalError_3000_ResponsePath       =
+    s"$verificationResponsePath/submitCISVerifyMessage-departmentalError-3000-response.xml"
   private val submitCISVerifyMessage_departmentalError_3001_ResponsePath       =
     s"$verificationResponsePath/submitCISVerifyMessage-departmentalError-3001-response.xml"
   private val submitCISVerifyMessage_departmentalError_business_ResponsePath   =
@@ -195,7 +197,7 @@ class ChrisController @Inject() (
         "SUBMITTED_NO_RECEIPT"          -> submitCISVerifyMessage_success_no_receipt_ResponsePath,
         "FATAL_ERROR"                   -> submitCISVerifyMessage_fatalError_ResponsePath,
         "DEPARTMENTAL_ERROR"            -> submitCISVerifyMessage_businessError_ResponsePath,
-        "DEPARTMENTAL_ERROR_3000"       -> submitCISVerifyMessage_fatalError_3000_ResponsePath,
+        "DEPARTMENTAL_ERROR_3000"       -> submitCISVerifyMessage_departmentalError_3000_ResponsePath,
         "DEPARTMENTAL_ERROR_3001"       -> submitCISVerifyMessage_departmentalError_3001_ResponsePath,
         "DEPARTMENTAL_ERROR_BUSINESS"   -> submitCISVerifyMessage_departmentalError_business_ResponsePath,
         "DEPARTMENTAL_ERROR_DEPARTMENT" -> submitCISVerifyMessage_departmentalError_department_ResponsePath,

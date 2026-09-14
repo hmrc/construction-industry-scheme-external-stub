@@ -144,7 +144,7 @@ class ContractorSchemeController @Inject() (
 
       // manual browser journey: CheckSubcontractorRecords -> SuccessfulNoRecordsFound
       case "EZ10360"             =>
-        val callNumber = nextCallAndResetAfterThree(key)
+        val callNumber = nextCallAndResetAfterSix(key)
         logger.info(s"[getScheme] ref=$taxOfficeReference callNumber=$callNumber")
         if (callNumber <= 3) {
           Ok(schemeJson(getScheme_firstTime_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
@@ -154,7 +154,7 @@ class ContractorSchemeController @Inject() (
 
       // manual browser journey: CheckSubcontractorRecords -> SuccessfulAutomaticSubcontractorUpdate
       case "EZ10410"             =>
-        val callNumber = nextCallAndResetAfterThree(key)
+        val callNumber = nextCallAndResetAfterSix(key)
         logger.info(s"[getScheme] ref=$taxOfficeReference callNumber=$callNumber")
         if (callNumber <= 3) {
           Ok(schemeJson(getScheme_firstTime_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
@@ -271,7 +271,7 @@ class ContractorSchemeController @Inject() (
       NoContent
     }
 
-  private def nextCallAndResetAfterThree(key: String): Int = {
+  private def nextCallAndResetAfterSix(key: String): Int = {
     val counter    = schemeCounters.getOrElseUpdate(key, new AtomicInteger(0))
     val callNumber = counter.incrementAndGet()
     if (callNumber >= 7) {

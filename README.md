@@ -343,6 +343,67 @@ To trigger the happy path, ensure you provide a valid request body:
 }
 ```
 
+**Endpoint**: `POST /cis/enqueue-message `
+
+**Description**: Enqueue message executes enqueue message header and enqueue clob
+
+#### Happy Path
+
+- Affinity Group: Agent
+- Enrolment Key: IR-PAYE-AGENT
+- Identifier Name: IRAgentReference
+- Identifier Value: 123456
+
+- Request body:
+```json
+{
+  "message": {
+    "sender": "Portal",
+    "queueName": "AGTAUTH",
+    "replyQueue": "",
+    "correlationID": "",
+    "filter": "RemoveClient",
+    "payload": {
+      "IRAgentID": "123456789",
+      "Service": "CIS",
+      "TaxReference": "123/ABC123"
+    }
+  },
+  "tracking": {
+    "message": {
+      "sender": "Portal",
+      "queueName": "Tracking",
+      "replyQueue": "",
+      "correlationID": "",
+      "filter": "AGENTAUTH",
+      "payload": {
+        "GGIS_DTSTAMP": "20260827 154512747",
+        "MESSAGE_TYPE": "AGENT_AUTH_PORTAL",
+        "ADDITIONAL_INFO": "Request client removal",
+        "GW_AGENT_ID": "AGENT123",
+        "IR_CLIENT_REF": "123/ABC123",
+        "USER_ID": "user123",
+        "Service": "CIS"
+      }
+    },
+    "number": {
+      "dataType": 1,
+      "payload": {
+        "EVENT_TYPE": 1010
+      }
+    }
+  }
+}
+```
+
+- Response status: `200`
+- Response body:
+```json
+{
+  "messageIDOut": 1
+}
+```
+
 ### FormP Proxy
 
 **Endpoint**: `POST /monthly-returns `

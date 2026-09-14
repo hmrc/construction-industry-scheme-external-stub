@@ -142,6 +142,26 @@ class ContractorSchemeController @Inject() (
           Ok(schemeJson(getScheme_sub1_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
         }
 
+      // manual browser journey: CheckSubcontractorRecords -> SuccessfulNoRecordsFound
+      case "EZ10360"             =>
+        val callNumber = nextCallAndResetAfterThree(key)
+        logger.info(s"[getScheme] ref=$taxOfficeReference callNumber=$callNumber")
+        if (callNumber <= 3) {
+          Ok(schemeJson(getScheme_firstTime_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
+        } else {
+          Ok(schemeJson(getScheme_200_no_sub_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
+        }
+
+      // manual browser journey: CheckSubcontractorRecords -> SuccessfulAutomaticSubcontractorUpdate
+      case "EZ10410"             =>
+        val callNumber = nextCallAndResetAfterThree(key)
+        logger.info(s"[getScheme] ref=$taxOfficeReference callNumber=$callNumber")
+        if (callNumber <= 3) {
+          Ok(schemeJson(getScheme_firstTime_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
+        } else {
+          Ok(schemeJson(getScheme_sub1_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
+        }
+
       // 1 call scenarios
 
       // cis-ui-tests PrepopulationSpec Scenario 3
@@ -239,6 +259,22 @@ class ContractorSchemeController @Inject() (
     val counter    = schemeCounters.getOrElseUpdate(key, new AtomicInteger(0))
     val callNumber = counter.incrementAndGet()
     if (callNumber >= 6) {
+      schemeCounters.remove(key)
+    }
+    callNumber
+  }
+
+  def resetSchemeCounter(taxOfficeNumber: String, taxOfficeReference: String): Action[AnyContent] =
+    Action { _ =>
+      val key = s"$taxOfficeNumber|$taxOfficeReference"
+      schemeCounters.remove(key)
+      NoContent
+    }
+
+  private def nextCallAndResetAfterThree(key: String): Int = {
+    val counter    = schemeCounters.getOrElseUpdate(key, new AtomicInteger(0))
+    val callNumber = counter.incrementAndGet()
+    if (callNumber >= 7) {
       schemeCounters.remove(key)
     }
     callNumber

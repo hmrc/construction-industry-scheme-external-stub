@@ -124,7 +124,7 @@ class ContractorSchemeController @Inject() (
 
       // cis-ui-tests PrepopulationSpec Scenario 1
       case "EZ10350"             =>
-        val callNumber = nextCallAndResetAfterFour(key)
+        val callNumber = nextCallAndResetAfterFive(key)
         logger.info(s"[getScheme] ref=$taxOfficeReference callNumber=$callNumber")
         if (callNumber <= 4) {
           Ok(schemeJson(getScheme_firstTime_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
@@ -134,7 +134,7 @@ class ContractorSchemeController @Inject() (
 
       // cis-ui-tests PrepopulationSpec Scenario 2 & 9
       case "EZ10400" | "EZ10750" =>
-        val callNumber = nextCallAndResetAfterFour(key)
+        val callNumber = nextCallAndResetAfterFive(key)
         logger.info(s"[getScheme] ref=$taxOfficeReference callNumber=$callNumber")
         if (callNumber <= 4) {
           Ok(schemeJson(getScheme_firstTime_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
@@ -255,7 +255,7 @@ class ContractorSchemeController @Inject() (
 
   private val schemeCounters = TrieMap.empty[String, AtomicInteger]
 
-  private def nextCallAndResetAfterFour(key: String): Int = {
+  private def nextCallAndResetAfterFive(key: String): Int = {
     val counter    = schemeCounters.getOrElseUpdate(key, new AtomicInteger(0))
     val callNumber = counter.incrementAndGet()
     if (callNumber >= 6) {

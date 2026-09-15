@@ -16,7 +16,7 @@
         <Keys/>
         <GovTalkErrors>
             <Error>
-                <RaisedBy>Department</RaisedBy>
+                <RaisedBy>Gateway</RaisedBy>
                 <Number>3000</Number>
                 <Type>fatal</Type>
                 <Text>The processing of your document submission failed due to a departmental error.</Text>

@@ -1745,12 +1745,12 @@ This is a **stateful multi-call** scenario for the manual browser journey `Check
 
 | Call number | Response fixture | Scenario |
 |---|---|---|
-| 1–3 | `getScheme-200-first-time-response.json` | First-time state: no name/utr, `subcontractorCounter = 0`, `prePopSuccessful = "N"` |
-| 4–6 | `getScheme-200-no-sub-response.json` | Post-check state: name and utr present, `subcontractorCounter = 0`, `prePopSuccessful = "Y"` |
-| 7 | `getScheme-200-no-sub-response.json` (then counter resets) | Same as above; counter resets so the cycle repeats from call 1 |
+| 1–18 | `getScheme-200-first-time-response.json` | First-time state: no name/utr, `subcontractorCounter = 0`, `prePopSuccessful = "N"` |
+| 19–20 | `getScheme-200-no-sub-response.json` | Post-check state: name and utr present, `subcontractorCounter = 0`, `prePopSuccessful = "Y"` |
+| 21 | `getScheme-200-no-sub-response.json` (then counter resets) | Same as above; counter resets so the cycle repeats from call 1 |
 
 - Response status: `200`
-- Response body (calls 1–3):
+- Response body (calls 1–18):
 ```json
 {
   "schemeId": 2040,
@@ -1770,7 +1770,7 @@ This is a **stateful multi-call** scenario for the manual browser journey `Check
   "version": 0
 }
 ```
-- Response body (calls 4–7):
+- Response body (calls 19–21):
 ```json
 {
   "schemeId": 1000,

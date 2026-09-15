@@ -68,14 +68,40 @@ class CisTaxpayerController @Inject() (
             enrolments match {
               case Some(enrolmentReference) =>
                 (er.taxOfficeNumber, er.taxOfficeReference) match {
-                  case ("404", _)                                =>
+                  case ("404", _)                                                                             =>
                     NotFound(
                       Json.obj(
                         "message" -> s"CIS taxpayer not found for TON=${er.taxOfficeNumber}, TOR=${er.taxOfficeReference}"
                       )
                     )
-                  case ("500", _)                                => InternalServerError(Json.obj("message" -> "Unexpected error"))
-                  case (_, toRef) if uniqueIdMap.contains(toRef) =>
+                  case ("500", _)                                                                             => InternalServerError(Json.obj("message" -> "Unexpected error"))
+                  case (ton, "EZ10650")                                                                       =>
+                    val json    =
+                      Json.parse(resourceHelper.resourceAsString(getCisTaxpayerByTaxReference_200_ResponsePath))
+                    val updated = json
+                      .as[JsObject]
+                      .deepMerge(
+                        Json.obj(
+                          "taxOfficeNumber" -> ton,
+                          "taxOfficeRef"    -> "EZ10650",
+                          "schemeName"      -> "ABC Construction Ltd"
+                        )
+                      )
+                    Ok(updated)
+                  case (ton, tor) if Set("EZ10360", "EZ10410", "EZ10450", "EZ10500", "EZ10550").contains(tor) =>
+                    val json    =
+                      Json.parse(resourceHelper.resourceAsString(getCisTaxpayerByTaxReference_200_ResponsePath))
+                    val updated = json
+                      .as[JsObject]
+                      .deepMerge(
+                        Json.obj(
+                          "taxOfficeNumber" -> ton,
+                          "taxOfficeRef"    -> tor,
+                          "schemeName"      -> ""
+                        )
+                      )
+                    Ok(updated)
+                  case (_, toRef) if uniqueIdMap.contains(toRef)                                              =>
                     val uniqueId = uniqueIdMap(toRef)
                     val json     =
                       Json.parse(resourceHelper.resourceAsString(getCisTaxpayerByTaxReference_200_ResponsePath))
@@ -89,7 +115,7 @@ class CisTaxpayerController @Inject() (
                         )
                       )
                     Ok(updated)
-                  case (ton, tor)                                =>
+                  case (ton, tor)                                                                             =>
                     val json    =
                       Json.parse(resourceHelper.resourceAsString(getCisTaxpayerByTaxReference_200_ResponsePath))
                     val updated = json

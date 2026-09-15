@@ -154,9 +154,9 @@ class ContractorSchemeController @Inject() (
 
       // manual browser journey: CheckSubcontractorRecords -> SuccessfulAutomaticSubcontractorUpdate
       case "EZ10410"             =>
-        val callNumber = nextCallAndResetAfterSix(key)
+        val callNumber = nextCallAndResetAfterTwenty(key)
         logger.info(s"[getScheme] ref=$taxOfficeReference callNumber=$callNumber")
-        if (callNumber <= 3) {
+        if (callNumber <= 18) {
           Ok(schemeJson(getScheme_firstTime_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
         } else {
           Ok(schemeJson(getScheme_sub1_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))

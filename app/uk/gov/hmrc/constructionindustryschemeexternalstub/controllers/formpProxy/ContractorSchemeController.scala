@@ -124,7 +124,7 @@ class ContractorSchemeController @Inject() (
 
       // cis-ui-tests PrepopulationSpec Scenario 1
       case "EZ10350"             =>
-        val callNumber = nextCallAndResetAfterFour(key)
+        val callNumber = nextCallAndResetAfterFive(key)
         logger.info(s"[getScheme] ref=$taxOfficeReference callNumber=$callNumber")
         if (callNumber <= 4) {
           Ok(schemeJson(getScheme_firstTime_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
@@ -134,9 +134,29 @@ class ContractorSchemeController @Inject() (
 
       // cis-ui-tests PrepopulationSpec Scenario 2 & 9
       case "EZ10400" | "EZ10750" =>
-        val callNumber = nextCallAndResetAfterFour(key)
+        val callNumber = nextCallAndResetAfterFive(key)
         logger.info(s"[getScheme] ref=$taxOfficeReference callNumber=$callNumber")
         if (callNumber <= 4) {
+          Ok(schemeJson(getScheme_firstTime_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
+        } else {
+          Ok(schemeJson(getScheme_sub1_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
+        }
+
+      // manual browser journey: CheckSubcontractorRecords -> SuccessfulNoRecordsFound
+      case "EZ10360"             =>
+        val callNumber = nextCallAndResetAfterTwenty(key)
+        logger.info(s"[getScheme] ref=$taxOfficeReference callNumber=$callNumber")
+        if (callNumber <= 18) {
+          Ok(schemeJson(getScheme_firstTime_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
+        } else {
+          Ok(schemeJson(getScheme_200_no_sub_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
+        }
+
+      // manual browser journey: CheckSubcontractorRecords -> SuccessfulAutomaticSubcontractorUpdate
+      case "EZ10410"             =>
+        val callNumber = nextCallAndResetAfterTwenty(key)
+        logger.info(s"[getScheme] ref=$taxOfficeReference callNumber=$callNumber")
+        if (callNumber <= 18) {
           Ok(schemeJson(getScheme_firstTime_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
         } else {
           Ok(schemeJson(getScheme_sub1_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
@@ -235,10 +255,35 @@ class ContractorSchemeController @Inject() (
 
   private val schemeCounters = TrieMap.empty[String, AtomicInteger]
 
-  private def nextCallAndResetAfterFour(key: String): Int = {
+  private def nextCallAndResetAfterFive(key: String): Int = {
     val counter    = schemeCounters.getOrElseUpdate(key, new AtomicInteger(0))
     val callNumber = counter.incrementAndGet()
     if (callNumber >= 6) {
+      schemeCounters.remove(key)
+    }
+    callNumber
+  }
+
+  def resetSchemeCounter(taxOfficeNumber: String, taxOfficeReference: String): Action[AnyContent] =
+    Action { _ =>
+      val key = s"$taxOfficeNumber|$taxOfficeReference"
+      schemeCounters.remove(key)
+      NoContent
+    }
+
+  private def nextCallAndResetAfterSix(key: String): Int = {
+    val counter    = schemeCounters.getOrElseUpdate(key, new AtomicInteger(0))
+    val callNumber = counter.incrementAndGet()
+    if (callNumber >= 7) {
+      schemeCounters.remove(key)
+    }
+    callNumber
+  }
+
+  private def nextCallAndResetAfterTwenty(key: String): Int = {
+    val counter    = schemeCounters.getOrElseUpdate(key, new AtomicInteger(0))
+    val callNumber = counter.incrementAndGet()
+    if (callNumber >= 21) {
       schemeCounters.remove(key)
     }
     callNumber

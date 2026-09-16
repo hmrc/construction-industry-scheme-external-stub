@@ -73,6 +73,84 @@ To trigger the happy path, ensure you provide a valid request body:
 }
 ```
 
+#### Happy Path (TOR = EZ10650, with named scheme)
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: any valid Tax Office no.
+- Identifier Name: TaxOfficeReference
+- Identifier Value: EZ10650
+
+To trigger this path, ensure you provide a valid request body:
+```json
+{
+  "taxOfficeNumber": "754",
+  "taxOfficeReference": "EZ10650"
+}
+```
+- Response status: `200`
+- Response body: base fixture overridden with `taxOfficeNumber` and `taxOfficeRef` from the request and `schemeName = "ABC Construction Ltd"`:
+```json
+{
+  "uniqueId" : "1",
+  "taxOfficeNumber" : "754",
+  "taxOfficeRef" : "EZ10650",
+  "aoDistrict" : "123",
+  "aoPayType" : "P",
+  "aoCheckCode" : "A",
+  "aoReference" : "12345678",
+  "validBusinessAddr" : "Y",
+  "correlation" : "corr-abc",
+  "ggAgentId" : "AGENT-001",
+  "employerName1" : "TEST LTD",
+  "agentOwnRef" : "AG-REF-001",
+  "schemeName" : "ABC Construction Ltd",
+  "utr" : "1234567890",
+  "enrolledSig" : "Y"
+}
+```
+
+#### Happy Path (TORs with empty scheme name: EZ10360, EZ10410, EZ10450, EZ10500, EZ10550)
+
+These TORs are used for multi-call browser journeys where the scheme has not yet been named. The stub returns the base fixture overridden with `taxOfficeNumber` and `taxOfficeRef` from the request and `schemeName = ""`.
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: any valid Tax Office no.
+- Identifier Name: TaxOfficeReference
+- Identifier Value: one of `EZ10360`, `EZ10410`, `EZ10450`, `EZ10500`, `EZ10550`
+
+To trigger this path, ensure you provide a valid request body:
+```json
+{
+  "taxOfficeNumber": "754",
+  "taxOfficeReference": "EZ10360"
+}
+```
+- Response status: `200`
+- Response body:
+```json
+{
+  "uniqueId" : "1",
+  "taxOfficeNumber" : "754",
+  "taxOfficeRef" : "EZ10360",
+  "aoDistrict" : "123",
+  "aoPayType" : "P",
+  "aoCheckCode" : "A",
+  "aoReference" : "12345678",
+  "validBusinessAddr" : "Y",
+  "correlation" : "corr-abc",
+  "ggAgentId" : "AGENT-001",
+  "employerName1" : "TEST LTD",
+  "agentOwnRef" : "AG-REF-001",
+  "schemeName" : "",
+  "utr" : "1234567890",
+  "enrolledSig" : "Y"
+}
+```
+
 **Endpoint**: `GET /cis/client-list-status?credentialId=$credentialId&serviceName=$serviceName&gracePeriod=$gracePeriodSeconds`
 
 **Description**: Returns the status of the client list download process.
@@ -1650,6 +1728,115 @@ or
   "version": 0
 }
 ```
+
+#### Multi-call Scenario: CheckSubcontractorRecords → SuccessfulNoRecordsFound (TOR = EZ10360)
+
+This is a **stateful multi-call** scenario for the manual browser journey `CheckSubcontractorRecords -> SuccessfulNoRecordsFound`. The stub tracks a per-key call counter and varies the response accordingly.
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 754
+- Identifier Name: TaxOfficeReference
+- Identifier Value: EZ10360
+
+- Request body: N/A
+- Enrolments: request must have either HMRC-CIS-ORG or IR-PAYE-AGENT Enrolment
+
+| Call number | Response fixture | Scenario |
+|---|---|---|
+| 1–18 | `getScheme-200-first-time-response.json` | First-time state: no name/utr, `subcontractorCounter = 0`, `prePopSuccessful = "N"` |
+| 19–20 | `getScheme-200-no-sub-response.json` | Post-check state: name and utr present, `subcontractorCounter = 0`, `prePopSuccessful = "Y"` |
+| 21 | `getScheme-200-no-sub-response.json` (then counter resets) | Same as above; counter resets so the cycle repeats from call 1 |
+
+- Response status: `200`
+- Response body (calls 1–18):
+```json
+{
+  "schemeId": 2040,
+  "instanceId": "some-instance-id",
+  "accountsOfficeReference": "123PA00123456",
+  "taxOfficeNumber": "204",
+  "taxOfficeReference": "AB1234",
+  "utr": null,
+  "name": null,
+  "emailAddress": null,
+  "displayWelcomePage": null,
+  "prePopCount": 0,
+  "prePopSuccessful": "N",
+  "subcontractorCounter": 0,
+  "verificationBatchCounter": 0,
+  "lastUpdate": null,
+  "version": 0
+}
+```
+- Response body (calls 19–21):
+```json
+{
+  "schemeId": 1000,
+  "instanceId": "CIS-123",
+  "accountsOfficeReference": "123MXY1234567XY",
+  "taxOfficeNumber": "123",
+  "taxOfficeReference": "AB1234",
+  "utr": "1234567890",
+  "name": "ABC Construction Ltd",
+  "emailAddress": "test@test.com",
+  "displayWelcomePage": null,
+  "prePopCount": 1,
+  "prePopSuccessful": "Y",
+  "subcontractorCounter": 0,
+  "verificationBatchCounter": 0,
+  "lastUpdate": "2025-01-01T12:00:00Z",
+  "version": 1
+}
+```
+
+To reset the counter manually use the test-only endpoint `DELETE /test-only/scheme-counter/:taxOfficeNumber/:taxOfficeReference`.
+
+#### Multi-call Scenario: CheckSubcontractorRecords → SuccessfulAutomaticSubcontractorUpdate (TOR = EZ10410)
+
+This is a **stateful multi-call** scenario for the manual browser journey `CheckSubcontractorRecords -> SuccessfulAutomaticSubcontractorUpdate`. The stub tracks a per-key call counter and varies the response accordingly.
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 754
+- Identifier Name: TaxOfficeReference
+- Identifier Value: EZ10410
+
+- Request body: N/A
+- Enrolments: request must have either HMRC-CIS-ORG or IR-PAYE-AGENT Enrolment
+
+| Call number | Response fixture | Scenario |
+|---|---|---|
+| 1–18 | `getScheme-200-first-time-response.json` | First-time state: no name/utr, `subcontractorCounter = 0`, `prePopSuccessful = "N"` |
+| 19–20 | `getScheme-200-sub1-response.json` | Post-check state: name and utr present, `subcontractorCounter = 1`, `prePopSuccessful = "Y"` |
+| 21 | `getScheme-200-sub1-response.json` (then counter resets) | Same as above; counter resets so the cycle repeats from call 1 |
+
+- Response status: `200`
+- Response body (calls 1–18): same as `EZ10360` first-time response above
+- Response body (calls 19–21):
+```json
+{
+  "schemeId": 2010,
+  "instanceId": "some-instance-id",
+  "accountsOfficeReference": "123PA00123456",
+  "taxOfficeNumber": "201",
+  "taxOfficeReference": "AB1234",
+  "utr": "1234567890",
+  "name": "ABC Construction Ltd",
+  "emailAddress": "contact@example.com",
+  "displayWelcomePage": null,
+  "prePopCount": 1,
+  "prePopSuccessful": "Y",
+  "subcontractorCounter": 1,
+  "verificationBatchCounter": 0,
+  "lastUpdate": "2025-01-01T12:00:00Z",
+  "version": 1
+}
+```
+
+To reset the counter manually use the test-only endpoint `DELETE /test-only/scheme-counter/:taxOfficeNumber/:taxOfficeReference`.
 
 **Endpoint**: `/cis/govtalkstatus/get`
 
@@ -3979,6 +4166,25 @@ To trigger the happy path, ensure you provide a valid request body:
 
 
 ### Client Exchange Proxy
+
+---
+
+### Test-Only Endpoints
+
+These endpoints are available for test setup/teardown and are not part of the production API.
+
+**Endpoint**: `DELETE /test-only/scheme-counter/:taxOfficeNumber/:taxOfficeReference`
+
+**Description**: Resets the in-memory call counter for a `taxOfficeNumber`/`taxOfficeReference` pair. Use this to restart the multi-call cycle for stateful `GET /scheme/:instanceId` scenarios such as `EZ10360` (CheckSubcontractorRecords → SuccessfulNoRecordsFound) and `EZ10410` (CheckSubcontractorRecords → SuccessfulAutomaticSubcontractorUpdate).
+
+#### Example
+
+```
+DELETE /test-only/scheme-counter/754/EZ10360
+```
+
+- Response status: `204`
+- Response body: _empty_
 
 ---
 

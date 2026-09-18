@@ -18,7 +18,7 @@ package uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProx
 
 import play.api.Logging
 import play.api.libs.json.{JsError, JsValue, Json}
-import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.AuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.EmployerReference
 import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.*
@@ -186,14 +186,19 @@ class SubcontractorController @Inject() (
       Future.successful(NoContent)
     }
 
+  import play.api.libs.json.{JsValue, Json}
+  import play.api.mvc.{Action, Result}
+
+  import scala.concurrent.Future
+
   def updateSubcontractor: Action[JsValue] =
     authorise.async(parse.json) { implicit request =>
       request.body
         .validate[UpdateSubcontractorRequest]
         .foldErrorsIntoBadRequest { body =>
           handleUpdateSubcontractor(
-            body,
-            "updateSubcontractor"
+            subcontractor = body.subcontractor,
+            actionName = "updateSubcontractor"
           )
         }
     }
@@ -201,17 +206,17 @@ class SubcontractorController @Inject() (
   def updateSubcontractorForEdit: Action[JsValue] =
     authorise.async(parse.json) { implicit request =>
       request.body
-        .validate[UpdateSubcontractorRequest]
+        .validate[UpdateSubcontractorForEditRequest]
         .foldErrorsIntoBadRequest { body =>
           handleUpdateSubcontractor(
-            body,
-            "updateSubcontractorForEdit"
+            subcontractor = body.subcontractor,
+            actionName = "updateSubcontractorForEdit"
           )
         }
     }
 
   private def handleUpdateSubcontractor(
-    body: UpdateSubcontractorRequest,
+    subcontractor: Subcontractor,
     actionName: String
   )(implicit request: AuthenticatedRequest[_]): Future[Result] = {
 
@@ -241,7 +246,7 @@ class SubcontractorController @Inject() (
               Ok(
                 Json.toJson(
                   UpdateSubcontractorResponse(
-                    version = body.subcontractor.version.getOrElse(0) + 1
+                    version = subcontractor.version.getOrElse(0) + 1
                   )
                 )
               )
@@ -251,7 +256,7 @@ class SubcontractorController @Inject() (
           Ok(
             Json.toJson(
               UpdateSubcontractorResponse(
-                version = body.subcontractor.version.getOrElse(0) + 1
+                version = subcontractor.version.getOrElse(0) + 1
               )
             )
           )

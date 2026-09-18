@@ -1,26 +1,47 @@
+construction-industry-scheme-external-stub
+==========================================
 
-# construction-industry-scheme-external-stub
+![](https://img.shields.io/github/v/release/hmrc/construction-industry-scheme-external-stub)
 
-Th construction-industry-scheme-external-stub provides stubs for downstream services to mock the responses.
+Stub service for the Construction Industry Scheme (CIS), mocking the responses of downstream external services used during local development and testing.
+
+It stubs the following downstream services:
+
+* **RDS DataCache Proxy** — taxpayer lookup, client list retrieval, contractor and subcontractor prepopulation, and agent authorisation queue
+* **FormP Proxy** — monthly return creation, retrieval, amendment, and submission
+* **Email** — email notifications
+* **CHRIS** — GovTalk submission and response handling
 
 ## Running the service
 
-Service Manager: `sm2 --start CIS_ALL`
+Start the full service profile using Service Manager:
 
-To start the server locally: `sbt run`
+```bash
+sm2 --start CIS_ALL
+```
+
+To run locally (default port **6997**):
+
+```bash
+sbt run
+```
 
 ## Testing
-Run unit tests with:
+
+Run unit tests:
+
 ```shell
 sbt test
 ```
 
-Run integration tests with:
+Run integration tests:
+
 ```shell
 sbt it/test
 ```
 
-Check code coverage with:
+Check code coverage:
+
 ```shell
 sbt clean coverage test it/test coverageReport
 ```
@@ -4162,11 +4183,6 @@ To trigger the happy path, ensure you provide a valid request body:
 - Response status: `202`
 - Response body: N/A
 
-### Iass 
-
-
-### Client Exchange Proxy
-
 ---
 
 ### Test-Only Endpoints
@@ -4187,10 +4203,6 @@ DELETE /test-only/scheme-counter/754/EZ10360
 - Response body: _empty_
 
 ---
-
-### License
-
-This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html").
 
 **Endpoint**: `POST /cis/subcontractor/update`
 
@@ -4240,3 +4252,30 @@ To trigger the happy path, ensure you provide a valid request body:
     "version": 1
   }
 }
+```
+
+- Response status: `200`
+- Response body: returns the incremented version number
+```json
+{
+  "version": 2
+}
+```
+
+#### Error Scenario: 500 Internal Server Error
+
+Provide `taxOfficeNumber` = `500` to trigger an internal server error response.
+
+- Response status: `500`
+- Response body:
+```json
+{
+  "message": "Unexpected error"
+}
+```
+
+---
+
+## License
+
+This code is open source software licensed under the [Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0.html).

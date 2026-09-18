@@ -131,7 +131,7 @@
       "firstName": null,
       "secondName": null,
       "surname": null,
-      "tradingName": "ABC Company",
+      "tradingName": null,
       "partnershipTradingName": null,
       "verified": null,
       "verificationNumber": "V0000000007",
@@ -352,7 +352,7 @@
     {
       "verificationId": 1009,
       "matched": "Y",
-      "verificationNumber": null,
+      "verificationNumber": "V0000000008",
       "taxTreatment": "0",
       "verificationBatchId": 99,
       "subcontractorId": 8,
@@ -367,30 +367,30 @@
       "taxTreatment": "0",
       "verificationBatchId": 99,
       "subcontractorId": 9,
-      "actionIndicator": "EDIT",
+      "actionIndicator": "VERIFY",
       "proceed": "Y",
       "verificationResourceRef": 18
     },
     {
       "verificationId": 1011,
-      "matched": "N",
+      "matched": "Y",
       "verificationNumber": "V0000000010",
       "taxTreatment": "0",
       "verificationBatchId": 99,
       "subcontractorId": 10,
       "actionIndicator": "MATCH",
-      "proceed": "Y",
+      "proceed": "N",
       "verificationResourceRef": 19
     },
     {
       "verificationId": 1012,
-      "matched": "N",
+      "matched": "Y",
       "verificationNumber": "V0000000011",
       "taxTreatment": "0",
       "verificationBatchId": 99,
       "subcontractorId": 11,
       "actionIndicator": "VERIFY",
-      "proceed": "Y",
+      "proceed": "N",
       "verificationResourceRef": 20
     },
     {

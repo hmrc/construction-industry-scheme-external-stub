@@ -296,7 +296,7 @@
       "secondName": null,
       "surname": null,
       "partnershipTradingName": null,
-      "tradingName": "unverified nominated partner",
+      "tradingName": null,
       "subcontractorType": "partnership",
       "createDate": "2026-01-05T10:23:56",
       "subbieResourceRef": 19,

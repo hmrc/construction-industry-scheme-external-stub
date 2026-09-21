@@ -16,9 +16,9 @@
         <Keys/>
         <GovTalkErrors>
             <Error>
-                <RaisedBy>Gateway</RaisedBy>
+                <RaisedBy>Department</RaisedBy>
                 <Number>3001</Number>
-                <Type>fatal</Type>
+                <Type>business</Type>
                 <Text>Your submission failed due to business validation errors. Please see below for details.</Text>
             </Error>
         </GovTalkErrors>

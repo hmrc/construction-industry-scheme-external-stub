@@ -246,21 +246,6 @@
       "version": 1
     },
     {
-      "subcontractorId": 16016,
-      "subbieResourceRef": 16,
-      "utr": null,
-      "firstName": null,
-      "tradingName": "",
-      "nino": null,
-      "secondName": null,
-      "surname": null,
-      "subcontractorType": "company",
-      "verified": null,
-      "createDate": "2026-02-24T18:23:56",
-      "taxTreatment": null,
-      "version": 1
-    },
-    {
       "subcontractorId": 17017,
       "utr": null,
       "firstName": null,
@@ -271,20 +256,6 @@
       "subcontractorType": "trust",
       "createDate": "2026-02-24T18:23:56",
       "subbieResourceRef": 17,
-      "lastMonthlyReturnDate": "2026-02-24T00:00:00",
-      "version": 1
-    },
-    {
-      "subcontractorId": 18018,
-      "utr": null,
-      "firstName": null,
-      "secondName": null,
-      "surname": null,
-      "partnershipTradingName": "",
-      "tradingName": null,
-      "subcontractorType": "trust",
-      "createDate": "2026-02-24T18:23:56",
-      "subbieResourceRef": 18,
       "lastMonthlyReturnDate": "2026-02-24T00:00:00",
       "version": 1
     },
@@ -302,37 +273,6 @@
       "subbieResourceRef": 19,
       "lastMonthlyReturnDate": "2025-05-05T00:00:00",
       "version": 1
-    },
-    {
-      "subcontractorId": 20020,
-      "utr": null,
-      "partnerUtr": "6723510127",
-      "firstName": null,
-      "secondName": null,
-      "surname": null,
-      "partnershipTradingName": "",
-      "tradingName": "",
-      "subcontractorType": "partnership",
-      "createDate": "2026-01-05T10:23:56",
-      "subbieResourceRef": 20,
-      "lastMonthlyReturnDate": "2025-05-05T00:00:00",
-      "version": 1
-    },
-    {
-      "subcontractorId": 21021,
-      "subbieResourceRef": 21,
-      "utr": null,
-      "firstName": "",
-      "secondName": "",
-      "surname": "",
-      "tradingName": "",
-      "subcontractorType": "soletrader",
-      "emailAddress": "subcontractor@example.com",
-      "version": 3,
-      "taxTreatment": null,
-      "createDate": "2026-06-15T10:00:00",
-      "verified": null,
-      "lastMonthlyReturnDate": "2026-05-15T10:05:00"
     }
   ]
 }

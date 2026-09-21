@@ -18,7 +18,7 @@
             <Error>
                 <RaisedBy>Gateway</RaisedBy>
                 <Number>1020</Number>
-                <Type>technical</Type>
+                <Type>fatal</Type>
                 <Text>Verification failed with an unmapped ChRIS error.</Text>
             </Error>
         </GovTalkErrors>

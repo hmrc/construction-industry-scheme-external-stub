@@ -236,7 +236,6 @@
       "utr": null,
       "firstName": null,
       "tradingName": null,
-      "nino": null,
       "secondName": null,
       "surname": null,
       "subcontractorType": "company",
@@ -262,7 +261,7 @@
     {
       "subcontractorId": 17017,
       "utr": null,
-      "partnerUtr": "6723510127",
+      "partnerUtr": null,
       "firstName": null,
       "secondName": null,
       "surname": null,

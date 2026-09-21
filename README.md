@@ -20,7 +20,7 @@ Start the full service profile using Service Manager:
 sm2 --start CIS_ALL
 ```
 
-To run locally (default port **6997**):
+To start this service locally on port `6997`:
 
 ```bash
 sbt run

@@ -38,44 +38,44 @@ class SubcontractorController @Inject() (
 )() extends BackendController(cc)
     with Logging {
 
-  private val subcontractorResponsePath                                         = "/resources/subcontractor"
-  private val getSubcontractorList_200_ResponsePath                             =
+  private val subcontractorResponsePath                                        = "/resources/subcontractor"
+  private val getSubcontractorList_200_ResponsePath                            =
     s"$subcontractorResponsePath/getSubcontractorList-200-response.json"
-  private val getSubcontractorList_noSubcontractor_200_ResponsePath             =
+  private val getSubcontractorList_noSubcontractor_200_ResponsePath            =
     s"$subcontractorResponsePath/getSubcontractorList-200-noSubcontractor-response.json"
-  private val getSubcontractorIndividual_200_ResponsePath                       =
+  private val getSubcontractorIndividual_200_ResponsePath                      =
     s"$subcontractorResponsePath/getSubcontractorIndividual-200-verifiedResponse.json"
-  private val getSubcontractorTrust_200_ResponsePath                            =
+  private val getSubcontractorTrust_200_ResponsePath                           =
     s"$subcontractorResponsePath/getSubcontractorTrust-200-verifiedResponse.json"
-  private val getSubcontractorCompany_200_ResponsePath                          =
+  private val getSubcontractorCompany_200_ResponsePath                         =
     s"$subcontractorResponsePath/getSubcontractorCompany-200-verifiedResponse.json"
-  private val getSubcontractorPartnership_200_ResponsePath                      =
+  private val getSubcontractorPartnership_200_ResponsePath                     =
     s"$subcontractorResponsePath/getSubcontractorPartnership-200-verifiedResponse.json"
-  private val getSubcontractorIndividual_200_UnverifiedResponsePath             =
+  private val getSubcontractorIndividual_200_UnverifiedResponsePath            =
     s"$subcontractorResponsePath/getSubcontractorIndividual-200-unverifiedResponse.json"
-  private val getSubcontractorTrust_200_UnverifiedResponsePath                  =
+  private val getSubcontractorTrust_200_UnverifiedResponsePath                 =
     s"$subcontractorResponsePath/getSubcontractorTrust-200-unverifiedResponse.json"
-  private val getSubcontractorCompany_200_UnverifiedResponsePath                =
+  private val getSubcontractorCompany_200_UnverifiedResponsePath               =
     s"$subcontractorResponsePath/getSubcontractorCompany-200-unverifiedResponse.json"
-  private val getSubcontractorPartnership_200_UnverifiedResponsePath            =
+  private val getSubcontractorPartnership_200_UnverifiedResponsePath           =
     s"$subcontractorResponsePath/getSubcontractorPartnership-200-unverifiedResponse.json"
-  private val getSubcontractorIndividual_200_UnverifiedNameResponsePath         =
+  private val getSubcontractorIndividual_200_UnverifiedNameResponsePath        =
     s"$subcontractorResponsePath/getSubcontractorIndividual_200_unverifiedNameResponse.json"
-  private val getSubcontractorIndividual_200_UnverifiedBothNamesResponsePath    =
+  private val getSubcontractorIndividual_200_UnverifiedBothNamesResponsePath   =
     s"$subcontractorResponsePath/getSubcontractorIndividual_200_unverifiedBothNamesResponse.json"
-  private val getSubcontractorIndividual_200_UnverifiedFirstNamesResponsePath   =
+  private val getSubcontractorIndividual_200_UnverifiedFirstNamesResponsePath  =
     s"$subcontractorResponsePath/getSubcontractorIndividual_200_unverifiedFirstNamesResponse.json"
-  private val getSubcontractorIndividual_200_UnverifiedLastNamesResponsePath    =
+  private val getSubcontractorIndividual_200_UnverifiedLastNamesResponsePath   =
     s"$subcontractorResponsePath/getSubcontractorIndividual_200_unverifiedLastNamesResponse.json"
-  private val getSubcontractorIndividual_200_UnverifiedNoNamesNullResponsePath  =
+  private val getSubcontractorIndividual_200_UnverifiedNoNamesNullResponsePath =
     s"$subcontractorResponsePath/getSubcontractorIndividual_200_unverifiedNoNamesNullResponse.json"
-  private val getSubcontractorIndividual_200_UnverifiedMiddleNamesResponsePath  =
+  private val getSubcontractorIndividual_200_UnverifiedMiddleNamesResponsePath =
     s"$subcontractorResponsePath/getSubcontractorIndividual_200_unverifiedMiddleNamesResponse.json"
-  private val getSubcontractorCompany_200_UnverifiedNoNameNullResponsePath      =
+  private val getSubcontractorCompany_200_UnverifiedNoNameNullResponsePath     =
     s"$subcontractorResponsePath/getSubcontractorCompany_200_unverifiedNoNameNullResponse.json"
-  private val getSubcontractorTrust_200_UnverifiedNoNameNullResponsePath        =
+  private val getSubcontractorTrust_200_UnverifiedNoNameNullResponsePath       =
     s"$subcontractorResponsePath/getSubcontractorTrust_200_unverifiedNoNameNullResponse.json"
-  private val getSubcontractorPartnership_200_UnverifiedNoNameNullResponsePath  =
+  private val getSubcontractorPartnership_200_UnverifiedNoNameNullResponsePath =
     s"$subcontractorResponsePath/getSubcontractorPartnership_200_unverifiedNoNameNullResponse.json"
 
   def createAndUpdateSubcontractor(): Action[JsValue] =

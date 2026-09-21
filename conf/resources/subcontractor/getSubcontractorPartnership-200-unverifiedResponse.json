@@ -11,7 +11,7 @@
     "displayWelcomePage": "N",
     "prePopCount": 3,
     "prePopSuccessful": "N",
-    "subcontractorCounter": 14,
+    "subcontractorCounter": 17,
     "verificationBatchCounter": 0,
     "lastUpdate": "2026-08-05T10:23:56Z",
     "version": 3
@@ -21,7 +21,7 @@
     "utr": "1148985069",
     "pageVisited": 0,
     "partnerUtr": "6723510127",
-    "crn": "19457342",
+    "crn": null,
     "firstName": null,
     "nino": "AB623456C",
     "secondName": null,

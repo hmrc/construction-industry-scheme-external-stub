@@ -17,33 +17,34 @@
     "version": 3
   },
   "subcontractor": {
-    "subcontractorId": 40404,
-    "utr": "3574571357",
+    "subcontractorId": 16016,
+    "utr": null,
     "pageVisited": 0,
     "partnerUtr": null,
-    "crn": "AR123456",
+    "crn": null,
     "firstName": null,
     "nino": null,
     "secondName": null,
     "surname": null,
     "partnershipTradingName": null,
-    "tradingName": "Bridges Co. Ltd",
-    "subcontractorType": "company",
-    "addressLine1": "one",
-    "addressLine2": "two ",
-    "addressLine3": "three",
-    "addressLine4": "four",
-    "country": "England",
-    "postcode": "B1 2CD",
-    "emailAddress": "test@test.com",
-    "mobilePhoneNumber": "0712756789",
-    "worksReferenceNumber": "ref-1234",
+    "tradingName": null,
+    "subcontractorType": "trust",
+    "addressLine1": "trustNull",
+    "addressLine2": "six",
+    "addressLine3": "ten",
+    "addressLine4": "eleven",
+    "country": "UK",
+    "postcode": "A1 2SS",
+    "emailAddress": "testNull@test.com",
+    "phoneNumber": "08953456789",
+    "mobilePhoneNumber": "7885456789",
+    "worksReferenceNumber": "533",
     "createDate": "2026-02-24T18:23:56",
     "lastUpdate": "2026-02-24T18:23:56",
     "schemeId": 10800,
-    "subbieResourceRef": 4,
-    "matched": "Y",
-    "autoVerified": "Y",
+    "subbieResourceRef": 16,
+    "matched": null,
+    "autoVerified": null,
     "verified": null,
     "verificationNumber": null,
     "taxTreatment": null,
@@ -55,10 +56,10 @@
   },
   "otherInfo": [
     {
-      "utr": "8786438047"
+      "utr": "2673823208"
     },
     {
-      "utr": "6611252813"
+      "utr": "7916433636"
     }
   ]
 }

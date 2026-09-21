@@ -67,10 +67,16 @@ class SubcontractorController @Inject() (
     s"$subcontractorResponsePath/getSubcontractorIndividual_200_unverifiedFirstNamesResponse.json"
   private val getSubcontractorIndividual_200_UnverifiedLastNamesResponsePath   =
     s"$subcontractorResponsePath/getSubcontractorIndividual_200_unverifiedLastNamesResponse.json"
-  private val getSubcontractorIndividual_200_UnverifiedNoNamesResponsePath     =
-    s"$subcontractorResponsePath/getSubcontractorIndividual_200_unverifiedNoNamesResponse.json"
+  private val getSubcontractorIndividual_200_UnverifiedNoNamesNullResponsePath =
+    s"$subcontractorResponsePath/getSubcontractorIndividual_200_unverifiedNoNamesNullResponse.json"
   private val getSubcontractorIndividual_200_UnverifiedMiddleNamesResponsePath =
     s"$subcontractorResponsePath/getSubcontractorIndividual_200_unverifiedMiddleNamesResponse.json"
+  private val getSubcontractorCompany_200_UnverifiedNoNameNullResponsePath     =
+    s"$subcontractorResponsePath/getSubcontractorCompany_200_unverifiedNoNameNullResponse.json"
+  private val getSubcontractorTrust_200_UnverifiedNoNameNullResponsePath       =
+    s"$subcontractorResponsePath/getSubcontractorTrust_200_unverifiedNoNameNullResponse.json"
+  private val getSubcontractorPartnership_200_UnverifiedNoNameNullResponsePath =
+    s"$subcontractorResponsePath/getSubcontractorPartnership_200_unverifiedNoNameNullResponse.json"
 
   def createAndUpdateSubcontractor(): Action[JsValue] =
     authorise(parse.json) { implicit request =>
@@ -155,8 +161,11 @@ class SubcontractorController @Inject() (
         case 10 => getSubcontractorIndividual_200_UnverifiedBothNamesResponsePath
         case 11 => getSubcontractorIndividual_200_UnverifiedFirstNamesResponsePath
         case 12 => getSubcontractorIndividual_200_UnverifiedLastNamesResponsePath
-        case 13 => getSubcontractorIndividual_200_UnverifiedNoNamesResponsePath
+        case 13 => getSubcontractorIndividual_200_UnverifiedNoNamesNullResponsePath
         case 14 => getSubcontractorIndividual_200_UnverifiedMiddleNamesResponsePath
+        case 15 => getSubcontractorCompany_200_UnverifiedNoNameNullResponsePath
+        case 16 => getSubcontractorTrust_200_UnverifiedNoNameNullResponsePath
+        case 17 => getSubcontractorPartnership_200_UnverifiedNoNameNullResponsePath
         case _  => getSubcontractorIndividual_200_ResponsePath
       }
 

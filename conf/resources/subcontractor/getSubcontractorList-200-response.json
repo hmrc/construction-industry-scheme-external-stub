@@ -229,6 +229,49 @@
       "createDate": "2026-06-15T10:00:00",
       "verified": null,
       "lastMonthlyReturnDate": "2026-05-15T10:05:00"
+    },
+    {
+      "subcontractorId": 15015,
+      "subbieResourceRef": 15,
+      "utr": null,
+      "firstName": null,
+      "tradingName": null,
+      "secondName": null,
+      "surname": null,
+      "subcontractorType": "company",
+      "verified": null,
+      "createDate": "2026-02-24T18:23:56",
+      "taxTreatment": null,
+      "version": 1
+    },
+    {
+      "subcontractorId": 16016,
+      "utr": null,
+      "firstName": null,
+      "secondName": null,
+      "surname": null,
+      "partnershipTradingName": null,
+      "tradingName": null,
+      "subcontractorType": "trust",
+      "createDate": "2026-02-24T18:23:56",
+      "subbieResourceRef": 16,
+      "lastMonthlyReturnDate": "2026-02-24T00:00:00",
+      "version": 1
+    },
+    {
+      "subcontractorId": 17017,
+      "utr": null,
+      "partnerUtr": null,
+      "firstName": null,
+      "secondName": null,
+      "surname": null,
+      "partnershipTradingName": null,
+      "tradingName": null,
+      "subcontractorType": "partnership",
+      "createDate": "2026-01-05T10:23:56",
+      "subbieResourceRef": 17,
+      "lastMonthlyReturnDate": "2025-05-05T00:00:00",
+      "version": 1
     }
   ]
 }

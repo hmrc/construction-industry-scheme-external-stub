@@ -109,9 +109,12 @@ class InternalAuthActionSpec extends AnyWordSpec with Matchers with BeforeAndAft
       cisEnrolment.flatMap(_.getIdentifier("TaxOfficeReference")).map(_.value) mustBe Some("EZ10350")
     }
 
-    "produce empty enrolments when enrolment headers are absent" in {
-      var capturedEnrolments: Enrolments = Enrolments(Set(null))
-      val request                        = FakeRequest().withHeaders("Authorization" -> token)
+    "build IR-PAYE-AGENT enrolments from X-IRAgentReference headers" in {
+      var capturedEnrolments: Enrolments = Enrolments(Set.empty)
+      val request                        = FakeRequest().withHeaders(
+        "Authorization"      -> token,
+        "X-IRAgentReference" -> "123456"
+      )
 
       val result = action.invokeBlock(
         request,
@@ -122,7 +125,10 @@ class InternalAuthActionSpec extends AnyWordSpec with Matchers with BeforeAndAft
       )
 
       status(result) mustBe OK
-      capturedEnrolments.enrolments mustBe empty
+
+      val cisEnrolment = capturedEnrolments.getEnrolment("IR-PAYE-AGENT")
+      cisEnrolment mustBe defined
+      cisEnrolment.flatMap(_.getIdentifier("IRAgentReference")).map(_.value) mustBe Some("123456")
     }
   }
 }

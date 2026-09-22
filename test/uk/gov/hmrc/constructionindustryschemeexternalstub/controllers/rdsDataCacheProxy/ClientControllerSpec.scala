@@ -259,7 +259,8 @@ class ClientControllerSpec extends SpecBase with MockitoSugar {
             employerName1 = Some("ABC Ltd"),
             employerName2 = None,
             agentOwnRef = None,
-            schemeName = Some("ABC")
+            schemeName = Some("ABC"),
+            agentRef = Some("123456")
           ),
           CisTaxpayerSearchResult(
             uniqueId = "2",
@@ -275,7 +276,8 @@ class ClientControllerSpec extends SpecBase with MockitoSugar {
             employerName1 = Some("XYZ Builders"),
             employerName2 = None,
             agentOwnRef = None,
-            schemeName = Some("XYZ")
+            schemeName = Some("XYZ"),
+            agentRef = Some("123456")
           )
         ),
         totalCount = 2,

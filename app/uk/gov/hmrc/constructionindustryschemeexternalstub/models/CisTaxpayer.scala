@@ -34,7 +34,8 @@ case class CisTaxpayer(
   agentOwnRef: Option[String],
   schemeName: Option[String],
   utr: Option[String],
-  enrolledSig: Option[String]
+  enrolledSig: Option[String],
+  agentRef: Option[String]
 )
 
 object CisTaxpayer {
@@ -55,7 +56,8 @@ case class CisTaxpayerSearchResult(
   employerName1: Option[String],
   employerName2: Option[String],
   agentOwnRef: Option[String],
-  schemeName: Option[String]
+  schemeName: Option[String],
+  agentRef: Option[String]
 )
 
 object CisTaxpayerSearchResult {

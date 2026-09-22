@@ -43,7 +43,8 @@ class CisTaxpayerSpec extends AnyWordSpec with Matchers {
           |"agentOwnRef": "ref-123",
           |"schemeName": "CIS",
           |"utr": "1234567890",
-          |"enrolledSig": "test-sig"
+          |"enrolledSig": "test-sig",
+          |"agentRef": "123456"
           |}
         """.stripMargin
       )
@@ -67,7 +68,8 @@ class CisTaxpayerSpec extends AnyWordSpec with Matchers {
         agentOwnRef = Some("ref-123"),
         schemeName = Some("CIS"),
         utr = Some("1234567890"),
-        enrolledSig = Some("test-sig")
+        enrolledSig = Some("test-sig"),
+        agentRef = Some("123456")
       )
 
       Json.toJson(model) mustBe json

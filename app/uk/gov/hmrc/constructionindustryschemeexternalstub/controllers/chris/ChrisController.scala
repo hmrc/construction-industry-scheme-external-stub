@@ -207,7 +207,8 @@ class ChrisController @Inject() (
         "FATAL_ERROR_UNKNOWN"           -> submitCISVerifyMessage_fatalError_unknown_ResponsePath,
         "IRMARK_MISMATCH_ERROR"         -> submitCISVerifyMessage_irMarkMismatchError_ResponsePath
       ),
-      defaultResponsePath = submitCISVerifyMessage_success_ResponsePath
+      defaultResponsePath = submitCISVerifyMessage_success_ResponsePath,
+      regime = "IR-CIS-VERIFY"
     )
   }
 
@@ -287,7 +288,8 @@ class ChrisController @Inject() (
     request: Request[AnyContent],
     deleteResponsePath: String,
     finalStatusResponsePaths: Map[String, String],
-    defaultResponsePath: String
+    defaultResponsePath: String,
+    regime: String = ""
   ): Result = {
     val message          = request.body.asXml.get
     val correlationId    = (message \ "Header" \ "MessageDetails" \ "CorrelationID").text
@@ -305,19 +307,38 @@ class ChrisController @Inject() (
       val finalStatus = request.getQueryString("final").get
       val statusCode  = finalStatus.stripPrefix("SERVER_ERROR_").toInt
 
-      logger.info(s"[ChrisStub] Simulating $statusCode on poll corrId=$correlationId count=$count")
+      logger.info(
+        s"[ChrisStub] F18 SERVER_ERROR: returning HTTP $statusCode corrId=$correlationId count=$count — frontend needs ~60s polling window before SEND_ERROR fires"
+      )
       Status(statusCode)("<error>Simulated ChRIS server error</error>").as("application/xml")
     } else if (request.getQueryString("final").contains(ResponseEntityFailurePollFinalStatus) && count >= 2) {
       terminateResponseEarly(correlationId)
     } else {
-      val finalStatusParam =
-        request.getQueryString("final").getOrElse("SUBMITTED")
+      val finalStatusParam = request.getQueryString("final").getOrElse("SUBMITTED")
+
+      // Count-based finals (SERVER_ERROR_* and CONNECTION_ABORT) return acknowledgement while
+      // count < 2 so the poll URL counter can advance; the error path fires once count >= 2.
+      val isCountBased =
+        ServerErrorPollFinalStatuses.contains(finalStatusParam) ||
+          finalStatusParam == ResponseEntityFailurePollFinalStatus
 
       val resourcePath =
-        finalStatusResponsePaths.getOrElse(finalStatusParam, defaultResponsePath)
+        if (isCountBased)
+          finalStatusResponsePaths.getOrElse("ACKNOWLEDGE", defaultResponsePath)
+        else
+          finalStatusResponsePaths.getOrElse(finalStatusParam, defaultResponsePath)
 
-      val rawXml       = resourceHelper.resourceAsString(resourcePath)
-      val nextPollUrl  = ""
+      val rawXml = resourceHelper.resourceAsString(resourcePath)
+
+      val nextPollUrl =
+        if (isCountBased && regime.nonEmpty)
+          s"${config.pollUrl(regime)}/${count + 1}?final=$finalStatusParam"
+        else ""
+
+      logger.info(
+        s"[ChrisStub] F18 poll: corrId=$correlationId count=$count final=$finalStatusParam isCountBased=$isCountBased nextPollUrl=$nextPollUrl"
+      )
+
       val storedIrMark = Option(irMarkStore.get(correlationId)).getOrElse("NO_IRMARK_FOUND")
 
       val xml =

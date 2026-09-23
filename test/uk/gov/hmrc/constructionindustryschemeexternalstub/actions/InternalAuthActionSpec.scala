@@ -112,8 +112,8 @@ class InternalAuthActionSpec extends AnyWordSpec with Matchers with BeforeAndAft
     "build IR-PAYE-AGENT enrolments from X-IRAgentReference headers" in {
       var capturedEnrolments: Enrolments = Enrolments(Set.empty)
       val request                        = FakeRequest().withHeaders(
-        "Authorization"      -> token,
-        "X-IRAgentReference" -> "123456"
+        "Authorization"        -> token,
+        "X-IR-Agent-Reference" -> "123456"
       )
 
       val result = action.invokeBlock(
@@ -130,5 +130,22 @@ class InternalAuthActionSpec extends AnyWordSpec with Matchers with BeforeAndAft
       cisEnrolment mustBe defined
       cisEnrolment.flatMap(_.getIdentifier("IRAgentReference")).map(_.value) mustBe Some("123456")
     }
+
+    "produce empty enrolments when enrolment headers are absent" in {
+      var capturedEnrolments: Enrolments = Enrolments(Set(null))
+      val request                        = FakeRequest().withHeaders("Authorization" -> token)
+
+      val result = action.invokeBlock(
+        request,
+        req => {
+          capturedEnrolments = req.enrolments
+          Future.successful(Results.Ok("ok"))
+        }
+      )
+
+      status(result) mustBe OK
+      capturedEnrolments.enrolments mustBe empty
+    }
   }
+
 }

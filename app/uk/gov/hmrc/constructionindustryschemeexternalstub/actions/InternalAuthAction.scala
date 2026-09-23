@@ -53,9 +53,10 @@ class InternalAuthAction @Inject() (
   private def enrolmentsFromHeaders[A](request: Request[A]): Enrolments =
     (
       request.headers.get("X-Tax-Office-Number"),
-      request.headers.get("X-Tax-Office-Reference")
+      request.headers.get("X-Tax-Office-Reference"),
+      request.headers.get("X-IR-Agent-Reference")
     ) match {
-      case (Some(taxOfficeNumber), Some(taxOfficeReference)) =>
+      case (Some(taxOfficeNumber), Some(taxOfficeReference), None) =>
         Enrolments(
           Set(
             Enrolment(
@@ -68,7 +69,11 @@ class InternalAuthAction @Inject() (
             )
           )
         )
-      case _                                                 =>
-        Enrolments(Set(Enrolment("IR-PAYE-AGENT", Seq(EnrolmentIdentifier("IRAgentReference", "123456")), "Activated")))
+      case (None, None, Some(irAgentReference))                    =>
+        Enrolments(
+          Set(Enrolment("IR-PAYE-AGENT", Seq(EnrolmentIdentifier("IRAgentReference", irAgentReference)), "Activated"))
+        )
+      case _                                                       =>
+        Enrolments(Set.empty)
     }
 }

@@ -65,7 +65,6 @@ trait SpecBase
 
   final val TonHeader = "X-Tax-Office-Number"
   final val TorHeader = "X-Tax-Office-Reference"
-  final val ToaHeader = "X-IRAgentReference"
 
   def requestWithCisHeaders(
     ton: String = "123",
@@ -79,9 +78,6 @@ trait SpecBase
   def requestMissingTor(ton: String = "123"): FakeRequest[AnyContentAsEmpty.type] =
     FakeRequest().withHeaders(TonHeader -> ton)
 
-  def requestMissingToa(toa: String = "123456"): FakeRequest[AnyContentAsEmpty.type] =
-    FakeRequest().withHeaders(ToaHeader -> toa)
-
   def requestWithoutCisHeaders: FakeRequest[AnyContentAsEmpty.type] =
     FakeRequest()
 
@@ -89,7 +85,6 @@ trait SpecBase
     id: String = "CIS-123",
     ton: String = "123",
     tor: String = "AB456",
-    toa: String = "123456",
     employerName1: Option[String] = Some("TEST LTD")
   ): CisTaxpayer =
     CisTaxpayer(
@@ -108,7 +103,6 @@ trait SpecBase
       agentOwnRef = None,
       schemeName = None,
       utr = None,
-      enrolledSig = None,
-      agentRef = Some(toa)
+      enrolledSig = None
     )
 }

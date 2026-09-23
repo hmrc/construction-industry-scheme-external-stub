@@ -109,7 +109,7 @@ class InternalAuthActionSpec extends AnyWordSpec with Matchers with BeforeAndAft
       cisEnrolment.flatMap(_.getIdentifier("TaxOfficeReference")).map(_.value) mustBe Some("EZ10350")
     }
 
-    "build IR-PAYE-AGENT enrolments from X-IRAgentReference headers" in {
+    "build IR-PAYE-AGENT enrolments from X-IR-Agent-Reference headers" in {
       var capturedEnrolments: Enrolments = Enrolments(Set.empty)
       val request                        = FakeRequest().withHeaders(
         "Authorization"        -> token,

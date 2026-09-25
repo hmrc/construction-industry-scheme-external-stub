@@ -36,33 +36,35 @@ class MonthlyReturnController @Inject() (
 )() extends BackendController(cc)
     with Logging {
 
-  private val monthlyNilReturnResponsePath                          = "/resources/monthlyNilReturns"
-  private val retrieveMonthlyReturns_200_ResponsePath               =
+  private val monthlyNilReturnResponsePath                              = "/resources/monthlyNilReturns"
+  private val retrieveMonthlyReturns_200_ResponsePath                   =
     s"$monthlyNilReturnResponsePath/retrieveMonthlyReturns-200-response.json"
-  private val retrieveMonthlyReturns_empty_200_ResponsePath         =
+  private val retrieveMonthlyReturns_empty_200_ResponsePath             =
     s"$monthlyNilReturnResponsePath/retrieveMonthlyReturns-empty-200-response.json"
-  private val createNilMonthlyReturn_200_ResponsePath               =
+  private val createNilMonthlyReturn_200_ResponsePath                   =
     s"$monthlyNilReturnResponsePath/createNilMonthlyReturn-200-response.json"
-  private val getSchemeEmail_200_ResponsePath                       = s"$monthlyNilReturnResponsePath/getSchemeEmail-200-response.json"
-  private val getSchemeEmail_null_200_ResponsePath                  =
+  private val getSchemeEmail_200_ResponsePath                           = s"$monthlyNilReturnResponsePath/getSchemeEmail-200-response.json"
+  private val getSchemeEmail_null_200_ResponsePath                      =
     s"$monthlyNilReturnResponsePath/getSchemeEmail-null-200-response.json"
-  private val retrieveUnsubmittedMonthlyReturns_200_ResponsePath    =
+  private val retrieveUnsubmittedMonthlyReturns_200_ResponsePath        =
     "/resources/retrieveUnsubmittedMonthlyReturns-200-response.json"
-  private val retrieveSubmittedMonthlyReturns_200_ResponsePath      =
+  private val retrieveSubmittedMonthlyReturns_200_ResponsePath          =
     "/resources/retrieveSubmittedMonthlyReturns-200-response.json"
-  private val getMonthlyReturnForEdit_200_ResponsePath              =
+  private val getMonthlyReturnForEdit_200_ResponsePath                  =
     "/resources/getMonthlyReturnForEdit-200-response.json"
-  private val getMonthlyReturnForEdit_batchPolling_200_ResponsePath =
+  private val getMonthlyReturnForEdit_final_validation_200_ResponsePath =
+    "/resources/getMonthlyReturnForEdit-final-validation-200-response.json"
+  private val getMonthlyReturnForEdit_batchPolling_200_ResponsePath     =
     "/resources/getMonthlyReturnForEdit-batch-polling-200-response.json"
-  private val getMonthlyReturnForEdit_nosubmission_200_ResponsePath =
+  private val getMonthlyReturnForEdit_nosubmission_200_ResponsePath     =
     "/resources/getMonthlyReturnForEdit-nosubmission-200-response.json"
-  private val getMonthlyReturnForEdit_nil_200_ResponsePath          =
+  private val getMonthlyReturnForEdit_nil_200_ResponsePath              =
     "/resources/getMonthlyReturnForEdit-nil-200-response.json"
-  private val getMonthlyReturnComplete_200_ResponsePath             =
+  private val getMonthlyReturnComplete_200_ResponsePath                 =
     "/resources/getMonthlyReturnComplete-200-response.json"
-  private val getMonthlyReturnComplete_nil_200_ResponsePath         =
+  private val getMonthlyReturnComplete_nil_200_ResponsePath             =
     "/resources/getMonthlyReturnComplete-nil-200-response.json"
-  private val getSubmittedMonthlyReturnsData_200_ResponsePath       =
+  private val getSubmittedMonthlyReturnsData_200_ResponsePath           =
     s"$monthlyNilReturnResponsePath/retrieveSubmittedMonthlyReturnsData-200-response.json"
 
   def retrieveMonthlyReturns: Action[JsValue] =
@@ -198,16 +200,15 @@ class MonthlyReturnController @Inject() (
             ) match {
               case ("10001", 2025, 6, isAmendment) if !isAmendment.contains(true) =>
                 getMonthlyReturnForEdit_batchPolling_200_ResponsePath
-
-              case (_, _, 3, _) =>
+              case (_, 2025, 7, _)                                                =>
+                getMonthlyReturnForEdit_200_ResponsePath
+              case (_, _, 3, _)                                                   =>
                 getMonthlyReturnForEdit_nosubmission_200_ResponsePath
-
               // TODO: Re-enable when the nil-return scenario is required.
               // case (_, _, 4, _) =>
               //   getMonthlyReturnForEdit_nil_200_ResponsePath
-
               case _ =>
-                getMonthlyReturnForEdit_200_ResponsePath
+                getMonthlyReturnForEdit_final_validation_200_ResponsePath
             }
           Future.successful(Ok(resourceHelper.resourceAsString(fixturePath)))
         }

@@ -207,7 +207,7 @@ class MonthlyReturnController @Inject() (
               // TODO: Re-enable when the nil-return scenario is required.
               // case (_, _, 4, _) =>
               //   getMonthlyReturnForEdit_nil_200_ResponsePath
-              case _ =>
+              case _                                                              =>
                 getMonthlyReturnForEdit_final_validation_200_ResponsePath
             }
           Future.successful(Ok(resourceHelper.resourceAsString(fixturePath)))

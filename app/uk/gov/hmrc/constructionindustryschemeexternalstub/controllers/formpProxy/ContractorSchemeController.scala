@@ -271,15 +271,6 @@ class ContractorSchemeController @Inject() (
       NoContent
     }
 
-  private def nextCallAndResetAfterSix(key: String): Int = {
-    val counter    = schemeCounters.getOrElseUpdate(key, new AtomicInteger(0))
-    val callNumber = counter.incrementAndGet()
-    if (callNumber >= 7) {
-      schemeCounters.remove(key)
-    }
-    callNumber
-  }
-
   private def nextCallAndResetAfterTwenty(key: String): Int = {
     val counter    = schemeCounters.getOrElseUpdate(key, new AtomicInteger(0))
     val callNumber = counter.incrementAndGet()

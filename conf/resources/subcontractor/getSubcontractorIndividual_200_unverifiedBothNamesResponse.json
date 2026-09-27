@@ -17,15 +17,15 @@
     "version": 3
   },
   "subcontractor": {
-    "subcontractorId": 10010,
+    "subcontractorId": 1,
     "subbieResourceRef": 10,
-    "utr": null,
+    "utr": "2149783822",
     "pageVisited": 1,
-    "firstName": "Leo",
+    "firstName": "John",
     "nino": "AA123456A",
     "secondName": null,
-    "surname": "Fox",
-    "tradingName": "Blue Ltd",
+    "surname": "Smith",
+    "tradingName": "ACME",
     "subcontractorType": "soletrader",
     "addressLine1": "3 Main Street",
     "addressLine2": "Flat 2",
@@ -51,10 +51,10 @@
   },
   "otherInfo": [
     {
-      "utr": "1111111111"
+      "utr": "1674482593"
     },
     {
-      "utr": "2222222222"
+      "utr": "1684425915"
     }
   ]
 }

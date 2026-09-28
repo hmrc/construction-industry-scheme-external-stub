@@ -18,12 +18,12 @@
       "monthlyReturnId": 30001,
       "taxYear": 2025,
       "taxMonth": 1,
-      "nilReturnIndicator": "Y",
+      "nilReturnIndicator": "N",
       "decInformationCorrect": "Y",
       "decNilReturnNoPayments": "N",
       "status": "STARTED",
       "lastUpdate": "2026-01-01T23:24:56",
-      "amendment": "N"
+      "amendment": "Y"
     },
     {
       "monthlyReturnId": 30002,

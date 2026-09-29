@@ -121,7 +121,7 @@ class UpdateSubcontractorForEditRequestSpec extends SpecBase {
       val json =
         Json.toJson(request)
 
-      val result =
+      val _ =
         Json.fromJson[UpdateSubcontractorForEditRequest](json)
 
     }

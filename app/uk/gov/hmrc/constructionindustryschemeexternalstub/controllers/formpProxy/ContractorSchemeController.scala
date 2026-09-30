@@ -39,16 +39,17 @@ class ContractorSchemeController @Inject() (
 ) extends BackendController(cc)
     with Logging {
 
-  private val basePath                              = "/resources/contractorSchemes"
-  private val getScheme_200_no_sub_ResponsePath     = s"$basePath/getScheme-200-no-sub-response.json"
-  private val getScheme_sub1_ResponsePath           = s"$basePath/getScheme-200-sub1-response.json"
-  private val getScheme_sub1_rest_no_ResponsePath   = s"$basePath/getScheme-200-sub1-rest-no-response.json"
-  private val getScheme_nameOnly_ResponsePath       = s"$basePath/getScheme-200-name-only-response.json"
-  private val getScheme_utrOnly_ResponsePath        = s"$basePath/getScheme-200-utr-only-response.json"
-  private val getScheme_prepop_no_Only_ResponsePath = s"$basePath/getScheme-200-flag-no-only-response.json"
-  private val getScheme_firstTime_ResponsePath      = s"$basePath/getScheme-200-first-time-response.json"
-  private val createScheme_201_ResponsePath         = s"$basePath/createScheme-201-response.json"
-  private val updateScheme_200_ResponsePath         = s"$basePath/updateScheme-200-response.json"
+  private val basePath                                        = "/resources/contractorSchemes"
+  private val getScheme_200_no_sub_ResponsePath               = s"$basePath/getScheme-200-no-sub-response.json"
+  private val getScheme_sub1_ResponsePath                     = s"$basePath/getScheme-200-sub1-response.json"
+  private val getScheme_sub1_rest_no_ResponsePath             = s"$basePath/getScheme-200-sub1-rest-no-response.json"
+  private val getScheme_nameOnly_ResponsePath                 = s"$basePath/getScheme-200-name-only-response.json"
+  private val getScheme_invalidContractorDetails_ResponsePath = s"$basePath/getScheme-200-invalid-details-response.json"
+  private val getScheme_utrOnly_ResponsePath                  = s"$basePath/getScheme-200-utr-only-response.json"
+  private val getScheme_prepop_no_Only_ResponsePath           = s"$basePath/getScheme-200-flag-no-only-response.json"
+  private val getScheme_firstTime_ResponsePath                = s"$basePath/getScheme-200-first-time-response.json"
+  private val createScheme_201_ResponsePath                   = s"$basePath/createScheme-201-response.json"
+  private val updateScheme_200_ResponsePath                   = s"$basePath/updateScheme-200-response.json"
 
   def getScheme(instanceId: String): Action[AnyContent] =
     authorise { implicit request =>
@@ -202,6 +203,10 @@ class ContractorSchemeController @Inject() (
         val applied = prepopAppliedKeys.remove(key).isDefined
         if (applied) Ok(schemeJson(getScheme_200_no_sub_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
         else Ok(schemeJson(getScheme_firstTime_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
+
+      // cis-ui-tests PrepopulationSpec Scenario 7
+      case "EZ10850"             =>
+        Ok(schemeJson(getScheme_invalidContractorDetails_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
 
       // default happy path with successfully prepoped scheme and subcontractorCounter = 1
       case _                     =>

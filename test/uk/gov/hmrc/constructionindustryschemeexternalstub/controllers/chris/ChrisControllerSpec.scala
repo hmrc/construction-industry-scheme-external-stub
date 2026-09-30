@@ -318,7 +318,8 @@ class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar wi
       val response = testInstance.getCISResponse(1).apply(request)
 
       status(response) mustBe OK
-      contentAsString(response) mustBe s"$correlationId--NO_IRMARK_FOUND"
+      contentAsString(response) mustBe
+        s"$correlationId-http://localhost/submission/ChRIS/poll/IR-CIS-CIS300MR/2?final=CONNECTION_ABORT-NO_IRMARK_FOUND"
     }
 
     "return fatal error response for submitCISMessage when initial status is FATAL_ERROR" in {
@@ -394,7 +395,6 @@ class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar wi
         </GovTalkMessage>
 
       val statuses = Seq(
-        "ACKNOWLEDGE",
         "SUBMITTED_NO_RECEIPT",
         "FATAL_ERROR",
         "DEPARTMENTAL_ERROR",
@@ -422,6 +422,35 @@ class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar wi
         contentAsString(response) mustBe
           s"$correlationId--NO_IRMARK_FOUND-$statusValue"
       }
+    }
+
+    "continue polling for ACKNOWLEDGE monthly return responses" in {
+      val correlationId = "CORR-ACK-LOOP"
+      val pollCount     = 2
+
+      val pollRequestXml =
+        <GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
+          <Header>
+            <MessageDetails>
+              <CorrelationID>{correlationId}</CorrelationID>
+            </MessageDetails>
+          </Header>
+          <Body/>
+        </GovTalkMessage>
+
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn("[correlationId]-[pollUrl]-[digestValue]-ACKNOWLEDGE")
+
+      val request =
+        FakeRequest("POST", "/dummy-path?final=ACKNOWLEDGE")
+          .withXmlBody(pollRequestXml)
+
+      val response =
+        testInstance.getCISResponse(pollCount).apply(request)
+
+      status(response) mustBe OK
+      contentAsString(response) mustBe
+        s"$correlationId-http://localhost/submission/ChRIS/poll/IR-CIS-CIS300MR/3?final=ACKNOWLEDGE-NO_IRMARK_FOUND-ACKNOWLEDGE"
     }
 
     "store IRmark from submitCISMessage and use it as digestValue in getCISResponse" in {
@@ -550,7 +579,6 @@ class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar wi
         </GovTalkMessage>
 
       val statuses = Seq(
-        "ACKNOWLEDGE",
         "SUBMITTED_NO_RECEIPT",
         "FATAL_ERROR",
         "DEPARTMENTAL_ERROR",
@@ -576,6 +604,34 @@ class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar wi
         contentAsString(response) mustBe
           s"$correlationId--NO_IRMARK_FOUND-$statusValue"
       }
+    }
+    "continue polling for ACKNOWLEDGE verification responses" in {
+      val correlationId = "CORR-VERIFY-ACK-LOOP"
+      val pollCount     = 2
+
+      val pollRequestXml =
+        <GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
+          <Header>
+            <MessageDetails>
+              <CorrelationID>{correlationId}</CorrelationID>
+            </MessageDetails>
+          </Header>
+          <Body/>
+        </GovTalkMessage>
+
+      when(mockResourceHelper.resourceAsString(any()))
+        .thenReturn("[correlationId]-[pollUrl]-[digestValue]-ACKNOWLEDGE")
+
+      val request =
+        FakeRequest("POST", "/dummy-path?final=ACKNOWLEDGE")
+          .withXmlBody(pollRequestXml)
+
+      val response =
+        testInstance.getCISVerifyResponse(pollCount).apply(request)
+
+      status(response) mustBe OK
+      contentAsString(response) mustBe
+        s"$correlationId-http://localhost/submission/ChRIS/poll/IR-CIS-VERIFY/3?final=ACKNOWLEDGE-NO_IRMARK_FOUND-ACKNOWLEDGE"
     }
 
     "store IRmark from submitCISVerifyMessage and use it as digestValue in getCISVerifyResponse" in {

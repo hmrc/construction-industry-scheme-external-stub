@@ -183,7 +183,8 @@ class ChrisController @Inject() (
         "RECOVERABLE_ERROR_1000" -> submitCISMessage_recoverableError_1000_ResponsePath,
         "IRMARK_MISMATCH_ERROR"  -> submitCISMessage_irMarkMismatchError_ResponsePath
       ),
-      defaultResponsePath = submitCISMessage_success_ResponsePath
+      defaultResponsePath = submitCISMessage_success_ResponsePath,
+      regime = "IR-CIS-CIS300MR"
     )
   }
 
@@ -259,15 +260,9 @@ class ChrisController @Inject() (
           )
 
         case _ =>
-          val basePollUrl = config.pollUrl(regime)
-
-          val pollUrlWith0 =
-            if (service.isForeverPending(regime, taxOfficeNumber)) {
-              s"$basePollUrl/0"
-            } else {
-              val finalStatus = service.terminalStatusFor(regime, taxOfficeNumber)
-              s"$basePollUrl/0?final=$finalStatus"
-            }
+          val basePollUrl  = config.pollUrl(regime)
+          val finalStatus  = service.terminalStatusFor(regime, taxOfficeNumber)
+          val pollUrlWith0 = s"$basePollUrl/0?final=$finalStatus"
 
           val xml =
             replaceCorrelationId(
@@ -330,8 +325,10 @@ class ChrisController @Inject() (
 
       val rawXml = resourceHelper.resourceAsString(resourcePath)
 
+      val shouldContinuePolling = isCountBased || finalStatusParam == "ACKNOWLEDGE"
+
       val nextPollUrl =
-        if (isCountBased && regime.nonEmpty)
+        if (shouldContinuePolling && regime.nonEmpty)
           s"${config.pollUrl(regime)}/${count + 1}?final=$finalStatusParam"
         else ""
 

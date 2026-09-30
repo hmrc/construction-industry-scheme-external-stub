@@ -106,6 +106,9 @@ class ContractorSchemeController @Inject() (
 
   def applyPrepopulation: Action[JsValue] =
     authorise.async(parse.json) { implicit request =>
+      enrolmentHelper.contractorEnrolmentsOpt(request).foreach { ref =>
+        prepopAppliedKeys.put(s"${ref.taxOfficeNumber}|${ref.taxOfficeReference}", true)
+      }
       request.body
         .validate[ApplyPrepopulationRequest]
         .foldErrorsIntoBadRequest { payload =>
@@ -188,6 +191,18 @@ class ContractorSchemeController @Inject() (
       case "EZ10700"             =>
         Ok(schemeJson(getScheme_sub1_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
 
+      // staging pen test: successful with subs — firstTime until POST /scheme/prepopulate fires, then sub1
+      case "EZ10420"             =>
+        val applied = prepopAppliedKeys.remove(key).isDefined
+        if (applied) Ok(schemeJson(getScheme_sub1_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
+        else Ok(schemeJson(getScheme_firstTime_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
+
+      // staging pen test: successful no records — firstTime until POST /scheme/prepopulate fires, then no-sub
+      case "EZ10370"             =>
+        val applied = prepopAppliedKeys.remove(key).isDefined
+        if (applied) Ok(schemeJson(getScheme_200_no_sub_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
+        else Ok(schemeJson(getScheme_firstTime_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
+
       // default happy path with successfully prepoped scheme and subcontractorCounter = 1
       case _                     =>
         Ok(schemeJson(getScheme_sub1_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
@@ -253,7 +268,8 @@ class ContractorSchemeController @Inject() (
     }
   }
 
-  private val schemeCounters = TrieMap.empty[String, AtomicInteger]
+  private val schemeCounters    = TrieMap.empty[String, AtomicInteger]
+  private val prepopAppliedKeys = TrieMap.empty[String, Boolean]
 
   private def nextCallAndResetAfterFive(key: String): Int = {
     val counter    = schemeCounters.getOrElseUpdate(key, new AtomicInteger(0))

@@ -1,0 +1,59 @@
+{
+  "subcontractors": [
+    {
+      "subcontractorId": 10,
+      "firstName": "Iris",
+      "secondName": "D",
+      "surname": "Wood",
+      "tradingName": null,
+      "partnershipTradingName": null,
+      "subbieResourceRef": 19,
+      "utr": "3992651526",
+      "partnerUtr": null,
+      "crn": "99999",
+      "nino": "AA123456A"
+    },
+    {
+      "subcontractorId": 11,
+      "firstName": "Linda",
+      "secondName": "D",
+      "surname": "Jones",
+      "tradingName": null,
+      "partnershipTradingName": null,
+      "subbieResourceRef": 20,
+      "utr": "9450429526",
+      "partnerUtr": null,
+      "crn": "99999",
+      "nino": "AA123456A"
+    }
+  ],
+  "verificationBatch": {
+    "verificationBatchId": 99,
+    "verifBatchResourceRef": 1234567,
+    "status": "STARTED"
+  },
+  "verifications": [
+    {
+      "verificationId": 1011,
+      "verificationBatchId": 99,
+      "verificationResourceRef": 19,
+      "matched": "N",
+      "verificationNumber": "V0000000010",
+      "taxTreatment": "unmatched",
+      "subcontractorName": "Iris Wood",
+      "subcontractorId": 10,
+      "actionIndicator": "verify"
+    },
+    {
+      "verificationId": 1012,
+      "verificationBatchId": 99,
+      "verificationResourceRef": 20,
+      "matched": "N",
+      "verificationNumber": "V0000000011",
+      "taxTreatment": "unmatched",
+      "subcontractorName": "Linda Jones",
+      "subcontractorId": 11,
+      "actionIndicator": "verify"
+    }
+  ]
+}

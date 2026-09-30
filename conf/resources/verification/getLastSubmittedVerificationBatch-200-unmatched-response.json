@@ -1,0 +1,63 @@
+{
+  "scheme": {
+    "accountsOfficeReference": "123PA00123456",
+    "name": "ABC Construction Ltd",
+    "utr": "1111111111",
+    "emailAddress": "ops@example.com"
+  },
+  "subcontractors": [
+    {
+      "subcontractorId": 10,
+      "subbieResourceRef": 19,
+      "subcontractorType": "soletrader",
+      "firstName": "Iris",
+      "secondName": "D",
+      "surname": "Wood",
+      "utr": null
+    },
+    {
+      "subcontractorId": 11,
+      "subbieResourceRef": 20,
+      "subcontractorType": "soletrader",
+      "firstName": "Linda",
+      "secondName": "D",
+      "surname": "Jones",
+      "utr": null
+    }
+  ],
+  "verificationBatch": {
+    "verificationBatchId": 99,
+    "verifBatchResourceRef": 1234567,
+    "status": "STARTED"
+  },
+  "verifications": [
+    {
+      "verificationId": 1011,
+      "verificationBatchId": 99,
+      "verificationResourceRef": 19,
+      "matched": "N",
+      "verificationNumber": "V0000000010",
+      "taxTreatment": "unmatched",
+      "subcontractorName": "Iris Wood",
+      "subcontractorId": 10,
+      "actionIndicator": "verify"
+    },
+    {
+      "verificationId": 1012,
+      "verificationBatchId": 99,
+      "verificationResourceRef": 20,
+      "matched": "N",
+      "verificationNumber": "V0000000011",
+      "taxTreatment": "unmatched",
+      "subcontractorName": "Linda Jones",
+      "subcontractorId": 11,
+      "actionIndicator": "verify"
+    }
+  ],
+  "submission": {
+    "submissionId": 1234,
+    "activeObjectId": 98765,
+    "status": "ACCEPTED",
+    "submissionRequestDate": "2026-08-11T11:50:00"
+  }
+}

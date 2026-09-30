@@ -671,6 +671,50 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
         "/resources/getMonthlyReturnForEdit-200-response.json"
       )
     }
+
+    "returns the nil amendment fixture for tax month 12 when isAmendment is true" in new Setup {
+      val response =
+        Json.obj(
+          "monthlyReturn" -> Json.arr(
+            Json.obj(
+              "taxYear"            -> 2024,
+              "taxMonth"           -> 12,
+              "nilReturnIndicator" -> "Y",
+              "status"             -> "STARTED",
+              "amendment"          -> "Y"
+            )
+          ),
+          "submission"    -> Json.arr()
+        )
+
+      when(
+        mockResourceHelper.resourceAsString(
+          "/resources/getMonthlyReturnForEdit-nil-200-response.json"
+        )
+      ).thenReturn(response.toString)
+
+      val req: FakeRequest[JsValue] =
+        FakeRequest(POST, "/formp-proxy/cis/monthly-return-edit")
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(
+            Json.obj(
+              "instanceId"  -> "abc-123",
+              "taxYear"     -> 2024,
+              "taxMonth"    -> 12,
+              "isAmendment" -> true
+            )
+          )
+
+      val result: Future[Result] =
+        controller.getMonthlyReturnForEdit(req)
+
+      status(result) mustBe OK
+      contentAsJson(result) mustBe response
+
+      verify(mockResourceHelper).resourceAsString(
+        "/resources/getMonthlyReturnForEdit-nil-200-response.json"
+      )
+    }
   }
 
   "MonthlyReturnController getMonthlyReturnComplete" - {

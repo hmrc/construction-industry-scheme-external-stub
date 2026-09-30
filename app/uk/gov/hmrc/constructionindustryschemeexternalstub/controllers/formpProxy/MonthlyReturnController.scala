@@ -226,12 +226,11 @@ class MonthlyReturnController @Inject() (
               case ("10001", 2025, 6, isAmendment) if !isAmendment.contains(true) =>
                 getMonthlyReturnForEdit_batchPolling_200_ResponsePath
 
+              case (_, _, 12, isAmendment) if isAmendment.contains(true) =>
+                getMonthlyReturnForEdit_nil_200_ResponsePath
+
               case (_, _, 3, _) =>
                 getMonthlyReturnForEdit_nosubmission_200_ResponsePath
-
-              // TODO: Re-enable when the nil-return scenario is required.
-              // case (_, _, 4, _) =>
-              //   getMonthlyReturnForEdit_nil_200_ResponsePath
 
               case _ =>
                 getMonthlyReturnForEdit_200_ResponsePath

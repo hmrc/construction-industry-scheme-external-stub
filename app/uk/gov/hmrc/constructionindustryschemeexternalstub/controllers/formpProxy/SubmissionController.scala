@@ -24,7 +24,7 @@ import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.{Creat
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.EnrolmentsHelper
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
-import java.util.concurrent.atomic.AtomicLong
+import java.util.concurrent.ThreadLocalRandom
 import javax.inject.Inject
 
 class SubmissionController @Inject() (
@@ -72,10 +72,16 @@ class SubmissionController @Inject() (
         )
     }
 
-  private val submissionIdCounter = new AtomicLong(90000L)
+  private def nextSubmissionId(): Long = {
+    val millis = System.currentTimeMillis()
+    val random = ThreadLocalRandom.current().nextInt(1000)
+
+    millis * 1000L + random
+  }
 
   private def createSubmissionSuccessResponse: Result = {
-    val submissionId = submissionIdCounter.incrementAndGet().toString
+    val submissionId = nextSubmissionId().toString
+
     logger.info(s"[SubmissionController] createSubmission returning submissionId=$submissionId")
 
     Created(Json.obj("submissionId" -> submissionId))

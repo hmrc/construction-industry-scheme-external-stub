@@ -223,6 +223,21 @@
       "lastUpdate": "2018-02-23T16:24:59",
       "amendment": "N",
       "monthlyReturnItems": "N"
+    },
+    {
+      "monthlyReturnId": 10014,
+      "taxYear": 2024,
+      "taxMonth": 12,
+      "nilReturnIndicator": "Y",
+      "decEmpStatusConsidered": "Y",
+      "decAllSubsVerified": "Y",
+      "decInformationCorrect": "Y",
+      "status": "SUBMITTED",
+      "supersededBy": 30008,
+      "amendmentStatus": "STARTED",
+      "lastUpdate": "2018-12-15T10:30:00",
+      "amendment": "N",
+      "monthlyReturnItems": "N"
     }
 ],
   "submissions": [
@@ -435,6 +450,21 @@
       "schemeId": 10877,
       "agentId": "-",
       "submissionRequestDate": "2018-03-15T10:29:00"
+    },
+    {
+      "submissionId": 10914,
+      "submissionType": "MONTHLY_RETURN",
+      "activeObjectId": 10014,
+      "status": "SUBMITTED",
+      "hmrcMarkGenerated": "xN7pQ2rKl8mT5vBw3jH9cYzA1Fo=",
+      "hmrcMarkGgis": "xN7pQ2rKl8mT5vBw3jH9cYzA1Fo=",
+      "emailRecipient": "test@test.com",
+      "acceptedTime": "2018-12-15T10:30:00",
+      "createDate": "2018-12-15T10:28:00",
+      "lastUpdate": "2018-12-15T10:30:00",
+      "schemeId": 10877,
+      "agentId": "-",
+      "submissionRequestDate": "2018-12-15T10:29:00"
     }
   ]
 }

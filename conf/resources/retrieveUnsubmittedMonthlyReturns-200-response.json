@@ -79,6 +79,17 @@
       "status": "STARTED",
       "lastUpdate": "2026-01-06T23:24:56",
       "amendment": "N"
+    },
+    {
+      "monthlyReturnId": 30008,
+      "taxYear": 2024,
+      "taxMonth": 12,
+      "nilReturnIndicator": "Y",
+      "decInformationCorrect": "Y",
+      "decNilReturnNoPayments": "Y",
+      "status": "STARTED",
+      "lastUpdate": "2026-01-08T23:24:56",
+      "amendment": "Y"
     }
   ]
 }

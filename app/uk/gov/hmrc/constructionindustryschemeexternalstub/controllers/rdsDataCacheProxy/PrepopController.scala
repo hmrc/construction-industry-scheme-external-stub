@@ -120,9 +120,13 @@ class PrepopController @Inject() (
                   knownFacts.taxOfficeNumber == "204" && knownFacts.taxOfficeReference == "EZ00201"
                 val agentContractorSubs0 = knownFacts.accountOfficeReference == "AGT207"
 
+                // staging pen test: successful with subs
+                val penTestSubs1 =
+                  knownFacts.taxOfficeNumber == "754" && knownFacts.taxOfficeReference == "EZ10420"
+
                 if (orgNoContractor || agentNoContractor || orgContractorSubs0 || agentContractorSubs0) {
                   NotFound(Json.obj("message" -> s"No CIS subcontractor pre-pop data found for ${context(knownFacts)}"))
-                } else if (orgContractorSubs1 || agentContractorSubs1) {
+                } else if (orgContractorSubs1 || agentContractorSubs1 || penTestSubs1) {
                   val json = Json
                     .parse(resourceHelper.resourceAsString(getSubconPrepopByKnownFacts_200_ResponsePath))
                     .as[JsObject]

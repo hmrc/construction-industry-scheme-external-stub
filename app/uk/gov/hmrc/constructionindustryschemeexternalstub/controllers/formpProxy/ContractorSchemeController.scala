@@ -107,9 +107,6 @@ class ContractorSchemeController @Inject() (
 
   def applyPrepopulation: Action[JsValue] =
     authorise.async(parse.json) { implicit request =>
-      enrolmentHelper.contractorEnrolmentsOpt(request).foreach { ref =>
-        prepopAppliedKeys.put(s"${ref.taxOfficeNumber}|${ref.taxOfficeReference}", new AtomicInteger(5))
-      }
       request.body
         .validate[ApplyPrepopulationRequest]
         .foldErrorsIntoBadRequest { payload =>
@@ -192,19 +189,23 @@ class ContractorSchemeController @Inject() (
       case "EZ10700"             =>
         Ok(schemeJson(getScheme_sub1_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
 
-      // staging pen test: successful with subs — firstTime until POST /scheme/prepopulate fires, then sub1 for 5 calls then auto-reset
+      // staging pen test: successful with subs — firstTime for first 4 calls, then sub1, resets after 20
       case "EZ10420"             =>
-        if (consumePrepopCountdown(key))
+        val callNumber = nextCallAndResetAfterTwenty(key)
+        logger.info(s"[getScheme] ref=$taxOfficeReference callNumber=$callNumber")
+        if (callNumber <= 4)
+          Ok(schemeJson(getScheme_firstTime_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
+        else
           Ok(schemeJson(getScheme_sub1_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
-        else
-          Ok(schemeJson(getScheme_firstTime_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
 
-      // staging pen test: successful no records — firstTime until POST /scheme/prepopulate fires, then no-sub for 5 calls then auto-reset
+      // staging pen test: successful no records — firstTime for first 4 calls, then no-sub, resets after 20
       case "EZ10370"             =>
-        if (consumePrepopCountdown(key))
-          Ok(schemeJson(getScheme_200_no_sub_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
-        else
+        val callNumber = nextCallAndResetAfterTwenty(key)
+        logger.info(s"[getScheme] ref=$taxOfficeReference callNumber=$callNumber")
+        if (callNumber <= 4)
           Ok(schemeJson(getScheme_firstTime_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
+        else
+          Ok(schemeJson(getScheme_200_no_sub_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
 
       // cis-ui-tests PrepopulationSpec Scenario 7
       case "EZ10850"             =>
@@ -275,17 +276,7 @@ class ContractorSchemeController @Inject() (
     }
   }
 
-  private val schemeCounters    = TrieMap.empty[String, AtomicInteger]
-  private val prepopAppliedKeys = TrieMap.empty[String, AtomicInteger]
-
-  private def consumePrepopCountdown(key: String): Boolean =
-    prepopAppliedKeys.get(key) match {
-      case None          => false
-      case Some(counter) =>
-        val remaining = counter.decrementAndGet()
-        if (remaining <= 0) prepopAppliedKeys.remove(key)
-        remaining >= 0
-    }
+  private val schemeCounters = TrieMap.empty[String, AtomicInteger]
 
   private def nextCallAndResetAfterFive(key: String): Int = {
     val counter    = schemeCounters.getOrElseUpdate(key, new AtomicInteger(0))
@@ -300,7 +291,6 @@ class ContractorSchemeController @Inject() (
     Action { _ =>
       val key = s"$taxOfficeNumber|$taxOfficeReference"
       schemeCounters.remove(key)
-      prepopAppliedKeys.remove(key)
       NoContent
     }
 

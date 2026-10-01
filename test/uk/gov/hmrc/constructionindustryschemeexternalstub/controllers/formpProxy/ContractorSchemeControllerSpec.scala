@@ -278,6 +278,118 @@ class ContractorSchemeControllerSpec extends AnyWordSpec with Matchers with Mock
     }
   }
 
+  "ContractorSchemeController#getScheme for EZ10420 (staging pen test)" should {
+
+    "return firstTime response for calls 1-4" in {
+      val mockResourceHelper   = mock[ResourceHelper]
+      val mockEnrolmentsHelper = mock[EnrolmentsHelper]
+
+      when(
+        mockResourceHelper.resourceAsString(eqTo("/resources/contractorSchemes/getScheme-200-first-time-response.json"))
+      )
+        .thenReturn("""{ "prePopSuccessful": "N", "subcontractorCounter": 0 }""")
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("754", "EZ10420")))
+
+      val controller = new ContractorSchemeController(
+        authorise = new FakeAuthAction(cc.parsers),
+        resourceHelper = mockResourceHelper,
+        enrolmentHelper = mockEnrolmentsHelper,
+        cc = cc
+      )
+
+      for (_ <- 1 to 4) {
+        val result = controller.getScheme("some-instance-id")(FakeRequest(GET, "/formp-proxy/scheme/some-instance-id"))
+        status(result) mustBe OK
+        (contentAsJson(result) \ "prePopSuccessful").as[String] mustBe "N"
+      }
+    }
+
+    "return sub1 response from call 5 onwards" in {
+      val mockResourceHelper   = mock[ResourceHelper]
+      val mockEnrolmentsHelper = mock[EnrolmentsHelper]
+
+      when(
+        mockResourceHelper.resourceAsString(eqTo("/resources/contractorSchemes/getScheme-200-first-time-response.json"))
+      )
+        .thenReturn("""{ "prePopSuccessful": "N", "subcontractorCounter": 0 }""")
+      when(mockResourceHelper.resourceAsString(eqTo("/resources/contractorSchemes/getScheme-200-sub1-response.json")))
+        .thenReturn("""{ "prePopSuccessful": "Y", "subcontractorCounter": 1 }""")
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("754", "EZ10420")))
+
+      val controller = new ContractorSchemeController(
+        authorise = new FakeAuthAction(cc.parsers),
+        resourceHelper = mockResourceHelper,
+        enrolmentHelper = mockEnrolmentsHelper,
+        cc = cc
+      )
+
+      for (_ <- 1 to 4)
+        controller.getScheme("some-instance-id")(FakeRequest(GET, "/formp-proxy/scheme/some-instance-id"))
+
+      val result = controller.getScheme("some-instance-id")(FakeRequest(GET, "/formp-proxy/scheme/some-instance-id"))
+      status(result) mustBe OK
+      (contentAsJson(result) \ "prePopSuccessful").as[String] mustBe "Y"
+    }
+  }
+
+  "ContractorSchemeController#getScheme for EZ10370 (staging pen test)" should {
+
+    "return firstTime response for calls 1-4" in {
+      val mockResourceHelper   = mock[ResourceHelper]
+      val mockEnrolmentsHelper = mock[EnrolmentsHelper]
+
+      when(
+        mockResourceHelper.resourceAsString(eqTo("/resources/contractorSchemes/getScheme-200-first-time-response.json"))
+      )
+        .thenReturn("""{ "prePopSuccessful": "N", "subcontractorCounter": 0 }""")
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("754", "EZ10370")))
+
+      val controller = new ContractorSchemeController(
+        authorise = new FakeAuthAction(cc.parsers),
+        resourceHelper = mockResourceHelper,
+        enrolmentHelper = mockEnrolmentsHelper,
+        cc = cc
+      )
+
+      for (_ <- 1 to 4) {
+        val result = controller.getScheme("some-instance-id")(FakeRequest(GET, "/formp-proxy/scheme/some-instance-id"))
+        status(result) mustBe OK
+        (contentAsJson(result) \ "prePopSuccessful").as[String] mustBe "N"
+      }
+    }
+
+    "return no-sub response from call 5 onwards" in {
+      val mockResourceHelper   = mock[ResourceHelper]
+      val mockEnrolmentsHelper = mock[EnrolmentsHelper]
+
+      when(
+        mockResourceHelper.resourceAsString(eqTo("/resources/contractorSchemes/getScheme-200-first-time-response.json"))
+      )
+        .thenReturn("""{ "prePopSuccessful": "N", "subcontractorCounter": 0 }""")
+      when(mockResourceHelper.resourceAsString(eqTo("/resources/contractorSchemes/getScheme-200-no-sub-response.json")))
+        .thenReturn("""{ "prePopSuccessful": "Y", "subcontractorCounter": 0 }""")
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("754", "EZ10370")))
+
+      val controller = new ContractorSchemeController(
+        authorise = new FakeAuthAction(cc.parsers),
+        resourceHelper = mockResourceHelper,
+        enrolmentHelper = mockEnrolmentsHelper,
+        cc = cc
+      )
+
+      for (_ <- 1 to 4)
+        controller.getScheme("some-instance-id")(FakeRequest(GET, "/formp-proxy/scheme/some-instance-id"))
+
+      val result = controller.getScheme("some-instance-id")(FakeRequest(GET, "/formp-proxy/scheme/some-instance-id"))
+      status(result) mustBe OK
+      (contentAsJson(result) \ "prePopSuccessful").as[String] mustBe "Y"
+    }
+  }
+
   "ContractorSchemeController#applyPrepopulation" should {
 
     "return 200 and increment version on valid payload and enrolments" in {

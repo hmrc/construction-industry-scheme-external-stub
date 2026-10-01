@@ -337,6 +337,15 @@ or
 - Identifier Name: TaxOfficeReference
 - Identifier Value: EZ00200
 
+or (staging pen test)
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 754
+- Identifier Name: TaxOfficeReference
+- Identifier Value: EZ10420
+
 
 To trigger the happy path, ensure you provide a valid request body:
 ```json
@@ -1858,6 +1867,46 @@ This is a **stateful multi-call** scenario for the manual browser journey `Check
 ```
 
 To reset the counter manually use the test-only endpoint `DELETE /test-only/scheme-counter/:taxOfficeNumber/:taxOfficeReference`.
+
+#### Staging Pen Test Scenario: CheckSubcontractorRecords → SuccessfulAutomaticSubcontractorUpdate (TOR = EZ10420)
+
+This is a **self-resetting prepopulate-flag** scenario for staging pen testing. The stub returns `firstTime` until `POST /scheme/prepopulate` fires (triggered automatically by the UI flow), then returns `sub1` for the next 5 calls before auto-resetting. No manual counter reset is needed.
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 754
+- Identifier Name: TaxOfficeReference
+- Identifier Value: EZ10420
+
+- Request body: N/A
+- Enrolments: request must have either HMRC-CIS-ORG or IR-PAYE-AGENT Enrolment
+
+| State | Response fixture | Scenario |
+|---|---|---|
+| Before `POST /scheme/prepopulate` | `getScheme-200-first-time-response.json` | First-time state: no name/utr, `subcontractorCounter = 0`, `prePopSuccessful = "N"` |
+| Calls 1–5 after prepopulate | `getScheme-200-sub1-response.json` | Post-prepop state: name and utr present, `subcontractorCounter = 1`, `prePopSuccessful = "Y"` |
+| Call 6+ (auto-reset) | `getScheme-200-first-time-response.json` | Resets to first-time; next run starts cleanly |
+
+#### Staging Pen Test Scenario: CheckSubcontractorRecords → SuccessfulNoRecordsFound (TOR = EZ10370)
+
+This is a **self-resetting prepopulate-flag** scenario for staging pen testing. The stub returns `firstTime` until `POST /scheme/prepopulate` fires, then returns `no-sub` for the next 5 calls before auto-resetting.
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 754
+- Identifier Name: TaxOfficeReference
+- Identifier Value: EZ10370
+
+- Request body: N/A
+- Enrolments: request must have either HMRC-CIS-ORG or IR-PAYE-AGENT Enrolment
+
+| State | Response fixture | Scenario |
+|---|---|---|
+| Before `POST /scheme/prepopulate` | `getScheme-200-first-time-response.json` | First-time state: no name/utr, `subcontractorCounter = 0`, `prePopSuccessful = "N"` |
+| Calls 1–5 after prepopulate | `getScheme-200-no-sub-response.json` | Post-prepop state: name and utr present, `subcontractorCounter = 0`, `prePopSuccessful = "Y"` |
+| Call 6+ (auto-reset) | `getScheme-200-first-time-response.json` | Resets to first-time; next run starts cleanly |
 
 **Endpoint**: `/cis/govtalkstatus/get`
 
@@ -4191,7 +4240,12 @@ These endpoints are available for test setup/teardown and are not part of the pr
 
 **Endpoint**: `DELETE /test-only/scheme-counter/:taxOfficeNumber/:taxOfficeReference`
 
-**Description**: Resets the in-memory call counter for a `taxOfficeNumber`/`taxOfficeReference` pair. Use this to restart the multi-call cycle for stateful `GET /scheme/:instanceId` scenarios such as `EZ10360` (CheckSubcontractorRecords → SuccessfulNoRecordsFound) and `EZ10410` (CheckSubcontractorRecords → SuccessfulAutomaticSubcontractorUpdate).
+**Description**: Resets the in-memory call counter and prepopulate countdown for a `taxOfficeNumber`/`taxOfficeReference` pair. Use this to restart stateful `GET /scheme/:instanceId` scenarios mid-flow:
+
+- `EZ10360` — CheckSubcontractorRecords → SuccessfulNoRecordsFound (call-count cycle)
+- `EZ10410` — CheckSubcontractorRecords → SuccessfulAutomaticSubcontractorUpdate (call-count cycle)
+- `EZ10420` — Staging pen test: SuccessfulAutomaticSubcontractorUpdate (prepopulate countdown; self-resets after 5 reads, so manual reset is only needed to force-restart mid-flow)
+- `EZ10370` — Staging pen test: SuccessfulNoRecordsFound (prepopulate countdown; self-resets after 5 reads)
 
 #### Example
 

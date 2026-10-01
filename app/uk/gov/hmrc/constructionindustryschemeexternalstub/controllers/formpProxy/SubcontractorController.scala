@@ -93,13 +93,13 @@ class SubcontractorController @Inject() (
 
         case (Some(employerRef), _) =>
           (employerRef.taxOfficeNumber, employerRef.taxOfficeReference) match {
-            case ("500", _)     => InternalServerError(Json.obj("message" -> "Unexpected error"))
-            case ("502", _)     => BadGateway(Json.obj("message" -> "formp failed"))
-            case (_, "EZ00225") =>
+            case ("500", _)                                       => InternalServerError(Json.obj("message" -> "Unexpected error"))
+            case ("502", _)                                       => BadGateway(Json.obj("message" -> "formp failed"))
+            case (_, "EZ00225") | (_, "EZ10420") | (_, "EZ10370") =>
               Ok(resourceHelper.resourceAsString(getSubcontractorList_noSubcontractor_200_ResponsePath))
-            case (_, "EZ10900") =>
+            case (_, "EZ10900")                                   =>
               Ok(resourceHelper.resourceAsString(getSubcontractorList_invalidSubcontractorDetails_200_ResponsePath))
-            case _              => Ok(resourceHelper.resourceAsString(getSubcontractorList_200_ResponsePath))
+            case _                                                => Ok(resourceHelper.resourceAsString(getSubcontractorList_200_ResponsePath))
           }
 
         case (None, Some(agentRef)) =>

@@ -45,6 +45,8 @@ class SubcontractorController @Inject() (
     s"$subcontractorResponsePath/getSubcontractorList-200-noSubcontractor-response.json"
   private val getSubcontractorList_invalidSubcontractorDetails_200_ResponsePath =
     s"$subcontractorResponsePath/getSubcontractorList-200-invalid-subcontractor-response.json"
+  private val getSubcontractorList_withUnmatchedSubcontractors_200_ResponsePath =
+    s"$subcontractorResponsePath/getSubcontractorList-200-with-unmatched-subcontractors-response.json"
   private val getSubcontractorIndividual_200_ResponsePath                       =
     s"$subcontractorResponsePath/getSubcontractorIndividual-200-verifiedResponse.json"
   private val getSubcontractorTrust_200_ResponsePath                            =
@@ -99,6 +101,8 @@ class SubcontractorController @Inject() (
               Ok(resourceHelper.resourceAsString(getSubcontractorList_noSubcontractor_200_ResponsePath))
             case (_, "EZ10900")                                   =>
               Ok(resourceHelper.resourceAsString(getSubcontractorList_invalidSubcontractorDetails_200_ResponsePath))
+            case (_, "EZ00250")                                   =>
+              Ok(resourceHelper.resourceAsString(getSubcontractorList_withUnmatchedSubcontractors_200_ResponsePath))
             case _                                                => Ok(resourceHelper.resourceAsString(getSubcontractorList_200_ResponsePath))
           }
 

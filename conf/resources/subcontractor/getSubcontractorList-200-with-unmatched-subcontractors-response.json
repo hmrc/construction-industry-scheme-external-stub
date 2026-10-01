@@ -1,0 +1,42 @@
+{
+  "subcontractors": [
+    {
+      "subcontractorId": 10,
+      "subbieResourceRef": 19,
+      "utr": null,
+      "firstName": "Iris",
+      "secondName": "D",
+      "surname": "Wood",
+      "tradingName": null,
+      "subcontractorType": "soletrader",
+      "version": 1,
+      "taxTreatment": null,
+      "verificationNumber": "V0000000010",
+      "createDate": "2026-04-10T14:15:00",
+      "matched": "N",
+      "verified": null,
+      "autoVerified": null,
+      "verificationDate": null,
+      "lastMonthlyReturnDate": null
+    },
+    {
+      "subcontractorId": 11,
+      "subbieResourceRef": 20,
+      "utr": null,
+      "firstName": "Linda",
+      "secondName": "D",
+      "surname": "Jones",
+      "tradingName": null,
+      "subcontractorType": "soletrader",
+      "version": 1,
+      "taxTreatment": null,
+      "verificationNumber": "V0000000011",
+      "createDate": "2026-04-10T14:15:00",
+      "matched": "N",
+      "verified": null,
+      "autoVerified": null,
+      "verificationDate": null,
+      "lastMonthlyReturnDate": null
+    }
+  ]
+}

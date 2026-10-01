@@ -60,6 +60,8 @@ class VerificationController @Inject() (
     s"$verificationResponsePath/getCurrentVerificationBatch-200-verificationBatchStatus-chris-response.json"
   private val getCurrentVerificationBatch_200_verificationBatchStatus_Insufficient_chris_ResponsePath =
     s"$verificationResponsePath/getCurrentVerificationBatch-200-verificationBatchStatus-chris-response-insufficient.json"
+  private val getCurrentVerificationBatch_200_unmatched_ResponsePath                                  =
+    s"$verificationResponsePath/getCurrentVerificationBatch-200-unmatched-response.json"
   private val getLastSubmittedVerificationBatch_200_AllVerified_ResponsePath                          =
     s"$verificationResponsePath/getLastSubmittedVerificationBatch-200-allVerified-response.json"
   private val getLastSubmittedVerificationBatch_200_ResponsePath                                      =
@@ -70,6 +72,8 @@ class VerificationController @Inject() (
     s"$verificationResponsePath/getLastSubmittedVerificationBatch-200-verificationBatchStatus-pending-response.json"
   private val getLastSubmittedVerificationBatch_200_verificationBatchStatus_none_ResponsePath         =
     s"$verificationResponsePath/getLastSubmittedVerificationBatch-200-verificationBatchStatus-none-response.json"
+  private val getLastSubmittedVerificationBatch_200_Unmatched_ResponsePath                            =
+    s"$verificationResponsePath/getLastSubmittedVerificationBatch-200-unmatched-response.json"
   private val createVerificationBatchAndVerifications_201_ResponsePath                                =
     s"$verificationResponsePath/createVerificationBatchAndVerifications-201-response.json"
   private val createSubmissionForVerification_201_ResponsePath                                        =
@@ -127,6 +131,7 @@ class VerificationController @Inject() (
             case "150" => getLastSubmittedVerificationBatch_200_verificationBatchStatus_pending_ResponsePath
             case "175" => getLastSubmittedVerificationBatch_200_verificationBatchStatus_accepted_ResponsePath
             case "225" => getLastSubmittedVerificationBatch_200_verificationBatchStatus_none_ResponsePath
+            case "250" => getLastSubmittedVerificationBatch_200_Unmatched_ResponsePath
             case _     => getLastSubmittedVerificationBatch_200_ResponsePath
           }
 
@@ -144,6 +149,7 @@ class VerificationController @Inject() (
             case "125" => getCurrentVerificationBatch_200_verificationBatchStatus_chris_ResponsePath
             case "150" => getCurrentVerificationBatch_200_verificationBatchStatus_chris_ResponsePath
             case "175" => getCurrentVerificationBatch_200_verificationBatchStatus_chris_ResponsePath
+            case "250" => getCurrentVerificationBatch_200_unmatched_ResponsePath
             case "275" => getCurrentVerificationBatch_200_verificationBatchStatus_Insufficient_chris_ResponsePath
             case _     => getCurrentVerificationBatch_200_verificationBatchStatus_none_ResponsePath
           }

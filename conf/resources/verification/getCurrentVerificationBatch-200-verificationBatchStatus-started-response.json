@@ -66,7 +66,7 @@
       "surname": "bridges",
       "tradingName": null,
       "partnershipTradingName": null,
-      "subbieResourceRef":  13,
+      "subbieResourceRef":  23,
       "utr": "4444444444",
       "partnerUtr": null,
       "crn":  null,
@@ -258,6 +258,18 @@
       "actionIndicator": "A",
       "proceed": "Y",
       "matched": "Y"
+    },
+    {
+      "verificationId": 1003,
+      "verificationBatchId": 99,
+      "subcontractorId": 10908,
+      "verificationResourceRef": 13,
+      "subcontractorName": "Noel Armstrong",
+      "verificationNumber": null,
+      "taxTreatment": null,
+      "actionIndicator": "A",
+      "proceed": "Y",
+      "matched": null
     }
   ]
 }

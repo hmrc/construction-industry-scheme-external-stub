@@ -54,6 +54,7 @@ class CisTaxpayerController @Inject() (
           er => {
             val uniqueIdMap: Map[String, String] = Map(
               "EZ10800" -> "800",
+              "EZ10700" -> "777",
               "EZ00125" -> "125",
               "EZ00150" -> "150",
               "EZ00175" -> "175",

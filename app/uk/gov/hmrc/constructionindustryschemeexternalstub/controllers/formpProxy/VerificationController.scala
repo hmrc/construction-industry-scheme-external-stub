@@ -52,6 +52,8 @@ class VerificationController @Inject() (
     s"$verificationResponsePath/getNewestVerificationBatch-200-response-unmatched.json"
   private val getNewestVerificationBatch_200_Insufficient_ResponsePath                                =
     s"$verificationResponsePath/getNewestVerificationBatch-200-response-insufficient.json"
+  private val getNewestVerificationBatch_200_SubmittedNoReceipt_ResponsePath                          =
+    s"$verificationResponsePath/getNewestVerificationBatch-200-response-submitted-no-receipt.json"
   private val getCurrentVerificationBatch_200_verificationBatchStatus_none_ResponsePath               =
     s"$verificationResponsePath/getCurrentVerificationBatch-200-verificationBatchStatus-none-response.json"
   private val getCurrentVerificationBatch_200_verificationBatchStatus_started_ResponsePath            =
@@ -111,6 +113,7 @@ class VerificationController @Inject() (
             case "225" => getNewestVerificationBatch_200_no_Subcontractor_ResponsePath
             case "250" => getNewestVerificationBatch_200_Unmatched_ResponsePath
             case "275" => getNewestVerificationBatch_200_Insufficient_ResponsePath
+            case "777" => getNewestVerificationBatch_200_SubmittedNoReceipt_ResponsePath
             case _     => getNewestVerificationBatch_200_ResponsePath
           }
 
@@ -145,6 +148,7 @@ class VerificationController @Inject() (
             case "150" => getCurrentVerificationBatch_200_verificationBatchStatus_chris_ResponsePath
             case "175" => getCurrentVerificationBatch_200_verificationBatchStatus_chris_ResponsePath
             case "275" => getCurrentVerificationBatch_200_verificationBatchStatus_Insufficient_chris_ResponsePath
+            case "777" => getCurrentVerificationBatch_200_verificationBatchStatus_started_ResponsePath
             case _     => getCurrentVerificationBatch_200_verificationBatchStatus_none_ResponsePath
           }
 

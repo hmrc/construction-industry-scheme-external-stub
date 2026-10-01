@@ -101,7 +101,7 @@ class SubcontractorController @Inject() (
               Ok(resourceHelper.resourceAsString(getSubcontractorList_noSubcontractor_200_ResponsePath))
             case (_, "EZ10900")                                   =>
               Ok(resourceHelper.resourceAsString(getSubcontractorList_invalidSubcontractorDetails_200_ResponsePath))
-            case (_, "EZ00250") =>
+            case (_, "EZ00250")                                   =>
               Ok(resourceHelper.resourceAsString(getSubcontractorList_withUnmatchedSubcontractors_200_ResponsePath))
             case _                                                => Ok(resourceHelper.resourceAsString(getSubcontractorList_200_ResponsePath))
           }

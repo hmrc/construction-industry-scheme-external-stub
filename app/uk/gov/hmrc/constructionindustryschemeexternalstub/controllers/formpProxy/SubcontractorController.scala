@@ -223,6 +223,15 @@ class SubcontractorController @Inject() (
         }
     }
 
+  def updateSubcontractorForFinalValidation: Action[JsValue] =
+    authorise.async(parse.json) { implicit request =>
+      request.body
+        .validate[FinalValidationUpdateSubcontractorRequest]
+        .foldErrorsIntoBadRequest { _ =>
+          Future.successful(NoContent)
+        }
+    }
+
   private def handleUpdateSubcontractor(
     subcontractor: Subcontractor,
     actionName: String

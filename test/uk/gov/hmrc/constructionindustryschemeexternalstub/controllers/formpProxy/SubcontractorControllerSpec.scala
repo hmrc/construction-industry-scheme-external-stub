@@ -24,10 +24,9 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.actions.FakeAuthAction
 import uk.gov.hmrc.constructionindustryschemeexternalstub.base.SpecBase
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.EmployerReference
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests._
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.ContractorScheme
-import uk.gov.hmrc.constructionindustryschemeexternalstub.models.response._
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.{ContractorScheme, EmployerReference, FinalValidationSubcontractorPatch}
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.requests.*
+import uk.gov.hmrc.constructionindustryschemeexternalstub.models.response.*
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.{EnrolmentsHelper, ResourceHelper}
 
 import scala.concurrent.Future
@@ -40,6 +39,7 @@ class SubcontractorControllerSpec extends SpecBase {
   private val getSubcontractorListUrl: String                               = s"/cis/subcontractors/$getListCisId"
   private val updateExistingSubcontractorUrl: String                        = "/cis/subcontractor/update"
   private val editExistingSubcontractorUrl: String                          = "/cis/subcontractor/edit"
+  private val updateSubcontractorForFinalValidationUrl: String              = "/cis/subcontractor/final-validation/update"
   private val sampleSubcontractorListResponse: GetSubcontractorListResponse =
     GetSubcontractorListResponse(
       subcontractors = List(
@@ -796,6 +796,58 @@ class SubcontractorControllerSpec extends SpecBase {
 
       (contentAsJson(res) \ "message")
         .as[String] mustBe "Missing enrolments"
+    }
+  }
+
+  ".updateSubcontractorForFinalValidation" - {
+
+    val validUpdateJson: JsValue =
+      Json.toJson(
+        FinalValidationUpdateSubcontractorRequest(
+          instanceId = "abc-123",
+          subcontractorId = 999L,
+          subbieResourceRef = 10L,
+          changeTargets = Set("tradingName"),
+          patch = FinalValidationSubcontractorPatch(
+            tradingName = Some("Updated Trading Name")
+          )
+        )
+      )
+
+    "returns 204 NoContent when payload is valid" in new Setup {
+
+      val req: FakeRequest[JsValue] =
+        makeJsonRequest(
+          validUpdateJson,
+          updateSubcontractorForFinalValidationUrl
+        )
+
+      val res: Future[Result] =
+        controller.updateSubcontractorForFinalValidation(req)
+
+      status(res) mustBe NO_CONTENT
+      contentAsString(res) mustBe ""
+    }
+
+    "returns 400 BadRequest when payload is invalid" in new Setup {
+
+      val invalidJson: JsValue =
+        Json.obj(
+          "bad" -> "payload"
+        )
+
+      val req: FakeRequest[JsValue] =
+        makeJsonRequest(
+          invalidJson,
+          updateSubcontractorForFinalValidationUrl
+        )
+
+      val res: Future[Result] =
+        controller.updateSubcontractorForFinalValidation(req)
+
+      status(res) mustBe BAD_REQUEST
+      (contentAsJson(res) \ "message").as[String] mustBe "Invalid JSON body"
+      (contentAsJson(res) \ "errors").isDefined mustBe true
     }
   }
 

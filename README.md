@@ -1870,7 +1870,7 @@ To reset the counter manually use the test-only endpoint `DELETE /test-only/sche
 
 #### Staging Pen Test Scenario: CheckSubcontractorRecords → SuccessfulAutomaticSubcontractorUpdate (TOR = EZ10420)
 
-This is a **self-resetting prepopulate-flag** scenario for staging pen testing. The stub returns `firstTime` until `POST /scheme/prepopulate` fires (triggered automatically by the UI flow), then returns `sub1` for the next 5 calls before auto-resetting. No manual counter reset is needed.
+This is a **stateful multi-call** scenario for the staging pen test journey `CheckSubcontractorRecords -> SuccessfulAutomaticSubcontractorUpdate`. The stub tracks a per-key call counter and varies the response accordingly. No manual counter reset is needed.
 
 - Affinity Group: Organisation
 - Enrolment Key: HMRC-CIS-ORG
@@ -1882,15 +1882,17 @@ This is a **self-resetting prepopulate-flag** scenario for staging pen testing. 
 - Request body: N/A
 - Enrolments: request must have either HMRC-CIS-ORG or IR-PAYE-AGENT Enrolment
 
-| State | Response fixture | Scenario |
+| Call number | Response fixture | Scenario |
 |---|---|---|
-| Before `POST /scheme/prepopulate` | `getScheme-200-first-time-response.json` | First-time state: no name/utr, `subcontractorCounter = 0`, `prePopSuccessful = "N"` |
-| Calls 1–5 after prepopulate | `getScheme-200-sub1-response.json` | Post-prepop state: name and utr present, `subcontractorCounter = 1`, `prePopSuccessful = "Y"` |
-| Call 6+ (auto-reset) | `getScheme-200-first-time-response.json` | Resets to first-time; next run starts cleanly |
+| 1–4 | `getScheme-200-first-time-response.json` | First-time state: no name/utr, `subcontractorCounter = 0`, `prePopSuccessful = "N"` |
+| 5–6 | `getScheme-200-sub1-response.json` | Post-check state: name and utr present, `subcontractorCounter = 1`, `prePopSuccessful = "Y"` |
+| 7 | `getScheme-200-first-time-response.json` (counter resets) | Counter resets so the cycle repeats from call 1 |
+
+To reset the counter manually use the test-only endpoint `DELETE /test-only/scheme-counter/:taxOfficeNumber/:taxOfficeReference`.
 
 #### Staging Pen Test Scenario: CheckSubcontractorRecords → SuccessfulNoRecordsFound (TOR = EZ10370)
 
-This is a **self-resetting prepopulate-flag** scenario for staging pen testing. The stub returns `firstTime` until `POST /scheme/prepopulate` fires, then returns `no-sub` for the next 5 calls before auto-resetting.
+This is a **stateful multi-call** scenario for the staging pen test journey `CheckSubcontractorRecords -> SuccessfulNoRecordsFound`. The stub tracks a per-key call counter and varies the response accordingly. No manual counter reset is needed.
 
 - Affinity Group: Organisation
 - Enrolment Key: HMRC-CIS-ORG
@@ -1902,11 +1904,13 @@ This is a **self-resetting prepopulate-flag** scenario for staging pen testing. 
 - Request body: N/A
 - Enrolments: request must have either HMRC-CIS-ORG or IR-PAYE-AGENT Enrolment
 
-| State | Response fixture | Scenario |
+| Call number | Response fixture | Scenario |
 |---|---|---|
-| Before `POST /scheme/prepopulate` | `getScheme-200-first-time-response.json` | First-time state: no name/utr, `subcontractorCounter = 0`, `prePopSuccessful = "N"` |
-| Calls 1–5 after prepopulate | `getScheme-200-no-sub-response.json` | Post-prepop state: name and utr present, `subcontractorCounter = 0`, `prePopSuccessful = "Y"` |
-| Call 6+ (auto-reset) | `getScheme-200-first-time-response.json` | Resets to first-time; next run starts cleanly |
+| 1–4 | `getScheme-200-first-time-response.json` | First-time state: no name/utr, `subcontractorCounter = 0`, `prePopSuccessful = "N"` |
+| 5–6 | `getScheme-200-no-sub-response.json` | Post-check state: name and utr present, `subcontractorCounter = 0`, `prePopSuccessful = "Y"` |
+| 7 | `getScheme-200-first-time-response.json` (counter resets) | Counter resets so the cycle repeats from call 1 |
+
+To reset the counter manually use the test-only endpoint `DELETE /test-only/scheme-counter/:taxOfficeNumber/:taxOfficeReference`.
 
 **Endpoint**: `/cis/govtalkstatus/get`
 

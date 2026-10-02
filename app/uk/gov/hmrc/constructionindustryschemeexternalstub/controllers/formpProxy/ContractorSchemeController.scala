@@ -189,18 +189,18 @@ class ContractorSchemeController @Inject() (
       case "EZ10700"             =>
         Ok(schemeJson(getScheme_sub1_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
 
-      // staging pen test: successful with subs — firstTime for first 4 calls, then sub1, resets after 20
+      // staging pen test: successful with subs — firstTime for first 4 calls, then sub1, resets after 5
       case "EZ10420"             =>
-        val callNumber = nextCallAndResetAfterTwenty(key)
+        val callNumber = nextCallAndResetAfterFive(key)
         logger.info(s"[getScheme] ref=$taxOfficeReference callNumber=$callNumber")
         if (callNumber <= 4)
           Ok(schemeJson(getScheme_firstTime_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
         else
           Ok(schemeJson(getScheme_sub1_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))
 
-      // staging pen test: successful no records — firstTime for first 4 calls, then no-sub, resets after 20
+      // staging pen test: successful no records — firstTime for first 4 calls, then no-sub, resets after 5
       case "EZ10370"             =>
-        val callNumber = nextCallAndResetAfterTwenty(key)
+        val callNumber = nextCallAndResetAfterFive(key)
         logger.info(s"[getScheme] ref=$taxOfficeReference callNumber=$callNumber")
         if (callNumber <= 4)
           Ok(schemeJson(getScheme_firstTime_ResponsePath, Some(taxOfficeNumber), Some(taxOfficeReference)))

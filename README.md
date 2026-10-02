@@ -172,6 +172,22 @@ To trigger this path, ensure you provide a valid request body:
 }
 ```
 
+#### TOR → uniqueId routing
+
+These TORs return the base fixture with a specific `uniqueId` value, which is used as the `instanceId` for downstream formp-proxy calls (e.g. `getNewestVerificationBatch`, `getCurrentVerificationBatch`). All other TORs return `uniqueId = "1"`.
+
+| TaxOfficeReference | uniqueId |
+|---|---|
+| `EZ10800` | `800` |
+| `EZ10700` | `777` — SUBMITTED_NO_RECEIPT scenario (null `verificationNumber`) |
+| `EZ00125` | `125` |
+| `EZ00150` | `150` |
+| `EZ00175` | `175` |
+| `EZ00200` | `200` |
+| `EZ00225` | `225` |
+| `EZ00250` | `250` |
+| `EZ00275` | `275` |
+
 **Endpoint**: `GET /cis/client-list-status?credentialId=$credentialId&serviceName=$serviceName&gracePeriod=$gracePeriodSeconds`
 
 **Description**: Returns the status of the client list download process.
@@ -2601,7 +2617,19 @@ To trigger the happy path, ensure you provide a valid request body:
 - Identifier Value: Any
 
 - Response status: `200`
-- Response body: `resources/verification/getNewestVerificationBatch-200-response.json`
+- Response body: varies by `instanceId`:
+
+| instanceId | Response fixture |
+|---|---|
+| `777` | `getNewestVerificationBatch-200-response-submitted-no-receipt.json` (null `verificationNumber`, SUBMITTED_NO_RECEIPT scenario) |
+| `250` | `getNewestVerificationBatch-200-response-unmatched.json` |
+| `275` | `getNewestVerificationBatch-200-response-insufficient.json` |
+| `200` | `getNewestVerificationBatch-200-response-verification-in-progress.json` |
+| `225` | `getNewestVerificationBatch-200-response-no-subcontractor.json` |
+| `175` | `getNewestVerificationBatch-200-response-inactive.json` |
+| `150` | `getNewestVerificationBatch-200-response-no-newly-added.json` |
+| `125` | `getNewestVerificationBatch-200-response-no-reverify.json` |
+| `1`, `800`, or any other | `getNewestVerificationBatch-200-response.json` |
 
 #### Happy Path (Agent)
 
@@ -2611,7 +2639,7 @@ To trigger the happy path, ensure you provide a valid request body:
 - Identifier Value: Any
 
 - Response status: `200`
-- Response body: `resources/verification/getNewestVerificationBatch-200-response.json`
+- Response body: same instanceId routing as Organisation above.
 
 #### Unhappy Paths (Organisation)
 
@@ -2695,8 +2723,14 @@ To trigger the happy path, ensure you provide a valid request body:
 - Identifier Value: Any
 
 - Response status: `200`
-- Response body (instance id not 1): `resources/verification/getCurrentVerificationBatch-200-verificationBatchStatus-started-response.json`
-- Response body (instance id equal 1): `resources/verification/getCurrentVerificationBatch-200-verificationBatchStatus-none-response.json`
+- Response body varies by `instanceId`:
+
+| instanceId | Response fixture |
+|---|---|
+| `1`, `777` | `getCurrentVerificationBatch-200-verificationBatchStatus-started-response.json` |
+| `800`, `125`, `150`, `175` | `getCurrentVerificationBatch-200-verificationBatchStatus-chris-response.json` |
+| `275` | `getCurrentVerificationBatch-200-verificationBatchStatus-chris-response-insufficient.json` |
+| any other | `getCurrentVerificationBatch-200-verificationBatchStatus-none-response.json` |
 
 #### Happy Path (Agent)
 
@@ -2706,8 +2740,7 @@ To trigger the happy path, ensure you provide a valid request body:
 - Identifier Value: Any
 
 - Response status: `200`
-- Response body (instance id not 1): `resources/verification/getCurrentVerificationBatch-200-verificationBatchStatus-started-response.json`
-- Response body (instance id equal 1): `resources/verification/getCurrentVerificationBatch-200-verificationBatchStatus-none-response.json`
+- Response body: same instanceId routing as Organisation above.
 
 #### Unhappy Paths (Organisation)
 

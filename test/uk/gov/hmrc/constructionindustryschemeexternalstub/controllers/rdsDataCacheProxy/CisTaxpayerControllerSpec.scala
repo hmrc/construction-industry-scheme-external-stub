@@ -91,6 +91,7 @@ class CisTaxpayerControllerSpec extends SpecBase with MockitoSugar {
       }
 
       Seq(
+        "EZ10700" -> "777",
         "EZ00250" -> "250",
         "EZ00275" -> "275"
       ).foreach { case (taxOfficeReference, expectedUniqueId) =>

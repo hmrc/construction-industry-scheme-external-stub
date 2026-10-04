@@ -299,51 +299,111 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
 
   ".retrieveUnsubmittedMonthlyReturns" - {
 
-    "returns 200 when JSON body is valid" in new Setup {
-      when(mockResourceHelper.resourceAsString(any()))
-        .thenReturn(
-          """{"scheme":{"schemeId":1,"instanceId":"123","accountsOfficeReference":"a","taxOfficeNumber":"1","taxOfficeReference":"b"},"monthlyReturn":[]}"""
-        )
+    "returns 200 with normal fixture for non-EZ00300 tax office reference" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("101", "AB0001")))
 
-      val req: FakeRequest[JsValue] =
+      when(
+        mockResourceHelper.resourceAsString(
+          "/resources/retrieveUnsubmittedMonthlyReturns-200-response.json"
+        )
+      ).thenReturn(
+        """{"scheme":{"schemeId":1,"instanceId":"123","accountsOfficeReference":"a","taxOfficeNumber":"1","taxOfficeReference":"b"},"monthlyReturn":[{"monthlyReturnId":1}]}"""
+      )
+
+      val request =
         FakeRequest(POST, "/monthly-return")
           .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
           .withBody(Json.obj("instanceId" -> "abc-123"))
 
-      val res = controller.retrieveUnsubmittedMonthlyReturns(req)
+      val result = controller.retrieveUnsubmittedMonthlyReturns(request)
 
-      status(res) mustBe OK
+      status(result) mustBe OK
+
+      verify(mockResourceHelper).resourceAsString(
+        "/resources/retrieveUnsubmittedMonthlyReturns-200-response.json"
+      )
+    }
+
+    "returns 200 with empty fixture for taxOfficeReference EZ00300" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("101", "EZ00300")))
+
+      when(
+        mockResourceHelper.resourceAsString(
+          "/resources/retrieveUnsubmittedMonthlyReturns-empty-200-response.json"
+        )
+      ).thenReturn(
+        """{"scheme":{"schemeId":1,"instanceId":"123","accountsOfficeReference":"a","taxOfficeNumber":"101","taxOfficeReference":"EZ00300"},"monthlyReturn":[]}"""
+      )
+
+      val request =
+        FakeRequest(POST, "/monthly-return")
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(Json.obj("instanceId" -> "abc-123"))
+
+      val result = controller.retrieveUnsubmittedMonthlyReturns(request)
+
+      status(result) mustBe OK
+
+      verify(mockResourceHelper).resourceAsString(
+        "/resources/retrieveUnsubmittedMonthlyReturns-empty-200-response.json"
+      )
     }
   }
 
   ".retrieveSubmittedMonthlyReturns" - {
 
-    "returns 200 when JSON body is valid" in new Setup {
-      when(mockResourceHelper.resourceAsString(any()))
-        .thenReturn(
-          """{"scheme":{"schemeId":1,"instanceId":"123","accountsOfficeReference":"a","taxOfficeNumber":"1","taxOfficeReference":"b"},"monthlyReturn":[]}"""
-        )
+    "returns 200 with normal fixture for non-EZ00300 tax office reference" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("101", "AB0001")))
 
-      val req: FakeRequest[JsValue] =
+      when(
+        mockResourceHelper.resourceAsString(
+          "/resources/retrieveSubmittedMonthlyReturns-200-response.json"
+        )
+      ).thenReturn(
+        """{"scheme":{"schemeId":1,"instanceId":"123","accountsOfficeReference":"a","taxOfficeNumber":"1","taxOfficeReference":"b"},"monthlyReturn":[]}"""
+      )
+
+      val request =
         FakeRequest(POST, "/cis/retrieve-submitted-monthly-returns")
           .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
           .withBody(Json.obj("instanceId" -> "abc-123"))
 
-      val res = controller.retrieveSubmittedMonthlyReturns(req)
+      val result = controller.retrieveSubmittedMonthlyReturns(request)
 
-      status(res) mustBe OK
+      status(result) mustBe OK
+
+      verify(mockResourceHelper).resourceAsString(
+        "/resources/retrieveSubmittedMonthlyReturns-200-response.json"
+      )
     }
 
-    "returns 400 when JSON body is invalid" in new Setup {
-      val req: FakeRequest[JsValue] =
+    "returns 200 with empty fixture for taxOfficeReference EZ00300" in new Setup {
+      when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+        .thenReturn(Some(EmployerReference("101", "EZ00300")))
+
+      when(
+        mockResourceHelper.resourceAsString(
+          "/resources/retrieveSubmittedMonthlyReturns-empty-200-response.json"
+        )
+      ).thenReturn(
+        """{"scheme":{"schemeId":1,"instanceId":"123","accountsOfficeReference":"a","taxOfficeNumber":"101","taxOfficeReference":"EZ00300"},"monthlyReturn":[]}"""
+      )
+
+      val request =
         FakeRequest(POST, "/cis/retrieve-submitted-monthly-returns")
           .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
-          .withBody(Json.obj("somethingElse" -> "oops"))
+          .withBody(Json.obj("instanceId" -> "abc-123"))
 
-      val res = controller.retrieveSubmittedMonthlyReturns(req)
+      val result = controller.retrieveSubmittedMonthlyReturns(request)
 
-      status(res) mustBe BAD_REQUEST
-      (contentAsJson(res) \ "message").as[String] mustBe "Invalid JSON body"
+      status(result) mustBe OK
+
+      verify(mockResourceHelper).resourceAsString(
+        "/resources/retrieveSubmittedMonthlyReturns-empty-200-response.json"
+      )
     }
   }
 
@@ -609,6 +669,50 @@ class MonthlyReturnControllerSpec extends AnyFreeSpec with Matchers with ScalaFu
 
       verify(mockResourceHelper).resourceAsString(
         "/resources/getMonthlyReturnForEdit-200-response.json"
+      )
+    }
+
+    "returns the nil amendment fixture for tax month 12 when isAmendment is true" in new Setup {
+      val response =
+        Json.obj(
+          "monthlyReturn" -> Json.arr(
+            Json.obj(
+              "taxYear"            -> 2024,
+              "taxMonth"           -> 12,
+              "nilReturnIndicator" -> "Y",
+              "status"             -> "STARTED",
+              "amendment"          -> "Y"
+            )
+          ),
+          "submission"    -> Json.arr()
+        )
+
+      when(
+        mockResourceHelper.resourceAsString(
+          "/resources/getMonthlyReturnForEdit-nil-200-response.json"
+        )
+      ).thenReturn(response.toString)
+
+      val req: FakeRequest[JsValue] =
+        FakeRequest(POST, "/formp-proxy/cis/monthly-return-edit")
+          .withHeaders(CONTENT_TYPE -> JSON, ACCEPT -> JSON)
+          .withBody(
+            Json.obj(
+              "instanceId"  -> "abc-123",
+              "taxYear"     -> 2024,
+              "taxMonth"    -> 12,
+              "isAmendment" -> true
+            )
+          )
+
+      val result: Future[Result] =
+        controller.getMonthlyReturnForEdit(req)
+
+      status(result) mustBe OK
+      contentAsJson(result) mustBe response
+
+      verify(mockResourceHelper).resourceAsString(
+        "/resources/getMonthlyReturnForEdit-nil-200-response.json"
       )
     }
   }

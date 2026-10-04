@@ -129,6 +129,10 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
       (
         "275",
         "/resources/verification/getNewestVerificationBatch-200-response-insufficient.json"
+      ),
+      (
+        "777",
+        "/resources/verification/getNewestVerificationBatch-200-response-submitted-no-receipt.json"
       )
     ).foreach { case (testInstanceId, expectedResponsePath) =>
       s"select the correct segregated response for instanceId $testInstanceId" in new Setup {
@@ -438,6 +442,32 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
 
         val result =
           controller.getCurrentVerificationBatch("275")(request)
+
+        status(result) mustBe OK
+        contentAsJson(result) mustBe Json.obj()
+
+        verify(mockResourceHelper).resourceAsString(expectedResponsePath)
+      }
+
+      "select the started current-verification response for instanceId 777" in new Setup {
+        val expectedResponsePath =
+          "/resources/verification/getCurrentVerificationBatch-200-verificationBatchStatus-started-response.json"
+
+        when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+          .thenReturn(Some(EmployerReference("200", "")))
+        when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+          .thenReturn(None)
+        when(mockResourceHelper.resourceAsString(expectedResponsePath))
+          .thenReturn(Json.obj().toString())
+
+        val request =
+          FakeRequest(
+            GET,
+            "/cis/verification-batch/current/777"
+          )
+
+        val result =
+          controller.getCurrentVerificationBatch("777")(request)
 
         status(result) mustBe OK
         contentAsJson(result) mustBe Json.obj()

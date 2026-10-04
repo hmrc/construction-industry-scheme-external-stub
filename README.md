@@ -172,6 +172,22 @@ To trigger this path, ensure you provide a valid request body:
 }
 ```
 
+#### TOR → uniqueId routing
+
+These TORs return the base fixture with a specific `uniqueId` value, which is used as the `instanceId` for downstream formp-proxy calls (e.g. `getNewestVerificationBatch`, `getCurrentVerificationBatch`). All other TORs return `uniqueId = "1"`.
+
+| TaxOfficeReference | uniqueId |
+|---|---|
+| `EZ10800` | `800` |
+| `EZ10700` | `777` — SUBMITTED_NO_RECEIPT scenario (null `verificationNumber`) |
+| `EZ00125` | `125` |
+| `EZ00150` | `150` |
+| `EZ00175` | `175` |
+| `EZ00200` | `200` |
+| `EZ00225` | `225` |
+| `EZ00250` | `250` |
+| `EZ00275` | `275` |
+
 **Endpoint**: `GET /cis/client-list-status?credentialId=$credentialId&serviceName=$serviceName&gracePeriod=$gracePeriodSeconds`
 
 **Description**: Returns the status of the client list download process.
@@ -336,6 +352,15 @@ or
 - Identifier Value: 204
 - Identifier Name: TaxOfficeReference
 - Identifier Value: EZ00200
+
+or (staging pen test)
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 754
+- Identifier Name: TaxOfficeReference
+- Identifier Value: EZ10420
 
 
 To trigger the happy path, ensure you provide a valid request body:
@@ -1859,6 +1884,50 @@ This is a **stateful multi-call** scenario for the manual browser journey `Check
 
 To reset the counter manually use the test-only endpoint `DELETE /test-only/scheme-counter/:taxOfficeNumber/:taxOfficeReference`.
 
+#### Staging Pen Test Scenario: CheckSubcontractorRecords → SuccessfulAutomaticSubcontractorUpdate (TOR = EZ10420)
+
+This is a **stateful multi-call** scenario for the staging pen test journey `CheckSubcontractorRecords -> SuccessfulAutomaticSubcontractorUpdate`. The stub tracks a per-key call counter and varies the response accordingly. No manual counter reset is needed.
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 754
+- Identifier Name: TaxOfficeReference
+- Identifier Value: EZ10420
+
+- Request body: N/A
+- Enrolments: request must have either HMRC-CIS-ORG or IR-PAYE-AGENT Enrolment
+
+| Call number | Response fixture | Scenario |
+|---|---|---|
+| 1–4 | `getScheme-200-first-time-response.json` | First-time state: no name/utr, `subcontractorCounter = 0`, `prePopSuccessful = "N"` |
+| 5–6 | `getScheme-200-sub1-response.json` | Post-check state: name and utr present, `subcontractorCounter = 1`, `prePopSuccessful = "Y"` |
+| 7 | `getScheme-200-first-time-response.json` (counter resets) | Counter resets so the cycle repeats from call 1 |
+
+To reset the counter manually use the test-only endpoint `DELETE /test-only/scheme-counter/:taxOfficeNumber/:taxOfficeReference`.
+
+#### Staging Pen Test Scenario: CheckSubcontractorRecords → SuccessfulNoRecordsFound (TOR = EZ10370)
+
+This is a **stateful multi-call** scenario for the staging pen test journey `CheckSubcontractorRecords -> SuccessfulNoRecordsFound`. The stub tracks a per-key call counter and varies the response accordingly. No manual counter reset is needed.
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 754
+- Identifier Name: TaxOfficeReference
+- Identifier Value: EZ10370
+
+- Request body: N/A
+- Enrolments: request must have either HMRC-CIS-ORG or IR-PAYE-AGENT Enrolment
+
+| Call number | Response fixture | Scenario |
+|---|---|---|
+| 1–4 | `getScheme-200-first-time-response.json` | First-time state: no name/utr, `subcontractorCounter = 0`, `prePopSuccessful = "N"` |
+| 5–6 | `getScheme-200-no-sub-response.json` | Post-check state: name and utr present, `subcontractorCounter = 0`, `prePopSuccessful = "Y"` |
+| 7 | `getScheme-200-first-time-response.json` (counter resets) | Counter resets so the cycle repeats from call 1 |
+
+To reset the counter manually use the test-only endpoint `DELETE /test-only/scheme-counter/:taxOfficeNumber/:taxOfficeReference`.
+
 **Endpoint**: `/cis/govtalkstatus/get`
 
 **Description**: Get GovTalk Status Record. The stub allows triggering specific HTTP responses by providing special enrolment identifiers
@@ -2548,7 +2617,19 @@ To trigger the happy path, ensure you provide a valid request body:
 - Identifier Value: Any
 
 - Response status: `200`
-- Response body: `resources/verification/getNewestVerificationBatch-200-response.json`
+- Response body: varies by `instanceId`:
+
+| instanceId | Response fixture |
+|---|---|
+| `777` | `getNewestVerificationBatch-200-response-submitted-no-receipt.json` (null `verificationNumber`, SUBMITTED_NO_RECEIPT scenario) |
+| `250` | `getNewestVerificationBatch-200-response-unmatched.json` |
+| `275` | `getNewestVerificationBatch-200-response-insufficient.json` |
+| `200` | `getNewestVerificationBatch-200-response-verification-in-progress.json` |
+| `225` | `getNewestVerificationBatch-200-response-no-subcontractor.json` |
+| `175` | `getNewestVerificationBatch-200-response-inactive.json` |
+| `150` | `getNewestVerificationBatch-200-response-no-newly-added.json` |
+| `125` | `getNewestVerificationBatch-200-response-no-reverify.json` |
+| `1`, `800`, or any other | `getNewestVerificationBatch-200-response.json` |
 
 #### Happy Path (Agent)
 
@@ -2558,7 +2639,7 @@ To trigger the happy path, ensure you provide a valid request body:
 - Identifier Value: Any
 
 - Response status: `200`
-- Response body: `resources/verification/getNewestVerificationBatch-200-response.json`
+- Response body: same instanceId routing as Organisation above.
 
 #### Unhappy Paths (Organisation)
 
@@ -2642,8 +2723,14 @@ To trigger the happy path, ensure you provide a valid request body:
 - Identifier Value: Any
 
 - Response status: `200`
-- Response body (instance id not 1): `resources/verification/getCurrentVerificationBatch-200-verificationBatchStatus-started-response.json`
-- Response body (instance id equal 1): `resources/verification/getCurrentVerificationBatch-200-verificationBatchStatus-none-response.json`
+- Response body varies by `instanceId`:
+
+| instanceId | Response fixture |
+|---|---|
+| `1`, `777` | `getCurrentVerificationBatch-200-verificationBatchStatus-started-response.json` |
+| `800`, `125`, `150`, `175` | `getCurrentVerificationBatch-200-verificationBatchStatus-chris-response.json` |
+| `275` | `getCurrentVerificationBatch-200-verificationBatchStatus-chris-response-insufficient.json` |
+| any other | `getCurrentVerificationBatch-200-verificationBatchStatus-none-response.json` |
 
 #### Happy Path (Agent)
 
@@ -2653,8 +2740,7 @@ To trigger the happy path, ensure you provide a valid request body:
 - Identifier Value: Any
 
 - Response status: `200`
-- Response body (instance id not 1): `resources/verification/getCurrentVerificationBatch-200-verificationBatchStatus-started-response.json`
-- Response body (instance id equal 1): `resources/verification/getCurrentVerificationBatch-200-verificationBatchStatus-none-response.json`
+- Response body: same instanceId routing as Organisation above.
 
 #### Unhappy Paths (Organisation)
 
@@ -4191,7 +4277,12 @@ These endpoints are available for test setup/teardown and are not part of the pr
 
 **Endpoint**: `DELETE /test-only/scheme-counter/:taxOfficeNumber/:taxOfficeReference`
 
-**Description**: Resets the in-memory call counter for a `taxOfficeNumber`/`taxOfficeReference` pair. Use this to restart the multi-call cycle for stateful `GET /scheme/:instanceId` scenarios such as `EZ10360` (CheckSubcontractorRecords → SuccessfulNoRecordsFound) and `EZ10410` (CheckSubcontractorRecords → SuccessfulAutomaticSubcontractorUpdate).
+**Description**: Resets the in-memory call counter and prepopulate countdown for a `taxOfficeNumber`/`taxOfficeReference` pair. Use this to restart stateful `GET /scheme/:instanceId` scenarios mid-flow:
+
+- `EZ10360` — CheckSubcontractorRecords → SuccessfulNoRecordsFound (call-count cycle)
+- `EZ10410` — CheckSubcontractorRecords → SuccessfulAutomaticSubcontractorUpdate (call-count cycle)
+- `EZ10420` — Staging pen test: SuccessfulAutomaticSubcontractorUpdate (prepopulate countdown; self-resets after 5 reads, so manual reset is only needed to force-restart mid-flow)
+- `EZ10370` — Staging pen test: SuccessfulNoRecordsFound (prepopulate countdown; self-resets after 5 reads)
 
 #### Example
 

@@ -1,0 +1,93 @@
+{
+  "scheme": {
+    "accountsOfficeReference": "123PA00123456",
+    "name": "John",
+    "utr": "1111111111",
+    "emailAddress": "ops@example.com"
+  },
+  "subcontractors": [
+    {
+      "subcontractorId": 1,
+      "firstName": "John",
+      "secondName": null,
+      "surname": "Smith",
+      "tradingName": "ACME",
+      "partnershipTradingName": "ACME trading",
+      "verified": "Y",
+      "verificationNumber": "V0000000001",
+      "taxTreatment": "0",
+      "verificationDate": "2026-04-01T10:00:00",
+      "lastMonthlyReturnDate": null,
+      "createDate": "2026-04-01T10:00:00",
+      "subcontractorType": "soletrader",
+      "subbieResourceRef": 10,
+      "utr": "1111111111",
+      "partnerUtr": null,
+      "crn":  "99999",
+      "nino": "AA123456A"
+    },
+    {
+      "subcontractorId": 10908,
+      "firstName": "Noel",
+      "secondName": null,
+      "surname": "Armstrong",
+      "tradingName": "DBB Construction",
+      "partnershipTradingName": null,
+      "verified": null,
+      "verificationNumber": null,
+      "taxTreatment": null,
+      "verificationDate": null,
+      "lastMonthlyReturnDate": null,
+      "createDate": "2026-04-10T14:15:00",
+      "subcontractorType": "soletrader",
+      "subbieResourceRef": 13,
+      "utr": "8786438047",
+      "partnerUtr": null,
+      "crn":  null,
+      "nino": "AB623456C"
+    }
+  ],
+  "verificationBatch": {
+    "verificationBatchId": 99,
+    "status": "VALIDATED",
+    "verificationNumber": null
+  },
+  "verifications": [
+    {
+      "verificationId": 1001,
+      "matched": "Y",
+      "verificationNumber": "V0000000001",
+      "taxTreatment": "0",
+      "verificationBatchId": 99,
+      "subcontractorId": 1,
+      "actionIndicator": "VERIFY",
+      "proceed": "Y",
+      "verificationResourceRef": 43
+    },
+    {
+      "verificationId": 1003,
+      "matched": null,
+      "verificationNumber": null,
+      "taxTreatment": null,
+      "verificationBatchId": 99,
+      "subcontractorId": 10908,
+      "actionIndicator": "A",
+      "proceed": "Y",
+      "verificationResourceRef": 13
+    }
+  ],
+  "submission": {
+    "submissionId": 555,
+    "activeObjectId": 99,
+    "status": "SUBMITTED_NO_RECEIPT",
+    "submissionRequestDate": "2026-04-01T10:00:00"
+  },
+  "monthlyReturn": {
+    "monthlyReturnId": 777,
+    "decNoMoreSubPayments": null
+  },
+  "monthlyReturnSubmission": {
+    "submissionId": 888,
+    "submissionRequestDate": "2026-04-01T10:00:00"
+  }
+}

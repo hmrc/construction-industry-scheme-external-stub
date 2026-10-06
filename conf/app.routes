@@ -33,8 +33,9 @@ GET        /cis/subcontractors/:cisId                               uk.gov.hmrc.
 GET        /cis/subcontractor/:cisId/:subbieResourceRef/delete-status   uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubcontractorController.getSubcontractorForDelete(cisId: String, subbieResourceRef: Long)
 GET        /cis/subcontractor/:cisId/:subbieResourceRef             uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubcontractorController.getSubcontractor(cisId: String, subbieResourceRef: Long)
 POST       /cis/subcontractor/delete                                uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubcontractorController.deleteSubcontractor
-POST        /cis/subcontractor/update                               uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubcontractorController.updateSubcontractor
-POST        /cis/subcontractor/edit                                 uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubcontractorController.updateSubcontractorForEdit
+POST       /cis/subcontractor/update                                uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubcontractorController.updateSubcontractor
+POST       /cis/subcontractor/edit                                  uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubcontractorController.updateSubcontractorForEdit
+POST       /cis/subcontractor/final-validation/update               uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.SubcontractorController.updateSubcontractorForFinalValidation()
 
 POST       /cis/monthly-return-item/update                          uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.MonthlyReturnController.updateMonthlyReturnItem()
 GET        /cis/verification-batch/newest/:instanceId               uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.VerificationController.getNewestVerificationBatch(instanceId: String)
@@ -43,7 +44,7 @@ GET        /cis/verification-batch/current/:instanceId              uk.gov.hmrc.
 POST       /cis/verification-batch/create                           uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.VerificationController.createVerificationBatchAndVerifications()
 POST       /cis/verification-batch/modify                           uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.VerificationController.modifyVerifications()
 
-POST       /cis/verification/delete                                     uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.VerificationController.deleteVerification()
+POST       /cis/verification/delete                                 uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.VerificationController.deleteVerification()
 POST       /cis/verification/submission/create                      uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.VerificationController.createSubmissionAndUpdateVerifications()
 POST       /cis/verification/submission/update                      uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.VerificationController.updateVerificationSubmission()
 POST       /cis/verification/response/process                       uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy.VerificationController.processVerificationResponseFromChris()
@@ -62,13 +63,13 @@ GET        /cis/has-client                                          uk.gov.hmrc.
 POST       /cis/prepop-contractor                                   uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.rdsDataCacheProxy.PrepopController.getSchemePrepopByKnownFacts
 POST       /cis/prepop-subcontractor                                uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.rdsDataCacheProxy.PrepopController.getSubcontractorPrepopByKnownFacts
 
-POST       /cis/enqueue-message                                      uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.rdsDataCacheProxy.UdasQueueController.enqueueMessage()
+POST       /cis/enqueue-message                                     uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.rdsDataCacheProxy.UdasQueueController.enqueueMessage()
 
 # stubbed client-exchange-proxy routes
 GET        /:serviceId/:credentialId/:agentId/clientlist            uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.clientExchangeProxy.ClientlistController.updateClientList(serviceId, credentialId, agentId)
 
 # stubbed iass routes
-#GET        /:service/:credential/:agentId/clientlist                uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.iass.StubController.clientlist(service: String, credential: String, agentId: String)
+#GET        /:service/:credential/:agentId/clientlist               uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.iass.StubController.clientlist(service: String, credential: String, agentId: String)
 
 # stubbed chris routes
 POST       /submission/ChRIS/CISR/Filing/sync/CIS300MR              uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.chris.ChrisController.submitCISMessage()

@@ -63,6 +63,7 @@
                     <Subcontractor>
                         <Name>
                             <Fore>John</Fore>
+                            <Fore>Peter</Fore>
                             <Sur>Smith</Sur>
                         </Name>
                         <TradingName>ACME</TradingName>

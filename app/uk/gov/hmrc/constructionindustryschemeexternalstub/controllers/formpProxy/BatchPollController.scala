@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.constructionindustryschemeexternalstub.controllers.formpProxy
 
-import play.api.Logging
+import play.api.{Configuration, Logging}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.constructionindustryschemeexternalstub.utils.ResourceHelper
@@ -26,7 +26,8 @@ import javax.inject.Inject
 
 class BatchPollController @Inject() (
   resourceHelper: ResourceHelper,
-  cc: ControllerComponents
+  cc: ControllerComponents,
+  configuration: Configuration
 ) extends BackendController(cc)
     with Logging {
 
@@ -38,9 +39,17 @@ class BatchPollController @Inject() (
   private val getBatchPollSubmissions200EmptyResponsePath =
     s"$batchPollResponsePath/getBatchPollSubmissions-200-empty-response.json"
 
+  private val getBatchPollSubmissions200MissingProceedResponsePath =
+    s"$batchPollResponsePath/getBatchPollSubmissions-200-missingProceed-response.json"
+
+  // The backend calls this endpoint without query params, so a scenario can also be set via config,
+  // e.g. `sbt run -Dstub.batchPoll.defaultScenario=missingProceed`
+  private val defaultScenario: Option[String] =
+    configuration.getOptional[String]("stub.batchPoll.defaultScenario")
+
   def getBatchPollSubmissions: Action[AnyContent] =
     Action { request =>
-      request.getQueryString("scenario") match {
+      request.getQueryString("scenario").orElse(defaultScenario) match {
         case Some("500") =>
           logger.warn("[BatchPollController][getBatchPollSubmissions] Scenario 500 - returning Unexpected error")
           InternalServerError(Json.obj("message" -> "Unexpected error"))
@@ -50,6 +59,12 @@ class BatchPollController @Inject() (
         case Some("000") =>
           logger.info("[BatchPollController][getBatchPollSubmissions] Scenario 000 - returning empty submissions")
           Ok(Json.parse(resourceHelper.resourceAsString(getBatchPollSubmissions200EmptyResponsePath)))
+
+        case Some("missingProceed") =>
+          logger.info(
+            "[BatchPollController][getBatchPollSubmissions] Scenario missingProceed - returning verification submission with batch ref 6"
+          )
+          Ok(Json.parse(resourceHelper.resourceAsString(getBatchPollSubmissions200MissingProceedResponsePath)))
 
         case _ =>
           logger.info("[BatchPollController][getBatchPollSubmissions] Returning batch poll submissions")

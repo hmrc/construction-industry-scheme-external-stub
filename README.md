@@ -2730,6 +2730,8 @@ To trigger the happy path, ensure you provide a valid request body:
 | `1`, `777` | `getCurrentVerificationBatch-200-verificationBatchStatus-started-response.json` |
 | `800`, `125`, `150`, `175` | `getCurrentVerificationBatch-200-verificationBatchStatus-chris-response.json` |
 | `275` | `getCurrentVerificationBatch-200-verificationBatchStatus-chris-response-insufficient.json` |
+| `850` | `getCurrentVerificationBatch-200-emptyVerifications-response.json` (no verifications) |
+| `851` | `getCurrentVerificationBatch-200-missingVerificationResourceRef-response.json` (first verification has no `verificationResourceRef`) |
 | any other | `getCurrentVerificationBatch-200-verificationBatchStatus-none-response.json` |
 
 #### Happy Path (Agent)
@@ -3068,6 +3070,8 @@ The response includes:
 * Request body: N/A
 * Response status: `200`
 * Response body: `resources/verification/getSubmissionWithVerificationBatch-200-response.json`
+
+`verificationBatchResourceRef = 6` returns `getSubmissionWithVerificationBatch-200-missingProceed-response.json` instead (verifications with `proceed` null and `actionIndicator` `VERIFY`). It is reached by the batch poller via the `missingProceed` scenario of `GET /cis/batchpoll-submissions`. The backend calls that endpoint without query params, so set the scenario at startup: `sbt run -Dstub.batchPoll.defaultScenario=missingProceed`.
 
 #### Happy Path (Agent)
 

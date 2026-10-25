@@ -1,0 +1,14 @@
+{
+  "verificationSubmissions": [
+    {
+      "submissionId": 90001,
+      "submissionType": "VERIFICATIONS",
+      "taxOfficeNumber": "123",
+      "taxOfficeReference": "AB456",
+      "instanceId": "10001",
+      "status": "ACCEPTED",
+      "verificationBatchResourceRef": 6
+    }
+  ],
+  "monthlyReturnSubmissions": []
+}

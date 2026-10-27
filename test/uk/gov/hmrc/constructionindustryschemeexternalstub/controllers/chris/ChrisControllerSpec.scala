@@ -354,6 +354,38 @@ class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar wi
       contentAsString(response) mustBe "FATAL-" + correlationId
     }
 
+    "return schema validation error response for submitCISMessage when TON/TOR is in schemaValidationErrorFilter" in {
+      val correlationId = "CORR-SCHEMA-1"
+      val cisMessage    =
+        <GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
+          <Header>
+            <MessageDetails>
+              <Class>IR-CIS-CIS300MR</Class>
+              <CorrelationID>{correlationId}</CorrelationID>
+            </MessageDetails>
+          </Header>
+          <GovTalkDetails>
+            <Keys>
+              <Key Type="TaxOfficeNumber">754</Key>
+              <Key Type="TaxOfficeReference">EZ00175</Key>
+            </Keys>
+          </GovTalkDetails>
+          <Body/>
+        </GovTalkMessage>
+
+      when(
+        mockResourceHelper.resourceAsString(
+          eqTo("/resources/monthlyNilReturns/submitCISMessage-schemaValidationError-response.xml")
+        )
+      )
+        .thenReturn("SCHEMA-[correlationId]")
+
+      val response = testInstance.submitCISMessage().apply(postRequest.withXmlBody(cisMessage))
+
+      status(response) mustBe OK
+      contentAsString(response) mustBe "SCHEMA-" + correlationId
+    }
+
     "return SUBMITTED polling response on first poll" in {
       val correlationId = "CORR-ACK-1"
       val pollCount     = 0

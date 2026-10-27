@@ -54,6 +54,8 @@ class ChrisController @Inject() (
     s"$monthlyNilReturnResponsePath/submitCISMessage-fatalError-response.xml"
   private val submitCISMessage_businessError_ResponsePath         =
     s"$monthlyNilReturnResponsePath/submitCISMessage-businessError-response.xml"
+  private val submitCISMessage_schemaValidationError_ResponsePath =
+    s"$monthlyNilReturnResponsePath/submitCISMessage-schemaValidationError-response.xml"
   private val submitCISMessage_irMarkMismatchError_ResponsePath   =
     s"$monthlyNilReturnResponsePath/submitCISMessage-irMarkMismatchError-response.xml"
   private val submitCISMessage_delete_ResponsePath                =
@@ -115,7 +117,9 @@ class ChrisController @Inject() (
       request = request,
       regime = "IR-CIS-CIS300MR",
       acknowledgementResponsePath = submitCISMessage_acknowledgement_ResponsePath,
-      fatalErrorResponsePath = submitCISMessage_fatalError_ResponsePath
+      fatalErrorResponsePath = submitCISMessage_fatalError_ResponsePath,
+      schemaValidationErrorFilter = config.schemaValidationErrorFilter,
+      schemaValidationErrorResponsePath = submitCISMessage_schemaValidationError_ResponsePath
     )
   }
 
@@ -220,7 +224,9 @@ class ChrisController @Inject() (
     request: Request[AnyContent],
     regime: String,
     acknowledgementResponsePath: String,
-    fatalErrorResponsePath: String
+    fatalErrorResponsePath: String,
+    schemaValidationErrorFilter: Seq[String] = Seq.empty,
+    schemaValidationErrorResponsePath: String = ""
   ): Result = {
     val message          = request.body.asXml.get
     val correlationId    = (message \ "Header" \ "MessageDetails" \ "CorrelationID").text
@@ -248,6 +254,17 @@ class ChrisController @Inject() (
       val statusCode = taxOfficeNumber.toInt
       logger.info(s"[ChrisStub] Simulating $statusCode for taxOfficeNumber=$taxOfficeNumber corrId=$correlationId")
       Status(statusCode)("<error>Simulated ChRIS server error</error>").as("application/xml")
+    } else if (schemaValidationErrorFilter.contains(s"$taxOfficeNumber/$taxOfficeReference")) {
+      logger.info(
+        s"[ChrisStub] Simulating schema validation error for $taxOfficeNumber/$taxOfficeReference corrId=$correlationId"
+      )
+      Ok(
+        replaceCorrelationId(
+          resourceHelper.resourceAsString(schemaValidationErrorResponsePath),
+          correlationId,
+          pollingUrlHost
+        )
+      )
     } else {
       service.initialCisStatus(regime, taxOfficeNumber, taxOfficeReference) match {
         case FATAL_ERROR =>

@@ -367,7 +367,7 @@ class ChrisControllerSpec extends AnyWordSpec with Matchers with MockitoSugar wi
           <GovTalkDetails>
             <Keys>
               <Key Type="TaxOfficeNumber">754</Key>
-              <Key Type="TaxOfficeReference">EZ00175</Key>
+              <Key Type="TaxOfficeReference">EZ00325</Key>
             </Keys>
           </GovTalkDetails>
           <Body/>

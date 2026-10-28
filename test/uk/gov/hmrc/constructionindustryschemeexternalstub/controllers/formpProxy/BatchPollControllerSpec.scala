@@ -20,6 +20,7 @@ import org.mockito.Mockito.*
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.Configuration
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{AnyContentAsEmpty, ControllerComponents, Result}
 import play.api.test.FakeRequest
@@ -62,6 +63,37 @@ class BatchPollControllerSpec extends AnyFreeSpec with Matchers with MockitoSuga
       contentAsJson(result) mustBe nonEmptyResponse
 
       verify(mockResourceHelper).resourceAsString(nonEmptyPath)
+    }
+
+    "returns the missing-proceed submission for scenario missingProceed" in new Setup {
+      when(mockResourceHelper.resourceAsString(missingProceedPath))
+        .thenReturn(nonEmptyResponse.toString)
+
+      val result: Future[Result] =
+        controller.getBatchPollSubmissions()(makeGetRequest(Some("missingProceed")))
+
+      status(result) mustBe OK
+      contentAsJson(result) mustBe nonEmptyResponse
+
+      verify(mockResourceHelper).resourceAsString(missingProceedPath)
+    }
+
+    "returns the missing-proceed submission when stub.batchPoll.defaultScenario is configured" in new Setup {
+      when(mockResourceHelper.resourceAsString(missingProceedPath))
+        .thenReturn(nonEmptyResponse.toString)
+
+      val configured =
+        new BatchPollController(
+          resourceHelper = mockResourceHelper,
+          cc = stubControllerComponents(),
+          configuration = Configuration("stub.batchPoll.defaultScenario" -> "missingProceed")
+        )
+
+      val result: Future[Result] =
+        configured.getBatchPollSubmissions()(makeGetRequest())
+
+      status(result) mustBe OK
+      verify(mockResourceHelper).resourceAsString(missingProceedPath)
     }
 
     "returns 200 with empty submissions for scenario 000" in new Setup {
@@ -118,13 +150,17 @@ class BatchPollControllerSpec extends AnyFreeSpec with Matchers with MockitoSuga
     val nonEmptyPath: String =
       "/resources/batchPoll/getBatchPollSubmissions-200-response.json"
 
+    val missingProceedPath: String =
+      "/resources/batchPoll/getBatchPollSubmissions-200-missingProceed-response.json"
+
     val emptyPath: String =
       "/resources/batchPoll/getBatchPollSubmissions-200-empty-response.json"
 
     val controller =
       new BatchPollController(
         resourceHelper = mockResourceHelper,
-        cc = cc
+        cc = cc,
+        configuration = Configuration.empty
       )
 
     def makeGetRequest(

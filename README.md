@@ -2730,6 +2730,8 @@ To trigger the happy path, ensure you provide a valid request body:
 | `1`, `777` | `getCurrentVerificationBatch-200-verificationBatchStatus-started-response.json` |
 | `800`, `125`, `150`, `175` | `getCurrentVerificationBatch-200-verificationBatchStatus-chris-response.json` |
 | `275` | `getCurrentVerificationBatch-200-verificationBatchStatus-chris-response-insufficient.json` |
+| `850` | `getCurrentVerificationBatch-200-emptyVerifications-response.json` (no verifications) |
+| `851` | `getCurrentVerificationBatch-200-missingVerificationResourceRef-response.json` (first verification has no `verificationResourceRef`) |
 | any other | `getCurrentVerificationBatch-200-verificationBatchStatus-none-response.json` |
 
 #### Happy Path (Agent)
@@ -3043,6 +3045,61 @@ This is executed in a single transaction in FormP Proxy.
 #### Response
 - 204 No Content
 
+### Get batch poll submissions
+
+**Endpoint**: `GET /cis/batchpoll-submissions`
+
+**Description**: Returns the submissions the backend batch poller should poll (F1). The response contains `verificationSubmissions` and `monthlyReturnSubmissions`.
+
+* Authentication: none
+* Request body: N/A
+* Optional query parameter: `scenario`
+
+| Scenario | Response |
+|----------|----------|
+| _(none)_ / any other | `200` with `batchPoll/getBatchPollSubmissions-200-response.json` (verification batch resource ref `5`, `proceed` populated) |
+| `000` | `200` with `batchPoll/getBatchPollSubmissions-200-empty-response.json` (no submissions) |
+| `500` | `500` `{"message": "Unexpected error"}` |
+| `502` | `502` `{"message": "formp failed"}` |
+| `missingProceed` | `200` with `batchPoll/getBatchPollSubmissions-200-missingProceed-response.json` (one verification submission, `instanceId` `10001`, verification batch resource ref `6`) |
+
+#### Setting the scenario when the backend is the caller
+
+The backend calls this endpoint without query parameters, so `?scenario=` cannot be used from the batch poller. Set a default scenario when starting the stub instead. A `scenario` query parameter, if present, takes precedence.
+
+```bash
+sbt run -Dstub.batchPoll.defaultScenario=missingProceed
+```
+
+#### Testing verification batch polling locally
+
+Reproduces the case where a verification has `proceed` null (the backend `proceedVerification` failure fixed in DTR-9497).
+
+1. Start the stub with the `missingProceed` default scenario (see above) and confirm the response:
+
+   ```bash
+   curl -s localhost:6997/cis/batchpoll-submissions
+   # expect verificationSubmissions[0].verificationBatchResourceRef = 6
+   ```
+
+2. Confirm the follow-up call (F7) returns `proceed: null`:
+
+   ```bash
+   curl -s localhost:6997/cis/verification/submission-batch/10001/6 | grep proceed
+   ```
+
+3. In `construction-industry-scheme`, enable the poller and shorten the schedule (revert afterwards):
+   * `schedules.batch-poller-job.enabled = true`
+   * `schedules.batch-poller-job.expression = "0_0/1_*_?_*_*"` (every minute; the default is every 30 minutes)
+
+4. Point the backend at this stub for formp-proxy, register the internal-auth token as described in the backend README, then run the backend with `sbt run`.
+
+5. Check the backend logs on the next tick:
+   * `[SubmissionService][syncVerificationSessionForPolling] Successfully fetched F7 verification ...` should appear.
+   * `Failed to build verification context: ... proceedVerification ...` should **not** appear. It does on a backend build without the DTR-9497 fix.
+
+Run the stub without `stub.batchPoll.defaultScenario` to get the default response as a control.
+
 ### Get submission with verification batch
 
 **Endpoint**: `GET /cis/verification/submission-batch/:instanceId/:verificationBatchResourceRef`
@@ -3068,6 +3125,8 @@ The response includes:
 * Request body: N/A
 * Response status: `200`
 * Response body: `resources/verification/getSubmissionWithVerificationBatch-200-response.json`
+
+`verificationBatchResourceRef = 6` returns `getSubmissionWithVerificationBatch-200-missingProceed-response.json` instead (verifications with `proceed` null and `actionIndicator` `VERIFY`). It is reached by the batch poller via the `missingProceed` scenario of `GET /cis/batchpoll-submissions`; see [Get batch poll submissions](#get-batch-poll-submissions).
 
 #### Happy Path (Agent)
 

@@ -475,6 +475,31 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
         verify(mockResourceHelper).resourceAsString(expectedResponsePath)
       }
 
+      Seq(
+        "850" -> "getCurrentVerificationBatch-200-emptyVerifications-response.json",
+        "851" -> "getCurrentVerificationBatch-200-missingVerificationResourceRef-response.json"
+      ).foreach { case (id, fixture) =>
+        s"select the $fixture current-verification response for instanceId $id" in new Setup {
+          val expectedResponsePath = s"/resources/verification/$fixture"
+
+          when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
+            .thenReturn(Some(EmployerReference("200", "")))
+          when(mockEnrolmentsHelper.agentEnrolmentsOpt(any()))
+            .thenReturn(None)
+          when(mockResourceHelper.resourceAsString(expectedResponsePath))
+            .thenReturn(Json.obj().toString())
+
+          val request = FakeRequest(GET, s"/cis/verification-batch/current/$id")
+
+          val result = controller.getCurrentVerificationBatch(id)(request)
+
+          status(result) mustBe OK
+          contentAsJson(result) mustBe Json.obj()
+
+          verify(mockResourceHelper).resourceAsString(expectedResponsePath)
+        }
+      }
+
       "returns 502 BadGateway for taxOfficeNumber = 502 (contractor enrolment)" in new Setup {
         when(mockEnrolmentsHelper.contractorEnrolmentsOpt(any()))
           .thenReturn(Some(EmployerReference("502", "")))
@@ -1575,6 +1600,22 @@ class VerificationControllerSpec extends AnyFreeSpec with SpecBase {
 
       verify(mockResourceHelper).resourceAsString(responsePath)
       verifyNoInteractions(mockEnrolmentsHelper)
+    }
+
+    "returns the missing-proceed snapshot for verificationBatchResourceRef 6" in new Setup {
+      val missingProceedPath =
+        "/resources/verification/getSubmissionWithVerificationBatch-200-missingProceed-response.json"
+
+      when(mockResourceHelper.resourceAsString(missingProceedPath))
+        .thenReturn(Json.obj().toString())
+
+      val result: Future[Result] =
+        controller.getSubmissionWithVerificationBatchByRefs("10001", 6L)(FakeRequest(GET, "/"))
+
+      status(result) mustBe OK
+      contentAsJson(result) mustBe Json.obj()
+
+      verify(mockResourceHelper).resourceAsString(missingProceedPath)
     }
 
     "returns 200 OK through the application route without authentication or session headers" in {

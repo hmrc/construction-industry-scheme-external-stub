@@ -62,6 +62,10 @@ class VerificationController @Inject() (
     s"$verificationResponsePath/getCurrentVerificationBatch-200-verificationBatchStatus-chris-response.json"
   private val getCurrentVerificationBatch_200_verificationBatchStatus_Insufficient_chris_ResponsePath =
     s"$verificationResponsePath/getCurrentVerificationBatch-200-verificationBatchStatus-chris-response-insufficient.json"
+  private val getCurrentVerificationBatch_200_emptyVerifications_ResponsePath                         =
+    s"$verificationResponsePath/getCurrentVerificationBatch-200-emptyVerifications-response.json"
+  private val getCurrentVerificationBatch_200_missingVerificationResourceRef_ResponsePath             =
+    s"$verificationResponsePath/getCurrentVerificationBatch-200-missingVerificationResourceRef-response.json"
   private val getCurrentVerificationBatch_200_unmatched_ResponsePath                                  =
     s"$verificationResponsePath/getCurrentVerificationBatch-200-unmatched-response.json"
   private val getLastSubmittedVerificationBatch_200_AllVerified_ResponsePath                          =
@@ -80,6 +84,8 @@ class VerificationController @Inject() (
     s"$verificationResponsePath/createVerificationBatchAndVerifications-201-response.json"
   private val createSubmissionForVerification_201_ResponsePath                                        =
     s"$verificationResponsePath/createSubmissionForVerification-201-response.json"
+  private val getSubmissionWithVerificationBatch_200_MissingProceed_ResponsePath                      =
+    s"$verificationResponsePath/getSubmissionWithVerificationBatch-200-missingProceed-response.json"
   private val getSubmissionWithVerificationBatch_200_ResponsePath                                     =
     s"$verificationResponsePath/getSubmissionWithVerificationBatch-200-response.json"
   private val getSubmittedVerifications_200_ResponsePath                                              =
@@ -155,6 +161,8 @@ class VerificationController @Inject() (
             case "250" => getCurrentVerificationBatch_200_unmatched_ResponsePath
             case "275" => getCurrentVerificationBatch_200_verificationBatchStatus_Insufficient_chris_ResponsePath
             case "777" => getCurrentVerificationBatch_200_verificationBatchStatus_started_ResponsePath
+            case "850" => getCurrentVerificationBatch_200_emptyVerifications_ResponsePath
+            case "851" => getCurrentVerificationBatch_200_missingVerificationResourceRef_ResponsePath
             case _     => getCurrentVerificationBatch_200_verificationBatchStatus_none_ResponsePath
           }
 
@@ -276,13 +284,13 @@ class VerificationController @Inject() (
         s"[VerificationController][getSubmissionWithVerificationBatchByRefs] Returning stubbed response for instanceId=$instanceId, verificationBatchResourceRef=$verificationBatchResourceRef"
       )
 
-      Ok(
-        Json.parse(
-          resourceHelper.resourceAsString(
-            getSubmissionWithVerificationBatch_200_ResponsePath
-          )
-        )
-      )
+      val responsePath =
+        verificationBatchResourceRef match {
+          case 6 => getSubmissionWithVerificationBatch_200_MissingProceed_ResponsePath
+          case _ => getSubmissionWithVerificationBatch_200_ResponsePath
+        }
+
+      Ok(Json.parse(resourceHelper.resourceAsString(responsePath)))
     }
 
   def getSubmittedVerifications: Action[JsValue] =

@@ -182,7 +182,7 @@ These TORs return the base fixture with a specific `uniqueId` value, which is us
 | `EZ10700` | `777` — SUBMITTED_NO_RECEIPT scenario (null `verificationNumber`) |
 | `EZ00125` | `125` |
 | `EZ00150` | `150` |
-| `EZ00175` | `175` |
+| `EZ00175` | `175` — reserved for the Accessibility Audit (inactive batch); do not reuse for ChRIS submit scenarios |
 | `EZ00200` | `200` |
 | `EZ00225` | `225` |
 | `EZ00250` | `250` |
@@ -3719,6 +3719,75 @@ staging = https://construction-industry-scheme-external-stub.protected.mdtp:443/
     <Body/>
 </GovTalkMessage>
 ```
+###### HTTP 200 - Schema Validation Error (3001 business error, no Polling)
+
+- Affinity Group: Organisation
+- Enrolment Key: HMRC-CIS-ORG
+- Identifier Name: TaxOfficeNumber
+- Identifier Value: 754
+- Identifier Name: TaxOfficeReference
+- Identifier Value: **EZ00325**
+
+Returns a ChRIS 3001 business error whose Body contains HMRC-ERIC 5012 schema validation errors (invalid `AOref`), as ChRIS does when the `CISreturn` fails schema validation. Configured via `stub.endpoint.submission.cis.filing.schemaValidationErrorFilter` in `conf/application.conf`.
+
+> **Note:** do not reuse `EZ00175` for this scenario. It is used by the Accessibility Audit (verification batch "Inactive batch", instanceId `175`) and any return submitted with it would fail with this error.
+
+- Request body: **See valid request body above.**
+
+
+- Response status: `200`
+- Response body:
+
+```xml
+<GovTalkMessage xmlns="http://www.govtalk.gov.uk/CM/envelope">
+    <EnvelopeVersion>2.0</EnvelopeVersion>
+    <Header>
+        <MessageDetails>
+            <Class>IR-CIS-CIS300MR</Class>
+            <Qualifier>error</Qualifier>
+            <Function>submit</Function>
+            <CorrelationID>[correlationId]</CorrelationID>
+            <ResponseEndPoint/>
+            <Transformation>XML</Transformation>
+            <GatewayTimestamp/>
+        </MessageDetails>
+        <SenderDetails/>
+    </Header>
+    <GovTalkDetails>
+        <Keys/>
+        <GovTalkErrors>
+            <Error>
+                <RaisedBy>ChRIS</RaisedBy>
+                <Number>3001</Number>
+                <Type>business</Type>
+                <Text>Your submission failed due to business validation errors. Please see below for details.</Text>
+            </Error>
+        </GovTalkErrors>
+    </GovTalkDetails>
+    <Body>
+        <ErrorResponse xmlns="http://www.govtalk.gov.uk/CM/errorresponse" SchemaVersion="2.0">
+            <Application>
+                <MessageCount>2</MessageCount>
+            </Application>
+            <Error>
+                <RaisedBy>HMRC-ERIC</RaisedBy>
+                <Number>5012</Number>
+                <Type>Schema Validation</Type>
+                <Text>cvc-pattern-valid: Value '70PQ00160798' is not facet-valid with respect to pattern '[0-9]{3}P[A-Za-z][A-Za-z0-9]{8}' for type 'AOrefType'.</Text>
+                <Location>54:34</Location>
+            </Error>
+            <Error>
+                <RaisedBy>HMRC-ERIC</RaisedBy>
+                <Number>5012</Number>
+                <Type>Schema Validation</Type>
+                <Text>cvc-type.3.1.3: The value '70PQ00160798' of element 'AOref' is not valid.</Text>
+                <Location>54:34</Location>
+            </Error>
+        </ErrorResponse>
+    </Body>
+</GovTalkMessage>
+```
+
 **Endpoint**: `POST /submission/ChRIS/CISR/Filing/sync/CISVERIFY`
 
 **Description**: A soap message constructed for subcontractor verification and submitted to the ChRIS service.

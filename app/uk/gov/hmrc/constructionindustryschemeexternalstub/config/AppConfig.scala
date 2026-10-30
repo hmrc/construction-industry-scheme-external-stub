@@ -42,10 +42,14 @@ class AppConfig @Inject() (config: Configuration):
 
   val appName: String = config.get[String]("appName")
 
-  lazy val acknowledgeFilter: Seq[String] =
+  lazy val acknowledgeFilter: Seq[String]           =
     config.get[Seq[String]]("stub.endpoint.submission.cis.filing.acknowledgeFilter")
-  lazy val fatalErrorFilter: Seq[String]  =
+  lazy val fatalErrorFilter: Seq[String]            =
     config.get[Seq[String]]("stub.endpoint.submission.cis.filing.fatalErrorFilter")
+  lazy val schemaValidationErrorFilter: Seq[String] =
+    config
+      .getOptional[Seq[String]]("stub.endpoint.submission.cis.filing.schemaValidationErrorFilter")
+      .getOrElse(Seq.empty)
 
   lazy val verifyAcknowledgeFilter: Seq[String] =
     config.get[Seq[String]]("stub.endpoint.submission.cis.verify.acknowledgeFilter")
